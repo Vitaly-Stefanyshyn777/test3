@@ -1,0 +1,515 @@
+.personalData {
+  --grey-for-cards: #c0c0c0;
+  background-color: #ffffff;
+  border-radius: 12px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.title {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.description {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.inputGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.sectionHeader {
+  display: flex;
+
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sectionTitle {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 140%;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+.fileInfo {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+  opacity: 0.6;
+}
+
+.profilePhotoSection {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  border-radius: 12px;
+  justify-content: space-between;
+}
+
+.profilePhotoBlock {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.profilePhoto {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profileImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholderPhoto {
+  border-radius: 67px;
+  width: 92px;
+  height: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9f9f9;
+}
+
+.placeholderIcon {
+  width: 32px;
+  height: 32px;
+  fill: rgba(14, 14, 14, 0.3);
+}
+
+.photoActions {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.changePhotoBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--black);
+  color: var(--white);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  transition: background 0.35s ease, color 0.35s ease, box-shadow 0.35s ease,
+    transform 0.25s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  border-radius: 15px;
+  padding: 16px 24px;
+}
+
+.changePhotoBtn:hover {
+  background: var(--violet);
+  color: var(--white);
+  transform: translateY(-1px) scale(1.015);
+}
+
+.changePhotoBtn:active {
+  transform: translateY(0) scale(1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+}
+
+/* Sync icon/text colors on hover */
+.changePhotoBtn:hover .btnIcon,
+.changePhotoBtn:hover span,
+.changePhotoBtn:hover svg,
+.changePhotoBtn:hover svg * {
+  color: var(--white);
+  fill: var(--white);
+  stroke: var(--white);
+}
+
+.fileInput {
+  display: none;
+}
+
+.btnIcon {
+  font-size: 16px;
+  font-weight: bold;
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.removePhotoBtn {
+  background: var(--grey-for-cards);
+  border: 1px solid hsl(0, 0%, 90%);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  border-radius: 15px;
+  padding: 16px 24px;
+
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--white);
+}
+
+.removePhotoBtnActive {
+  border-radius: 15px;
+  padding: 16px 24px;
+  width: 173px;
+  height: 54px;
+  background: var(--black);
+  border-color: transparent;
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.removePhotoBtn:hover {
+  background: #f0f0f0;
+  border-color: #d0d0d0;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.inputContainer {
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIconWrapper {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  color: rgba(14, 14, 14, 0.4);
+}
+
+.inputIcon {
+  width: 20px;
+  height: 20px;
+  fill: rgba(14, 14, 14, 0.4);
+}
+
+.input {
+  width: 100%;
+  padding: 16px 16px 16px 48px;
+  border-radius: 12px;
+  background: #f9f9f9;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--black);
+  transition: all 0.2s ease;
+  line-height: 130%;
+  color: var(--black);
+  max-width: 542px;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: #e5e5e5;
+}
+
+.wrapperBlock {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.wrapperBlock > * {
+  flex: 1;
+  width: 100%;
+}
+
+.wrapperBlockSingle {
+  max-width: 542px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--violet);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.input::placeholder {
+  color: rgba(14, 14, 14, 0.4);
+}
+
+.saveSection {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.saveBtn {
+  padding: 12px 24px;
+  background: var(--violet);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 16px;
+  transition: background 0.3s ease, transform 0.2s ease;
+
+  height: 66px;
+}
+
+.saveBtn:hover {
+  background: var(--black);
+  transform: translateY(-1px);
+}
+
+.saveBtn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 1000px) {
+  .personalData {
+    border-radius: mvw(12);
+    gap: mvw(24);
+    overflow: visible;
+  }
+
+  .header {
+    gap: mvw(8);
+    border-radius: mvw(12);
+    padding: mvw(16);
+    height: mvw(160);
+    background: var(--bg-color);
+    display: none;
+  }
+
+  .backBtn {
+    gap: mvw(8);
+    border-radius: mvw(12);
+    padding: mvw(12) mvw(16);
+    height: auto;
+    font-size: mvw(14);
+    margin-bottom: mvw(8);
+    display: flex;
+  }
+
+  .backBtn svg {
+    width: mvw(16);
+    height: mvw(16);
+  }
+
+  .title {
+    font-size: mvw(20);
+    line-height: 120%;
+  }
+
+  .description {
+    font-size: mvw(14);
+    line-height: 140%;
+  }
+
+  .form {
+    gap: mvw(24);
+  }
+
+  .section {
+    gap: mvw(20);
+  }
+
+  .sectionTitle {
+    font-size: mvw(16);
+    line-height: 140%;
+  }
+
+  .fileInfo {
+    font-size: mvw(12);
+    line-height: 140%;
+  }
+
+  .profilePhotoSection {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: mvw(16);
+    border-radius: mvw(12);
+
+    padding: mvw(16);
+
+    /* height: mvw(160); */
+  }
+
+  .profilePhotoBlock {
+    width: 100%;
+    gap: mvw(12);
+  }
+
+  .profilePhoto {
+    width: mvw(60);
+    height: mvw(60);
+    border-radius: 50%;
+  }
+
+  .placeholderPhoto {
+    width: mvw(60);
+    height: mvw(60);
+    border-radius: 50%;
+  }
+
+  .placeholderIcon {
+    width: mvw(24);
+    height: mvw(24);
+  }
+
+  .sectionHeader {
+    flex: 1;
+    gap: mvw(6);
+  }
+
+  .photoActions {
+    width: 100%;
+    flex-direction: row;
+    gap: mvw(8);
+    align-items: center;
+  }
+
+  .changePhotoBtn {
+    flex: 1;
+    padding: mvw(12) mvw(20);
+    font-size: mvw(14);
+    border-radius: mvw(12);
+    justify-content: center;
+    height: mvw(52);
+    gap: mvw(8);
+  }
+
+  .btnIcon {
+    font-size: mvw(14);
+  }
+
+  .btnIcon svg {
+    width: mvw(12);
+    height: mvw(12);
+  }
+
+  .removePhotoBtn {
+    flex: 1;
+    padding: mvw(12) mvw(20);
+    font-size: mvw(14);
+    border-radius: mvw(12);
+    justify-content: center;
+    height: mvw(52);
+  }
+
+  .inputGroup {
+    gap: mvw(12);
+  }
+
+  .wrapperBlock {
+    flex-direction: column;
+    gap: mvw(12);
+  }
+
+  .inputContainer {
+    width: 100%;
+  }
+
+  .inputIconWrapper {
+    left: mvw(12);
+    width: mvw(18);
+    height: mvw(18);
+  }
+
+  .inputIcon {
+    width: mvw(18);
+    height: mvw(18);
+  }
+
+  .input {
+    padding: mvw(16) mvw(16) mvw(16) mvw(40);
+    border-radius: mvw(12);
+    font-size: mvw(14);
+    max-width: 100%;
+  }
+
+  .divider {
+    height: 1px;
+    display: none;
+  }
+
+  .saveSection {
+    justify-content: center;
+  }
+
+  .saveBtn {
+    width: 100%;
+    padding: mvw(16) mvw(24);
+    border-radius: mvw(16);
+    font-size: mvw(14);
+    height: mvw(48);
+  }
+}

@@ -1,0 +1,188 @@
+.filterSection {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 24px 24px 28px;
+  transition: all 0.3s ease-in-out;
+}
+
+.filterSection.collapsedSection {
+  gap: 0;
+  padding: 24px 24px 24px;
+  border-radius: 8px;
+}
+
+.sectionTitleContainer {
+  width: auto;
+  height: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  cursor: pointer;
+  color: var(--black);
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.sectionTitle {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.sectionContent {
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+  height: auto;
+  opacity: 1;
+}
+
+.sectionContent.collapsed {
+  height: 0;
+  opacity: 0;
+}
+
+.sectionContent.expanded {
+  height: auto;
+  opacity: 1;
+}
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #555;
+  transition: all 0.2s ease;
+  padding: 4px 0;
+}
+
+.radioInput {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.radioCircle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(14, 14, 14, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s ease;
+}
+
+.radioCircle::after {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--violet);
+  transform: scale(0);
+  transition: transform 0.2s ease;
+  margin: auto;
+}
+
+.radioInput:checked + .radioCircle {
+  border-color: var(--violet);
+}
+
+.radioInput:checked + .radioCircle::after {
+  transform: scale(1);
+}
+
+.radioText {
+  flex: 1;
+  line-height: 1.4;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 140%;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+@media (max-width: 1000px) {
+  .filterSection {
+    padding: mvw(16);
+    border-bottom: mvw(1) solid rgba(14, 14, 14, 0.1);
+    margin-bottom: 0;
+    gap: 0;
+  }
+
+  .filterSection:last-of-type {
+    border-bottom: none;
+  }
+
+  .sectionTitle {
+    font-size: mvw(16);
+    font-weight: 500;
+    line-height: 140%;
+    letter-spacing: -0.01em;
+    margin-bottom: 0;
+  }
+
+  .sectionTitleContainer {
+    margin-bottom: mvw(16);
+    padding: 0;
+  }
+
+  .sectionTitleContainer svg {
+    width: mvw(20);
+    height: mvw(2);
+  }
+
+  .radioGroup {
+    gap: 0;
+  }
+
+  .radioLabel {
+    font-size: mvw(14);
+    padding: 0;
+    margin-bottom: mvw(12);
+    gap: mvw(12);
+  }
+
+  .radioLabel:last-child {
+    margin-bottom: 0;
+  }
+
+  .radioLabel.selected .radioText {
+    color: var(--violet);
+  }
+
+  .radioCircle {
+    width: mvw(20);
+    height: mvw(20);
+  }
+
+  .radioCircle::after {
+    width: mvw(15);
+    height: mvw(15);
+    margin: auto;
+  }
+
+  .radioText {
+    font-size: mvw(14);
+    font-weight: 400;
+    line-height: 140%;
+    letter-spacing: -0.02em;
+  }
+}

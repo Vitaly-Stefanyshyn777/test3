@@ -1,0 +1,17 @@
+.divider {
+  padding: 45px 0;
+}
+
+.line {
+  height: 1px;
+  width: 100%;
+  background-color: rgba(14, 14, 14, 0.1);
+  border-radius: 1px;
+}
+
+@media (max-width: 1000px) {
+  .divider {
+    padding: mvw(24) 0;
+    display: none;
+  }
+}

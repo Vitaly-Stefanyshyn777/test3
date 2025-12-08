@@ -1,0 +1,254 @@
+.hero {
+  color: #fff;
+
+  border-radius: 1.04167vw;
+  align-items: center;
+  height: 29.7917vw;
+
+  margin: 0 auto;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  justify-content: center;
+  width: 98.75vw;
+  height: 582px;
+
+  background-color: #9f57ff;
+  background-image: url(/images/trainersBackground.png);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.heroContainer {
+  display: flex;
+}
+
+.heroContent {
+  gap: 56px;
+  flex: 1;
+}
+
+.heroContentBlock {
+  align-items: center;
+  text-align: center;
+  gap: 1.66667vw;
+  display: flex;
+  flex-direction: column;
+}
+
+.roiBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 10px 14px;
+  width: auto;
+  height: 46px;
+}
+
+.roiIcon {
+  font-size: 16px;
+}
+
+.roiIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.roiText {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 140%;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+
+.heroTitle {
+  font-family: var(--second-family);
+  font-weight: 800;
+  font-size: 72px;
+  line-height: 110%;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+
+.heroDescription {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--white);
+  width: 820px;
+}
+
+.heroActions {
+  display: flex;
+  gap: 13px;
+  margin-top: 10px;
+}
+
+.heroButtonPrimary,
+.heroButtonSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.heroButtonPrimary {
+  background: var(--violet);
+  color: white;
+}
+
+.heroButtonPrimary:hover {
+  background: #6a1b9a;
+  transform: translateY(-2px);
+}
+
+.heroButtonSecondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.heroButtonSecondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.heroNavigation {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.navArrow {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.navArrow:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.navArrow svg {
+  width: 20px;
+  height: 20px;
+  color: white;
+}
+
+.navDots {
+  display: flex;
+  gap: 8px;
+}
+
+.navDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.navDotActive {
+  background: white;
+}
+
+.navDot:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 1000px) {
+  .hero {
+    width: 100%;
+    border-radius: 0 0 mvw(16) mvw(16);
+    height: auto;
+    min-height: mvw(300);
+    border-radius: 0;
+    margin: 0;
+    padding: mvw(24) mvw(16);
+    background-color: #9f57ff;
+    background-image: url(/images/trainersBackground.png);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+
+  .heroContainer {
+    width: 100%;
+  }
+
+  .heroContent {
+    gap: mvw(24);
+    width: 100%;
+  }
+
+  .heroContentBlock {
+    gap: mvw(16);
+    align-items: center;
+    text-align: center;
+  }
+
+  .roiBanner {
+    gap: mvw(8);
+    padding: mvw(10) mvw(14);
+    height: auto;
+    border-radius: mvw(8);
+  }
+
+  .roiIcon {
+    font-size: mvw(16);
+  }
+
+  .roiIcon svg {
+    width: mvw(18);
+    height: mvw(18);
+  }
+
+  .roiText {
+    font-size: mvw(10);
+    line-height: 140%;
+  }
+
+  .heroTitle {
+    font-size: mvw(32);
+    line-height: 110%;
+    text-align: center;
+  }
+
+  .heroDescription {
+    font-size: mvw(14);
+    line-height: 140%;
+    text-align: center;
+    width: auto;
+  }
+}

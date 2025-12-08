@@ -1,0 +1,135 @@
+.filterSection {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 24px 24px 28px;
+  transition: all 0.3s ease-in-out;
+  border-bottom: 1px solid #e1e1e1;
+}
+
+.filterSection.collapsedSection {
+  gap: 0;
+  padding: 24px 24px 24px;
+  border-radius: 8px;
+}
+
+.sectionTitleContainer {
+  width: auto;
+  height: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  color: var(--black);
+}
+
+.sectionTitleContainer svg {
+  width: 16px;
+  height: 16px;
+}
+
+.sectionTitle {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.sectionContent {
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+  height: auto;
+  opacity: 1;
+}
+
+.sectionContent.collapsed {
+  height: 0;
+  opacity: 0;
+}
+
+.sectionContent.expanded {
+  height: auto;
+  opacity: 1;
+}
+
+.sizeButtons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sizeButton {
+  padding: 12px 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: var(--bg-color);
+  color: var(--black);
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 140%;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+  text-align: center;
+}
+
+.sizeButton:hover {
+  border-color: var(--violet);
+  color: var(--violet);
+  background: #f8f9fa;
+}
+
+.sizeButton.selected {
+  background: var(--violet);
+  color: white;
+  border-color: var(--violet);
+}
+
+.loading {
+  font-family: var(--font-family);
+  font-size: 14px;
+  color: rgba(14, 14, 14, 0.6);
+}
+
+@media (max-width: 1000px) {
+  .filterSection {
+    gap: mvw(20);
+    padding: mvw(20) mvw(16) mvw(24);
+    border-bottom: none;
+  }
+
+  .sectionTitle {
+    font-size: mvw(16);
+  }
+
+  .sectionTitleContainer svg {
+    width: mvw(16);
+    height: mvw(16);
+  }
+
+  .sizeButtons {
+    gap: mvw(12);
+  }
+
+  .sizeButton {
+    padding: mvw(12) mvw(20);
+    border-radius: mvw(10);
+    min-width: mvw(90);
+    font-size: mvw(14);
+  }
+}
+.error {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 140%;
+  color: var(--black);
+  text-align: center;
+  padding: 40px 20px;
+}

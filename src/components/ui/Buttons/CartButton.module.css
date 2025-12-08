@@ -1,0 +1,51 @@
+.root {
+  /* position: absolute; */
+  /* bottom: 20px;
+  right: 20px; */
+  width: 56px;
+  height: 56px;
+  background: var(--violet);
+  border: none;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #fff;
+}
+
+.root:hover {
+  background: var(--black);
+  color: var(--white);
+}
+
+.root svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.active {
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--black);
+}
+
+.active svg {
+  stroke: var(--black);
+}
+
+@media (max-width: 1000px) {
+  .root {
+    /* position: absolute; */
+    width: mvw(40);
+    height: mvw(40);
+    border-radius: mvw(8);
+    /* bottom: mvw(12);
+    right: mvw(12); */
+  }
+  .root svg {
+    width: mvw(18);
+    height: mvw(18);
+  }
+}

@@ -1,0 +1,574 @@
+.footer {
+  background-image: url(/images/Abstract-Background-Footer.png);
+  border-radius: 2.29167vw;
+  width: 100%;
+  max-width: 1896px;
+  height: auto;
+  display: flex;
+  padding: 90px 60px;
+  margin: 0 auto;
+  align-content: space-between;
+  flex-direction: column;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #9f57ff;
+}
+
+.footerTop {
+  margin: 0 auto;
+  width: 100%;
+  height: auto;
+}
+
+.logoContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 24px;
+  font-weight: 700;
+  fill: var(--white);
+}
+
+.logoIcon {
+  width: 51px;
+  height: 50px;
+  svg {
+    width: 51px;
+    height: 51px;
+  }
+}
+
+.brandLink {
+  color: #ffffff;
+  text-decoration: none;
+  position: relative;
+  transition: color 0.25s ease;
+  display: flex;
+  align-items: center;
+}
+
+.brandLink:hover,
+.brandLink:focus-visible {
+  color: #ffe680;
+}
+
+.authButtons {
+  display: flex;
+  gap: 16px;
+  height: 52px;
+  width: auto;
+  display: none;
+}
+
+.loginButton,
+.registerButton {
+  padding: 8px 24px;
+  border-radius: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.loginButton:hover,
+.loginButton:focus-visible,
+.registerButton:hover,
+.registerButton:focus-visible {
+  background: #0e0e0e;
+  color: #ffffff;
+}
+
+.loginButton {
+  background: transparent;
+  background: rgba(255, 254, 252, 0.15);
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--white);
+}
+
+.registerButton {
+  backdrop-filter: blur(11.699999809265137px);
+  background: var(--white);
+  color: #2a1454;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  color: #3b2d47;
+  width: 144px;
+}
+
+.footerMain {
+  display: flex;
+  justify-content: space-between;
+}
+
+.sectionTitle {
+  margin-bottom: 24px;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 130%;
+  text-transform: uppercase;
+  color: rgba(255, 254, 252, 0.56);
+}
+
+.contactInfo {
+  margin-bottom: 24px;
+}
+
+.contactLink {
+  display: block;
+  margin-bottom: 8px;
+  text-decoration: none;
+  opacity: 0.9;
+  transition: opacity 0.25s ease, color 0.25s ease;
+  color: #ffffff;
+}
+
+.phoneLink {
+  font-weight: 700;
+  font-size: 20px;
+  font-family: var(--second-family);
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 110%;
+  letter-spacing: -0.02em;
+  color: var(--white);
+}
+
+.mailLink {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 120%;
+  color: var(--white);
+}
+
+.contactLink:hover,
+.contactLink:focus-visible {
+  opacity: 1;
+  color: #ffffff;
+}
+
+.socialIcons {
+  display: flex;
+  gap: 12px;
+}
+
+.iconButton {
+  border: 2px solid rgba(255, 254, 252, 0.3);
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.2s ease;
+  border: 2px solid rgba(255, 254, 252, 0.3);
+  border-radius: 16px;
+  width: 58px;
+  height: 58px;
+  color: var(--white);
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.iconButton:hover,
+.iconButton:focus-visible {
+  background: #ffffff;
+}
+
+.iconButton:hover svg,
+.iconButton:focus-visible svg {
+  color: #8426d7;
+}
+
+.address {
+  font-style: normal;
+}
+
+.addressText {
+  margin-bottom: 8px;
+  opacity: 0.9;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 120%;
+  color: var(--white);
+}
+.scheduleItem {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  color: var(--white);
+  opacity: 0.6;
+}
+
+.navigationSections {
+  display: flex;
+  justify-content: flex-end;
+  gap: 60px;
+  width: 728px;
+  height: auto;
+}
+.navSection {
+  width: auto;
+  height: 177px;
+}
+
+.navList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.navItem {
+  margin-bottom: 12px;
+}
+
+.navLink {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  transition: color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+
+.navLink:hover,
+.navLink:focus-visible {
+  opacity: 1;
+  text-decoration: underline;
+  text-decoration-skip-ink: none;
+}
+
+.footerBottom {
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.paymentMethods {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 8px;
+  align-items: center;
+  svg {
+    width: auto;
+    height: 25px;
+    color: rgba(255, 254, 252, 0.4);
+  }
+}
+
+.paymentMethod {
+  opacity: 0.9;
+}
+
+.copyright {
+  margin: 0;
+  opacity: 0.8;
+}
+
+.credits {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.75;
+  text-decoration-skip-ink: none;
+  color: rgba(255, 254, 252, 0.8);
+
+  text-decoration-skip-ink: none;
+  color: rgba(255, 254, 252, 0.4);
+}
+
+.creditsLink {
+  color: #ffffff;
+  text-decoration: none;
+  text-decoration: underline;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.creditsLink:hover,
+.creditsLink:focus-visible {
+  color: #ffd700;
+  border-color: #ffd700;
+}
+
+.brandLinkContainer {
+  width: 249px;
+  height: 47px;
+  display: flex;
+  gap: 27px;
+  align-items: center;
+}
+
+.brandNameContainer {
+  width: 166px;
+  height: 25px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  img {
+    width: 166px;
+    height: 25px;
+    object-fit: contain;
+    display: block;
+  }
+}
+
+.brandNameLineOne {
+  font-size: 24px;
+}
+
+.contactsSection {
+  width: auto;
+  height: 208px;
+}
+
+.contactsContainer {
+  display: flex;
+  gap: 65px;
+}
+
+.copyright {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 120%;
+  color: rgba(255, 254, 252, 0.4);
+}
+
+.divider {
+  border-radius: 3px;
+  width: 1776px;
+  height: 2px;
+  background: rgba(249, 249, 249, 0.15);
+  margin: 53px 0;
+}
+
+@media (max-width: 1000px) {
+  .footer {
+    border-radius: mvw(16);
+    padding: mvw(56) mvw(16);
+    width: mvw(375);
+    height: mvw(auto);
+    background-color: #9f57ff;
+    background-image: none;
+  }
+  .logoContainer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: mvw(23);
+  }
+  .logo {
+    font-size: mvw(20);
+    gap: mvw(8);
+  }
+  .logoIcon {
+    width: mvw(70);
+    height: mvw(70);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logoIcon svg {
+    width: mvw(55);
+    height: mvw(55);
+  }
+  .brandLinkContainer {
+    width: 100%;
+    height: 100%;
+    gap: mvw(20);
+  }
+  .brandNameContainer {
+    display: flex;
+    gap: mvw(10);
+    align-items: center;
+    width: mvw(176);
+    height: mvw(22);
+  }
+  .brandNameContainer img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  .brandNameLineOne {
+    font-size: mvw(20);
+    font-weight: 700;
+    color: var(--white);
+  }
+  .brandNameLineTwo {
+    font-size: mvw(20);
+    font-weight: 700;
+    color: var(--white);
+  }
+  .authButtons {
+    width: 100%;
+    gap: mvw(12);
+    height: auto;
+    height: mvw(54);
+    display: none;
+  }
+  .loginButton,
+  .registerButton {
+    flex: none;
+    padding: mvw(12) mvw(16);
+
+    font-size: mvw(14);
+    font-weight: 500;
+    width: mvw(75);
+    border-radius: mvw(16);
+  }
+  .loginButton {
+    /* background: var(--violet); */
+    color: var(--white);
+    border-radius: mvw(16);
+  }
+  .registerButton {
+    background: var(--white);
+    color: var(--violet);
+    width: mvw(130);
+  }
+  .footerTop {
+    /* margin-top: mvw(24); */
+  }
+  .divider {
+    width: 100%;
+    margin: mvw(40) 0;
+  }
+  .footerMain {
+    flex-direction: column;
+    gap: mvw(24);
+  }
+  .contactsContainer {
+    flex-direction: column;
+    gap: mvw(24);
+  }
+  .contactsSection {
+    width: 100%;
+    height: auto;
+  }
+  .sectionTitle {
+    font-size: mvw(14);
+    margin-bottom: mvw(26);
+    color: rgba(255, 254, 252, 0.56);
+  }
+  .contactInfo {
+    margin-bottom: mvw(20);
+  }
+  .phoneLink {
+    font-size: mvw(24);
+    margin-bottom: mvw(16);
+  }
+  .mailLink {
+    font-size: mvw(16);
+  }
+  .socialIcons {
+    gap: mvw(12);
+  }
+  .iconButton {
+    width: mvw(58);
+    height: mvw(58);
+    border-radius: mvw(16);
+    border: mvw(2) solid rgba(255, 254, 252, 0.3);
+    color: var(--white);
+  }
+  .iconButton svg {
+    width: mvw(24);
+    height: mvw(24);
+    color: var(--white);
+  }
+  .addressSection {
+    width: 100%;
+  }
+  .addressText {
+    font-size: mvw(18);
+    margin-bottom: mvw(8);
+  }
+  .scheduleItem {
+    font-size: mvw(14);
+    margin-bottom: mvw(12);
+    opacity: 0.6;
+  }
+  .navigationSections {
+    flex-direction: column;
+    gap: mvw(24);
+    width: 100%;
+  }
+  .navSection {
+    width: 100%;
+    height: auto;
+  }
+  .navItem {
+    margin-bottom: mvw(12);
+  }
+  .navLink {
+    font-size: mvw(14);
+    /* opacity: 0.6; */
+    color: var(--white);
+  }
+
+  .navLink:hover,
+  .navLink:focus-visible {
+    opacity: 1;
+    text-decoration: underline;
+    text-decoration-skip-ink: none;
+  }
+  .footerBottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: mvw(16);
+    padding: mvw(24) 0 0;
+  }
+  .copyright {
+    font-size: mvw(14);
+    color: var(--white);
+    opacity: 1;
+    color: rgba(255, 254, 252, 0.4);
+  }
+  .paymentMethods {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: mvw(12);
+    margin-bottom: 0;
+  }
+  .paymentMethod svg {
+    height: mvw(20);
+    width: mvw(45);
+    color: var(--white);
+    opacity: 0.8;
+  }
+  .credits {
+    font-size: mvw(14);
+    color: var(--white);
+    opacity: 1;
+
+    font-family: var(--font-family);
+    font-weight: 500;
+
+    line-height: 120%;
+    color: rgba(255, 254, 252, 0.4);
+  }
+  .creditsLink {
+    text-decoration: underline;
+    text-decoration-skip-ink: none;
+    color: rgba(255, 254, 252, 0.8);
+  }
+}

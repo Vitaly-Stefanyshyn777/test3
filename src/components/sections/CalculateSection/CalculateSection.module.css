@@ -1,0 +1,366 @@
+.section {
+  padding-top: 5.21vw;
+  padding-bottom: 101px;
+
+  .topBlock {
+    margin-bottom: 70px;
+
+    h2 {
+      text-align: center;
+      font-family: "Inter Tight";
+      font-size: 56px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.56px;
+      color: var(--black);
+    }
+  }
+
+  .content {
+    display: flex;
+    gap: 16px;
+    .calculatorContainer {
+      width: 1002px;
+      padding: 52px;
+      border-radius: 28px;
+      background-color: #fff;
+
+      h3 {
+        margin-bottom: 40px;
+        font-family: "Golos Text";
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 140%; /* 33.6px */
+        color: var(--black);
+        align-items: center;
+        display: flex;
+        justify-content: center;
+      }
+
+      .form {
+        .fields {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 16px;
+          margin-bottom: 40px;
+        }
+
+        input,
+        select {
+          width: 441px;
+          padding: 22px 20px;
+          background-color: var(--bg-color);
+          border-radius: 12px;
+
+          color: rgba(14, 14, 14, 0.4);
+          font-family: "Golos Text";
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 130%;
+        }
+
+        input:focus,
+        select:focus {
+          outline: none;
+        }
+
+        select {
+          appearance: none;
+          border: none;
+          color: rgba(14, 14, 14, 0.8);
+        }
+
+        button {
+          width: 100%;
+          height: 64px;
+          border-radius: 20px;
+          background-color: var(--violet);
+          border: none;
+          cursor: pointer;
+          font-family: "Manrope";
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 800;
+          line-height: 100%; /* 16px */
+          color: var(--white);
+          transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        button:hover:not(:disabled) {
+          background-color: var(--black);
+        }
+
+        button:disabled {
+          background: var(--violet);
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+
+      .calculateHint {
+        margin-top: 16px;
+        text-align: center;
+        color: rgba(14, 14, 14, 0.4);
+        font-family: "Golos Text";
+        font-size: 14px;
+        line-height: 130%;
+      }
+    }
+
+    .statistics {
+      width: 812px;
+      padding: 52px;
+      border-radius: 28px;
+      background-color: var(--white);
+
+      h3 {
+        text-align: center;
+        margin-bottom: 24px;
+        font-family: "Golos Text";
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 140%; /* 33.6px */
+        color: var(--black);
+      }
+
+      ul {
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: space-between;
+
+        li {
+          width: 228px;
+          padding: 24px 32px;
+          border-radius: 16px;
+          background-color: var(--bg-color);
+
+          h4 {
+            margin-bottom: 8px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            color: rgba(14, 14, 14, 0.4);
+            font-family: "Golos Text";
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 140%; /* 22.4px */
+          }
+
+          p {
+            text-align: center;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            font-family: "Inter Tight";
+            font-size: 32px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 120%; /* 38.4px */
+            letter-spacing: -0.32px;
+
+            color: var(--black);
+          }
+        }
+      }
+
+      div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 13px 32px;
+        border-radius: 16px;
+        background-color: var(--violet);
+
+        h4 {
+          margin-bottom: 8px;
+          color: rgba(255, 254, 252, 0.4);
+          font-family: "Golos Text";
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 140%; /* 22.4px */
+        }
+
+        p {
+          color: var(--white);
+          font-family: "Inter Tight";
+          font-size: 60px;
+          font-style: normal;
+          font-weight: 700;
+          line-height: 120%; /* 72px */
+          letter-spacing: -0.6px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .section {
+    padding-top: mvw(24);
+    padding-bottom: mvw(24);
+
+    .topBlock {
+      margin-bottom: mvw(16);
+      h2 {
+        font-size: mvw(28);
+        line-height: 120%;
+        letter-spacing: -0.01em;
+      }
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: mvw(16);
+      flex-direction: column-reverse;
+      background-color: var(--white);
+      align-items: center;
+      .calculatorContainer {
+        width: mvw(343);
+        padding: mvw(0) mvw(16) mvw(16) mvw(16);
+        border-radius: mvw(16);
+
+        h3 {
+          margin-bottom: mvw(16);
+          font-size: mvw(14);
+          line-height: 140%;
+          display: none;
+        }
+
+        .form {
+          .fields {
+            display: flex;
+            flex-direction: column;
+            gap: mvw(8);
+            margin-bottom: mvw(16);
+          }
+
+          input,
+          select {
+            width: 100%;
+            padding: mvw(16);
+            border-radius: mvw(12);
+            font-size: mvw(14);
+            line-height: 130%;
+          }
+
+          select {
+            appearance: none;
+            border: none;
+          }
+
+          button {
+            height: mvw(50);
+            border-radius: mvw(16);
+            font-size: mvw(14);
+            border: none;
+            cursor: pointer;
+            font-family: var(--third-family);
+            font-weight: 700;
+            line-height: 100%;
+            color: #fff;
+            background-color: var(--violet);
+            transition: background-color 0.2s ease, color 0.2s ease;
+          }
+
+          button:hover:not(:disabled) {
+            background-color: var(--black);
+          }
+
+          button:disabled {
+            cursor: not-allowed;
+            background: var(--violet);
+            opacity: 0.6;
+          }
+        }
+
+        .calculateHint {
+          margin-top: mvw(12);
+          font-size: mvw(12);
+          text-align: center;
+        }
+      }
+
+      .statistics {
+        width: mvw(343);
+        padding: mvw(20) mvw(20) mvw(0) mvw(20);
+        border-radius: mvw(16);
+
+        h3 {
+          margin-bottom: mvw(32);
+          font-size: mvw(16);
+        }
+
+        ul {
+          margin-bottom: mvw(16);
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: mvw(8);
+          margin-bottom: mvw(0);
+
+          li {
+            width: 100%;
+            padding: mvw(12);
+            border-radius: mvw(12);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            h4 {
+              margin-bottom: mvw(6);
+              font-size: mvw(12);
+            }
+            p {
+              font-size: mvw(24);
+              letter-spacing: -0.01em;
+            }
+          }
+
+          /* фіолетовий блок у списку на мобільному */
+          .weekIncome {
+            grid-column: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: mvw(12);
+            border-radius: mvw(12);
+            background-color: var(--violet);
+
+            h4 {
+              margin-bottom: mvw(6);
+              color: rgba(255, 254, 252, 0.4);
+              font-size: mvw(12);
+            }
+            p {
+              color: var(--white);
+              font-size: mvw(28);
+              letter-spacing: -0.01em;
+            }
+          }
+        }
+
+        .weekIncomeDesktop {
+          padding: mvw(12);
+          border-radius: mvw(12);
+
+          h4 {
+            margin-bottom: mvw(6);
+            font-size: mvw(12);
+          }
+          p {
+            font-size: mvw(28);
+            letter-spacing: -0.01em;
+          }
+        }
+      }
+    }
+  }
+}

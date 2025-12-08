@@ -1,0 +1,113 @@
+.container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  max-width: 400px;
+  width: 100%;
+  pointer-events: auto;
+}
+
+.locationCard {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 2px solid #ff0000;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.imagesContainer {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.imagePlaceholder {
+  width: 80px;
+  height: 60px;
+  background: var(--bg-color);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.placeholderText {
+  font-size: 24px;
+  color: var(--black);
+}
+
+.locationName {
+  font-family: var(--second-family);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 120%;
+  color: var(--black);
+  margin: 0 0 20px 0;
+}
+
+.contactInfo {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.leftColumn,
+.rightColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 120%;
+  color: var(--gray);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.value {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  color: var(--black);
+}
+
+.socialIcons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+.socialIcon {
+  width: 32px;
+  height: 32px;
+  background: var(--white);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.socialIcon:hover {
+  background: var(--bg-color);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}

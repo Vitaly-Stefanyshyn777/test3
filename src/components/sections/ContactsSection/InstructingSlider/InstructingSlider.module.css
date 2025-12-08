@@ -1,0 +1,258 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  backdrop-filter: blur(10px);
+  background: rgba(14, 14, 14, 0.2);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.modalContainer {
+  background: var(--bg-color);
+  max-width: 1442px;
+  max-height: 940px;
+  width: 100%;
+  height: 100%;
+
+  border-radius: 20px;
+  padding: 56px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.modalBlock {
+  width: auto;
+  height: auto;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modalText {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 36px;
+  line-height: 110%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.closeButton {
+  width: 46px;
+  height: 46px;
+  border: none;
+  background: #f3f3f3;
+  border-radius: 10px;
+  svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  background: white;
+  transform: scale(1.1);
+}
+
+.mainImageContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mainImageBlock {
+  width: 100%;
+  height: calc(100vh - 200px);
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+}
+
+.mainImage {
+  width: 100%;
+  height: calc(100% - 120px);
+  position: relative;
+  overflow: hidden;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnailContainer {
+  height: 120px;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.arrowButton {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.arrowButton:hover {
+  background: rgba(0, 0, 0, 0.2);
+  transform: scale(1.1);
+}
+
+.thumbnails {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  flex: 1;
+  padding: 0 8px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.thumbnails::-webkit-scrollbar {
+  display: none;
+}
+
+.thumbnail {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.thumbnail:hover {
+  transform: scale(1.05);
+}
+
+.activeThumbnail {
+  border-color: #007bff;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.thumbnailImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sliderNavContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+@media (max-width: 1000px) {
+  .overlay {
+    padding: mvw(16);
+    align-items: center;
+  }
+
+  .modalContainer {
+    max-width: mvw(343);
+    max-height: mvw(624);
+    width: 100%;
+    height: 100%;
+    border-radius: mvw(16);
+    padding: mvw(16);
+    gap: mvw(16);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .modalBlock {
+    flex-shrink: 0;
+  }
+
+  .modalText {
+    font-size: mvw(20);
+    line-height: 120%;
+  }
+
+  .closeButton {
+    width: mvw(32);
+    height: mvw(32);
+    border-radius: mvw(8);
+  }
+
+  .closeButton svg {
+    width: mvw(16);
+    height: mvw(16);
+  }
+
+  .mainImageContainer {
+    flex: 1;
+    min-height: 0;
+    gap: mvw(12);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mainImageBlock {
+    flex: 1;
+    min-height: 0;
+    max-height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .thumbnailContainer {
+    height: auto;
+    min-height: mvw(80);
+    gap: mvw(12);
+  }
+
+  .thumbnails {
+    gap: mvw(8);
+    padding: 0 mvw(4);
+  }
+
+  .thumbnail {
+    width: mvw(80);
+    height: mvw(80);
+    border-radius: mvw(8);
+  }
+
+  .sliderNavContainer {
+    padding: mvw(12);
+    justify-content: flex-start;
+    flex-shrink: 0;
+  }
+}

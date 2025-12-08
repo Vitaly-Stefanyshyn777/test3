@@ -1,0 +1,1398 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  color: #fff;
+  font-family: inherit;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+/* Клас для різних секцій, зміна стилів під тесну або світлу тему  */
+
+.headerLight {
+  color: #333;
+}
+
+.headerDark {
+  color: #fff;
+}
+
+.headerTrainerProfileBlock {
+  width: 100%;
+  height: auto;
+  justify-content: space-between;
+  border-radius: 28px;
+
+  background: transparent;
+  display: flex;
+}
+
+.headerTrainerProfile .headerTrainerProfileBlock {
+  background: white;
+  border-radius: 12px;
+}
+
+.headerTrainerProfile .logo a {
+  color: var(--black);
+}
+
+.headerTrainerProfile .phone a {
+  color: var(--black);
+}
+
+.headerTrainerProfile .contactText {
+  color: var(--black);
+}
+
+/* .headerTrainerProfile .iconBtn {
+  color: var(--black);
+} */
+
+/* .headerTrainerProfile .iconBtn:hover {
+  background: rgba(0, 0, 0, 0.1);
+} */
+
+.headerTrainerProfile .iconBtn svg,
+.headerTrainerProfile .phone svg,
+.headerTrainerProfile .burger svg {
+  stroke: var(--black);
+  color: var(--black);
+}
+
+.headerTrainerProfile .nav svg {
+  stroke: var(--black);
+  color: var(--black);
+}
+
+.headerTrainerProfile .logo svg {
+  stroke: var(--black);
+  color: var(--black);
+}
+
+/* .headerTrainerProfile * svg {
+  stroke: var(--black);
+  color: var(--black);
+} */
+
+.headerTrainerProfile .nav a:hover svg {
+  stroke: var(--black);
+  color: var(--black);
+}
+
+.headerTrainerProfile .register {
+  color: var(--white);
+  background: var(--violet);
+  border: 1px solid var(--black);
+}
+
+.headerTrainerProfile .register:hover {
+  backdrop-filter: blur(11.699999809265137px);
+  background: #8426d7;
+  color: var(--white);
+}
+
+.headerTrainerProfile .nav {
+  backdrop-filter: none !important;
+  background: transparent !important;
+}
+
+.headerTrainerProfile .iconBtn {
+  backdrop-filter: none !important;
+  background: transparent !important;
+}
+
+.headerTrainerProfile .iconBtn:hover {
+  backdrop-filter: none !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+.headerTrainerProfile .nav a {
+  color: var(--black);
+}
+
+.headerTrainerProfile .burger {
+  color: var(--black);
+  backdrop-filter: none !important;
+  background: transparent !important;
+}
+
+.headerTrainerProfile .burger:hover {
+  backdrop-filter: none !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Додаткові класи для білого фону */
+@media (min-width: 1001px) {
+  .headerTrainers .nav,
+  .headerShop .nav,
+  .headerInstructing .nav,
+  .headerProduct .nav {
+    backdrop-filter: none !important;
+    background: transparent !important;
+  }
+
+  .headerTrainers .iconBtn,
+  .headerShop .iconBtn,
+  .headerInstructing .iconBtn,
+  .headerProduct .iconBtn {
+    backdrop-filter: none !important;
+    background: transparent !important;
+    color: var(--white);
+  }
+
+  .headerTrainers .iconBtn svg,
+  .headerShop .iconBtn svg,
+  .headerInstructing .iconBtn svg,
+  .headerProduct .iconBtn svg,
+  .headerTrainers .iconBtn svg *,
+  .headerShop .iconBtn svg *,
+  .headerInstructing .iconBtn svg *,
+  .headerInstructing .burger svg *,
+  .headerProduct .iconBtn svg * {
+    stroke: var(--white) !important;
+    color: var(--white) !important;
+  }
+
+  .headerTrainers .iconBtn:hover,
+  .headerShop .iconBtn:hover,
+  .headerInstructing .iconBtn:hover,
+  .headerProduct .iconBtn:hover {
+    backdrop-filter: none !important;
+    background: rgba(0, 0, 0, 0.05) !important;
+  }
+
+  .headerTrainers .burger,
+  .headerShop .burger,
+  .headerInstructing .burger,
+  .headerProduct .burger {
+    backdrop-filter: none !important;
+    background: transparent !important;
+  }
+
+  .headerTrainers .burger,
+  .headerShop .burger,
+  .headerInstructing .burger,
+  .headerProduct .burger {
+    color: var(--white);
+  }
+
+  .headerTrainers .burger svg,
+  .headerShop .burger svg,
+  .headerInstructing .burger svg,
+  .headerProduct .burger svg {
+    stroke: currentColor;
+    color: currentColor;
+  }
+
+  .headerTrainers .burger:hover,
+  .headerShop .burger:hover,
+  .headerInstructing .burger:hover,
+  .headerProduct .burger:hover {
+    backdrop-filter: none !important;
+    background: rgba(0, 0, 0, 0.05) !important;
+  }
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 12px;
+}
+
+.burger {
+  background: rgba(255, 254, 252, 0.15);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  backdrop-filter: blur(20px);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  color: var(--white);
+}
+
+.burger:hover {
+  backdrop-filter: blur(20px);
+  background: var(--violet);
+  color: var(--white);
+  transition: all 0.3s ease;
+}
+
+.burger svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  color: currentColor;
+}
+
+.burger:hover svg,
+.burger:hover svg * {
+  stroke: var(--white) !important;
+  fill: var(--white) !important;
+  color: var(--white) !important;
+}
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 1001;
+  display: flex;
+  gap: 35px;
+  align-items: center;
+  height: 48px;
+  border-radius: 16px;
+  padding: 20px 16px;
+  backdrop-filter: blur(20px);
+  background: rgba(255, 254, 252, 0.15);
+}
+
+.nav a {
+  color: #fff;
+  font-family: inherit;
+  z-index: 1001;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  position: relative;
+}
+
+.nav a:hover {
+  text-decoration: underline;
+  text-decoration-skip-ink: none;
+}
+
+/* underline on hover for main nav links */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 18px;
+  width: auto;
+  height: auto;
+  svg {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+.logo a {
+  color: inherit;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.logo a:hover {
+  opacity: 0.8;
+}
+
+.logo svg {
+  width: 48px;
+  height: 48px;
+}
+
+/* Ensure both white SVG logo and black raster SVG have identical box */
+.LogoIcon {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.LogoIcon img,
+.LogoIcon svg {
+  width: 48px;
+  height: 48px;
+}
+
+.contacts {
+  border-radius: 0.41667vw;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.20833vw;
+  width: fit-content;
+  height: auto;
+  display: flex;
+  transition: all 0.3s ease;
+}
+
+.contactText {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 130%;
+  letter-spacing: -0.01em;
+  color: inherit;
+  margin: 0;
+  color: var(--white);
+}
+
+.phoneWrapper {
+  width: 100%;
+  height: auto;
+}
+
+.phoneLink {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: inherit;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  color: var(--white);
+}
+
+.phoneLink:hover {
+  opacity: 0.8;
+}
+.right {
+  display: flex;
+  align-items: center;
+  gap: 35px;
+  padding: 12px;
+}
+
+.phone {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  transition: all 0.3s ease;
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.phone svg {
+  width: 22px;
+  height: 22px;
+}
+
+.phone p {
+  font-size: 12px;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.phone a {
+  font-weight: 600;
+  color: inherit;
+  text-decoration: none;
+  color: var(--white);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icons {
+  display: flex;
+  gap: 8px;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 254, 252, 0.15);
+  backdrop-filter: blur(20px);
+  color: var(--white);
+}
+
+.iconBtn:hover {
+  border-radius: 16px;
+  background: var(--white);
+  backdrop-filter: blur(20px);
+  color: var(--violet);
+}
+
+/* Ensure full icon painting (stroke and fill) on hover */
+.iconBtn:hover svg,
+.iconBtn:hover svg * {
+  stroke: var(--violet) !important;
+  fill: var(--violet) !important;
+}
+
+/* Active state when modal is open */
+.iconBtn.active {
+  border-radius: 16px;
+  background: var(--violet);
+  color: var(--white);
+}
+
+.iconBtn.active svg,
+.iconBtn.active svg * {
+  stroke: var(--white) !important;
+  fill: var(--white) !important;
+}
+
+/* icon buttons hover states depending on base bg */
+.iconBtn.transparent:hover {
+  border-radius: 16px;
+  background: var(--white);
+  backdrop-filter: blur(20px);
+}
+
+.iconBtn.transparent:hover svg,
+.iconBtn.transparent:hover svg * {
+  stroke: var(--violet) !important;
+  fill: var(--violet) !important;
+}
+
+.iconBtn.white:hover {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  color: var(--violet);
+}
+
+.iconBtn.white:hover svg,
+.iconBtn.white:hover svg * {
+  stroke: var(--violet) !important;
+  fill: var(--violet) !important;
+}
+
+.headerTrainerProfile .iconBtn:hover svg,
+.headerTrainerProfile .iconBtn:hover svg * {
+  stroke: var(--violet) !important;
+  fill: var(--violet) !important;
+}
+
+.iconBtn:active {
+  transform: translateY(0);
+}
+
+.iconBtn svg {
+  width: 20px;
+  height: 18px;
+}
+
+.userBtn {
+  position: relative;
+}
+
+/* Let SVG inherit currentColor so hover color paints fill and stroke */
+.iconBtn svg,
+.iconBtn svg * {
+  stroke: currentColor;
+  color: currentColor;
+  /* fill: none; */
+}
+
+/* active state fill variations */
+.iconBtn.transparent:active svg {
+  color: var(--violet);
+  fill: var(--violet);
+}
+
+.iconBtn.white:active svg {
+  color: var(--white);
+  fill: var(--white);
+}
+
+.badge {
+  position: absolute;
+  top: 33px;
+  left: 31px;
+  background: var(--violet);
+  border-radius: 4px;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  z-index: 10;
+  font-family: var(--third-family);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 100%;
+  letter-spacing: -0.02em;
+  color: var(--white);
+}
+
+.register {
+  cursor: pointer;
+  font-weight: 600;
+  font-family: var(--font-family);
+  color: #3b2d47;
+  background: #fff;
+  border: none;
+  border-radius: 0.83333vw;
+  width: 7.08333vw;
+  height: 2.5vw;
+  padding: 1.04167vw 1.25vw;
+  font-size: 0.83333vw;
+  font-weight: 500;
+  display: flex;
+  transition: all 0.3s;
+  align-items: center;
+}
+
+.register:hover {
+  backdrop-filter: blur(11.699999809265137px);
+  background: #8426d7;
+  color: var(--white);
+  transform: translateY(-1px);
+}
+
+/* Додати після існуючих стилів для headerTrainerProfile */
+
+/* .headerProduct .headerTrainerProfileBlock {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 12px;
+} */
+
+.headerProduct .logo a {
+  color: var(--black);
+}
+
+.headerProduct .phone a {
+  color: var(--black);
+}
+
+.headerProduct .contactText {
+  color: var(--black);
+}
+
+.headerProduct .iconBtn,
+.headerProduct .headerActions .iconBtn {
+  color: var(--black);
+  background: transparent;
+  backdrop-filter: none !important;
+}
+
+.headerProduct .iconBtn:hover,
+.headerProduct .headerActions .iconBtn:hover {
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: var(--black);
+}
+
+.headerProduct .iconBtn svg,
+.headerProduct .iconBtn svg *,
+.headerProduct .phone svg,
+.headerProduct .burger svg {
+  stroke: var(--black) !important;
+  color: var(--black) !important;
+  /* fill: var(--black) !important; */
+}
+
+.headerProduct .nav svg {
+  stroke: var(--black);
+  color: var(--black);
+}
+
+.headerProduct .logo svg {
+  stroke: var(--black);
+  color: var(--black);
+}
+
+.headerProduct .nav a:hover svg {
+  stroke: var(--black);
+  color: var(--black);
+}
+
+.headerProduct .register {
+  color: var(--white);
+  background: var(--violet);
+  border: 1px solid var(--black);
+}
+
+.headerProduct .register:hover {
+  backdrop-filter: blur(11.699999809265137px);
+  background: #8426d7;
+  color: var(--white);
+}
+
+.headerProduct .nav a {
+  color: var(--black);
+}
+
+.headerProduct .burger {
+  color: var(--violet);
+}
+
+.headerProduct .burger:hover {
+  background: var(--violet) !important;
+  color: var(--white) !important;
+}
+
+.headerProduct .burger:hover svg,
+.headerProduct .burger:hover svg * {
+  stroke: var(--white) !important;
+  fill: var(--white) !important;
+  color: var(--white) !important;
+}
+
+/* Desktop Menu Styles */
+.menuOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.menuContainer {
+  background: var(--white);
+  width: 478px;
+  height: 1080px;
+  padding: 52px 44px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  justify-content: space-between;
+}
+
+.menuContent {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.contactInfoContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.menuHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.menuTitle {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 125%;
+  letter-spacing: -0.03em;
+  color: var(--black);
+}
+
+.menuClose {
+  background: #f2f2f2;
+  border: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  color: #666;
+  transition: all 0.2s ease;
+}
+
+.menuClose:hover {
+  background: #e5e5e5;
+  color: #000;
+}
+
+.menuSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sectionTitle {
+  font-family: var(--second-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 135%;
+  color: #1a1a1a;
+  opacity: 0.4;
+}
+
+.menuItemBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.menuItem {
+  margin: 0;
+  padding: 0;
+}
+
+.menuLink {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 135%;
+  color: #1a1a1a;
+}
+
+.menuLink:hover {
+  text-decoration: underline;
+  text-decoration-skip-ink: none;
+}
+
+.contactGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.contactRow {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.contactItem {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.contactLabel {
+  font-family: var(--second-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 110%;
+  letter-spacing: -0.02em;
+  color: rgba(14, 14, 14, 0.4);
+}
+
+.contactValue {
+  font-family: var(--second-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 110%;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+.addressSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.socialSection {
+  display: flex;
+  gap: 16px;
+}
+
+.socialIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid rgba(14, 14, 14, 0.1);
+  /* backdrop-filter: blur(20px); */
+  color: var(--black);
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.socialIcon:hover {
+  background: #7c3aed;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.socialIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.headerScrolled .headerTrainerProfileBlock {
+  background: white;
+
+  border-radius: 12px;
+
+  transition: all 0.3s ease;
+}
+
+.headerScrolled .logo a {
+  color: var(--black) !important;
+  transition: color 0.3s ease;
+}
+
+.headerScrolled .phone a {
+  color: var(--black) !important;
+}
+
+.headerScrolled .contactText {
+  color: var(--black) !important;
+}
+
+/* .headerScrolled .iconBtn {
+  color: var(--black) !important;
+} */
+
+/* .headerScrolled .iconBtn:hover {
+  background: rgba(0, 0, 0, 0.1) !important;
+} */
+
+.headerScrolled .iconBtn svg,
+.headerScrolled .phone svg,
+.headerScrolled .burger svg {
+  stroke: var(--black) !important;
+  color: var(--black) !important;
+}
+
+.headerScrolled .nav svg {
+  stroke: var(--black) !important;
+  color: var(--black) !important;
+}
+
+.headerScrolled .logo svg {
+  stroke: var(--black) !important;
+  color: var(--black) !important;
+}
+
+.headerScrolled .nav a:hover svg {
+  stroke: var(--black) !important;
+  color: var(--black) !important;
+}
+
+.headerScrolled .register {
+  color: var(--white) !important;
+  background: var(--violet) !important;
+  border: 1px solid var(--black) !important;
+}
+
+.headerScrolled .register:hover {
+  backdrop-filter: blur(11.699999809265137px) !important;
+  background: #8426d7 !important;
+  color: var(--white) !important;
+}
+
+.headerScrolled .nav a {
+  color: var(--black) !important;
+}
+
+.headerScrolled .burger {
+  color: var(--black) !important;
+}
+
+.headerScrolled .burger svg,
+.headerScrolled .burger svg * {
+  stroke: var(--black) !important;
+  fill: var(--black) !important;
+  color: var(--black) !important;
+}
+
+.headerScrolled .burger:hover {
+  background: var(--white) !important;
+  color: var(--violet) !important;
+}
+
+.headerScrolled .burger:hover svg,
+.headerScrolled .burger:hover svg * {
+  stroke: var(--violet) !important;
+  fill: var(--violet) !important;
+}
+
+/* Перекриваємо headerTrainerProfile коли є headerScrolled */
+.headerScrolled.headerTrainerProfile .burger,
+.headerScrolled .headerTrainerProfile .burger {
+  color: var(--black) !important;
+}
+
+.headerScrolled.headerTrainerProfile .burger svg,
+.headerScrolled .headerTrainerProfile .burger svg,
+.headerScrolled.headerTrainerProfile .burger svg *,
+.headerScrolled .headerTrainerProfile .burger svg * {
+  stroke: var(--black) !important;
+  fill: var(--black) !important;
+  color: var(--black) !important;
+}
+
+.headerScrolled.headerTrainerProfile .burger:hover,
+.headerScrolled .headerTrainerProfile .burger:hover {
+  background: var(--white) !important;
+  color: var(--violet) !important;
+}
+
+.headerScrolled.headerTrainerProfile .burger:hover svg,
+.headerScrolled .headerTrainerProfile .burger:hover svg,
+.headerScrolled.headerTrainerProfile .burger:hover svg *,
+.headerScrolled .headerTrainerProfile .burger:hover svg * {
+  stroke: var(--violet) !important;
+  fill: var(--violet) !important;
+}
+
+.headerScrolled .iconBtn {
+  color: var(--black) !important;
+  background: transparent !important;
+}
+
+.headerScrolled .iconBtn svg,
+.headerScrolled .iconBtn svg * {
+  stroke: var(--black) !important;
+  color: var(--black) !important;
+  /* fill: var(--black) !important; */
+}
+
+.headerScrolled .iconBtn:hover {
+  background: var(--white) !important;
+  color: var(--violet) !important;
+}
+
+.headerScrolled .iconBtn:hover svg,
+.headerScrolled .iconBtn:hover svg * {
+  stroke: var(--violet) !important;
+  fill: var(--violet) !important;
+}
+
+/* Стилі для скроленого стану на сторінці trainers */
+.headerScrolled.headerTrainers .iconBtn,
+.headerScrolled.headerShop .iconBtn,
+.headerScrolled.headerInstructing .iconBtn,
+.headerScrolled.headerProduct .iconBtn {
+  color: var(--black) !important;
+  background: transparent !important;
+}
+
+.headerScrolled.headerTrainers .iconBtn svg,
+.headerScrolled.headerShop .iconBtn svg,
+.headerScrolled.headerInstructing .iconBtn svg,
+.headerScrolled.headerProduct .iconBtn svg,
+.headerScrolled.headerTrainers .iconBtn svg *,
+.headerScrolled.headerShop .iconBtn svg *,
+.headerScrolled.headerInstructing .iconBtn svg *,
+.headerScrolled.headerProduct .iconBtn svg * {
+  stroke: var(--black) !important;
+  color: var(--black) !important;
+  /* fill: var(--black) !important; */
+}
+
+.headerScrolled.headerTrainers .iconBtn:hover,
+.headerScrolled.headerShop .iconBtn:hover,
+.headerScrolled.headerInstructing .iconBtn:hover,
+.headerScrolled.headerProduct .iconBtn:hover {
+  background: var(--white) !important;
+  color: var(--violet) !important;
+}
+
+.headerScrolled.headerTrainers .iconBtn:hover svg,
+.headerScrolled.headerShop .iconBtn:hover svg,
+.headerScrolled.headerInstructing .iconBtn:hover svg,
+.headerScrolled.headerProduct .iconBtn:hover svg,
+.headerScrolled.headerTrainers .iconBtn:hover svg *,
+.headerScrolled.headerShop .iconBtn:hover svg *,
+.headerScrolled.headerInstructing .iconBtn:hover svg *,
+.headerScrolled.headerProduct .iconBtn:hover svg * {
+  stroke: var(--violet) !important;
+  fill: var(--violet) !important;
+}
+
+.headerScrolled.headerTrainers .burger,
+.headerScrolled.headerShop .burger,
+.headerScrolled.headerInstructing .burger,
+.headerScrolled.headerProduct .burger {
+  color: var(--black) !important;
+}
+
+.headerScrolled.headerTrainers .burger svg,
+.headerScrolled.headerShop .burger svg,
+.headerScrolled.headerInstructing .burger svg,
+.headerScrolled.headerProduct .burger svg,
+.headerScrolled.headerTrainers .burger svg *,
+.headerScrolled.headerShop .burger svg *,
+.headerScrolled.headerInstructing .burger svg *,
+.headerScrolled.headerProduct .burger svg * {
+  stroke: var(--black) !important;
+  fill: var(--black) !important;
+  color: var(--black) !important;
+}
+
+.headerScrolled.headerTrainers .burger:hover,
+.headerScrolled.headerShop .burger:hover,
+.headerScrolled.headerInstructing .burger:hover,
+.headerScrolled.headerProduct .burger:hover {
+  background: var(--white) !important;
+  color: var(--violet) !important;
+}
+
+.headerScrolled.headerTrainers .burger:hover svg,
+.headerScrolled.headerShop .burger:hover svg,
+.headerScrolled.headerInstructing .burger:hover svg,
+.headerScrolled.headerProduct .burger:hover svg,
+.headerScrolled.headerTrainers .burger:hover svg *,
+.headerScrolled.headerShop .burger:hover svg *,
+.headerScrolled.headerInstructing .burger:hover svg *,
+.headerScrolled.headerProduct .burger:hover svg * {
+  stroke: var(--violet) !important;
+  fill: var(--violet) !important;
+}
+
+/* Мобільні стилі */
+@media (max-width: 1000px) {
+  .badge {
+    width: auto !important;
+    height: mvw(20) !important;
+    padding: 0 !important;
+    font-size: mvw(10) !important;
+    top: mvw(30) !important;
+    right: auto !important;
+    left: mvw(30) !important;
+    border-radius: mvw(4) !important;
+  }
+  .header {
+    padding: mvw(12) mvw(16);
+    z-index: 1001;
+  }
+
+  .mobileHeader {
+    padding: mvw(12) mvw(16);
+    background: var(--white);
+  }
+
+  .headerTrainerProfileBlock {
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    border-radius: mvw(11) !important;
+  }
+
+  .headerTrainerProfile .headerTrainerProfileBlock {
+    background: #fff !important;
+    border-radius: mvw(11) !important;
+  }
+
+  .mobileLeft {
+    display: flex;
+    align-items: center;
+
+    flex-shrink: 0;
+  }
+
+  .mobileLeft .burger {
+    width: mvw(48);
+    height: mvw(48);
+    border-radius: mvw(10);
+    color: var(--violet);
+    backdrop-filter: none;
+  }
+
+  .mobileLeft .burger:hover {
+    background: var(--violet);
+  }
+
+  .mobileLeft .burger svg {
+    width: mvw(20);
+    height: mvw(20);
+    stroke: var(--white);
+    fill: var(--white);
+    color: var(--violet);
+  }
+
+  /* Переконаємося, що для профілю тренера бургер меню також фіолетовий */
+  .headerTrainerProfile .mobileLeft .burger {
+    color: var(--violet) !important;
+  }
+
+  .headerTrainerProfile .mobileLeft .burger svg {
+    stroke: var(--violet) !important;
+    fill: var(--violet) !important;
+    color: var(--violet) !important;
+  }
+
+  .mobileLeft .iconBtn {
+    width: mvw(48);
+    height: mvw(48);
+    border-radius: mvw(10);
+    background: transparent;
+    backdrop-filter: none;
+    padding: mvw(8);
+    color: var(--violet);
+  }
+
+  .mobileLeft .iconBtn:hover {
+    background: var(--violet);
+    color: var(--white);
+  }
+
+  .mobileLeft .iconBtn svg {
+    width: mvw(20);
+    height: mvw(20);
+    stroke: currentColor;
+    color: currentColor;
+    fill: none;
+  }
+
+  .mobileLeft .iconBtn:hover svg,
+  .mobileLeft .iconBtn:hover svg * {
+    stroke: var(--white) !important;
+    fill: var(--white) !important;
+    color: var(--white) !important;
+  }
+
+  /* Mobile: фіолетовий колір для іконки юзера при ховері */
+  .mobileLeft .userBtn:hover .userIconHover {
+    display: inline-block;
+    filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%)
+      hue-rotate(246deg) brightness(104%) contrast(101%); /* Фіолетовий колір для мобілки */
+  }
+
+  .mobileLogo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+
+  .mobileLogo .LogoIcon {
+    width: mvw(34);
+    height: mvw(43);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobileLogo .LogoIcon svg,
+  .mobileLogo .LogoIcon img {
+    width: mvw(34);
+    height: mvw(43);
+  }
+
+  .mobileLogo .LogoIcon svg {
+    stroke: var(--violet);
+    color: var(--violet);
+    fill: none;
+  }
+
+  .mobileRight {
+    display: flex;
+    align-items: center;
+
+    flex-shrink: 0;
+  }
+
+  .mobileRight .iconBtn {
+    width: mvw(48);
+    height: mvw(48);
+    border-radius: mvw(10);
+    padding: mvw(8);
+    background: transparent;
+    backdrop-filter: none;
+    position: relative;
+    color: var(--violet);
+  }
+
+  .mobileRight .iconBtn:hover {
+    background: var(--violet);
+    color: var(--white);
+  }
+
+  .mobileRight .iconBtn svg {
+    width: mvw(20);
+    height: mvw(20);
+    stroke: currentColor;
+    color: currentColor;
+    fill: none;
+  }
+
+  .mobileRight .iconBtn:hover svg,
+  .mobileRight .iconBtn:hover svg * {
+    stroke: var(--white) !important;
+    fill: var(--white) !important;
+    color: var(--white) !important;
+  }
+
+  .mobileRight .iconBtn.active {
+    background: var(--violet);
+    color: var(--white);
+  }
+
+  .mobileRight .iconBtn.active svg,
+  .mobileRight .iconBtn.active svg * {
+    stroke: var(--white) !important;
+    fill: var(--white) !important;
+    color: var(--white) !important;
+  }
+
+  .mobileRight .iconBtn .badge {
+    position: absolute;
+    top: mvw(4);
+    right: mvw(4);
+    border-radius: mvw(8);
+    min-width: mvw(16) !important;
+    width: mvw(16) !important;
+    height: mvw(16) !important;
+    font-size: mvw(10);
+    padding: 0 !important;
+    background: var(--violet);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  /* Приховуємо елементи, які не потрібні на мобільній версії */
+  .left,
+  .right,
+  .logo {
+    display: none !important;
+  }
+
+  /* Мобільні стилі для меню */
+  .menuOverlay {
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .menuContainer {
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+    padding: mvw(20) mvw(16);
+    gap: mvw(24);
+    justify-content: flex-start;
+  }
+
+  .menuContent {
+    gap: mvw(24);
+  }
+
+  .menuHeader {
+    margin-bottom: mvw(8);
+  }
+
+  .menuTitle {
+    font-size: mvw(28);
+    line-height: 120%;
+    letter-spacing: -0.01em;
+  }
+
+  .menuClose {
+    width: mvw(40);
+    height: mvw(40);
+    border-radius: mvw(10);
+  }
+
+  .menuClose svg {
+    width: mvw(20);
+    height: mvw(20);
+  }
+
+  .menuSection {
+    gap: mvw(16);
+  }
+
+  .sectionTitle {
+    font-size: mvw(14);
+    line-height: 140%;
+    opacity: 0.4;
+  }
+
+  .menuItemBlock {
+    gap: mvw(16);
+  }
+
+  .menuLink {
+    font-size: mvw(16);
+    line-height: 140%;
+    font-weight: 400;
+  }
+
+  .contactInfoContainer {
+    gap: mvw(24);
+    margin-top: auto;
+  }
+
+  .contactGrid {
+    gap: mvw(20);
+  }
+
+  .contactRow {
+    flex-direction: row;
+    gap: mvw(16);
+    justify-content: space-between;
+  }
+
+  .contactRow .contactItem {
+    flex: 1;
+  }
+
+  .contactItem {
+    gap: mvw(8);
+  }
+
+  .contactLabel {
+    font-size: mvw(12);
+    line-height: 140%;
+    color: rgba(14, 14, 14, 0.4);
+  }
+
+  .contactValue {
+    font-size: mvw(14);
+    line-height: 140%;
+    color: var(--black);
+  }
+
+  .addressSection {
+    display: none;
+  }
+
+  .socialSection {
+    display: none;
+  }
+
+  .headerScrolled .iconBtn:hover {
+    background: var(--violet) !important;
+    color: var(--violet) !important;
+  }
+
+  .burger:hover {
+    background: var(--violet) !important;
+    color: var(--white) !important;
+  }
+
+  .headerScrolled .burger:hover {
+    background: var(--violet) !important;
+    color: var(--white) !important;
+  }
+
+  .headerScrolled .burger:hover svg,
+  .headerScrolled .burger:hover svg * {
+    stroke: var(--white) !important;
+    fill: var(--white) !important;
+  }
+}

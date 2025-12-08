@@ -1,0 +1,41 @@
+{
+  "name": "bfb",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.85.9",
+    "axios": "^1.11.0",
+    "formik": "^2.4.6",
+    "leaflet": "^1.9.4",
+    "next": "15.4.8",
+    "react": "19.1.2",
+    "react-dom": "19.1.2",
+    "react-hook-form": "^7.62.0",
+    "react-leaflet": "^5.0.0",
+    "react-loading-skeleton": "^3.5.0",
+    "swiper": "^11.2.10",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/leaflet": "^1.9.21",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.4.8",
+    "postcss-functions": "^4.0.2",
+    "postcss-px-to-viewport-8-media": "^1.0.1",
+    "postcss-px-to-viewport-8-media-screen": "^1.0.0",
+    "postcss-px-to-viewport-8-plugin": "^1.2.5",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

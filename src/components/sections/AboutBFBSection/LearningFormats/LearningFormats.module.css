@@ -1,0 +1,473 @@
+.section {
+}
+
+.container {
+  padding: 0 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+
+.header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.subtitle {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--violet);
+}
+
+.title {
+  font-family: var(--second-family);
+  font-weight: 700;
+  font-size: 48px;
+  color: var(--black);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.cardImage1 {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url(/images/image-1.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.cardImage2 {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url(/images/image-2.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.cardBadge {
+  position: absolute;
+  bottom: 80px;
+  color: #fff;
+  font-family: var(--second-family);
+  font-weight: 700;
+  font-size: 40px;
+}
+
+.cardBody {
+  padding: 48px 80px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 48px 80px 56px;
+}
+
+.cardListСontainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.cardListBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.cardListBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cardListTitle {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 140%;
+  color: var(--black);
+}
+
+.listItemText {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.cardListText {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.list {
+  display: flex;
+  gap: 22px;
+}
+
+.listColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1 1 0;
+}
+
+.listItemIcon {
+  border-radius: 16px;
+  background: rgba(132, 38, 215, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  svg {
+    width: 13px;
+    height: 13px;
+    color: var(--violet);
+  }
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  color: #0e0e0e;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--violet);
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #f7f7f8;
+  border-radius: 14px;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 14px;
+  color: #0e0e0e;
+}
+
+.pillIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    color: var(--black);
+  }
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.priceWrap {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.priceFrom {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 36px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  text-align: right;
+  color: var(--black);
+}
+
+.price {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  text-align: right;
+  color: var(--black);
+}
+.priceValue {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+.priceCurrency {
+  margin-left: 4px;
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.priceOld {
+  font-family: var(--second-family);
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  text-align: right;
+  color: var(--grey-for-cards);
+  text-decoration: line-through;
+}
+.priceOldValue {
+  font-family: var(--second-family);
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  color: var(--grey-for-cards);
+}
+.priceOldCurrency {
+  margin-left: 4px;
+  font-family: var(--second-family);
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  color: var(--grey-for-cards);
+}
+
+.button {
+  padding: 12px 20px;
+  background: var(--violet);
+  cursor: pointer;
+
+  border-radius: 20px;
+  padding: 24px 42px;
+  width: 185px;
+  height: 64px;
+
+  font-family: var(--third-family);
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 100%;
+  color: var(--white);
+  transition: all 0.2s;
+}
+
+.button:hover {
+  background: var(--black);
+}
+
+@media (max-width: 1000px) {
+  .container {
+    padding: 0 mvw(16);
+    gap: mvw(16);
+  }
+
+  .header {
+    gap: mvw(8);
+  }
+  .subtitle {
+    font-size: mvw(12);
+  }
+  .title {
+    font-size: mvw(24);
+    line-height: 120%;
+    letter-spacing: -0.01em;
+  }
+
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: mvw(24);
+  }
+
+  .card {
+    border-radius: mvw(16);
+  }
+
+  .cardImage1,
+  .cardImage2 {
+    height: mvw(160);
+    position: relative;
+  }
+
+  .cardBadge {
+    bottom: mvw(12);
+    font-size: mvw(28);
+    line-height: 120%;
+    padding: 0 mvw(8);
+
+    position: absolute;
+    bottom: mvw(60);
+    left: mvw(12);
+    right: mvw(12);
+    text-align: center;
+  }
+
+  .cardBody {
+    padding: mvw(16);
+    gap: mvw(30);
+  }
+
+  .cardListСontainer {
+    gap: mvw(24);
+  }
+  .cardListBlock {
+    gap: mvw(12);
+  }
+  .cardListTitle {
+    font-size: mvw(18);
+  }
+  .cardListText {
+    font-size: mvw(14);
+  }
+  .list {
+    gap: mvw(12);
+    flex-direction: column;
+  }
+  .listColumn {
+    gap: mvw(8);
+  }
+  .listItem {
+    gap: mvw(8);
+    font-size: mvw(14);
+  }
+  .listItemIcon {
+    width: mvw(28);
+    height: mvw(28);
+    border-radius: mvw(12);
+  }
+  .listItemIcon svg {
+    width: mvw(12);
+    height: mvw(12);
+  }
+
+  .pills {
+    gap: mvw(8);
+  }
+  .pill {
+    gap: mvw(8);
+    padding: mvw(8) mvw(12);
+    border-radius: mvw(12);
+    font-size: mvw(12);
+
+    font-family: var(--font-family);
+    font-weight: 500;
+
+    line-height: 140%;
+    letter-spacing: -0.02em;
+    color: var(--black);
+  }
+  .pillIcon {
+    width: mvw(20);
+    height: mvw(20);
+  }
+  .pillIcon svg {
+    width: mvw(20);
+    height: mvw(20);
+  }
+
+  .cardFooter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: mvw(32);
+  }
+  .priceWrap {
+    justify-content: flex-start;
+    gap: mvw(6);
+    font-family: var(--second-family);
+    font-weight: 600;
+    font-size: mvw(26);
+    line-height: 120%;
+    letter-spacing: -0.01em;
+    text-align: right;
+    color: var(--black);
+  }
+  .priceFrom {
+    font-size: mvw(20);
+  }
+  .price,
+  .priceValue,
+  .priceCurrency {
+    font-size: mvw(20);
+  }
+  .priceOld,
+  .priceOldValue,
+  .priceOldCurrency {
+    font-size: mvw(16);
+  }
+  .button {
+    width: 100%;
+    height: mvw(50);
+    border-radius: mvw(16);
+    padding: 0;
+    font-size: mvw(16);
+    background: var(--violet);
+    font-family: var(--third-family);
+    font-weight: 700;
+    font-size: mvw(14);
+    line-height: 100%;
+    color: #fff;
+  }
+  .listItemText {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(14);
+    line-height: 140%;
+    letter-spacing: -0.02em;
+    color: var(--black);
+  }
+}

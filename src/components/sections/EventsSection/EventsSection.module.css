@@ -1,0 +1,1061 @@
+.section {
+  padding: 100px 0;
+}
+
+.container {
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 72px;
+}
+
+.header {
+  text-align: center;
+}
+
+.title {
+  font-family: var(--second-family);
+  font-weight: 700;
+  font-size: 56px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.content {
+  display: flex;
+  gap: 16px;
+  align-items: start;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.leftColumnWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 588px;
+  width: 100%;
+  background: var(--white);
+  border-radius: 20px;
+  padding: 48px;
+  height: 863px;
+}
+
+.calendarBlock {
+  background: #ffffff;
+  border-radius: 16px;
+}
+
+.calendar {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.calendarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.calendarContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.monthTitle {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 32px;
+  letter-spacing: -0.04em;
+  color: var(--black);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.monthNavigation {
+  display: flex;
+  gap: 8px;
+}
+
+.navButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  backdrop-filter: blur(20px);
+  background: #8426d7;
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  border-radius: 32px;
+  padding: 14px 12px;
+  width: 46px;
+  height: 46px;
+}
+
+.navButtonIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.navButton:hover {
+  backdrop-filter: blur(20px);
+  background: var(--black);
+  transform: scale(1.05);
+  color: var(--white);
+}
+
+.weekDays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.weekDay {
+  text-align: center;
+  background: #f9f9f9;
+  border-radius: 41px;
+  width: 60px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--black);
+}
+
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(5, 70px);
+  grid-auto-flow: row;
+}
+
+.calendarDay {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--black);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid var(--white);
+  width: 70px;
+  height: 70px;
+}
+
+.calendarDay:hover {
+  background: #f3f4f6;
+}
+
+.calendarDay.hasEvent {
+  background: #f3e8ff;
+  color: var(--black);
+
+  background-image: url(/images/Cell.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* .calendarDay.hasEvent:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(122, 90, 248, 0.2);
+  background-color: #e9d5ff;
+} */
+
+.calendarDay.selectedEventDay {
+  background: var(--white);
+  color: var(--black);
+  border: 2px solid var(--violet) !important;
+}
+
+.calendarDay.selected {
+  background: var(--violet);
+  color: white;
+}
+
+.calendarDay.otherMonth {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  text-align: center;
+  color: rgba(168, 168, 168, 0.4);
+  border: 2px solid var(--white);
+  border-radius: 12px;
+  background: #f9f9f9;
+}
+
+.eventsListBlock {
+  border-radius: 16px;
+  padding: 0px 15px 0px 0px;
+
+  height: 210px;
+  overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.eventsList {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.TitleTextBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.headerText {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 135%;
+  text-align: center;
+  color: #8426d7;
+}
+
+.eventsTitle {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 140%;
+  text-align: center;
+  color: var(--black);
+  /* display: none; */
+}
+
+.eventItem {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 100px;
+  background: #f9f9f9;
+  /* display: none; */
+}
+
+.eventItem:hover {
+  background: #f9fafb;
+}
+
+.eventItem.activeEvent {
+  background: var(--violet);
+  color: white;
+}
+
+.eventItem.activeEvent .eventDay {
+  color: var(--white);
+}
+
+.eventItem.activeEvent .eventTime {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.eventItem.activeEvent .eventTitle {
+  color: var(--white);
+}
+
+.eventItem.activeEvent .eventDescription {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.eventDate {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: 100%;
+  width: 83px;
+  gap: 10px;
+}
+
+.eventDay {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.eventItem:not(.activeEvent) .eventDay {
+  color: var(--black);
+}
+
+.eventTime {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: rgba(255, 254, 252, 0.6);
+}
+
+.eventItem:not(.activeEvent) .eventTime {
+  color: rgba(14, 14, 14, 0.6);
+}
+
+.eventDivider {
+  width: 2px;
+  height: 100%;
+  background: var(--black);
+  opacity: 0.3;
+
+  border-radius: 2px;
+}
+
+.eventItem.activeEvent .eventDivider {
+  background: var(--white);
+  opacity: 0.3;
+}
+
+.eventInfo {
+  flex: 1;
+}
+
+.eventTitle {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--white);
+}
+
+.eventItem:not(.activeEvent) .eventTitle {
+  color: var(--black);
+}
+
+.eventDescription {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 140%;
+  color: #6b7280;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eventItem:not(.activeEvent) .eventDescription {
+  color: rgba(14, 14, 14, 0.4);
+}
+
+.eventDetailsButton {
+  border: 1px solid var(--grey);
+  border-radius: 16px;
+  padding: 14px 28px;
+  width: 180px;
+  height: 40px;
+  background: #f9f9f9;
+  color: var(--black);
+  font-family: var(--third-family);
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.eventDetailsButton:hover {
+  background: #f0f0f0;
+}
+
+.eventItem.activeEvent .eventDetailsButton {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--white);
+}
+
+.eventCardBlock {
+  border-radius: 16px;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.eventCard {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.eventCardImage {
+  position: relative;
+  width: 100%;
+  height: 364px;
+  /* height: 490px; */
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.cardImage {
+  object-fit: cover;
+}
+
+.eventCardMeta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cardMetaItem {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 120%;
+  color: #6b7280;
+  background: #f9f9f9;
+
+  border-radius: 47px;
+  padding: 10px 16px;
+  height: 37px;
+}
+
+.cardMetaItemText {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 140%;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  color: rgba(14, 14, 14, 0.6);
+}
+
+.eventCardTitle {
+  font-family: var(--second-family);
+  font-weight: 500;
+  font-size: 56px;
+  line-height: 120%;
+  letter-spacing: -0.03em;
+  color: var(--black);
+}
+
+.eventCardDescription {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: rgba(14, 14, 14, 0.4);
+}
+
+.eventCardResults {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.resultsGrid {
+  display: flex;
+  gap: 12px;
+}
+
+.eventCardButton {
+  width: 100%;
+  padding: 16px 24px;
+  background: var(--violet);
+
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 120%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  /* display: none; */
+}
+
+.eventCardButton:hover {
+  background: var(--black);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  max-width: auto;
+  width: 100%;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  overflow-y: auto;
+  /* Запобігаємо прокрутці до хедера */
+  overscroll-behavior: contain;
+  /* Забезпечуємо, що модалка завжди в центрі viewport */
+  margin: 0;
+}
+
+.modalContent {
+  position: relative;
+  background: var(--white);
+  border-radius: 16px;
+  max-width: 1228px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  margin: auto;
+}
+
+.modalCloseButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 1px solid var(--grey);
+  color: var(--black);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  transition: all 0.2s ease;
+}
+
+.modalCloseButton:hover {
+  background: #f0f0f0;
+}
+
+.eventImage {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.eventMeta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.metaItem {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 120%;
+  color: #6b7280;
+  background: #f9fafb;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.eventDescription {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 140%;
+  color: #4b5563;
+  margin: 0;
+}
+
+.results {
+  margin-top: 24px;
+}
+
+.eventCardResults {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.resultsTitle {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 140%;
+  color: var(--black);
+}
+
+.resultsList {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.resultItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--black);
+
+  border-radius: 20px;
+  padding: 10px 16px;
+  background: #f9f9f9;
+}
+
+.resultIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  overflow: hidden;
+}
+.resultIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.resultText {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 120%;
+  color: var(--black);
+}
+
+.signUpButton {
+  width: 100%;
+  padding: 16px 24px;
+  background: #7a5af8;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 120%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 24px;
+}
+
+.signUpButton:hover {
+  background: #6d4cdb;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(122, 90, 248, 0.3);
+}
+
+.eventCardImageWrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 32px 52px 52px;
+  flex: 1;
+  height: 100%;
+  gap: 70px;
+  background: var(--white);
+  height: 516px;
+}
+
+.eventCardBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.eventCardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.eventCardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (max-width: 1000px) {
+  .section {
+    padding: mvw(24) 0;
+  }
+  .container {
+    padding: 0 mvw(16);
+  }
+  .rightColumn {
+    display: none;
+  }
+  .header {
+    text-align: left;
+  }
+  .headerText {
+    font-family: var(--font-family);
+    font-weight: 600;
+    font-size: mvw(14);
+    line-height: 140%;
+    text-align: center;
+    color: var(--violet);
+  }
+  .title {
+    font-size: mvw(28);
+    text-align: left;
+  }
+  .content {
+    flex-direction: column;
+    gap: mvw(16);
+  }
+  .leftColumnWrapper {
+    padding: mvw(16);
+    border-radius: mvw(16);
+    gap: mvw(16);
+    max-width: 100%;
+    height: auto;
+  }
+  .calendarBlock {
+    border-radius: mvw(16);
+  }
+  .calendar {
+    gap: mvw(16);
+  }
+  .monthTitle {
+    font-size: mvw(20);
+  }
+  .navButton {
+    width: mvw(32);
+    height: mvw(32);
+    padding: mvw(8);
+  }
+  .weekDays {
+    gap: mvw(4);
+  }
+  .weekDay {
+    width: mvw(42);
+    height: mvw(24);
+    font-size: mvw(12);
+    border-radius: mvw(8);
+    background: none;
+  }
+  .calendarGrid {
+    grid-template-rows: repeat(5, mvw(42));
+    gap: mvw(4);
+  }
+  .calendarDay {
+    width: mvw(42);
+    height: mvw(42);
+    border-radius: mvw(12);
+    font-size: mvw(14);
+  }
+  .calendarDay.selected {
+    background: var(--violet);
+    padding: mvw(20);
+  }
+  .calendarDay.selectedEventDay {
+    border: 2px solid var(--violet);
+  }
+  .eventsTitle {
+    font-size: mvw(16);
+    text-align: left;
+  }
+  .eventsListBlock {
+    height: auto;
+    max-height: mvw(300);
+    padding: 0;
+  }
+  .eventsList {
+    gap: mvw(8);
+  }
+  .eventItem {
+    padding: mvw(12);
+    border-radius: mvw(12);
+    height: auto;
+    min-height: mvw(68);
+    gap: mvw(12);
+    flex-direction: row;
+    align-items: flex-start;
+    position: relative;
+  }
+  .eventDate {
+    gap: mvw(6);
+    min-width: mvw(86);
+  }
+  .eventDay {
+    font-size: mvw(14);
+  }
+  .eventTime {
+    font-size: mvw(12);
+  }
+  .eventDivider {
+    width: 1px;
+    min-height: mvw(68);
+    height: auto;
+    align-self: stretch;
+    background: var(--black);
+    opacity: 1;
+    flex-shrink: 0;
+  }
+
+  .eventItem.activeEvent .eventDivider {
+    background: var(--white);
+    opacity: 1;
+  }
+  .eventInfoWrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: mvw(12);
+    align-items: center;
+  }
+  .eventInfo {
+    display: flex;
+    flex-direction: column;
+    gap: mvw(8);
+    align-items: center;
+    width: 100%;
+  }
+  .eventTitle {
+    font-size: mvw(14);
+    text-align: center;
+  }
+  .eventDescription {
+    font-size: mvw(12);
+    display: none;
+  }
+  .eventDetailsButton {
+    width: mvw(180);
+    height: mvw(40);
+    padding: mvw(14) mvw(28);
+    border-radius: mvw(16);
+    font-size: mvw(12);
+    flex-shrink: 0;
+    align-self: center;
+  }
+  .modalOverlay {
+    padding: 0;
+
+    align-items: center;
+    justify-content: center;
+  }
+  .modalContent {
+    border-radius: mvw(16);
+    height: auto;
+    width: mvw(343);
+    max-width: 100%;
+  }
+  .modalCloseButton {
+    top: 6vw;
+    right: 6vw;
+    width: mvw(44);
+    height: mvw(44);
+    font-size: mvw(24);
+    border-radius: mvw(12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .eventCardBlock {
+    border-radius: mvw(16);
+    width: 100%;
+  }
+  .eventCardImage {
+    height: mvw(189);
+  }
+  .eventCardImageWrap {
+    padding: mvw(16);
+    gap: mvw(24);
+  }
+  .cardMetaItem {
+    padding: mvw(8);
+    height: mvw(30);
+    border-radius: mvw(47);
+    font-size: mvw(12);
+    width: auto;
+    min-width: mvw(107);
+  }
+  .cardMetaItemText {
+    font-size: mvw(10);
+    line-height: 100%;
+    font-family: var(--font-family);
+    font-weight: 500;
+
+    line-height: 140%;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+    color: rgba(14, 14, 14, 0.6);
+  }
+  .eventCardTitle {
+    font-size: mvw(18);
+
+    font-family: var(--second-family);
+    font-weight: 500;
+
+    line-height: 100%;
+    letter-spacing: -0.03em;
+    color: var(--black);
+  }
+  .eventCardDescription {
+    font-size: mvw(14);
+    line-height: 140%;
+    letter-spacing: -0.01em;
+
+    font-family: var(--font-family);
+    font-weight: 500;
+
+    color: rgba(14, 14, 14, 0.4);
+  }
+  .eventCardResults {
+    gap: mvw(12);
+  }
+  .resultsTitle {
+    font-size: mvw(16);
+
+    font-family: var(--font-family);
+    font-weight: 500;
+
+    line-height: 100%;
+    color: var(--black);
+  }
+  .resultsGrid {
+    gap: mvw(8);
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .resultItem {
+    padding: mvw(6) mvw(8);
+    border-radius: mvw(20);
+    gap: mvw(8);
+    width: auto;
+    height: auto;
+    background: var(--bg-color);
+  }
+  .resultIcon {
+    width: mvw(20);
+    height: mvw(20);
+  }
+  .resultIcon svg {
+    width: mvw(20);
+    height: mvw(20);
+  }
+  .resultText {
+    font-size: mvw(12);
+
+    font-weight: 700;
+    font-family: var(--third-family);
+
+    line-height: 140%;
+    letter-spacing: -0.01em;
+    color: var(--black);
+  }
+  .eventCardButton {
+    width: 100%;
+    height: mvw(50);
+    padding: mvw(16) mvw(24);
+    border-radius: mvw(16);
+    font-size: mvw(16);
+    align-self: stretch;
+    background: var(--violet);
+  }
+  .TitleTextBlock {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: mvw(6);
+  }
+  .title {
+    font-family: var(--second-family);
+    font-weight: 700;
+    font-size: mvw(28);
+    line-height: 120%;
+    letter-spacing: -0.01em;
+    text-align: center;
+    color: var(--black);
+  }
+  .navButton {
+    width: mvw(46);
+    height: mvw(46);
+    padding: mvw(8);
+    border-radius: mvw(32);
+    color: var(--violet);
+
+    background: none;
+  }
+  .monthTitle {
+    font-family: var(--font-family);
+    font-weight: 600;
+    font-size: mvw(20);
+    letter-spacing: -0.04em;
+    color: var(--black);
+  }
+  .otherMonth {
+    font-size: mvw(14) !important;
+    border-radius: mvw(12) !important;
+  }
+  .eventCardContent {
+    gap: mvw(20);
+  }
+  .navButtonIcon {
+    svg {
+      width: mvw(20);
+      height: mvw(20);
+    }
+  }
+}

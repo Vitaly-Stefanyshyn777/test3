@@ -1,0 +1,245 @@
+.productCard {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  border: 1px solid #f0f0f0;
+  position: relative;
+}
+
+.productCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.cardImage {
+  position: relative;
+  width: 100%;
+  height: 251px;
+  overflow: hidden;
+}
+
+.productImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.productCard:hover .productImage {
+  transform: scale(1.05);
+}
+
+.badges {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 2;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: lowercase;
+  color: #fff;
+  line-height: 1;
+  font-family: var(--font-family);
+}
+
+.newBadge {
+  background: #8b5cf6;
+}
+
+.hitBadge {
+  background: #ff3b30;
+}
+
+.discountBadge {
+  background: #8b5cf6;
+}
+
+.favoriteActive {
+  background: var(--violet);
+  color: #fff;
+}
+
+.favoriteActive svg {
+  fill: #fff;
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 24px 24px;
+  width: 100%;
+  height: auto;
+  height: 100%;
+}
+
+.category {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 140%;
+  letter-spacing: -0.02em;
+  color: var(--black);
+  opacity: 0.6;
+}
+
+.productName {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 140%;
+  color: var(--black);
+}
+
+.productInfo {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  width: auto;
+}
+
+/* Додаємо стилі для опису */
+.productDescription {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 140%;
+  color: rgba(14, 14, 14, 0.6);
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.star {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.starFilled {
+  color: #8b5cf6;
+}
+
+.starHalf {
+  color: #8b5cf6;
+  opacity: 0.7;
+}
+
+.starEmpty {
+  color: #d1d5db;
+}
+
+.reviewsCount {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: rgba(14, 14, 14, 0.6);
+}
+
+.requirements {
+  margin: 0 0 16px 0;
+}
+
+.requirementsBadge {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #8b5cf6;
+  color: white;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-family);
+}
+
+.subscriptionBlock {
+  width: 100%;
+  height: auto;
+  display: flex;
+}
+
+.subscriptionPrice {
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: space-between;
+}
+
+.subscriptionDiscountBlock {
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.subscriptionDiscount {
+  margin: -2px 0 4px 0;
+}
+
+.pricing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.currentPrice {
+  font-weight: 600;
+  color: var(--black);
+  font-size: 18px;
+  line-height: 1;
+  font-family: var(--font-family);
+}
+
+.originalPrice {
+  font-size: 14px;
+  color: #999;
+  text-decoration: line-through;
+  line-height: 1;
+  font-family: var(--font-family);
+}
+
+.cartBtn {
+  bottom: 18px;
+  right: 24px;
+  background: var(--violet);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #fff;
+  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+}
+
+.cartBtn:hover {
+  background: var(--black);
+  transform: scale(1.05);
+}
+
+.cartBtn svg {
+  width: 20px;
+  height: 20px;
+}

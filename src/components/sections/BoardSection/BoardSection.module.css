@@ -1,0 +1,296 @@
+.section {
+  padding: 100px 0;
+}
+
+.container {
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 72px;
+}
+
+.titleTextBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.eyebrow {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 135%;
+  text-align: center;
+  color: #8426d7;
+}
+
+.title {
+  font-family: var(--second-family);
+  font-weight: 700;
+  font-size: 56px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  text-align: center;
+  color: var(--black);
+}
+
+.grid {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: start;
+  align-items: flex-end;
+}
+
+/* Mobile card */
+.mobileCard {
+  display: none;
+}
+.mobileImageWrap {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.mobileList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mobileItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #ffffff;
+  border-radius: 14px;
+}
+.mobileItemIcon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 10px;
+  background: rgba(132, 38, 215, 0.1);
+  color: var(--violet);
+}
+.mobileItemIcon svg {
+  width: 14px;
+  height: 14px;
+}
+.mobileItemText {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  color: var(--black);
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 28px;
+  overflow: hidden;
+  position: relative;
+}
+
+.card1 {
+  width: 344px;
+  height: 560px;
+}
+
+.card2 {
+  width: 360px;
+  height: 500px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.card3 {
+  width: 360px;
+  height: 400px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card4 {
+  width: 344px;
+  height: 560px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.card5 {
+  width: 360px;
+  height: 400px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.imageWrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.asset {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  height: 469px;
+  position: absolute;
+  top: 95px;
+}
+
+.assetWrap {
+  /* height: 469px; */
+  position: relative;
+  bottom: 43%;
+  /* top: 115px; */
+}
+
+.assetImg {
+  object-fit: contain;
+}
+
+.icon {
+  backdrop-filter: blur(20px);
+  background: #f9f9f9;
+  color: #7a5af8;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 14px;
+
+  border-radius: 65px;
+  width: 64px;
+  height: 64px;
+  svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.cardTitleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardTitle {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 125%;
+  letter-spacing: -0.03em;
+  color: var(--black);
+}
+
+.cardDesc {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.cardDesc2 {
+  padding: 30px;
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 26px;
+  line-height: 120%;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+.cardDesc4 {
+  padding: 30px;
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 26px;
+  line-height: 120%;
+  letter-spacing: -0.03em;
+  color: var(--black);
+}
+
+@media (max-width: 1000px) {
+  .section {
+    padding: mvw(0) 0 mvw(80) 0;
+  }
+  .container {
+    gap: mvw(32);
+    padding: 0 mvw(16);
+  }
+  .eyebrow {
+    font-size: mvw(14);
+    text-align: left;
+  }
+  .title {
+    font-size: mvw(28);
+    text-align: left;
+  }
+  .grid {
+    display: none;
+  }
+  .mobileCard {
+    display: block;
+  }
+  .mobileImageWrap {
+    height: mvw(200);
+    border-radius: mvw(16);
+    margin-bottom: mvw(12);
+  }
+  .mobileList {
+    gap: mvw(8);
+  }
+  .mobileItem {
+    gap: mvw(10);
+    padding: mvw(12);
+    border-radius: mvw(12);
+  }
+  .mobileItemIcon {
+    display: grid;
+    place-items: center;
+    width: mvw(40);
+    height: mvw(40);
+    min-width: mvw(40);
+    min-height: mvw(40);
+    border-radius: 50%;
+    background: var(--bg-color);
+    color: var(--violet);
+    flex-shrink: 0;
+  }
+  .mobileItemIcon svg {
+    width: mvw(20);
+    height: mvw(20);
+    flex-shrink: 0;
+  }
+  .mobileItemText {
+    font-size: mvw(14);
+  }
+  .titleTextBlock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+}

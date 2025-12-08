@@ -1,0 +1,16 @@
+.sectionWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 180px;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1000px) {
+  .sectionWrap {
+    gap: mvw(24);
+    overflow-x: hidden;
+  }
+}

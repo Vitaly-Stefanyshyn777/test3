@@ -1,0 +1,441 @@
+.productCard {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+}
+
+.productCardFluid {
+  width: 100%;
+  height: auto;
+}
+
+.cardImage {
+  position: relative;
+  width: 100%;
+  height: 251px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.productImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.productCard:hover .productImage {
+  transform: scale(1.05);
+}
+
+.badges {
+  display: flex;
+  /* flex-direction: column; */
+  gap: 6px;
+  z-index: 2;
+}
+
+.badge {
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: lowercase;
+  color: #fff;
+  line-height: 1;
+  font-family: var(--font-family);
+
+  border-radius: 10px;
+  padding: 12px;
+  width: 42px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.newBadge {
+  background: var(--white);
+  color: var(--violet);
+
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 10;
+  position: relative;
+
+  border-radius: 10px;
+  padding: 12px;
+  width: 75px;
+  height: 36px;
+}
+
+.hitBadge {
+  background: #ff3b30;
+}
+
+.discountBadge {
+  background: #8b5cf6;
+}
+
+.favoriteBtn {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 2;
+  backdrop-filter: blur(4px);
+  color: var(--violet);
+  svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+    transform: translateX(0.5px);
+  }
+}
+
+/* .favoriteBtn:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.1);
+} */
+
+.favoriteActive {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--violet);
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 18px 24px 24px;
+  width: 100%;
+  flex: 1 1 auto;
+}
+
+.category {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 140%;
+  letter-spacing: -0.02em;
+  color: var(--black);
+  opacity: 0.6;
+}
+
+.productName {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 140%;
+  color: var(--black);
+}
+
+.subscriptionBlock {
+  width: 100%;
+  height: auto;
+  display: flex;
+}
+
+.subscriptionPrice {
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.subscriptionDiscount {
+  margin: -2px 0 4px 0;
+}
+
+.subscriptionPriceAuth {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.subNewPrice {
+  color: var(--black);
+  font-weight: 700;
+}
+
+.subOldPrice {
+  color: #999;
+  text-decoration: line-through;
+}
+
+.pricing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.currentPrice {
+  font-weight: 600;
+  color: var(--black);
+  font-size: 18px;
+  line-height: 1;
+  font-family: var(--font-family);
+}
+
+.originalPrice {
+  font-size: 14px;
+  color: #999;
+  text-decoration: line-through;
+  line-height: 1;
+  font-family: var(--font-family);
+}
+
+.cartBtn {
+  background: var(--violet);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--white);
+  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+  margin-left: auto; /* штовхаємо кнопку вправо у flex-рядку ціни */
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.cartBtn:hover {
+  background: var(--black);
+  color: var(--white);
+}
+
+/* Disable hover when active (trash icon state) */
+.cartBtn.cartBtnActive:hover {
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--black);
+}
+
+/* .cartBtn:hover {
+  background: var(--black);
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+} */
+
+.cartBtn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.cartBtnActive {
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--black) !important;
+}
+
+.cartBtnActive svg {
+  stroke: var(--black) !important;
+}
+
+/* Кнопка "Немає сертифікації" */
+.noCertificationButton {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #ff4444;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 3;
+  box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.noCertificationButton:hover {
+  background: #ff3333;
+  transform: translate(-50%, -50%) scale(1.05);
+  box-shadow: 0 6px 16px rgba(255, 68, 68, 0.4);
+}
+
+/* Стилі для карток з категорією "Немає сертифікації" */
+.productCard[data-category="78"] {
+  position: relative;
+}
+
+.productCard[data-category="78"]::after {
+  content: "Немає сертифікації";
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 68, 68, 0.9);
+
+  letter-spacing: 0.5px;
+  z-index: 10;
+  pointer-events: none;
+
+  border-radius: 12px;
+  padding: 16px 32px;
+  width: auto;
+  max-width: none;
+  height: auto;
+  white-space: nowrap;
+  text-align: center;
+  display: block;
+
+  background: var(--style);
+
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  color: var(--white);
+}
+
+/* Кнопки для товарів без сертифікації */
+.productCard[data-category="78"] .cartBtn {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+.productCard[data-category="78"] .cartBtn:hover {
+  opacity: 0.6 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Кнопка корзини для продуктів без сертифікації */
+.cartBtnNoCert {
+  opacity: 0.6;
+  background: var(--grey-for-cards);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Всі бейджі для продуктів без сертифікації */
+.productCard[data-category="78"] .badges .badge {
+  opacity: 0.6;
+}
+
+/* Бейдж знижки з підпискою для продуктів без сертифікації */
+/* Всі основні елементи картки для продуктів без сертифікації */
+.productCard[data-category="78"] .productName {
+  opacity: 0.6;
+}
+
+.productCard[data-category="78"] .currentPrice {
+  opacity: 0.6;
+}
+
+.productCard[data-category="78"] .favoriteBtn {
+  opacity: 0.6;
+}
+
+.productCard[data-category="78"] .cardContent {
+  opacity: 0.6;
+}
+
+.productCard[data-category="78"] .cardImage {
+  opacity: 0.6;
+}
+
+@media (max-width: 1000px) {
+  .productCard {
+    border-radius: mvw(12);
+    width: mvw(166);
+    min-height: mvw(208);
+  }
+  .productCardFluid {
+    width: 100%;
+    height: auto;
+  }
+  .cardImage {
+    height: mvw(120);
+  }
+  .badges {
+    top: mvw(8);
+    left: mvw(8);
+    gap: mvw(6);
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .newBadge,
+  .hitBadge,
+  .discountBadge {
+    padding: mvw(6);
+    border-radius: mvw(6);
+    font-size: mvw(12);
+  }
+  .newBadge {
+    border-radius: mvw(6);
+    padding: mvw(6);
+    width: mvw(55);
+    height: mvw(22);
+  }
+  .cardContent {
+    padding: mvw(12);
+    gap: mvw(10);
+    flex: 1 1 auto;
+  }
+  .productName {
+    font-size: mvw(12);
+    font-family: var(--font-family);
+    font-weight: 500;
+    line-height: 140%;
+    letter-spacing: -0.01em;
+    color: var(--black);
+  }
+  .pricing {
+    gap: mvw(6);
+    align-items: flex-start;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .currentPrice {
+    font-size: mvw(18);
+    font-family: var(--second-family);
+    font-weight: 600;
+    line-height: 100%;
+    color: var(--black);
+  }
+  .originalPrice {
+    font-size: mvw(14);
+    font-family: var(--second-family);
+    font-weight: 500;
+    line-height: 100%;
+    letter-spacing: -0.01em;
+    color: var(--grey-for-cards);
+  }
+
+  .productCard[data-category="78"]::after {
+    border-radius: mvw(12);
+    padding: mvw(8) mvw(12);
+
+    font-size: mvw(12);
+  }
+}

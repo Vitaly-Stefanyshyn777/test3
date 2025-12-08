@@ -1,0 +1,378 @@
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  backdrop-filter: blur(10px);
+  background: rgba(14, 14, 14, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal {
+  background: var(--bg-color);
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  border-radius: 20px;
+  padding: 52px;
+  width: 764px;
+  height: 619px;
+}
+
+.headerBlock {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.header {
+  text-align: center;
+}
+
+.header h2 {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 110%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.subtitle {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+  opacity: 0.6;
+}
+
+.close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  background-color: var(--bg-light);
+  border-radius: 10px;
+  fill: #f2f2f2;
+}
+
+.close:hover {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.rowSingle {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.privacyLinkBlock {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  color: rgba(144, 144, 144, 0.8);
+  text-decoration: none !important;
+  text-decoration-skip-ink: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.inputIconWrapper {
+  position: absolute;
+  left: 16px;
+  top: 27px;
+  transform: translateY(-50%);
+  color: #999;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.inputIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.inputBlock {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  padding: 20px 20px 20px 48px;
+  border-radius: 12px;
+  transition: all 0.2s;
+  background: #fff;
+  box-sizing: border-box;
+  height: auto;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 130%;
+  color: rgba(14, 14, 14, 0.4);
+  background: var(--white);
+  background: #f9f9f9;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+  .input::placeholder {
+    color: #999;
+    font-size: 14px;
+  }
+
+.textarea {
+  height: auto;
+  min-height: 162px;
+  resize: vertical;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  line-height: 1.4;
+}
+
+.submit {
+  background: var(--violet);
+  border: none;
+  padding: 24px 42px;
+  border-radius: 18px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--third-family);
+  font-weight: 800;
+  line-height: 135%;
+  color: var(--white);
+  text-decoration: none;
+  margin-top: 25px;
+}
+
+/* .submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+} */
+
+.submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.error {
+  color: #e74c3c;
+  font-size: 14px;
+  margin: 0;
+  text-align: center;
+}
+
+.privacyText {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  color: rgba(14, 14, 14, 0.4);
+  text-align: center;
+  margin: 0;
+  text-decoration: none;
+}
+
+.privacyLink {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  color: rgba(14, 14, 14, 0.4);
+  text-decoration: underline;
+  text-decoration-skip-ink: none;
+}
+
+.privacyLink:hover {
+  color: #667eea;
+}
+
+@media (max-width: 1000px) {
+  .form {
+    gap: mvw(12);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+    gap: mvw(12);
+  }
+
+  .rowSingle {
+    gap: mvw(12);
+  }
+
+  .inputIcon {
+    left: mvw(16);
+    width: mvw(20);
+    height: mvw(20);
+  }
+
+  .inputIcon svg {
+    width: mvw(20);
+    height: mvw(20);
+  }
+
+  .inputIconWrapper {
+    left: mvw(16);
+    top: mvw(20);
+  }
+
+  .inputIconWrapper svg {
+    width: mvw(20);
+    height: mvw(20);
+  }
+
+  .input {
+    padding: mvw(12) mvw(16) mvw(12) mvw(48);
+    border-radius: mvw(12);
+    font-size: mvw(14);
+    line-height: 140%;
+  }
+
+  .input::placeholder {
+    color: rgba(14, 14, 14, 0.4);
+    font-size: mvw(14);
+    font-family: var(--font-family);
+    font-weight: 400;
+    line-height: 140%;
+  }
+
+  .textarea {
+    min-height: mvw(120);
+    padding-top: mvw(12);
+    padding-bottom: mvw(12);
+    padding-left: mvw(48);
+  }
+
+  .textarea::placeholder {
+    color: rgba(14, 14, 14, 0.4);
+    font-size: mvw(14);
+    font-family: var(--font-family);
+    font-weight: 400;
+    line-height: 140%;
+  }
+
+  .submit {
+    width: 100%;
+    padding: mvw(16) mvw(24);
+    border-radius: mvw(16);
+    font-size: mvw(16);
+    background: var(--bg-color);
+    color: var(--black);
+    font-weight: 600;
+    margin-top: 0;
+  }
+
+  .submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    background: var(--bg-color);
+    color: var(--black);
+  }
+
+  .privacyLinkBlock {
+    gap: mvw(12);
+    margin-top: mvw(12);
+  }
+
+  .privacyText {
+    font-size: mvw(12);
+    line-height: 140%;
+    text-align: center;
+    font-family: var(--font-family);
+    font-weight: 500;
+    color: rgba(144, 144, 144, 0.8);
+  }
+
+  .privacyLink {
+    font-size: mvw(12);
+    font-family: var(--font-family);
+    font-weight: 500;
+    line-height: 140%;
+    text-align: center;
+    color: rgba(144, 144, 144, 0.8);
+    text-decoration: underline;
+  }
+
+  .error {
+    font-size: mvw(12);
+    text-align: left;
+  }
+}

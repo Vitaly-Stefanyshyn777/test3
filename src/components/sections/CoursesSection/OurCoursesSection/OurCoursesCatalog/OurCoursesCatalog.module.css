@@ -1,0 +1,141 @@
+.trainersCatalog {
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+
+  border-radius: 1.04167vw;
+  justify-content: space-around;
+  align-items: center;
+}
+.catalogContentContainer {
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+.catalogContentBlock {
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.catalogContentBlock {
+  width: auto;
+  height: auto;
+  padding: 155px 50px 0px 50px;
+}
+
+.catalogContent {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 25px;
+  margin-top: 30px;
+}
+
+.filters {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.trainersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.error {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 140%;
+  color: var(--black);
+  text-align: center;
+  padding: 40px 20px;
+}
+
+@media (max-width: 1000px) {
+  .productsCatalog {
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .catalogContentBlock {
+    padding: mvw(24) mvw(16);
+    gap: mvw(24);
+  }
+
+  .catalogContentContainer {
+    width: 100%;
+  }
+
+  .filterSortPanel {
+    width: 100%;
+    margin-bottom: mvw(16);
+  }
+
+  .filterSortBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: mvw(12);
+  }
+
+  .filterMobileButton {
+    display: flex;
+    align-items: center;
+    gap: mvw(8);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: mvw(8) mvw(12);
+  }
+
+  .filterMobileIcon {
+    width: mvw(20);
+    height: mvw(20);
+  }
+
+  .filterMobileLabel {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(14);
+    color: var(--black);
+  }
+
+  .sortSection {
+    display: flex;
+    align-items: center;
+    gap: mvw(12);
+  }
+
+  .sortOptionWrapper {
+    display: flex;
+    align-items: center;
+    gap: mvw(12);
+  }
+
+  .sortOptionLabel {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(14);
+    color: var(--black);
+  }
+
+  .sortIcon {
+    width: mvw(14);
+    height: mvw(8);
+  }
+
+  .catalogContent {
+    display: flex;
+    flex-direction: column;
+    gap: mvw(16);
+    margin-top: 0;
+    grid-template-columns: 1fr;
+  }
+}

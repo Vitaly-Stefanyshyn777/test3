@@ -1,0 +1,88 @@
+.contactSection {
+  padding: 200px 0px;
+  background-color: #9f57ff;
+  background: url(/Frame13213183072.png);
+  background-size: cover;
+  width: 100%;
+
+  max-width: 1900px;
+  border-radius: 56px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  height: auto;
+}
+
+.container {
+  width: 100%;
+  max-width: 100%;
+  padding: 0 20px;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+  height: auto;
+}
+
+.innerContainer {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  max-width: 1528px;
+  box-sizing: border-box;
+  height: auto;
+}
+
+.formWrapper {
+  flex: 0 0 58.9%;
+  background: white;
+  border-radius: 24px;
+  padding: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  min-height: auto;
+}
+
+@media (max-width: 1000px) {
+  .contactSection {
+    padding: mvw(50) 0;
+    border-radius: 0;
+    background-color: #9f57ff;
+    background-image: url(/images/Frame132131830791.png);
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    height: auto;
+  }
+
+  .container {
+    padding: 0 mvw(16);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    height: auto;
+  }
+
+  .innerContainer {
+    flex-direction: column;
+    gap: mvw(40);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    height: auto;
+  }
+
+  .formWrapper {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+    padding: mvw(20) mvw(16);
+    border-radius: mvw(16);
+    box-sizing: border-box;
+    height: auto;
+    min-height: auto;
+    font-size: mvw(14);
+  }
+}

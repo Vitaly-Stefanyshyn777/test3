@@ -1,0 +1,36 @@
+.iconBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 2;
+  backdrop-filter: blur(4px);
+  color: var(--violet);
+}
+
+.iconBtn svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.iconBtnActive {
+  background: var(--violet);
+  color: #fff;
+}
+
+.iconBtnActive svg {
+  fill: #fff;
+  stroke: #fff;
+}
+
+

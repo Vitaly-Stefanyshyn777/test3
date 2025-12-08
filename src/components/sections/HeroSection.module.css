@@ -1,0 +1,607 @@
+.hero {
+  color: #fff;
+  display: flex;
+  justify-content: center;
+
+  position: relative; /* for absolutely positioned banner */
+
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Container of the photo (Banner) */
+.heroBanner {
+  position: absolute; /* sit behind content */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  /* background буде додано через inline style з JS */
+  /* Не блокуємо кліки по елементам зверху (навігація, кнопки) */
+  pointer-events: none;
+}
+
+.heroContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1896px;
+  margin: 0 auto;
+  padding: 0 98px;
+  gap: 80px;
+  position: relative;
+  height: 1110px;
+  z-index: 1; /* above banner */
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 56px;
+  max-width: 600px;
+  flex: 1;
+}
+
+.heroContentBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.roiBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+
+  border-radius: 8px;
+  padding: 10px 14px;
+  width: 263px;
+  height: 46px;
+  svg {
+    width: 23px;
+    height: 23px;
+  }
+}
+
+.roiIcon {
+  font-size: 16px;
+}
+
+.roiText {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 140%;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+
+.heroTitle {
+  font-family: var(--second-family);
+  font-weight: 800;
+  font-size: 72px;
+  line-height: 110%;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+
+.heroDescription {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--white);
+}
+
+.heroActions {
+  display: flex;
+  gap: 13px;
+  margin-top: 10px;
+}
+
+.heroOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+
+  pointer-events: none;
+  z-index: 2;
+  display: block;
+}
+.heroButtonPrimary,
+.heroButtonSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--third-family);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 100%;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  cursor: pointer;
+  border-radius: 20px;
+  height: 64px;
+  padding: 24px 42px;
+}
+.heroButtonPrimary {
+  color: var(--white);
+  background: var(--violet);
+  font-family: var(--third-family);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 100%;
+  color: var(--white);
+}
+
+.heroButtonSecondary {
+  color: var(--white);
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  background: var(--white);
+  transition: all 0.3s ease;
+
+  font-family: var(--third-family);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 100%;
+  color: #3b2d47;
+}
+
+.heroButtonPrimary:hover {
+  background: var(--black);
+  transition: all 0.3s ease;
+}
+
+.heroButtonSecondary:hover {
+  background: var(--black);
+  color: var(--white);
+  transition: all 0.3s ease;
+  border: 2px solid var(--black);
+}
+
+.heroNavigation {
+  align-items: center;
+  gap: 24px;
+  margin-top: 1.04167vw;
+  display: flex;
+  position: absolute;
+  left: 94px;
+  bottom: 85px;
+  z-index: 2; /* вище за банер/слайди */
+}
+
+/* Floating hero video container (replaces previous inline styles) */
+.heroVideo {
+  position: absolute;
+  right: 48px;
+  bottom: 120px;
+  width: 520px;
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+  border-radius: 32px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* Стилі для відео плеєра в хіро */
+.heroVideo :global(.closeButton) {
+  position: absolute !important;
+  left: 16px !important;
+  top: 16px !important;
+  z-index: 20 !important;
+  backdrop-filter: blur(20px) !important;
+  background: rgba(255, 254, 252, 0.4) !important;
+  color: #fff !important;
+  border: none !important;
+  height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  border-radius: 62px !important;
+  padding: 16px !important;
+  width: 109px !important;
+  min-width: 109px !important;
+  font-family: var(--font-family) !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  line-height: 140% !important;
+  color: var(--white) !important;
+  box-sizing: border-box !important;
+}
+
+.heroVideo :global(.closeButton svg) {
+  width: 12px !important;
+  height: 12px !important;
+  stroke: var(--white) !important;
+  stroke-width: 2px !important;
+  transform: rotate(-180deg) !important;
+  flex-shrink: 0 !important;
+}
+
+.heroVideo :global(.playPauseButton) {
+  width: 70px !important;
+  height: 69px !important;
+  min-width: 70px !important;
+  min-height: 69px !important;
+  border-radius: 40px !important;
+  padding: 0 !important;
+  border: none !important;
+  backdrop-filter: blur(20px) !important;
+  background: rgba(255, 254, 252, 0.4) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18) !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+}
+
+.heroVideo :global(.playPauseButton.noBlur) {
+  backdrop-filter: none !important;
+  background: var(--white) !important;
+}
+
+.heroVideo :global(.playPauseButton .playTriangle),
+.heroVideo :global(.playPauseButton .playTriangle img) {
+  width: 27px;
+  height: 30px;
+}
+
+.heroVideo :global(.playPauseButton:not(.noBlur) .playTriangle),
+.heroVideo :global(.playPauseButton:not(.noBlur) .playTriangle img) {
+  fill: var(--white);
+}
+
+.heroVideo :global(.playPauseButton.noBlur .playTriangle),
+.heroVideo :global(.playPauseButton.noBlur .playTriangle img) {
+  fill: #3b2d47;
+}
+
+.heroVideo :global(.playPauseButton.noBlur .playTriangle svg),
+.heroVideo :global(.playPauseButton.noBlur .playTriangle svg path) {
+  fill: #3b2d47;
+  stroke: #3b2d47;
+}
+
+.navArrow {
+  border-radius: 62px;
+  padding: 24px;
+  width: 68px;
+  height: 68px;
+
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 18px;
+
+  backdrop-filter: blur(20px);
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.navArrow:hover {
+  backdrop-filter: blur(20px);
+  background: var(--white);
+  color: var(--black);
+}
+
+.navDots {
+  display: flex;
+  gap: 8px;
+}
+
+.navDot {
+  border-radius: 10px;
+  width: 10px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.navDotActive {
+  background: white;
+  transform: scale(1.2);
+}
+
+.heroImageContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+}
+
+.heroImage {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 1000px) {
+  .hero {
+    flex-direction: column;
+    background: #f5f5f5;
+    padding: mvw(68) 0 0 0;
+  }
+
+  /* Банер стає звичайним блоком зверху, а не absolute */
+  .heroBanner {
+    position: relative;
+    width: 100%;
+    height: mvw(256);
+    border-radius: 0 0 mvw(16) mvw(16);
+    overflow: hidden;
+    pointer-events: auto; /* Дозволяємо взаємодію з Swiper на мобільній */
+  }
+
+  .heroBanner :global(.swiper),
+  .heroBanner :global(.swiper-wrapper),
+  .heroBanner :global(.swiper-slide) {
+    height: 100%;
+  }
+
+  /* .heroBanner :global(.swiper-slide) > div {
+    border-radius: 0 0 mvw(16) mvw(16);
+    height: 100%;
+  } */
+
+  .heroContainer {
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    height: auto;
+    gap: 0;
+    padding: mvw(20) mvw(16) mvw(100) mvw(16);
+    border-radius: 0 0 mvw(20) mvw(20);
+  }
+
+  .heroContent {
+    width: 100%;
+    gap: mvw(24);
+    max-width: 100%;
+  }
+
+  .heroContentBlock {
+    gap: mvw(12);
+  }
+
+  .roiBanner {
+    width: auto;
+    height: auto;
+    padding: mvw(10);
+    gap: mvw(9);
+
+    backdrop-filter: none;
+
+    border-radius: mvw(10);
+    color: var(--violet);
+
+    backdrop-filter: blur(20px);
+    background: rgba(132, 38, 215, 0.16);
+  }
+
+  .roiBanner svg {
+    width: mvw(26);
+    height: mvw(26);
+  }
+
+  .roiText {
+    font-family: var(--font-family);
+    font-weight: 600;
+    font-size: mvw(13);
+    line-height: 140%;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--violet);
+  }
+
+  .heroTitle {
+    font-family: var(--second-family);
+    font-weight: 800;
+    font-size: mvw(28);
+    line-height: 120%;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+
+  .heroDescription {
+    font-size: mvw(14);
+    line-height: 140%;
+    color: var(--black);
+    font-family: var(--font-family);
+    font-weight: 500;
+  }
+
+  .heroActions {
+    flex-direction: column;
+    width: 100%;
+    gap: mvw(12);
+    margin-top: 0;
+  }
+
+  .heroOverlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: mvw(200);
+
+    pointer-events: none;
+    z-index: 2;
+    display: block;
+  }
+
+  .heroButtonPrimary,
+  .heroButtonSecondary {
+    width: 100%;
+    height: mvw(48);
+    padding: mvw(14) mvw(24);
+    font-size: mvw(14);
+    border-radius: mvw(12);
+  }
+
+  .heroButtonPrimary {
+    background: var(--violet);
+    color: var(--white);
+
+    font-family: var(--third-family);
+    font-weight: 700;
+    font-size: mvw(14);
+    line-height: 100%;
+    color: #fff;
+  }
+
+  .heroButtonSecondary {
+    background: var(--white);
+    color: var(--violet);
+    border-color: var(--violet);
+    font-family: var(--third-family);
+    font-weight: 500;
+    font-size: mvw(14);
+    line-height: 100%;
+
+    border: mvw(2) solid var(--violet);
+  }
+
+  /* Приховуємо відео на мобільній версії */
+  /* .heroVideo {
+    display: none;
+  } */
+  .heroVideo {
+    width: mvw(343);
+    aspect-ratio: 16 / 9;
+    border-radius: mvw(30);
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    bottom: mvw(110);
+    right: mvw(16);
+    position: relative;
+    bottom: -8.6667vw;
+    right: 0;
+  }
+
+  /* Мобільні стилі для відео плеєра в хіро */
+  .heroVideo :global(.closeButton) {
+    left: mvw(16) !important;
+    top: mvw(16) !important;
+    height: mvw(44) !important;
+    gap: mvw(8) !important;
+    border-radius: mvw(62) !important;
+    padding: mvw(16) !important;
+    width: mvw(109) !important;
+    min-width: mvw(109) !important;
+    font-size: mvw(14) !important;
+  }
+
+  .heroVideo :global(.closeButton svg) {
+    width: mvw(12) !important;
+    height: mvw(12) !important;
+    stroke-width: 2px !important;
+  }
+
+  .heroVideo :global(.playPauseButton) {
+    width: mvw(70) !important;
+    height: mvw(69) !important;
+    min-width: mvw(70) !important;
+    min-height: mvw(69) !important;
+    border-radius: mvw(40) !important;
+    box-shadow: 0 mvw(10) mvw(24) rgba(0, 0, 0, 0.18) !important;
+    padding: 0 !important;
+  }
+
+  .heroVideo :global(.playPauseButton .playTriangle),
+  .heroVideo :global(.playPauseButton .playTriangle img) {
+    width: mvw(27);
+    height: mvw(30);
+  }
+
+  .heroVideo :global(.playPauseButton:not(.noBlur) .playTriangle),
+  .heroVideo :global(.playPauseButton:not(.noBlur) .playTriangle img) {
+    fill: var(--white);
+  }
+
+  .heroVideo :global(.playPauseButton.noBlur .playTriangle),
+  .heroVideo :global(.playPauseButton.noBlur .playTriangle img) {
+    fill: var(--black);
+  }
+  /* Приховуємо навігацію на мобільній версії або змінюємо позиціювання */
+  .heroNavigation {
+    display: flex;
+    position: absolute;
+    left: 50%;
+    top: mvw(20);
+    transform: translateX(-50%);
+    gap: mvw(8);
+    z-index: 5;
+    bottom: auto; /* скидаємо desktop-значення */
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Показуємо тільки лінії (без стрілок) на мобільній версії */
+  .heroNavigation .navArrow {
+    display: none !important;
+  }
+
+  /* Показуємо тільки контейнер з лініями */
+  .heroNavigation .navDots {
+    display: flex;
+    gap: mvw(8);
+    padding: mvw(68) 0 0 0;
+  }
+
+  /* Лінії навігації (мобільна версія) */
+  .navDot {
+    border-radius: 60px;
+    width: mvw(81);
+    height: mvw(2);
+    background: var(--white);
+    opacity: 0.1;
+  }
+
+  .navDotActive {
+    width: mvw(57);
+    height: mvw(2);
+    background: var(--white);
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Контейнер для двох блоків контенту */
+  .heroContent {
+    display: flex;
+    flex-direction: column;
+    gap: mvw(20);
+  }
+}

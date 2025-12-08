@@ -1,0 +1,756 @@
+.section {
+  background-color: #fff;
+  padding-top: 8.49vw;
+  padding-bottom: 8.49vw;
+  border-radius: 2.92vw;
+  z-index: 10;
+  position: relative;
+  bottom: 40px;
+
+  h2 {
+    margin-bottom: 3.75vw;
+    font-size: 2.92vw;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.56px;
+    color: var(--text-black);
+    text-align: center;
+  }
+
+  .content {
+    display: flex;
+    justify-content: space-between;
+    .firstBlock {
+      flex-shrink: 0;
+      width: 25.26vw;
+
+      .topBlock {
+        margin-bottom: 1.46vw;
+        padding: 1.67vw;
+        border-radius: 1.67vw;
+        background-color: var(--bg-light);
+
+        h3 {
+          margin-bottom: 0.42vw;
+          font-size: 1.67vw;
+          font-style: normal;
+          font-weight: 600;
+          line-height: 1.2;
+          letter-spacing: -0.32px;
+          color: var(--text-black);
+        }
+
+        p {
+          margin-bottom: 1.15vw;
+          font-family: "Golos Text", sans-serif;
+          font-size: 0.83vw;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 1.4;
+          letter-spacing: -0.16px;
+          color: var(--text-black-transparent);
+        }
+
+        .photos {
+          display: flex;
+          justify-content: space-between;
+
+          .trainingImg {
+            width: 10.31vw;
+            height: 6.56vw;
+            border-radius: 0.31vw;
+          }
+
+          .group {
+            width: 11.1vw;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.63vw;
+
+            img {
+              width: 5.21vw;
+              height: 2.97vw;
+              border-radius: 0.31vw;
+            }
+
+            div {
+              width: 5.21vw;
+              height: 2.97vw;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              border-radius: 0.31vw;
+              background-color: var(--brand-primary);
+
+              svg {
+                width: 1.25vw;
+                height: 1.46vw;
+                fill: rgba(255, 254, 252, 0.4);
+              }
+            }
+          }
+        }
+      }
+
+      .bottomBlock {
+        height: 13.23vw;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        padding: 1.67vw;
+        border-radius: 1.67vw;
+        background-color: var(--brand-primary);
+        overflow: hidden;
+
+        .bg {
+          position: absolute;
+          z-index: 1;
+          top: -0.5vw;
+          right: -8vw;
+          width: 27.55vw;
+          height: 29.01vw;
+        }
+
+        .happyMen {
+          display: flex;
+
+          img {
+            position: relative;
+            width: 2.6vw;
+            height: 2.6vw;
+            border-radius: 50%;
+          }
+
+          img:first-child {
+            top: 0;
+            left: 0;
+          }
+
+          img:nth-child(2) {
+            left: -0.63vw;
+          }
+
+          img:nth-child(3) {
+            left: -1.25vw;
+          }
+
+          img:last-child {
+            left: -1.88vw;
+          }
+        }
+
+        h3 {
+          margin-top: auto;
+          margin-bottom: 0.42vw;
+          font-size: 2.92vw;
+          font-style: normal;
+          font-weight: 600;
+          line-height: 1.2;
+          letter-spacing: -0.56px;
+          color: rgba(255, 254, 252, 1);
+        }
+
+        p {
+          font-family: "Golos Text", sans-serif;
+          font-size: 0.83vw;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 1.4;
+          letter-spacing: -0.16px;
+          color: rgba(255, 254, 252, 0.6);
+        }
+      }
+    }
+
+    .secondBlock {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      width: 25.26vw;
+      padding: 1.67vw;
+      border-radius: 1.67vw;
+      background-color: var(--bg-light);
+
+      h3 {
+        margin-bottom: 1.15vw;
+        font-size: 4.69vw;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 1.2;
+        letter-spacing: -0.9px;
+        color: rgba(14, 14, 14, 1);
+      }
+
+      .stonks {
+        position: relative;
+        height: 100%;
+        padding: 1.25vw;
+        border-radius: 1.35vw;
+        background-color: #fff;
+
+        .blockTitle {
+          display: flex;
+          align-items: center;
+          gap: 0.63vw;
+
+          span {
+            width: 3.33vw;
+            height: 3.33vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background-color: var(--bg-light);
+
+            svg {
+              width: 1.46vw;
+              height: 1.46vw;
+              fill: var(--brand-primary);
+            }
+          }
+
+          div {
+            h4 {
+              font-family: "Golos Text";
+              font-size: 0.83vw;
+              font-style: normal;
+              font-weight: 600;
+              line-height: 1.4;
+              color: rgba(14, 14, 14, 1);
+            }
+
+            p {
+              font-family: "Golos Text";
+              font-size: 0.73vw;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 1.4;
+              color: rgba(14, 14, 14, 0.4);
+            }
+          }
+        }
+
+        /* Десктопне позиціонування графіка */
+        @media (min-width: 1025px) {
+          .stonksImg {
+            position: absolute;
+            bottom: 1.25vw;
+            left: 1.25vw;
+            width: 19.5vw;
+            height: 18.02vw;
+          }
+        }
+      }
+    }
+
+    .thirdBlock {
+      width: 41.98vw;
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 0.63vw;
+
+      .communityBlock {
+        width: 41.98vw;
+        height: 14.48vw;
+        padding: 1.25vw;
+        border-radius: 1.67vw;
+        background-image: url(/Frame13213181005.png) !important;
+        background-size: cover;
+        background-color: var(--bg-light);
+
+        h3 {
+          margin-bottom: 0.42vw;
+          font-size: 1.67vw;
+          font-style: normal;
+          font-weight: 600;
+          line-height: 1.2;
+          letter-spacing: -0.32px;
+          color: rgba(14, 14, 14, 1);
+        }
+
+        p {
+          width: 36%;
+          font-family: "Golos Text", sans-serif;
+          font-size: 0.83vw;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 1.4;
+          letter-spacing: -0.16px;
+          color: rgba(14, 14, 14, 0.4);
+        }
+      }
+
+      .instructors {
+        display: flex;
+        flex-direction: column;
+        width: 20.26vw;
+        height: 14.48vw;
+        padding: 1.25vw;
+        border-radius: 1.67vw;
+        background-color: var(--bg-light);
+
+        ul {
+          margin-bottom: auto;
+          display: flex;
+          gap: 0.63vw;
+
+          li {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 3.33vw;
+            height: 3.33vw;
+            border-radius: 50%;
+            background-color: #fff;
+
+            svg {
+              width: 1.67vw;
+              height: 1.46vw;
+              fill: var(--brand-primary);
+            }
+          }
+        }
+
+        h3 {
+          margin-bottom: 0.42vw;
+          font-size: 2.92vw;
+          font-style: normal;
+          font-weight: 600;
+          line-height: 1.2;
+          letter-spacing: -0.56px;
+          color: rgba(14, 14, 14, 1);
+        }
+
+        p {
+          font-family: "Golos Text", sans-serif;
+          font-size: 0.83vw;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 1.4;
+          letter-spacing: -0.16px;
+          color: var(--text-black-transparent);
+        }
+      }
+
+      .patent {
+        display: inline-block;
+        width: 20.26vw;
+        height: 14.48vw;
+        padding: 1.25vw;
+        border-radius: 1.67vw;
+        background-image: url(/images/Frame13213181021.png);
+        background-size: cover;
+        color: var(--white);
+        h3 {
+          font-size: 1.67vw;
+          font-style: normal;
+          font-weight: 600;
+          line-height: 1.1;
+          letter-spacing: -0.32px;
+          color: rgba(255, 254, 252, 1);
+        }
+      }
+    }
+  }
+}
+
+/* Перемикачі видимості для мобільної/десктопної версій */
+.onlyMobile {
+  display: none;
+}
+.onlyDesktop {
+  display: block;
+}
+
+@media (max-width: 1000px) {
+  .onlyMobile {
+    display: block;
+  }
+  .onlyDesktop {
+    display: none;
+  }
+}
+
+/* Поза контейнером — SliderNav для мобільного */
+.sliderNavOutside {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .sliderNavOutside {
+    display: flex;
+
+    margin-top: mvw(12);
+    margin-left: mvw(16);
+    justify-content: flex-start !important;
+  }
+  /* Гарантуємо повну ширину слайда */
+  .mobileSlider :global(.swiper) {
+    width: 100%;
+  }
+  .mobileSlider :global(.swiper-wrapper) {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .mobileSlider :global(.swiper-slide) {
+    display: block;
+    width: mvw(342) !important;
+  }
+
+  .section h2 {
+    font-family: var(--second-family) !important;
+    font-weight: 700 !important;
+    font-size: mvw(28) !important;
+    line-height: 120% !important;
+    letter-spacing: -0.01em !important;
+    color: var(--black) !important;
+    margin-bottom: mvw(40) !important;
+    text-align: center !important;
+  }
+
+  /* firstBlock — мобільний вигляд як у макеті */
+  .section .content .firstBlock {
+    width: mvw(342);
+    height: mvw(428);
+    display: flex;
+    flex-direction: column;
+    gap: mvw(8);
+  }
+  .section .content .firstBlock .topBlock {
+    padding: mvw(16);
+    border-radius: mvw(16);
+    background: var(--bg-color);
+    margin-bottom: 0;
+  }
+  .section .content .firstBlock .topBlock h3 {
+    margin: 0 0 mvw(8) 0;
+    font-family: var(--second-family);
+    font-weight: 600;
+    font-size: mvw(18) !important;
+    line-height: 120%;
+    letter-spacing: -0.01em;
+
+    color: var(--black);
+  }
+  .section .content .firstBlock .topBlock p {
+    margin: 0 0 mvw(12) 0;
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(14);
+    line-height: 140%;
+    letter-spacing: -0.01em;
+    opacity: 0.4;
+  }
+  .section .content .firstBlock .bottomBlock {
+    height: mvw(210);
+    padding: mvw(16);
+    border-radius: mvw(16);
+    background-image: url(/images/Frame13213181051.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    .bg {
+      position: absolute;
+      z-index: 1;
+      top: -0.5vw;
+      right: -8vw;
+      width: mvw(27);
+      height: mvw(29);
+    }
+  }
+  .section .content .firstBlock .bottomBlock h3 {
+    margin: 0 0 mvw(8) 0;
+    font-family: var(--second-family);
+    font-weight: 600;
+    font-size: mvw(36);
+    line-height: 120%;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .section .content .firstBlock .bottomBlock p {
+    margin: 0;
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(14);
+    line-height: 140%;
+    letter-spacing: -0.01em;
+    color: var(--white);
+    opacity: 0.6;
+  }
+  .mobileSliderWrap {
+    width: 100%;
+    overflow: hidden; /* не даємо контенту “виїжджати” за межі */
+  }
+  .groupContainer {
+    display: flex;
+    flex-direction: column;
+    gap: mvw(12);
+    width: 100%;
+  }
+
+  /* firstBlock > photos — мобільні розміри по макету */
+  .section .content .firstBlock .topBlock .photos .trainingImg {
+    width: mvw(151) !important;
+    height: mvw(92) !important;
+    border-radius: mvw(6) !important;
+  }
+  .section .content .firstBlock .topBlock .photos .group {
+    width: mvw(151) !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, mvw(73));
+    grid-auto-rows: mvw(44);
+    gap: mvw(3) !important;
+
+    div,
+    img {
+      width: 100% !important;
+      height: 100% !important;
+      border-radius: mvw(6) !important;
+    }
+    div {
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      background-color: var(--brand-primary) !important;
+    }
+    div svg {
+      width: mvw(24) !important;
+      height: mvw(24) !important;
+      fill: rgba(255, 254, 252, 0.4) !important;
+    }
+  }
+
+  /* Додатково: вирівнюємо вигляд карток як на десктопі */
+  .section .content .secondBlock {
+    /* мобільний макет: 342x428 */
+    width: mvw(342);
+    height: mvw(428);
+    padding: mvw(16);
+    border-radius: mvw(16);
+    background: var(--bg-light);
+    gap: mvw(12);
+  }
+  /* Внутрішня біла карта з графіком */
+  .section .content .secondBlock .stonks {
+    position: static;
+    width: 100%;
+    height: mvw(332);
+    padding: mvw(16) mvw(24);
+    border-radius: mvw(26);
+    background: var(--white);
+    box-sizing: border-box;
+  }
+  .section .content .secondBlock .stonks .blockTitle span {
+    width: mvw(54);
+    height: mvw(54);
+  }
+  .section .content .secondBlock .stonks .blockTitle span svg {
+    width: mvw(24);
+    height: mvw(24);
+  }
+  .section .content .secondBlock .stonks .blockTitle h4 {
+    font-family: var(--second-family);
+    font-weight: 600;
+    font-size: mvw(16);
+    line-height: 120%;
+    letter-spacing: -0.01em;
+  }
+  /* Перекриваємо десктопне правило з більшою специфічністю */
+  .section .content .secondBlock .stonks .blockTitle div h4 {
+    font-family: var(--second-family);
+    font-weight: 600;
+    font-size: mvw(16) !important;
+    line-height: 120% !important;
+    letter-spacing: -0.01em !important;
+  }
+  .section .content .secondBlock .stonks .blockTitle div p {
+    font-family: var(--font-family) !important;
+    font-weight: 500 !important;
+    font-size: mvw(12) !important;
+    line-height: 140% !important;
+    letter-spacing: -0.01em !important;
+    color: rgba(14, 14, 14, 0.6) !important;
+  }
+  .section .content .secondBlock .stonks .blockTitle p {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(12);
+    line-height: 140%;
+    letter-spacing: -0.01em;
+    opacity: 0.6;
+  }
+  /* svg графік */
+  .section .content .secondBlock .stonksImg {
+    position: static;
+    width: mvw(269);
+    height: mvw(209);
+    margin: 0 auto;
+    display: block;
+    left: mvw(35);
+    bottom: mvw(40);
+    position: absolute;
+
+    /* width: 269px;
+    height: 209px;
+    position: absolute;
+    bottom: 40px;
+    left: 35px; */
+  }
+  .section .content .secondBlock h3 {
+    font-family: var(--second-family);
+    font-size: mvw(40);
+    line-height: 120%;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+    text-align: center;
+    color: var(--black);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .section .content .communityBlock {
+    /* width: mvw(342); */
+    height: mvw(428);
+    padding: mvw(16);
+    border-radius: mvw(16);
+    background-image: url(/images/Frame13213181002.png);
+    background-size: cover;
+    background-position: top center;
+    background-repeat: no-repeat;
+    background-color: var(--bg-light);
+    background-position: 0% 100%;
+  }
+  .section .content .communityBlock h3 {
+    margin-bottom: mvw(8);
+    font-size: mvw(23);
+
+    font-family: var(--second-family);
+    font-weight: 600;
+
+    line-height: 120%;
+    letter-spacing: -0.01em;
+
+    color: var(--black);
+  }
+  .section .content .communityBlock p {
+    width: 100%;
+    font-size: mvw(14);
+    font-family: var(--font-family);
+    font-weight: 500;
+
+    line-height: 140%;
+    letter-spacing: -0.01em;
+    color: var(--black);
+    opacity: 0.4;
+  }
+  .section .content .instructors {
+    height: mvw(210);
+    padding: mvw(16);
+    border-radius: mvw(16);
+    background: var(--bg-light);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: mvw(28);
+  }
+  .section .content .instructors ul {
+    gap: mvw(12);
+
+    display: flex;
+  }
+  .section .content .instructors ul li {
+    width: mvw(56);
+    height: mvw(56);
+    background: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .section .content .instructors ul li svg {
+    width: mvw(24);
+    height: mvw(24);
+    fill: var(--brand-primary);
+  }
+  .section .content .instructors h3 {
+    font-size: mvw(38);
+    font-weight: 600;
+
+    color: var(--black);
+
+    font-family: var(--second-family);
+
+    line-height: 120%;
+    letter-spacing: -0.01em;
+  }
+  .section .content .instructors p {
+    font-size: mvw(14);
+    line-height: 140%;
+    color: rgba(14, 14, 14, 0.6);
+    opacity: 0.4;
+  }
+  .instructorsText {
+    display: flex;
+    flex-direction: column;
+    gap: mvw(8);
+  }
+  .section .content .patent {
+    height: mvw(210);
+    padding: mvw(16);
+    border-radius: mvw(16);
+    background-image: url(/images/Frame13213181021.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: var(--white);
+  }
+  .section .content .patent h3 {
+    font-size: mvw(24);
+    line-height: 1.2;
+
+    font-family: var(--second-family);
+    font-weight: 600;
+
+    line-height: 120%;
+    letter-spacing: -0.01em;
+    color: var(--white);
+  }
+  .happyMen {
+    img {
+      border-radius: 100%;
+      stroke-width: 1px;
+      stroke: var(--bg-color);
+      width: mvw(40) !important;
+      height: mvw(40) !important;
+      margin-bottom: mvw(47);
+    }
+
+    img:first-child {
+      top: 0;
+      left: 0;
+    }
+
+    img:nth-child(2) {
+      left: mvw(-12) !important;
+    }
+
+    img:nth-child(3) {
+      left: mvw(-24) !important;
+    }
+
+    img:last-child {
+      left: mvw(-36) !important;
+    }
+  }
+  .communityBlock {
+    background-image: url(/images/Frame13213181002.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--bg-light);
+    background-position: 0% 100%;
+  }
+}

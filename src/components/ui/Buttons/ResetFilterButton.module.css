@@ -1,0 +1,44 @@
+.resetButton {
+  width: 100%;
+  padding: 16px 24px;
+  background: var(--white);
+  color: var(--violet);
+  border: 2px solid var(--violet);
+  border-radius: 16px;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 100%;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+  height: 66px;
+}
+
+.resetButton:hover {
+  background: var(--black);
+  color: var(--white);
+  border: 2px solid var(--black);
+}
+
+.resetButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1000px) {
+  .resetButton {
+    padding: mvw(16) mvw(24);
+    border: mvw(2) solid var(--violet);
+    border-radius: mvw(16);
+    font-size: mvw(16);
+    height: mvw(56);
+    background: var(--violet);
+    color: var(--white);
+  }
+
+  .resetButton:hover {
+    background: var(--black);
+    color: var(--white);
+    border: mvw(2) solid var(--black);
+  }
+}

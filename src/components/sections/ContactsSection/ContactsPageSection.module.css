@@ -1,0 +1,9 @@
+.section {
+  padding: 0px 0px 180px 0px;
+}
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 150px;
+}
+

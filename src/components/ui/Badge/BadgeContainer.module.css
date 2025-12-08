@@ -1,0 +1,35 @@
+.badgeContainer {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 1000px) {
+  .badgeContainer {
+    top: mvw(12);
+    left: mvw(12);
+    gap: mvw(4);
+  }
+
+  .badgeContainer.mobileContainer {
+    display: flex;
+    flex-direction: column;
+    gap: mvw(4);
+  }
+
+  .mobileTopRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: mvw(4);
+  }
+
+  .mobileHitRow {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+}

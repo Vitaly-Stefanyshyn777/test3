@@ -1,0 +1,285 @@
+.breadcrumbs {
+  width: auto;
+  height: auto;
+  display: flex;
+  justify-content: flex-start;
+  position: absolute;
+  top: 110px;
+  z-index: 10;
+}
+
+.breadcrumbsContainer {
+  max-width: 1200px;
+  margin: 0;
+  padding-left: 70px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.breadcrumbList {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 8px;
+}
+
+.breadcrumbItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.breadcrumbLink {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 100%;
+  letter-spacing: -0.02em;
+  color: var(--breadcrumbs-link-color, var(--black));
+}
+
+.breadcrumbLink:hover {
+  color: var(--violet);
+  text-decoration: none;
+  background: rgba(111, 66, 193, 0.05);
+  transform: translateY(-1px);
+}
+
+.breadcrumbText {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 140%;
+  color: var(--black);
+}
+
+.breadcrumbText.active {
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+
+  color: rgb(14 14 14 / 30%);
+}
+
+.separator {
+  color: rgb(14 14 14 / 30%);
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 4px;
+}
+
+.breadcrumbs.onTrainers .breadcrumbLink,
+.breadcrumbs.onTrainers .breadcrumbText,
+.breadcrumbs.onTrainers .separator {
+  color: var(--white);
+}
+
+.breadcrumbs.onTrainers .breadcrumbText.active {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+}
+
+.breadcrumbs.onTrainers .breadcrumbLink:hover {
+  color: var(--white);
+}
+
+.breadcrumbs.onOurCourses,
+.breadcrumbs.onOurCourses,
+.breadcrumbs.onOurCourses {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 100%;
+  letter-spacing: -0.02em;
+  color: var(--white);
+}
+
+.breadcrumbs.onOurCourses .breadcrumbText.active {
+  opacity: 0.4;
+}
+
+.breadcrumbs.onOurCourses .breadcrumbLink:hover {
+  color: var(--white);
+}
+
+.breadcrumbs.onCoursesLanding .breadcrumbLink {
+  --breadcrumbs-link-color: var(--white);
+}
+
+.breadcrumbs.onCoursesLanding .breadcrumbText {
+  color: var(--white);
+  opacity: 0.4;
+}
+
+.breadcrumbs.onCoursesLanding .separator {
+  color: var(--white);
+}
+
+.breadcrumbs.onCoursesLanding {
+  --breadcrumbs-link-color: var(--white);
+}
+
+.breadcrumbs.onContacts .breadcrumbLink,
+.breadcrumbs.onContacts .breadcrumbText,
+.breadcrumbs.onContacts .separator {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 100%;
+  letter-spacing: -0.02em;
+  color: var(--white);
+}
+
+.breadcrumbs.onContacts .breadcrumbText.active {
+  opacity: 0.4;
+}
+
+.breadcrumbs.onContacts .breadcrumbLink:hover {
+  color: var(--white);
+}
+
+.breadcrumbs.onAboutBfb .breadcrumbLink,
+.breadcrumbs.onAboutBfb .breadcrumbText,
+.breadcrumbs.onAboutBfb .separator {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 100%;
+  letter-spacing: -0.02em;
+  color: var(--white);
+}
+
+.breadcrumbs.onAboutBfb .breadcrumbText.active {
+  opacity: 0.4;
+}
+
+.breadcrumbs.onAboutBfb .breadcrumbLink:hover {
+  color: var(--white);
+}
+
+@media (max-width: 1024px) {
+  .breadcrumbs {
+    position: absolute;
+    top: 100px;
+    left: 0;
+    right: 0;
+    padding: 0 16px;
+  }
+
+  .breadcrumbsContainer {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 1000px) {
+  .breadcrumbs {
+    position: relative;
+    top: 0;
+    padding: mvw(85) mvw(16) mvw(15);
+    z-index: 10;
+    display: flex;
+  }
+
+  .breadcrumbs.onCoursesLanding {
+    position: absolute;
+    top: 0;
+    padding: mvw(110) mvw(27) mvw(15);
+    left: 0;
+    right: 0;
+  }
+
+  /* Приховуємо breadcrumbs коли модалка InstructingSlider відкрита */
+  .breadcrumbs.hidden {
+    display: none !important;
+  }
+
+  /* Альтернативний варіант через :global() */
+  :global(body.instructing-slider-open) .breadcrumbs {
+    display: none !important;
+  }
+
+  .breadcrumbsContainer {
+    padding-left: 0;
+    max-width: 100%;
+  }
+
+  .breadcrumbList {
+    gap: mvw(6);
+    flex-wrap: wrap;
+  }
+
+  .breadcrumbItem {
+    gap: mvw(6);
+  }
+
+  .breadcrumbLink {
+    font-size: mvw(12);
+    line-height: 140%;
+    font-family: var(--font-family);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  .breadcrumbText {
+    font-size: mvw(12);
+    line-height: 140%;
+  }
+
+  .separator {
+    font-size: mvw(12);
+    margin: 0 mvw(2);
+    color: rgb(14 14 14 / 30%);
+  }
+
+  /* Стилі для breadcrumbs на сторінці профілю тренера (чорний текст на білому фоні) */
+  .breadcrumbs:not(.onTrainers):not(.onOurCourses):not(.onCoursesLanding):not(
+      .onContacts
+    ):not(.onAboutBfb)
+    .breadcrumbLink,
+  .breadcrumbs:not(.onTrainers):not(.onOurCourses):not(.onCoursesLanding):not(
+      .onContacts
+    ):not(.onAboutBfb)
+    .breadcrumbText,
+  .breadcrumbs:not(.onTrainers):not(.onOurCourses):not(.onCoursesLanding):not(
+      .onContacts
+    ):not(.onAboutBfb)
+    .separator {
+    color: var(--black) !important;
+  }
+
+  .breadcrumbs:not(.onTrainers):not(.onOurCourses):not(.onCoursesLanding):not(
+      .onContacts
+    ):not(.onAboutBfb)
+    .separator {
+    color: rgb(14 14 14 / 30%) !important;
+  }
+
+  .breadcrumbs:not(.onTrainers):not(.onOurCourses):not(.onCoursesLanding):not(
+      .onContacts
+    ):not(.onAboutBfb)
+    .breadcrumbText.active {
+    color: rgba(14, 14, 14, 0.3) !important;
+    font-weight: 600;
+    padding: mvw(4) mvw(8);
+    border-radius: mvw(6);
+  }
+
+  /* Стилі для breadcrumbs на сторінці about-bfb на мобілці */
+  .breadcrumbs.onAboutBfb .breadcrumbLink,
+  .breadcrumbs.onAboutBfb .breadcrumbText,
+  .breadcrumbs.onAboutBfb .separator {
+    color: var(--white) !important;
+    font-size: mvw(12);
+    line-height: 140%;
+  }
+
+  .breadcrumbs.onAboutBfb .breadcrumbText.active {
+    opacity: 0.4 !important;
+  }
+
+  .breadcrumbs.onAboutBfb .separator {
+    color: var(--white) !important;
+  }
+}

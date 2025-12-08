@@ -1,0 +1,390 @@
+.infoSection {
+  background: var(--bg-color);
+}
+
+.container {
+  width: 100%;
+  padding: 150px 110px 0px 110px;
+}
+
+.blocksContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.infoBlock {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.textContent {
+  /* flex: 1; */
+
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  border-radius: 32px;
+  padding: 100px 56px;
+  width: 842px;
+  height: auto;
+  background: var(--white);
+  height: 586px;
+}
+
+.imageContent {
+  flex: 1;
+  position: relative;
+}
+
+.imageContentTwo {
+  flex: 1;
+  position: relative;
+}
+.badgeBlock {
+  /* width: 100%; */
+  width: 842px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.badge {
+  width: fit-content;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 135%;
+  text-align: center;
+  color: #8426d7;
+}
+
+.title {
+  font-family: var(--third-family);
+
+  line-height: 1.2;
+  color: var(--black);
+  margin: 0;
+
+  font-weight: 700;
+  font-size: 56px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.description {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: rgba(14, 14, 14, 0.4);
+}
+
+.detailsBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--violet);
+  color: white;
+
+  text-decoration: none;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  width: fit-content;
+
+  border-radius: 20px;
+  padding: 20px 42px;
+  height: auto;
+}
+
+.detailsBtn:hover {
+  background: var(--black);
+  transform: translateY(-2px);
+}
+
+.courseImage {
+  width: 100%;
+  height: auto;
+  border-radius: 32px;
+  object-fit: cover;
+  height: 586px;
+}
+
+.courseImagetwo {
+  width: 100%;
+  height: auto;
+  border-radius: 32px;
+  object-fit: cover;
+  height: 586px;
+}
+
+.imageOverlay {
+  position: absolute;
+  bottom: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  border-radius: 8px;
+
+  font-family: "Plateia", sans-serif;
+  font-weight: 400;
+  font-size: 38px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--white);
+  width: 254px;
+  height: 54px;
+}
+
+.overlayText {
+  color: white;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.overlayIcon {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feature {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.featureIcon {
+  width: 64px;
+  height: 64px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  color: var(--violet);
+
+  border-radius: 65px;
+  fill: #f9f9f9;
+  backdrop-filter: blur(20px);
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+.featureContent {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.featureContent h3 {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 140%;
+  color: var(--black);
+  /* margin: 0 0 8px 0; */
+}
+
+.featureContent p {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: rgba(14, 14, 14, 0.4);
+}
+
+@media (max-width: 1000px) {
+  .infoSection {
+    background: var(--bg-color);
+  }
+
+  .container {
+    padding: mvw(40) mvw(16) mvw(40) mvw(16);
+  }
+
+  .mobileSliderWrap {
+    width: 100%;
+    overflow: hidden;
+    margin: 0;
+  }
+
+  .mobileSlider {
+    width: 100%;
+    padding: 0;
+  }
+
+  .mobileSlider :global(.swiper) {
+    width: 100%;
+    overflow: visible;
+    padding: 0;
+  }
+
+  .mobileSlider :global(.swiper-wrapper) {
+    display: flex;
+    width: 100%;
+  }
+
+  .mobileSlider :global(.swiper-slide) {
+    width: 100% !important;
+    flex-shrink: 0;
+    display: block;
+    box-sizing: border-box;
+  }
+
+  .swiperSlide {
+    width: 100%;
+  }
+
+  .blocksContainer {
+    gap: mvw(16);
+  }
+
+  .infoBlock {
+    flex-direction: column;
+    gap: mvw(16);
+    width: 100%;
+    display: flex;
+  }
+
+  .textContent {
+    width: 100%;
+    padding: mvw(20) mvw(16);
+    border-radius: mvw(16);
+    height: auto;
+    gap: mvw(16);
+    order: 2;
+  }
+
+  .badgeBlock {
+    width: 100%;
+    gap: mvw(12);
+  }
+
+  .badge {
+    font-size: mvw(14);
+    line-height: 135%;
+    text-align: left;
+  }
+
+  .title {
+    font-size: mvw(24);
+    line-height: 120%;
+    text-align: left;
+  }
+
+  .description {
+    font-size: mvw(14);
+    line-height: 140%;
+  }
+
+  .detailsBtn {
+    padding: mvw(16) mvw(24);
+    border-radius: mvw(16);
+    font-size: mvw(14);
+    width: 100%;
+    text-align: center;
+  }
+
+  .imageContent {
+    width: 100%;
+    order: -1;
+  }
+
+  .imageContentTwo {
+    width: 100%;
+    order: -1;
+  }
+
+  .courseImage {
+    width: mvw(343);
+    height: mvw(139);
+    border-radius: mvw(16);
+    object-fit: cover;
+  }
+
+  .courseImagetwo {
+    width: mvw(343);
+    height: mvw(240p);
+    border-radius: mvw(16);
+    object-fit: cover;
+  }
+
+  .imageOverlay {
+    bottom: mvw(12);
+    padding: mvw(6) mvw(12);
+    border-radius: mvw(6);
+    position: absolute;
+    top: 46%;
+  }
+
+  .overlayText {
+    font-size: mvw(12);
+  }
+
+  .overlayIcon {
+    max-width: mvw(100);
+    max-height: mvw(32);
+  }
+
+  .features {
+    gap: mvw(12);
+  }
+
+  .feature {
+    gap: mvw(12);
+  }
+
+  .featureIcon {
+    width: mvw(40);
+    height: mvw(40);
+    border-radius: mvw(65);
+    font-size: mvw(16);
+    flex-shrink: 0;
+  }
+
+  .featureIcon svg {
+    width: mvw(18);
+    height: mvw(18);
+  }
+
+  .featureContent h3 {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(16);
+    line-height: 140%;
+    color: var(--black);
+    margin: 0;
+  }
+
+  .featureContent p {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(14);
+    line-height: 140%;
+    letter-spacing: -0.01em;
+    color: rgba(14, 14, 14, 0.4);
+    margin: 0;
+  }
+}

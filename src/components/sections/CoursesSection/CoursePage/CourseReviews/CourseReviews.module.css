@@ -1,0 +1,279 @@
+.emptyState {
+  color: #000;
+}
+.reviews {
+  background: #f9f9f9;
+  padding: 150px 0px 0px 0px;
+}
+
+.containerReviews {
+  max-width: 1209px;
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.leaveReviewButton {
+  background: var(--violet);
+  color: var(--white);
+  border: none;
+  border-radius: 16px;
+  padding: 16px 32px;
+  font-family: var(--third-family);
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 135%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.leaveReviewButton:hover {
+  background: var(--black);
+  transform: translateY(-2px);
+}
+
+.reviewsCarousel {
+  margin-bottom: 40px;
+  overflow: hidden;
+}
+
+.reviewsCarousel :global(.swiper-slide) {
+  width: 566px !important;
+  height: 400px !important;
+}
+
+.reviewCard {
+  background: white;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 566px;
+  flex: 0 0 566px;
+  box-sizing: border-box;
+  scroll-snap-align: start;
+  white-space: normal;
+  border-radius: 20px;
+  height: 100%;
+}
+
+.reviewText {
+  white-space: normal;
+  max-height: 225px;
+  overflow-y: auto;
+  font-family: var(--second-family);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 140%;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rating {
+  display: flex;
+  gap: 4px;
+}
+
+.star {
+  font-size: 20px;
+  color: #ddd;
+}
+
+.starFilled {
+  color: var(--violet);
+}
+
+.starEmpty {
+  color: #ddd;
+}
+
+.reviewText {
+  font-size: 16px;
+  line-height: 150%;
+  color: var(--black);
+  opacity: 0.8;
+  margin: 0;
+  flex: 1;
+}
+
+.reviewFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  /* border-top: 1px solid #f0f0f0; */
+}
+
+.reviewerName {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: rgba(14, 14, 14, 0.6);
+}
+
+.reviewDate {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: rgba(14, 14, 14, 0.6);
+}
+
+.carouselNavigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+}
+
+.navButton {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: var(--white);
+  color: var(--black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navButton:hover {
+  background: var(--violet);
+  color: var(--white);
+  transform: translateY(-2px);
+}
+
+.navButton:last-child {
+  background: var(--black);
+  color: var(--white);
+}
+
+.navButton:last-child:hover {
+  background: var(--violet);
+}
+
+.paginationDots {
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ddd;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dotActive {
+  background: var(--black);
+  width: 12px;
+  height: 12px;
+}
+
+@media (max-width: 1000px) {
+  .reviews {
+    padding: mvw(24) 0 0 0;
+  }
+
+  .containerReviews {
+    gap: mvw(20);
+    padding: 0 mvw(16);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: mvw(16);
+  }
+
+  .title {
+    font-size: mvw(24);
+    line-height: 120%;
+  }
+
+  .leaveReviewButton {
+    width: 100%;
+    padding: mvw(14) mvw(24);
+    font-size: mvw(14);
+    border-radius: mvw(12);
+  }
+
+  .reviewsCarousel {
+    margin-bottom: mvw(24);
+  }
+
+  .reviewsCarousel :global(.swiper-slide) {
+    width: mvw(292) !important;
+    height: auto !important;
+  }
+
+  .reviewCard {
+    padding: mvw(20) mvw(16);
+    gap: mvw(16);
+    width: mvw(292);
+    flex: 0 0 mvw(292);
+    border-radius: mvw(16);
+    min-height: mvw(300);
+  }
+
+  .reviewHeader {
+    gap: mvw(12);
+  }
+
+  .rating {
+    gap: mvw(2);
+  }
+
+  .star {
+    font-size: mvw(16);
+  }
+
+  .reviewText {
+    font-size: mvw(14);
+    line-height: 140%;
+    max-height: mvw(180);
+  }
+
+  .reviewFooter {
+    padding-top: mvw(12);
+    gap: mvw(8);
+  }
+
+  .reviewerName {
+    font-size: mvw(14);
+  }
+
+  .reviewDate {
+    font-size: mvw(14);
+  }
+}

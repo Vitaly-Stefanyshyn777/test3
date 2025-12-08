@@ -1,0 +1,158 @@
+.catalogSection {
+  padding: 80px 0;
+  background: var(--bg-color);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.title {
+  font-family: var(--third-family);
+  font-weight: 800;
+  font-size: 2rem;
+  color: var(--black);
+  margin: 0;
+}
+
+.sortOptions {
+  display: flex;
+  gap: 16px;
+}
+
+.sortSelect {
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  font-family: var(--font-family);
+  font-size: 14px;
+  color: var(--black);
+  cursor: pointer;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 40px;
+}
+
+.filters {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  height: fit-content;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filterGroup {
+  margin-bottom: 32px;
+}
+
+.filterGroup h3 {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--black);
+  margin: 0 0 16px 0;
+}
+
+.filterGroup label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-family: var(--font-family);
+  font-size: 14px;
+  color: rgba(14, 14, 14, 0.7);
+  cursor: pointer;
+}
+
+.filterGroup input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--violet);
+}
+
+.filterActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.applyBtn {
+  background: var(--violet);
+  color: white;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 8px;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.applyBtn:hover {
+  background: var(--black);
+}
+
+.resetBtn {
+  background: white;
+  color: var(--black);
+  border: 1px solid #e0e0e0;
+  padding: 14px 20px;
+  border-radius: 8px;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.resetBtn:hover {
+  border-color: var(--violet);
+  color: var(--violet);
+}
+
+.coursesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 60px;
+}
+
+.paginationBtn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e0e0e0;
+  background: white;
+  border-radius: 8px;
+  font-family: var(--font-family);
+  font-weight: 500;
+  color: var(--black);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.paginationBtn:hover {
+  background: var(--violet);
+  color: white;
+  border-color: var(--violet);
+}

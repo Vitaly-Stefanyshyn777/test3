@@ -1,0 +1,181 @@
+.fieldWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.textareaWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.textareaIcon {
+  position: absolute;
+  left: 16px;
+  top: 33px;
+  transform: translateY(-50%);
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.textarea {
+  width: 100%;
+  padding: 20px 20px 20px 48px;
+  border-radius: 24px;
+  transition: all 0.2s;
+  box-sizing: border-box;
+  height: auto;
+  min-height: 162px;
+  resize: vertical;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 130%;
+  color: #000;
+  background: #f9f9f9;
+  border: 1px solid #f9f9f9;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #000;
+}
+
+.textarea::placeholder {
+  color: transparent;
+}
+
+.label {
+  position: absolute;
+  left: 48px;
+  top: 32px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 130%;
+  color: rgba(14, 14, 14, 0.4);
+  transition: all 0.15s ease;
+}
+
+.textarea:focus + .label,
+.textarea:not(:placeholder-shown) + .label {
+  top: 10px;
+  transform: translateY(0);
+  font-size: 11px;
+}
+
+/* Заповнений стан без фокусу */
+.textarea:not(:focus):not(:placeholder-shown) {
+  border-color: var(--bg-color);
+}
+
+.supportingTextWrapper {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 100%;
+  height: 16px;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.supportingText {
+  position: static;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transform: translateY(4px);
+  font-family: var(--font3);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: -0.02em;
+  color: var(--style);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.fieldWrapper[data-error="true"] .textarea {
+  border-color: var(--style);
+}
+
+.fieldWrapper[data-error="true"] .label {
+  color: var(--style);
+}
+
+.fieldWrapper[data-error="true"] .supportingText {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 1000px) {
+  .textareaIcon {
+    left: mvw(16);
+    top: mvw(32);
+    transform: translateY(-50%);
+  }
+
+  .textarea {
+    min-height: mvw(120);
+    padding: mvw(28) mvw(20) mvw(8) mvw(48);
+    border-radius: mvw(12);
+    font-size: mvw(14);
+    line-height: 140%;
+  }
+
+  .textarea::placeholder {
+    color: rgba(14, 14, 14, 0.4);
+    font-size: mvw(14);
+    font-family: var(--font-family);
+    font-weight: 400;
+    line-height: 140%;
+  }
+
+  .label {
+    position: absolute;
+    left: mvw(48);
+    top: mvw(32);
+    transform: translateY(-50%);
+    font-size: mvw(14);
+    line-height: 140%;
+    color: rgba(14, 14, 14, 0.4);
+    font-weight: 400;
+    margin-bottom: 0;
+  }
+
+  .textarea:focus + .label,
+  .textarea:not(:placeholder-shown) + .label {
+    position: absolute;
+    top: mvw(10);
+    transform: translateY(0);
+    font-size: mvw(11);
+    margin-bottom: 0;
+  }
+
+  .textareaWrapper {
+    display: block;
+  }
+
+  .supportingTextWrapper {
+    position: absolute;
+    left: mvw(8);
+    right: mvw(8);
+    top: 100%;
+    height: mvw(16);
+    margin: 0;
+    padding: 0;
+    gap: 0;
+  }
+
+  .supportingText {
+    font-size: mvw(11);
+    line-height: 1.3;
+    margin: 0;
+    padding: 0;
+  }
+}

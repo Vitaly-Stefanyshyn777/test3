@@ -1,0 +1,92 @@
+.userProfile {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: var(--white);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.avatarContainer {
+  position: relative;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f0f0f0;
+}
+
+.userInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.greeting {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.emailContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.email {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: rgba(14, 14, 14, 0.6);
+}
+
+.notificationBadge {
+  background-color: #ff6b9d;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 12px;
+  min-width: 20px;
+  text-align: center;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1000px) {
+  .userProfile {
+    gap: mvw(12);
+    padding: mvw(16);
+    border-radius: mvw(12);
+  }
+
+  .avatar {
+    width: mvw(60);
+    height: mvw(60);
+  }
+
+  .greeting {
+    font-size: mvw(18);
+    line-height: 120%;
+  }
+
+  .email {
+    font-size: mvw(14);
+    line-height: 140%;
+  }
+  .userInfo {
+    gap: mvw(4);
+  }
+}

@@ -1,0 +1,449 @@
+.instructor {
+  display: block;
+  width: 100%;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.content {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 720px;
+  align-items: stretch;
+}
+
+.titleTextBlock {
+  background: #fff;
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  padding: 52px;
+  gap: 40px;
+}
+
+.title {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 140%;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+.description {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+  opacity: 0.6;
+}
+
+.tagsBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tags {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tagsBlockTitle {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 140%;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--black);
+}
+
+.tag {
+  border-radius: 8px;
+  padding: 10px;
+  width: auto;
+  height: 40px;
+  background: rgba(132, 38, 215, 0.12);
+  color: var(--violet);
+  display: flex;
+  justify-self: center;
+  align-items: center;
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stats {
+  display: flex;
+  gap: 12px;
+}
+
+.statCard {
+  background: var(--white);
+  border-radius: 16px;
+  gap: 24px;
+  padding: 24px;
+  width: 232px;
+  height: 169px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+}
+
+.statIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 65px;
+  background-color: #f9f9f9;
+  backdrop-filter: blur(20px);
+  color: var(--violet);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.statNumber {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  text-align: right;
+  color: var(--black);
+}
+
+.statLabel {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: rgba(14, 14, 14, 0.6);
+}
+
+.rightColumn {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  border-radius: 20px;
+  width: 477px;
+  height: 575px;
+  flex-shrink: 0;
+}
+
+.imageContainer {
+  position: relative;
+  border-radius: 16px;
+
+  width: 500px;
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+}
+
+.instructorImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  align-self: stretch;
+
+  border-radius: 20px;
+}
+
+.sliderSection {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.sliderTitle {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+  display: flex;
+}
+
+/* Instagram секція - абсолютне позиціонування */
+.instagramSection {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+}
+
+.instagramCard {
+  /* background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px); */
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  border-radius: 32px;
+  padding: 16px 20px;
+  width: 185px;
+  height: 54px;
+
+  backdrop-filter: blur(15px);
+  background: rgba(255, 254, 252, 0.15);
+  transition: all 0.3s;
+}
+
+.instagramIcon svg {
+  width: 22px;
+  height: 22px;
+  color: var(--white);
+}
+
+.instagramCard:hover {
+  background: var(--violet);
+}
+
+.instagramContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.instagramText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--white);
+}
+
+.instagramLink {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 140%;
+  color: var(--violet);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.instagramLink:hover {
+  color: var(--black);
+  text-decoration: underline;
+}
+
+.loading {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 140%;
+  color: var(--black);
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.error {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 140%;
+  color: var(--black);
+  text-align: center;
+  padding: 40px 20px;
+}
+
+@media (max-width: 1000px) {
+  .instructor {
+    width: 100%;
+  }
+
+  .container {
+    gap: mvw(32);
+  }
+
+  .content {
+    flex-direction: column;
+    gap: mvw(8);
+    flex-direction: column-reverse;
+  }
+
+  .leftColumn {
+    width: 100%;
+    gap: mvw(8);
+  }
+
+  .sliderTitle {
+    font-size: mvw(24);
+    line-height: 120%;
+  }
+
+  .titleTextBlock {
+    padding: mvw(8);
+    border-radius: mvw(16);
+    gap: mvw(16);
+  }
+
+  .title {
+    font-size: mvw(20);
+    line-height: 140%;
+  }
+
+  .description {
+    font-size: mvw(14);
+    line-height: 140%;
+  }
+
+  .titleBlock {
+    gap: mvw(12);
+  }
+
+  .tagsBlock {
+    gap: mvw(12);
+  }
+
+  .tagsBlockTitle {
+    font-size: mvw(12);
+  }
+
+  .tags {
+    gap: mvw(8);
+  }
+
+  .tag {
+    padding: mvw(10);
+    height: mvw(32);
+    border-radius: mvw(8);
+    font-size: mvw(12);
+  }
+
+  .stats {
+    flex-direction: column;
+    gap: mvw(12);
+  }
+
+  .statCard {
+    width: 100%;
+    height: auto;
+    padding: mvw(20) mvw(16);
+    border-radius: mvw(16);
+    gap: mvw(16);
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .statIcon {
+    width: mvw(40);
+    height: mvw(40);
+    border-radius: mvw(32);
+  }
+
+  .statIcon svg {
+    width: mvw(18);
+    height: mvw(18);
+  }
+
+  .statContent {
+    gap: mvw(4);
+    align-items: flex-start;
+    width: mvw(178);
+  }
+
+  .statNumber {
+    font-size: mvw(20);
+    text-align: left;
+    width: 100%;
+  }
+
+  .statLabel {
+    font-size: mvw(14);
+    text-align: left;
+    width: 100%;
+  }
+
+  .rightColumn {
+    width: 100%;
+    height: auto;
+    border-radius: mvw(16);
+  }
+
+  .imageContainer {
+    border-radius: mvw(16);
+    height: auto;
+    min-height: mvw(215);
+    width: 100%;
+  }
+
+  .instructorImage {
+    border-radius: mvw(16);
+  }
+
+  .instagramSection {
+    top: mvw(16);
+    left: mvw(16);
+  }
+
+  .instagramCard {
+    padding: mvw(12) mvw(16);
+    width: auto;
+    height: auto;
+    border-radius: mvw(24);
+    gap: mvw(8);
+  }
+
+  .instagramIcon svg {
+    width: mvw(18);
+    height: mvw(18);
+  }
+
+  .instagramText {
+    font-size: mvw(14);
+  }
+
+  .sliderSection {
+    margin-top: mvw(16);
+    gap: mvw(16);
+  }
+}

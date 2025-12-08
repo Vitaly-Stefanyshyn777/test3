@@ -1,0 +1,116 @@
+.badge {
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: lowercase;
+  color: var(--white);
+  line-height: 1;
+  font-family: var(--font-family);
+  border-radius: 10px;
+  padding: 12px;
+  width: 42px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.newBadge {
+  background: var(--white);
+  color: var(--violet);
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  width: 75px;
+  height: 36px;
+}
+
+.hitBadge {
+  background: #ff3b30;
+  color: var(--white);
+}
+
+.discountBadge {
+  background: var(--violet);
+  color: var(--white);
+}
+
+/* Варіант для зображень ProductPage */
+.imageBadge {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.imageBadge.newBadge {
+  background: #3b82f6;
+  color: white;
+  width: auto;
+}
+
+.imageBadge.discountBadge {
+  background: #8b5cf6;
+  color: white;
+  width: auto;
+}
+
+.imageBadge.hitBadge {
+  background: #ef4444;
+  color: white;
+  width: auto;
+}
+
+@media (max-width: 1000px) {
+  .newBadge {
+    background: var(--white);
+    color: var(--violet);
+
+    font-size: 12px;
+    font-weight: 600;
+    width: mvw(55);
+    height: mvw(22);
+
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(10);
+    line-height: 100%;
+    letter-spacing: -0.01em;
+    color: var(--violet);
+    border-radius: mvw(6);
+  }
+  .discountBadge {
+    border-radius: mvw(6);
+    background: var(--violet);
+    padding: mvw(6);
+    width: mvw(30);
+    height: mvw(22);
+
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(10);
+    line-height: 100%;
+    letter-spacing: -0.01em;
+    color: var(--white);
+    border-radius: mvw(6);
+  }
+  .hitBadge {
+    border-radius: mvw(6);
+    background: var(--style);
+    padding: mvw(6);
+    width: mvw(30);
+    height: mvw(22);
+
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(10);
+    line-height: 100%;
+    letter-spacing: -0.01em;
+    color: var(--white);
+    border-radius: mvw(6);
+  }
+}

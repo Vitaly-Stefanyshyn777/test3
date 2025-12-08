@@ -1,0 +1,105 @@
+.filterSortPanel {
+  width: 100%;
+  border-bottom: 1px solid #e1e1e1;
+  /* padding: 0px 0px 24px; */
+  /* padding: 50px; */
+}
+
+.filterSortBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filterSection,
+.sortSection {
+  display: flex;
+  align-items: center;
+  padding: 0px 0px 24px;
+  /* display: none; */
+
+  gap: 32px;
+}
+
+.label {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 36px;
+  line-height: 100%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.sortOptionWrapper {
+  width: auto;
+  height: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  svg {
+    width: 14px;
+    height: 8px;
+  }
+}
+
+.sortOptionLabel {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  color: #3b2d47;
+}
+
+.filterMobileButton {
+  display: flex;
+  align-items: center;
+  gap: mvw(12);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.filterMobileIcon {
+  width: mvw(20);
+  height: mvw(22);
+}
+
+.filterMobileLabel {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: mvw(14);
+  line-height: 140%;
+  color: var(--black);
+}
+
+@media (max-width: 1000px) {
+  .filterSortPanel {
+    border-bottom: none;
+  }
+  .filterSortBar {
+    padding: mvw(24) 0;
+    gap: 0;
+    justify-content: space-between;
+  }
+  .filterSection {
+    /* display: none; */
+  }
+  .sortSection {
+    gap: 0;
+    padding: 0;
+  }
+  .sortOptionWrapper {
+    gap: mvw(12);
+    svg {
+      width: mvw(14);
+      height: mvw(8);
+    }
+  }
+  .sortOptionLabel {
+    font-size: mvw(14);
+  }
+  .sortIcon {
+    width: mvw(14);
+    height: mvw(8);
+  }
+}

@@ -1,0 +1,112 @@
+.navContainer {
+  width: auto;
+  height: 60px;
+  border-radius: 25px;
+  background: var(--light-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+}
+
+.leftBtn,
+.rightBtn {
+  cursor: pointer;
+  border: none;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  transition: opacity 0.2s;
+  display: flex;
+  backdrop-filter: blur(20px);
+  background: var(--white);
+  color: var(--black);
+}
+
+.leftBtn:disabled,
+.rightBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.leftBtn svg,
+.rightBtn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.pagesBlock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pageNumber {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--black);
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.pageNumber:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.activePage {
+  background: var(--black);
+  color: var(--white);
+}
+
+.activePage:hover {
+  background: var(--black);
+}
+
+.ellipsis {
+  cursor: default;
+  background: transparent;
+}
+
+.ellipsis:hover {
+  background: transparent;
+}
+
+@media (max-width: 1024px) {
+  .navContainer {
+    gap: 16px;
+    background: #fff;
+    border-radius: 50px;
+    padding: 8px 16px;
+    width: max-content;
+    margin: 0 auto;
+  }
+
+  .leftBtn,
+  .rightBtn {
+    background: #fff;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+  }
+
+  .leftBtn:hover,
+  .rightBtn:hover {
+    opacity: 0.85;
+  }
+
+  .pageNumber {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+}

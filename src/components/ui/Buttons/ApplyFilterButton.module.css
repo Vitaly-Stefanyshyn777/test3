@@ -1,0 +1,34 @@
+.applyButton {
+  width: 100%;
+  padding: 16px 24px;
+  background: var(--violet);
+  color: var(--white);
+  border: none;
+  border-radius: 16px;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 100%;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  height: 66px;
+}
+
+.applyButton:hover {
+  background: var(--black);
+}
+
+.applyButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1000px) {
+  .applyButton {
+    padding: mvw(16) mvw(24);
+    border-radius: mvw(16);
+    font-size: mvw(16);
+
+    height: mvw(56);
+  }
+}

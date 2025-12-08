@@ -1,0 +1,11 @@
+.ourCoursesSection {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg-color);
+}
+
+@media (max-width: 1000px) {
+  .ourCoursesSection {
+    padding: mvw(100) 0;
+  }
+}

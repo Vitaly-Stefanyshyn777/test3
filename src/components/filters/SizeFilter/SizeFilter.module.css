@@ -1,0 +1,49 @@
+.filterSection {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e1e1e1;
+}
+
+.sectionTitleContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.icon {
+  font-size: 18px;
+}
+
+.checkboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkboxInput {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--violet);
+}
+
+.checkboxText {
+  font-size: 14px;
+}

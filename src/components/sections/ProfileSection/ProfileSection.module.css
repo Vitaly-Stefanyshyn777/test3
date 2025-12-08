@@ -1,0 +1,122 @@
+.portfolioSection {
+  height: auto;
+  padding: 0;
+  padding: 120px 44px 150px 44px;
+  background: var(--bg-color);
+}
+
+.container {
+  display: flex;
+  height: auto;
+  gap: 16px;
+}
+
+.trainerContainer {
+  background: var(--white);
+  border-radius: 16px;
+}
+
+.sidebar {
+  width: 100%;
+  max-width: 476px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: visible;
+}
+
+.mainContent {
+  border-radius: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  overflow-y: auto;
+  width: 100%;
+  padding: 55px;
+  max-width: 1200px;
+  background-color: var(--white);
+}
+
+.backBtn {
+  display: none;
+}
+
+.backBtnIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 1000px) {
+  .portfolioSection {
+    padding: mvw(70) mvw(0) mvw(70) mvw(0);
+    overflow-x: visible;
+  }
+
+  .container {
+    flex-direction: column;
+    gap: mvw(24);
+    padding: 0 mvw(16);
+    overflow-x: visible;
+  }
+
+  .trainerContainer {
+    background: var(--white);
+    border-radius: mvw(16);
+  }
+
+  .sidebar {
+    width: mvw(400);
+    max-width: 110%;
+
+    /* width: calc(100% + mvw(32)); */
+    gap: mvw(0);
+    margin-left: mvw(-16);
+    margin-right: mvw(-16);
+    /* padding: 0 mvw(16); */
+    overflow: visible;
+  }
+
+  .mainContent {
+    padding: mvw(0);
+    background: var(--bg-color);
+    max-width: 100%;
+    border-radius: mvw(16);
+    overflow: visible;
+    gap: mvw(80);
+  }
+
+  .backBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: mvw(7);
+    background: var(--white);
+
+    border-radius: mvw(17);
+
+    font-family: var(--second-family);
+    font-weight: 600;
+    font-size: mvw(14);
+    line-height: 120%;
+    color: var(--black);
+
+    align-self: flex-start;
+  }
+  /* .backBtn {
+    gap: mvw(8);
+    border-radius: mvw(12);
+    padding: mvw(12) mvw(16);
+    height: auto;
+    font-size: mvw(14);
+    display: none;
+  } */
+  .backBtnIcon svg {
+    width: mvw(20);
+    height: mvw(20);
+  }
+
+  .hideFirstDividerOnMobile {
+    display: none !important;
+  }
+}

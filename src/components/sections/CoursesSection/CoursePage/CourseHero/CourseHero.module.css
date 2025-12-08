@@ -1,0 +1,282 @@
+.hero {
+  background: #fff;
+  border-radius: 16px;
+
+  padding: 52px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+.separator {
+  color: #999;
+}
+
+.courseCode {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  align-items: flex-end;
+}
+
+.tagsCodeContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.tagsCodeBlock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.courseTagsTitleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.title {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 36px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.tags {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  color: var(--violet);
+}
+
+.courseContentBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tag {
+  background: rgba(132, 38, 215, 0.12);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tagText {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 120%;
+  color: #8426d7;
+}
+
+.courseCodeText {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 140%;
+  letter-spacing: -0.02em;
+  color: var(--black);
+  opacity: 0.4;
+}
+
+.courseCodeNumber {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+
+.description {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.description p {
+  font-size: 18px;
+  line-height: 150%;
+  color: var(--black);
+  opacity: 0.8;
+}
+
+.description p:last-child {
+  margin-bottom: 0;
+}
+
+.topicsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.topicsSection h3 {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 140%;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--black);
+}
+
+.topicsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.topicTag {
+  background: #f9f9f9;
+  border-radius: 8px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: none;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: fit-content;
+}
+
+.topicText {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 140%;
+  color: var(--black);
+}
+
+.loading {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 140%;
+  color: var(--black);
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.error {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 140%;
+  color: var(--black);
+  text-align: center;
+  padding: 40px 20px;
+}
+
+@media (max-width: 1000px) {
+  .hero {
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    gap: mvw(24);
+  }
+
+  .courseContentBlock {
+    gap: mvw(20);
+    display: none;
+  }
+
+  .tagsCodeBlock {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: mvw(16);
+  }
+
+  .tags {
+    gap: mvw(8);
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    padding: mvw(8) mvw(12);
+    border-radius: mvw(8);
+    gap: mvw(8);
+  }
+
+  .tagIcon {
+    width: mvw(16);
+    height: mvw(16);
+  }
+
+  .tagIcon svg {
+    width: mvw(16);
+    height: mvw(16);
+  }
+
+  .tagText {
+    font-size: mvw(12);
+    line-height: 120%;
+  }
+
+  .courseCode {
+    gap: mvw(4);
+    align-items: center;
+  }
+
+  .courseCodeText {
+    font-size: mvw(12);
+  }
+
+  .courseCodeNumber {
+    font-size: mvw(12);
+  }
+
+  .title {
+    font-size: mvw(24);
+    line-height: 120%;
+  }
+
+  .description {
+    gap: mvw(16);
+  }
+
+  .description p {
+    font-size: mvw(14);
+    line-height: 140%;
+  }
+
+  .topicsSection {
+    gap: mvw(12);
+    display: none;
+  }
+
+  .topicsSection h3 {
+    font-size: mvw(12);
+  }
+
+  .topicsGrid {
+    gap: mvw(8);
+  }
+
+  .topicTag {
+    padding: mvw(10) mvw(12);
+    border-radius: mvw(8);
+  }
+
+  .topicText {
+    font-size: mvw(12);
+    line-height: 140%;
+  }
+}

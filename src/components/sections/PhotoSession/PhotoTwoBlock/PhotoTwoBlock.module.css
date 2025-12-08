@@ -1,0 +1,166 @@
+.section {
+  padding: 150px 50px;
+  background: var(--white);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 70px;
+  position: relative;
+}
+
+.title {
+  font-family: var(--second-family);
+  font-weight: 500;
+  font-size: 72px;
+  line-height: 110%;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: #0c1618;
+}
+
+.row {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 30px;
+}
+
+.leftTop {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 530px;
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+}
+
+.rightTop {
+  flex: 1 1 auto;
+  width: 100%;
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+}
+
+.pill {
+  color: var(--violet);
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 135%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 10px;
+  padding: 16px 24px;
+  background: rgba(132, 38, 215, 0.2);
+}
+
+.boxBody {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 135%;
+  color: #0c1618;
+}
+
+.boxBody.twoCols {
+  display: flex;
+  gap: 40px;
+}
+
+.boxBody.twoCols ul {
+  margin: 0;
+  padding-left: 18px;
+  flex: 1 1 0;
+  list-style: disc;
+  list-style-position: outside;
+}
+
+.leftBottom {
+  width: 100%;
+  max-width: 986px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.strong {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 135%;
+  color: #0c1618;
+}
+
+.photoWrap {
+  position: relative;
+  width: 986px;
+  height: 553px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.photo {
+  object-fit: cover;
+}
+
+.rightBottom {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.rightInner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 45px;
+}
+
+.infoBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.infoBody {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 135%;
+  color: #0c1618;
+}
+
+.infoBody ul {
+  margin: 8px 0 0 0;
+  padding-left: 18px;
+  list-style: disc;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 135%;
+  color: #0c1618;
+}
+
+.pageBadge {
+  position: absolute;
+  right: 16px;
+  bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 135%;
+  color: var(--black);
+
+  border-radius: 10px;
+
+  width: 76px;
+  height: 64px;
+  background: #f9f9f9;
+}

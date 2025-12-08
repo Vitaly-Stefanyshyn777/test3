@@ -1,0 +1,255 @@
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  backdrop-filter: blur(10px);
+  background: rgba(14, 14, 14, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal {
+  background: var(--bg-color);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 710px;
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 56px;
+  display: flex;
+  align-items: center;
+  align-content: space-between;
+  gap: 28px;
+}
+
+.close {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  background: #f3f3f3;
+  border: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  fill: #f2f2f2;
+  color: #000;
+  cursor: pointer;
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.icon {
+  border-radius: 16px;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  svg {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.iconSuccess {
+  background: var(--violet);
+  color: #fff;
+}
+.iconError {
+  background: var(--style);
+  color: #fff;
+}
+
+.titleBlock {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.title {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 110%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.description {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  text-align: center;
+  color: var(--black);
+}
+
+.primary {
+  width: 100%;
+  max-width: 598px;
+  background: var(--violet);
+  border: none;
+  border-radius: 18px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 24px 42px;
+  height: 66px;
+  font-family: var(--third-family);
+  line-height: 135%;
+  color: var(--white);
+  transition: all 0.2s;
+}
+
+.primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.privacyText {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  color: rgba(14, 14, 14, 0.4);
+  text-align: center;
+  margin: 0;
+}
+
+.privacyLink {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  color: var(--violet);
+  text-decoration: underline;
+  text-decoration-skip-ink: none;
+}
+
+.privacyLink:hover {
+  color: #667eea;
+}
+
+@media (max-width: 1000px) {
+  .backdrop {
+    padding: mvw(33) mvw(16) mvw(23) mvw(16);
+
+    backdrop-filter: blur(mvw(10));
+    background: rgba(14, 14, 14, 0.2);
+  }
+
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: 100vh;
+    height: auto;
+    border-radius: mvw(16);
+    padding: mvw(32) mvw(16) mvw(16);
+    gap: mvw(24);
+    box-shadow: none;
+    position: relative;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    animation: slideUp 0.3s ease;
+  }
+
+  .close {
+    top: mvw(20);
+    right: mvw(20);
+    width: mvw(45);
+    height: mvw(45);
+    border-radius: mvw(10);
+    font-size: mvw(24);
+    background: #f2f2f2;
+  }
+
+  .close svg {
+    width: mvw(14);
+    height: mvw(14);
+  }
+
+  .icon {
+    width: mvw(56);
+    height: mvw(56);
+    border-radius: mvw(16);
+  }
+
+  .icon svg {
+    width: mvw(24);
+    height: mvw(24);
+  }
+
+  .titleBlock {
+    gap: mvw(12);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .title {
+    font-size: mvw(22);
+    line-height: 120%;
+    width: mvw(282);
+  }
+
+  .description {
+    font-size: mvw(14);
+    line-height: 140%;
+
+    font-family: var(--font-family);
+    font-weight: 500;
+
+    line-height: 140%;
+    letter-spacing: -0.01em;
+    text-align: center;
+    color: var(--black);
+    opacity: 0.6;
+  }
+
+  .primary {
+    width: 100%;
+    max-width: 100%;
+    padding: mvw(16) mvw(24);
+    border-radius: mvw(16);
+    font-size: mvw(14);
+    line-height: 135%;
+    height: auto;
+    font-weight: 500;
+    min-height: mvw(56);
+  }
+
+  .privacyText {
+    font-size: mvw(12);
+    line-height: 140%;
+  }
+
+  .privacyLink {
+    font-size: mvw(12);
+    line-height: 140%;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

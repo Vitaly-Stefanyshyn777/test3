@@ -1,0 +1,801 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(10px);
+  background: rgba(14, 14, 14, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1002;
+}
+.modal {
+  width: 100%;
+  height: 100%;
+  max-width: 1833px;
+  max-height: 900px;
+  height: 900px;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+}
+.title {
+  font-weight: 600;
+}
+.close {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.body {
+  flex: 1;
+  display: flex;
+}
+.mapBox {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  z-index: 0; /* Карта має бути під іншими елементами */
+}
+.iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Власна карта з координатами */
+.customMap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0; /* Карта має бути під іншими елементами */
+}
+
+.mapSvg {
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.1s ease;
+}
+
+.mapSvg:active {
+  cursor: grabbing;
+}
+
+.svgMarker {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.svgMarker:hover {
+  r: 10;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* Кнопка скидання виду карти */
+.resetMapButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  background: white;
+  border: 2px solid #3b82f6;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.resetMapButton:hover {
+  background: #3b82f6;
+  color: white;
+  transform: scale(1.1);
+}
+.locationPermission {
+  position: absolute;
+  top: 8%;
+  left: 81%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 16px;
+  padding: 24px 52px 24px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 200; /* Збільшуємо z-index для дозволу на геолокацію */
+  width: 530px;
+}
+.locationIcon {
+  border-radius: 6px;
+  width: 45px;
+  height: 45px;
+  background: #8426d7;
+  color: var(--white);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  svg {
+    width: 18px;
+    height: 23px;
+  }
+}
+.locationText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.locationTitle {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 120%;
+  color: var(--black);
+}
+.locationSubtitle {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  color: var(--black);
+  opacity: 0.3;
+}
+
+.loading {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+}
+
+.backButton {
+  width: 100%;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 16px;
+}
+
+.backButton:hover {
+  background: #e9ecef;
+  border-color: #dee2e6;
+}
+
+.emptyState {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  font-style: italic;
+}
+.locationClose {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  background: var(--white);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  z-index: 300; /* Збільшуємо z-index для кнопки закриття */
+  border-radius: 10px;
+  color: var(--black);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: none;
+  flex-shrink: 0;
+}
+
+.locationClose svg {
+  width: 14px;
+  height: 14px;
+}
+
+.locationPermissionClose {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  z-index: 12;
+  color: var(--black);
+  transition: none;
+  flex-shrink: 0;
+
+  border-radius: 4px;
+  background: #f6f6f6;
+  svg {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+.sidePanel {
+  position: absolute;
+  left: 24px;
+  top: 24px;
+  width: 420px;
+  height: 836px;
+  padding: 32px;
+  border-radius: 24px;
+  background: var(--white);
+  box-shadow: 0 13px 34px 0 rgba(0, 0, 0, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 100; /* Збільшуємо z-index для бічної панелі */
+}
+.panelTitle {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+.panelDivider {
+  width: 356px;
+  height: 1px;
+  background: #efedee;
+}
+.tabs {
+  display: flex;
+  gap: 24px;
+}
+.tab {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 100%;
+  color: var(--black);
+  opacity: 0.3;
+}
+
+.loading {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+}
+
+.backButton {
+  width: 100%;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 16px;
+}
+
+.backButton:hover {
+  background: #e9ecef;
+  border-color: #dee2e6;
+}
+
+.emptyState {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  font-style: italic;
+}
+.tabActive {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 100%;
+  color: #8426d7;
+  opacity: 1;
+}
+.searchAndList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.searchWrap {
+  position: relative;
+}
+.search {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.02em;
+  color: #cac9c9;
+
+  width: 100%;
+  border-radius: 10px;
+  padding: 20px 16px;
+
+  border: 1px solid #efedee;
+}
+.searchIcon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  color: var(--black);
+}
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: auto;
+}
+.listItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 12px;
+  background: var(--white);
+  padding: 10px;
+  text-align: left;
+  cursor: pointer;
+
+  padding: 12px;
+}
+.npIcon {
+  display: inline-flex;
+}
+.itemText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+.itemTitle {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+  color: var(--black);
+}
+.itemMeta {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  color: var(--black);
+  opacity: 0.3;
+}
+
+.loading {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+}
+
+.backButton {
+  width: 100%;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 16px;
+}
+
+.backButton:hover {
+  background: #e9ecef;
+  border-color: #dee2e6;
+}
+
+.emptyState {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  font-style: italic;
+}
+
+/* Статичні мітки як у Leaflet */
+.customMarker {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 1000; /* Ensure markers are above the map */
+  pointer-events: auto; /* Ensure markers are clickable */
+  /* Позиціонування відносно контейнера карти */
+  left: 0;
+  top: 0;
+}
+
+.customMarker:hover {
+  transform: scale(1.1);
+  z-index: 1001;
+}
+
+.markerIcon {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.markerIcon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.markerLabel {
+  position: absolute;
+  top: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.customMarker:hover .markerLabel {
+  opacity: 1;
+}
+
+.markerLabel::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid rgba(0, 0, 0, 0.8);
+}
+
+/* Кнопка геолокації */
+.locationButton {
+  width: 100%;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #495057;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.locationButton:hover {
+  background: #e9ecef;
+  border-color: #dee2e6;
+}
+
+.locationButton svg {
+  width: 16px;
+  height: 16px;
+  color: #8426d7;
+}
+
+.locationButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f8f9fa;
+  color: #6c757d;
+}
+
+.locationButton:disabled svg {
+  color: #6c757d;
+}
+
+/* Глобальні стилі для Leaflet карти (обгорнуті локальним контейнером, щоб пройти CSS Modules) */
+.mapBox :global(.leaflet-container) {
+  z-index: 0 !important;
+}
+
+/* Стилі для іконки геолокації користувача */
+.mapBox :global(.user-location-marker) {
+  z-index: 1000 !important; /* Дуже високий z-index для видимості */
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+  position: relative;
+  animation: pulse 2s infinite;
+}
+
+.mapBox :global(.user-location-marker svg) {
+  width: 50px !important;
+  height: 50px !important;
+}
+
+/* Додаткові стилі для маркера геолокації */
+.mapBox :global(.leaflet-marker-icon.user-location-marker) {
+  z-index: 1000 !important;
+  position: relative !important;
+}
+
+/* Анімація пульсації для маркера геолокації */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.mapBox :global(.leaflet-control-container) {
+  z-index: 0 !important;
+}
+
+.mapBox :global(.leaflet-popup) {
+  z-index: 50 !important;
+}
+
+.mapBox :global(.leaflet-marker-icon) {
+  z-index: 10 !important;
+}
+
+.error {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 140%;
+  color: var(--black);
+  text-align: center;
+  padding: 40px 20px;
+}
+
+@media (max-width: 1000px) {
+  .backdrop {
+    padding: mvw(40) 0;
+    align-items: flex-end;
+  }
+
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: mvw(20) mvw(20) 0 0;
+    display: flex;
+    flex-direction: column;
+    width: mvw(343);
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    border-radius: mvw(12);
+  }
+
+  .modal::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  .body {
+    flex-direction: column;
+    flex: 1.2;
+    min-height: 0;
+    gap: mvw(8);
+  }
+
+  .mapBox {
+    flex: 1;
+    min-height: 0;
+    border-radius: mvw(12);
+    overflow: hidden;
+    background: var(--white);
+  }
+
+  .locationClose {
+    top: mvw(16);
+    right: mvw(16);
+    width: mvw(40);
+    height: mvw(40);
+    border-radius: mvw(10);
+    background: #f2f2f2;
+  }
+
+  .locationClose svg {
+    width: mvw(14);
+    height: mvw(14);
+  }
+
+  .sidePanel {
+    position: static;
+    width: 100%;
+    height: auto;
+    max-height: 50vh;
+    padding: mvw(20) mvw(16);
+    border-radius: mvw(12);
+    background: var(--white);
+    box-shadow: none;
+    border-top: 1px solid #eee;
+    order: -1;
+    overflow-y: auto;
+    gap: mvw(16);
+  }
+
+  .panelTitle {
+    font-size: mvw(20);
+    padding: 0 mvw(40) 0 0;
+    width: mvw(180);
+  }
+
+  .panelDivider {
+    width: 100%;
+    /* margin: mvw(12) 0; */
+  }
+
+  .tabs {
+    gap: mvw(16);
+  }
+
+  .tab {
+    font-size: mvw(20);
+    color: var(--black);
+  }
+
+  .tabActive {
+    font-size: mvw(20);
+  }
+
+  .search {
+    padding: mvw(14) mvw(16) mvw(14) mvw(50);
+    border-radius: mvw(10);
+    font-size: mvw(14);
+    color: var(--black);
+    opacity: 0.5;
+    background: var(--bg-color);
+
+    border: none;
+  }
+
+  .searchIcon {
+    right: mvw(274);
+    width: mvw(20);
+    height: mvw(20);
+    opacity: 0.2;
+  }
+
+  .list {
+    gap: mvw(8);
+    max-height: none;
+  }
+
+  .listItem {
+    padding: mvw(12);
+    border-radius: mvw(12);
+    gap: mvw(12);
+  }
+
+  .npIcon {
+    flex-shrink: 0;
+  }
+
+  .itemText {
+    gap: mvw(4);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .itemTitle {
+    font-size: mvw(14);
+  }
+
+  .itemMeta {
+    font-size: mvw(12);
+  }
+
+  .loading {
+    padding: mvw(20);
+    font-size: mvw(14);
+  }
+
+  .emptyState {
+    padding: mvw(20);
+    font-size: mvw(14);
+  }
+
+  .backButton {
+    padding: mvw(12) mvw(16);
+    border-radius: mvw(8);
+    font-size: mvw(14);
+    margin-top: mvw(12);
+  }
+
+  .locationPermission {
+    top: mvw(8);
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - mvw(32));
+    max-width: mvw(343);
+    padding: mvw(16) mvw(16) mvw(16) mvw(16);
+    border-radius: mvw(12);
+    gap: mvw(12);
+  }
+
+  .locationIcon {
+    width: mvw(40);
+    height: mvw(40);
+    border-radius: mvw(8);
+    padding: mvw(12);
+  }
+
+  .locationIcon svg {
+    width: mvw(16);
+    height: mvw(20);
+  }
+
+  .locationTitle {
+    font-size: mvw(16);
+  }
+
+  .locationSubtitle {
+    font-size: mvw(12);
+  }
+
+  .locationPermissionClose {
+    top: mvw(12);
+    right: mvw(12);
+    width: mvw(24);
+    height: mvw(24);
+  }
+
+  .locationPermissionClose svg {
+    width: mvw(10);
+    height: mvw(10);
+  }
+}

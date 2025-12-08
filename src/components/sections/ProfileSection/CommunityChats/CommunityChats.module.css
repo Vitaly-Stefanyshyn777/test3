@@ -1,0 +1,145 @@
+.communityChats {
+  background-color: #ffffff;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.title {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 120%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.chatsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.chatCard {
+  background: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  justify-content: center;
+  border-radius: 24px;
+  padding: 32px;
+}
+
+.chatIcon {
+  width: 65px;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background-color: rgba(132, 38, 215, 0.1);
+  color: var(--violet);
+  svg {
+    width: 37px;
+    height: 24px;
+  }
+}
+
+.iconEmoji {
+  font-size: 24px;
+  filter: grayscale(1) brightness(0) invert(1);
+}
+
+.telegramIcon {
+  width: 24px;
+  height: 24px;
+  fill: #0088cc;
+}
+
+.chatInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  align-items: center;
+}
+
+.chatTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.chatHandle {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  text-align: center;
+  color: rgba(14, 14, 14, 0.4);
+}
+
+@media (max-width: 1000px) {
+  .communityChats {
+    border-radius: mvw(12);
+    gap: mvw(16);
+    font-weight: 600;
+    background: var(--bg-color);
+  }
+
+  .title {
+    font-size: mvw(22);
+    line-height: 120%;
+  }
+
+  .chatsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: mvw(12);
+  }
+
+  .chatCard {
+    padding: mvw(20);
+    gap: mvw(16);
+    border-radius: mvw(16);
+    background: white;
+    aspect-ratio: 1;
+  }
+
+  .chatIcon {
+    width: mvw(50);
+    height: mvw(50);
+    border-radius: mvw(10);
+    svg {
+      width: mvw(24);
+      height: mvw(24);
+    }
+  }
+
+  .telegramIcon {
+    width: mvw(20);
+    height: mvw(20);
+  }
+
+  .chatInfo {
+    gap: mvw(4);
+  }
+
+  .chatTitle {
+    font-size: mvw(16);
+    line-height: 1.3;
+  }
+
+  .chatHandle {
+    font-size: mvw(14);
+    line-height: 140%;
+  }
+}

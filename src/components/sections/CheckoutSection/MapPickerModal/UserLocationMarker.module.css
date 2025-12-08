@@ -1,0 +1,24 @@
+/* Стилі для UserLocationMarker */
+
+.popupContainer {
+  min-width: 150px;
+  text-align: center;
+}
+
+.coordinates {
+  font-size: 12px;
+  margin-top: 4px;
+  color: #64748b;
+}
+
+.loading {
+  font-size: 11px;
+  color: #3b82f6;
+  margin-top: 2px;
+}
+
+.error {
+  font-size: 11px;
+  color: #ef4444;
+  margin-top: 2px;
+}

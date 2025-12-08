@@ -1,0 +1,253 @@
+.container {
+  position: relative;
+  background: #000;
+  border-radius: 1.04167vw;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+/* Ready-to-use fixed box for payload-style embeds */
+.payloadBox {
+  width: 520px;
+  height: 300px;
+  border-radius: 20px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  background: #000;
+  overflow: hidden;
+}
+
+.closeButton {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  z-index: 20;
+  backdrop-filter: blur(20px);
+  background: rgba(255, 254, 252, 0.4);
+
+  color: #fff;
+  border: none;
+
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+
+  border-radius: 62px;
+  padding: 16px;
+  width: auto;
+  height: 44px;
+
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  color: var(--white);
+}
+
+.closeButtonText {
+  font-family: "Plateia", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  color: var(--white);
+}
+
+.previewButton {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.previewImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.playButton {
+  position: relative;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background: rgba(14, 14, 14, 0.1);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+.playIcon {
+  display: block;
+  transform: translateX(2px); /* optical centering for current SVG */
+}
+
+.loaderOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #111827; /* gray-900 */
+}
+
+.loaderSpinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f3f3f3;
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  animation: spin 1s linear infinite;
+}
+
+.loaderText {
+  color: #fff;
+  text-align: center;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  background: rgba(14, 14, 14, 0.1);
+  border-radius: 10px;
+}
+
+.overlay.overlayNoBlur {
+  backdrop-filter: none;
+  background: transparent;
+}
+
+.overlayPlayBG {
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 9999px;
+  padding: 16px;
+}
+
+/* Minimal control: single play/pause button */
+.playPauseButton {
+  width: 109px;
+  height: 109px;
+  border-radius: 62px;
+  padding: 16px;
+  border: none;
+  backdrop-filter: blur(20px);
+  background: rgba(255, 254, 252, 0.4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+}
+
+.playPauseButton.noBlur {
+  backdrop-filter: none;
+  background: var(--white);
+}
+
+.playPauseButton.noBlur .playTriangle {
+  color: #3b2d47;
+}
+
+.playTriangle {
+  display: block;
+  transform: translateX(2px);
+}
+
+.pauseIcon {
+  position: relative;
+  width: 22px;
+  height: 22px;
+}
+.pauseIcon::before,
+.pauseIcon::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 6px;
+  height: 22px;
+  background: #ffffff;
+}
+.pauseIcon::before {
+  left: 0;
+}
+.pauseIcon::after {
+  right: 0;
+}
+
+.closeIcon {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2px;
+  transform: rotate(-180deg);
+}
+
+@media (max-width: 1000px) {
+  .closeButton {
+    font-size: mvw(14);
+    left: mvw(16);
+    top: mvw(16);
+    height: mvw(44);
+    gap: mvw(8);
+    border-radius: mvw(62);
+    width: auto;
+    min-width: mvw(109);
+    padding: mvw(16);
+  }
+
+  .closeIcon {
+    width: mvw(12);
+    height: mvw(12);
+    stroke-width: 2px;
+    transform: rotate(-180deg);
+  }
+
+  .playPauseButton {
+    width: mvw(70);
+    height: mvw(69);
+    min-width: mvw(70);
+    min-height: mvw(69);
+    border-radius: mvw(40);
+    padding: 0;
+  }
+
+  .playPauseButton .playTriangle,
+  .playPauseButton .playTriangle svg {
+    width: mvw(30);
+    height: mvw(30);
+  }
+  .closeButtonText {
+    font-size: mvw(14);
+  }
+}
