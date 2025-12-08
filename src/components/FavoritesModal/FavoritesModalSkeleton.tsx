@@ -3,7 +3,7 @@ import React from "react";
 import Skeleton from "react-loading-skeleton";
 import s from "./FavoritesModal.module.css";
 import "react-loading-skeleton/dist/skeleton.css";
-import { CardSkeleton } from "../ui/CardSkeleton/CardSkeleton";
+import { CardSkeleton } from "@/components/ui/CardSkeleton/CardSkeleton";
 
 const FavoritesModalSkeleton: React.FC = () => {
   return (
@@ -39,3 +39,4 @@ const FavoritesModalSkeleton: React.FC = () => {
 };
 
 export default FavoritesModalSkeleton;
+

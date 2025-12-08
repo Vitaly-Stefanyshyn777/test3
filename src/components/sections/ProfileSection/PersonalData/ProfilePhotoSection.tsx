@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import styles from "./PersonalData.module.css";
-import { UserIcon, PlusIcon } from "../../../Icons/Icons";
+import { UserIcon, PlusIcon } from "@/components/Icons/Icons";
 import ProfilePhotoSectionSkeleton from "./ProfilePhotoSectionSkeleton";
-import { uploadCoachMedia } from "../../../../lib/bfbApi";
-import { useAuthStore } from "../../../../store/auth";
+import { uploadCoachMedia } from "@/lib/bfbApi";
+import { useAuthStore } from "@/store/auth";
 
 type Props = {
   profileImage: string | null;

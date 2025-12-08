@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./PaginationNav.module.css";
-import { ArrowLeftIcon, ArrowRightIcon } from "../../Icons/Icons";
+import { ArrowLeftIcon, ArrowRightIcon } from "@/components/Icons/Icons";
 
 interface PaginationNavProps {
   currentPage: number;

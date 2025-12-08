@@ -1,8 +1,8 @@
 "use client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getMyProfile } from "../../lib/auth";
-import { adminRequest } from "../../lib/api";
-import { useAuthStore } from "../../store/auth";
+import { getMyProfile } from "@/lib/auth";
+import { adminRequest } from "@/lib/api";
+import { useAuthStore } from "@/store/auth";
 
 export type WpUserMe = {
   id?: number | string;
@@ -23,7 +23,9 @@ export function useUserProfileQuery() {
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
 
   return useQuery({
-    queryKey: ["user-profile", "me", token], // Додаємо token до queryKey щоб оновлювати при зміні токена
+    // Додаємо token та isLoggedIn до queryKey щоб оновлювати при зміні стану авторизації
+    // Не додаємо userId, щоб уникнути безкінечних циклів (userId може змінюватися після завантаження профілю)
+    queryKey: ["user-profile", "me", token, isLoggedIn],
     queryFn: async () => {
       // Передаємо токен з authStore в getMyProfile
       // getMyProfile також перевірить localStorage як fallback

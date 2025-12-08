@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./ButtonFilter.module.css";
-import { ApplyFilterButton } from "../Buttons/ApplyFilterButton";
-import { ResetFilterButton } from "../Buttons/ResetFilterButton";
+import { ApplyFilterButton } from "@/components/ui/Buttons/ApplyFilterButton";
+import { ResetFilterButton } from "@/components/ui/Buttons/ResetFilterButton";
 
 interface FilterActionsProps {
   onApply: () => void;

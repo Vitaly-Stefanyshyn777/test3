@@ -4,13 +4,16 @@ import { useForm } from "react-hook-form";
 import s from "./ContactsSection.module.css";
 import ContactInfo from "./ContactInfo/ContactInfo";
 import ContactForm, { ContactFormValues } from "./ContactForm/ContactForm";
-import { ThemeSettingsPost } from "../../../lib/bfbApi";
-import { useThemeSettingsQuery } from "../../hooks/useWpQueries";
-import { useContactQuestion } from "../../../lib/useMutation";
+import { ThemeSettingsPost } from "@/lib/bfbApi";
+import { useThemeSettingsQuery } from "@/components/hooks/useWpQueries";
+import { useContactQuestion } from "@/lib/useMutation";
+import { getContactData } from "@/lib/themeSettingsUtils";
+import { useMemo } from "react";
 
 const ContactsSection: React.FC = () => {
   const [themeSettings, setThemeSettings] = useState<ThemeSettingsPost[]>([]);
   const { data, isLoading, isError } = useThemeSettingsQuery();
+  const contactData = useMemo(() => getContactData(data), [data]);
 
   const {
     register,
@@ -62,12 +65,8 @@ const ContactsSection: React.FC = () => {
       <div className={s.header}>
         <p className={s.subtitle}>Зв’яжись з нами</p>
         <h2 className={s.title}>
-          {themeSettings[0]?.acf?.input_text_phone?.trim() ||
-            (isLoading
-              ? "Завантаження…"
-              : isError
-              ? "Дані не прийшли"
-              : "Маєте питання щодо навчання?")}
+          Маєте питання <br />
+          щодо навчання?
         </h2>
       </div>
       <div className={s.container}>

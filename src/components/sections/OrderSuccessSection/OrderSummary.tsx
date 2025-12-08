@@ -32,9 +32,7 @@ export default function OrderSummary({
         <div className={s.costRow}>
           <span className={s.costLabel}>Вартість доставки:</span>
           <span className={s.costValue}>
-            {deliveryCost === 0
-              ? "Безкоштовно"
-              : "За тарифами \"Нової Пошти\""}
+            {deliveryCost === 0 ? "Безкоштовно" : 'За тарифами "Нової Пошти"'}
           </span>
         </div>
         <div className={s.costRow}>
@@ -46,9 +44,8 @@ export default function OrderSummary({
       </div>
 
       <Link href="/checkout" className={s.returnButton}>
-        Обрати на мапі
+        Повернутися на головну
       </Link>
     </>
   );
 }
-

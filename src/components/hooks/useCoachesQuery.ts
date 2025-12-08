@@ -4,8 +4,8 @@ import {
   coachesQuery,
   coachQuery,
   coachesWithFiltersQuery,
-} from "../../lib/queries";
-import { fetchCases } from "../../lib/bfbApi";
+} from "@/lib/queries";
+import { fetchCases } from "@/lib/bfbApi";
 
 export function useCoachesQuery() {
   return useQuery(coachesQuery());

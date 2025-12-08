@@ -26,7 +26,6 @@
   font-weight: 700;
   font-size: 56px;
   line-height: 100%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -61,7 +60,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--white);
 }
 .instagramHandle {
@@ -82,6 +80,10 @@
   padding: 16px 20px;
 }
 
+.instagramHandle:hover {
+  background: var(--violet);
+}
+
 .teamCardContent {
   padding: 24px 32px 32px;
   display: flex;
@@ -100,7 +102,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--violet);
 }
 
@@ -109,7 +110,6 @@
   font-weight: 600;
   font-size: 32px;
   line-height: 140%;
-  letter-spacing: -0.02em;
   color: var(--black);
 }
 
@@ -146,7 +146,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
   opacity: 0.6;
 }

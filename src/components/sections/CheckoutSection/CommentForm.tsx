@@ -2,7 +2,7 @@
 import React from "react";
 import { FormData } from "./types";
 import s from "./CheckoutSection.module.css";
-import Multiline from "../../ui/FormFields/Multiline";
+import Multiline from "@/components/ui/FormFields/Multiline";
 import multilineStyles from "@/components/ui/FormFields/Multiline.module.css";
 
 interface CommentFormProps {

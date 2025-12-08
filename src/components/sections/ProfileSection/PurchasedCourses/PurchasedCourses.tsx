@@ -2,11 +2,8 @@
 import React, { useEffect, useState } from "react";
 import styles from "./PurchasedCourses.module.css";
 import CoursesList, { type Course } from "./CoursesList";
-import {
-  fetchPurchasedProducts,
-  PurchasedProduct,
-} from "../../../../lib/bfbApi";
-import { useAuthStore } from "../../../../store/auth";
+import { fetchPurchasedProducts, PurchasedProduct } from "@/lib/bfbApi";
+import { useAuthStore } from "@/store/auth";
 
 interface PurchasedCoursesProps {
   title?: string;

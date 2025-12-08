@@ -75,7 +75,6 @@
   line-height: 120%;
   color: var(--gray);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .value {

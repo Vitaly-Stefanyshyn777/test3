@@ -78,7 +78,6 @@
   font-family: var(--font7);
   font-weight: 500;
   font-size: 30px;
-  letter-spacing: -0.04em;
   color: #000;
 }
 
@@ -86,7 +85,6 @@
   font-family: var(--font7);
   font-weight: 700;
   font-size: 32px;
-  letter-spacing: -0.04em;
   color: #000;
 }
 
@@ -137,7 +135,6 @@
   font-weight: 400;
   font-size: 12px;
   line-height: 130%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -151,7 +148,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
   text-decoration: none;
   transition: opacity 0.3s ease;
@@ -204,7 +200,6 @@
   font-weight: 400;
   font-size: mvw(10);
   line-height: 130%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 

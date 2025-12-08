@@ -2,8 +2,8 @@
 
 import React from "react";
 import styles from "./TrainerProfile.module.css";
-import { DaggerIcon } from "../../../Icons/Icons";
-import SecondaryInput from "../../../ui/FormFields/SecondaryInput";
+import { DaggerIcon } from "@/components/Icons/Icons";
+import SecondaryInput from "@/components/ui/FormFields/SecondaryInput";
 
 type Props = {
   title: string;

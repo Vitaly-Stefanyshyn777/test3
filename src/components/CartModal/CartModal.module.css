@@ -35,31 +35,7 @@
   font-weight: 500;
   font-size: 36px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--black);
-}
-.close {
-  border: none;
-  font-size: 22px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  background-color: #f2f2f2;
-  width: 46px;
-  height: 46px;
-  color: var(--black);
-  transition: all 0.3s ease;
-  svg {
-    width: 14px;
-    height: 14px;
-  }
-}
-
-.close:hover {
-  color: var(--white);
-  background: var(--violet);
 }
 .list {
   overflow: auto;
@@ -113,7 +89,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .summaryLabelPrimary,
@@ -122,7 +97,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .amountDiscount {
@@ -130,7 +104,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
   opacity: 0.4;
 }
@@ -140,7 +113,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
   opacity: 0.4;
 }
@@ -150,7 +122,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .summaryCurrencyPrimary {
@@ -158,7 +129,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .label {
@@ -174,7 +144,6 @@
   font-weight: 500;
   font-size: 24px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -183,7 +152,6 @@
   font-weight: 500;
   font-size: 24px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--black);
   color: var(--black);
 }
@@ -192,7 +160,6 @@
   font-weight: 500;
   font-size: 24px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .value {
@@ -203,7 +170,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .totalValue {
@@ -211,7 +177,6 @@
   font-weight: 500;
   font-size: 24px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .progressTrack {
@@ -301,7 +266,6 @@
   font-weight: 500;
   font-size: 24px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .recoRow {
@@ -393,7 +357,6 @@
   font-weight: 500;
   font-size: 18px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   text-align: right;
   color: var(--black);
 }
@@ -402,7 +365,6 @@
   font-weight: 500;
   font-size: 22px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   text-align: right;
   color: var(--black);
   display: flex;
@@ -414,7 +376,6 @@
   font-weight: 500;
   font-size: 18px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .recoOldPrice {
@@ -590,7 +551,6 @@
   font-weight: 500;
   font-size: 18px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   text-align: right;
   color: var(--style);
 }
@@ -599,7 +559,6 @@
   font-weight: 500;
   font-size: 22px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   text-align: right;
   color: var(--style);
 }
@@ -710,17 +669,6 @@
   .title {
     font-size: mvw(24);
     line-height: 110%;
-  }
-
-  .close {
-    width: mvw(40);
-    height: mvw(40);
-    border-radius: mvw(10);
-  }
-
-  .close svg {
-    width: mvw(14);
-    height: mvw(14);
   }
 
   .bodyTwoCols {

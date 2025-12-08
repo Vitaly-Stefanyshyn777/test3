@@ -32,7 +32,7 @@ import CourseSidebarCourseInfoSkeleton from "./CourseSidebarCourseInfoSkeleton";
 import CourseSidebarImageSkeleton from "./CourseSidebarImageSkeleton";
 
 interface CourseSidebarProps {
-  courseId?: number;
+  courseId?: string | number;
 }
 
 const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
@@ -95,7 +95,11 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
   const { data: course, isLoading: isLoadingCourse } = useCourseQuery(courseId);
 
   // Отримуємо дані курсу з coursesQueries (як в CourseCard)
-  const { data: courseData, isLoading: isLoadingCourseData } = useCourseDataQuery(courseId || 169);
+  // Конвертуємо courseId в число для сумісності
+  const courseIdForQuery = typeof courseId === "number" ? courseId : 
+                           /^\d+$/.test(String(courseId)) ? parseInt(String(courseId)) : 
+                           169;
+  const { data: courseData, isLoading: isLoadingCourseData } = useCourseDataQuery(courseIdForQuery);
 
   // Логування для дебагу
   React.useEffect(() => {
@@ -178,8 +182,13 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
 
   React.useEffect(() => {
     if (courseId) {
+      // Використовуємо ID з отриманого курсу, якщо він є, інакше використовуємо courseId
+      const courseIdForApi = course?.id || 
+                              (typeof courseId === "number" ? courseId : 
+                               /^\d+$/.test(String(courseId)) ? parseInt(String(courseId)) : 
+                               courseId);
       const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE;
-      fetch(`${baseUrl}/wp-json/wc/v3/products/${courseId}`, {
+      fetch(`${baseUrl}/wp-json/wc/v3/products/${courseIdForApi}`, {
         headers: {
           Authorization:
             "Basic " +
@@ -197,7 +206,7 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
           setStoreProduct(null);
         });
     }
-  }, [courseId]);
+  }, [courseId, course?.id]);
 
   const ratingValue = useMemo(() => {
     const parsed = parseFloat(
@@ -341,7 +350,12 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
   React.useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`/api/wc/v3/products/${courseId}`);
+        // Використовуємо ID з отриманого курсу, якщо він є
+        const courseIdForApi = course?.id || 
+                               (typeof courseId === "number" ? courseId : 
+                                /^\d+$/.test(String(courseId)) ? parseInt(String(courseId)) : 
+                                courseId);
+        const response = await fetch(`/api/wc/v3/products/${courseIdForApi}`);
         if (response.ok) {
           const data = await response.json();
           const categoryIds =
@@ -356,7 +370,7 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
     if (courseId) {
       fetchCategories();
     }
-  }, [courseId]);
+  }, [courseId, course?.id]);
 
   const hasOnlineFormat = categories.includes(67);
   const hasOfflineFormat = categories.includes(68);

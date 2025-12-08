@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import styles from "./TrainerProfile.module.css";
 import type { WorkExperienceEntry } from "./types";
-import SecondaryInput from "../../../ui/FormFields/SecondaryInput";
+import SecondaryInput from "@/components/ui/FormFields/SecondaryInput";
 import DropdownField, {
   DropdownOption,
-} from "../../../ui/FormFields/DropdownField";
+} from "@/components/ui/FormFields/DropdownField";
 
 type Props = {
   value: WorkExperienceEntry;
@@ -49,9 +49,9 @@ export default function ExperienceForm({ value, onChange }: Props) {
   const years: DropdownOption[] = Array.from(
     { length: maxYear - minYear + 1 },
     (_, idx) => {
-      const year = maxYear - idx; // Від майбутнього до минулого
-      return { value: String(year), label: String(year) };
-    }
+    const year = maxYear - idx; // Від майбутнього до минулого
+    return { value: String(year), label: String(year) };
+    },
   );
 
   return (

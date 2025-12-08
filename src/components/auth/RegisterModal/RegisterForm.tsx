@@ -108,15 +108,6 @@ export default function RegisterForm({
       </div>
 
       <div className={s.rowSingle}>
-        <TextareaField
-          icon={<QuestionIcon />}
-          label="Коментар (необов'язково)"
-          rows={4}
-          {...register("comment")}
-        />
-      </div>
-
-      <div className={s.rowSingle}>
         <PasswordField
           icon={<PasswordsIcon />}
           label="Пароль"

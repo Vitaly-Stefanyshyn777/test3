@@ -8,9 +8,9 @@ import {
   LocationIcon,
   WalkingIcon,
   ChevronDownIcon,
-} from "../../../Icons/Icons";
+} from "@/components/Icons/Icons";
 import type { TrainerProfileForm } from "./types";
-import InputField from "../../../ui/FormFields/InputField";
+import InputField from "@/components/ui/FormFields/InputField";
 
 type Props = {
   formData: TrainerProfileForm;

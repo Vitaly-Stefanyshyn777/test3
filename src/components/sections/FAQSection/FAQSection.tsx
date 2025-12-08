@@ -4,7 +4,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { СhevronIcon } from "../../Icons/Icons";
 import styles from "./FAQSection.module.css";
-import { fetchFAQByCategoryWithLogging, FaqItem } from "../../../lib/bfbApi";
+import { fetchFAQByCategoryWithLogging, FaqItem } from "@/lib/bfbApi";
 import { useQuery } from "@tanstack/react-query";
 import FAQSectionSkeleton from "./FAQSectionSkeleton";
 
@@ -13,9 +13,7 @@ interface FAQSectionProps {
   categoryId?: number;
 }
 
-const FAQSection: React.FC<FAQSectionProps> = ({
-  categoryId: propCategoryId,
-}) => {
+const FAQSection: React.FC<FAQSectionProps> = ({ categoryId: propCategoryId }) => {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<number[]>([]);
   const [faqData, setFaqData] = useState<FaqItem[]>([]);
@@ -160,7 +158,9 @@ const FAQSection: React.FC<FAQSectionProps> = ({
                         onClick={() => toggleItem(item.id)}
                         aria-expanded={expandedItems.includes(item.id)}
                       >
-                        <span className={styles.question}>{questionText}</span>
+                        <span className={styles.question}>
+                          {questionText}
+                        </span>
                         <span
                           className={`${styles.chevron} ${
                             expandedItems.includes(item.id)

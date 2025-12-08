@@ -5,6 +5,7 @@ import styles from "./TrainerMap.module.css";
 import { TrainerUser } from "../types";
 import InstructingSlider from "../../InstructingSlider/InstructingSlider";
 import { useThemeSettingsQuery } from "@/components/hooks/useWpQueries";
+import { getContactData, convertSvgAttributesToCamelCase } from "@/lib/themeSettingsUtils";
 import {
   InstagramIcon,
   TelegramIcon,
@@ -75,7 +76,13 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
 
   // Отримуємо дані з API
   const { data: themeSettings } = useThemeSettingsQuery();
-  const themeMapMarkers = themeSettings?.[0]?.acf?.map_markers;
+  const contactData = getContactData(themeSettings);
+  // Перевіряємо map_markers на верхньому рівні або в acf
+  const themeMapMarkers = 
+    (Array.isArray(themeSettings) && themeSettings[0]?.map_markers) ||
+    (Array.isArray(themeSettings) && themeSettings[0]?.acf?.map_markers) ||
+    (themeSettings && !Array.isArray(themeSettings) && (themeSettings as ThemeSettingsPost).map_markers) ||
+    (themeSettings && !Array.isArray(themeSettings) && (themeSettings as ThemeSettingsPost).acf?.map_markers);
 
   // Контакти активного залу (my_wlocation[activeLocationIndex])
   // Перевіряємо, чи індекс не виходить за межі масиву
@@ -571,7 +578,7 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
                   href={contact.hl_input_text_link || "#"}
                   className={styles.socialIcon}
                   dangerouslySetInnerHTML={{
-                    __html: contact.hl_img_svg_icon,
+                    __html: convertSvgAttributesToCamelCase(contact.hl_img_svg_icon),
                   }}
                 />
               )
@@ -656,6 +663,7 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
                     <span className={styles.label}>Телефон:</span>
                     <span className={styles.value}>
                       {activeLocation?.hl_input_text_phone ||
+                        contactData.phone ||
                         "+380 95 437 25 75"}
                     </span>
                   </div>
@@ -664,6 +672,7 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
                     <span className={styles.label}>Час роботи у вихідні:</span>
                     <span className={styles.value}>
                       {activeLocation?.hl_input_text_schedule_two ||
+                        contactData.weekends ||
                         "10:00 - 20:00"}
                     </span>
                   </div>
@@ -673,6 +682,7 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
                     <span className={styles.label}>Email:</span>
                     <span className={styles.value}>
                       {activeLocation?.hl_input_text_email ||
+                        contactData.email ||
                         "bfb.board.ukraine@gmail.com"}
                     </span>
                   </div>
@@ -681,6 +691,7 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
                     <span className={styles.label}>Час роботи у будні:</span>
                     <span className={styles.value}>
                       {activeLocation?.hl_input_text_schedule_five ||
+                        contactData.weekdays ||
                         "09:00 - 22:00"}
                     </span>
                   </div>
@@ -691,6 +702,7 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
                 <span className={styles.label}>Адреса:</span>
                 <span className={styles.value}>
                   {activeLocation?.hl_input_text_address ||
+                    contactData.address ||
                     `${trainer.location_city || "м. Київ"}, ${
                       trainer.location_country || "Україна"
                     }`}

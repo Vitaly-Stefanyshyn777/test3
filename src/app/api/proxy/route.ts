@@ -4,6 +4,14 @@ const UPSTREAM_BASE = process.env.UPSTREAM_BASE;
 
 export async function GET(req: NextRequest) {
   try {
+    if (!UPSTREAM_BASE) {
+      console.error("Proxy GET error: UPSTREAM_BASE is not set");
+      return NextResponse.json(
+        { error: "Server configuration error" },
+        { status: 500 }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     const path = searchParams.get("path");
     if (!path) {

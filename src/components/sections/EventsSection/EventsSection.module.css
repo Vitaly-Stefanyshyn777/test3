@@ -18,7 +18,6 @@
   font-weight: 700;
   font-size: 56px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -76,7 +75,6 @@
   font-family: var(--font-family);
   font-weight: 600;
   font-size: 32px;
-  letter-spacing: -0.04em;
   color: var(--black);
   display: flex;
   align-items: center;
@@ -143,7 +141,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   text-transform: uppercase;
   color: var(--black);
 }
@@ -313,7 +310,6 @@
   font-weight: 600;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -326,7 +322,6 @@
   font-weight: 500;
   font-size: 14px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: rgba(255, 254, 252, 0.6);
 }
 
@@ -357,7 +352,6 @@
   font-weight: 600;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--white);
 }
 
@@ -468,7 +462,6 @@
   font-weight: 500;
   font-size: 12px;
   line-height: 140%;
-  letter-spacing: 0.08em;
   text-transform: uppercase;
   text-align: center;
   color: rgba(14, 14, 14, 0.6);
@@ -479,7 +472,6 @@
   font-weight: 500;
   font-size: 56px;
   line-height: 120%;
-  letter-spacing: -0.03em;
   color: var(--black);
 }
 
@@ -488,7 +480,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: rgba(14, 14, 14, 0.4);
 }
 
@@ -937,7 +928,6 @@
     font-weight: 500;
 
     line-height: 140%;
-    letter-spacing: 0.08em;
     text-transform: uppercase;
     text-align: center;
     color: rgba(14, 14, 14, 0.6);
@@ -949,13 +939,11 @@
     font-weight: 500;
 
     line-height: 100%;
-    letter-spacing: -0.03em;
     color: var(--black);
   }
   .eventCardDescription {
     font-size: mvw(14);
     line-height: 140%;
-    letter-spacing: -0.01em;
 
     font-family: var(--font-family);
     font-weight: 500;
@@ -1002,7 +990,6 @@
     font-family: var(--third-family);
 
     line-height: 140%;
-    letter-spacing: -0.01em;
     color: var(--black);
   }
   .eventCardButton {
@@ -1025,7 +1012,6 @@
     font-weight: 700;
     font-size: mvw(28);
     line-height: 120%;
-    letter-spacing: -0.01em;
     text-align: center;
     color: var(--black);
   }
@@ -1042,7 +1028,6 @@
     font-family: var(--font-family);
     font-weight: 600;
     font-size: mvw(20);
-    letter-spacing: -0.04em;
     color: var(--black);
   }
   .otherMonth {

@@ -1,6 +1,10 @@
 "use client";
 
-import { CloseButtonIcon, ErrotIcon, SuccessIcon } from "../../Icons/Icons";
+import {
+  CloseButtonIcon,
+  ErrotIcon,
+  SuccessIcon,
+} from "@/components/Icons/Icons";
 import s from "./RegisterResultModal.module.css";
 
 interface RegisterResultModalProps {

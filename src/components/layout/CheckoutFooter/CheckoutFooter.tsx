@@ -19,53 +19,55 @@ export default function CheckoutFooter() {
     <footer className={s.footer}>
       <div className={s.footerContent}>
         {/* Контакти */}
-        <div className={s.contactsSection}>
-          <h3 className={s.sectionTitle}>КОНТАКТИ:</h3>
-          <div className={s.contactInfo}>
-            <a
-              href="tel:+380954372575"
-              className={`${s.contactLink} ${s.phoneLink}`}
-            >
-              +380 95 437 25 75
-            </a>
-            <a
-              href="mailto:bfb.board.ukraine@gmail.com"
-              className={`${s.contactLink} ${s.mailLink}`}
-            >
-              bfb.board.ukraine@gmail.com
-            </a>
+        <div className={s.contactsBlock}>
+          <div className={s.contactsSection}>
+            <h3 className={s.sectionTitle}>КОНТАКТИ:</h3>
+            <div className={s.contactInfo}>
+              <a
+                href="tel:+380954372575"
+                className={`${s.contactLink} ${s.phoneLink}`}
+              >
+                +380 95 437 25 75
+              </a>
+              <a
+                href="mailto:bfb.board.ukraine@gmail.com"
+                className={`${s.contactLink} ${s.mailLink}`}
+              >
+                bfb.board.ukraine@gmail.com
+              </a>
+            </div>
+            <div className={s.socialIcons}>
+              <a
+                href="https://www.instagram.com/bfb.official_ukraine?igsh=enFybWFmZGE3NG8z"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={s.iconButton}
+              >
+                <InstagramIcon />
+              </a>
+              <button className={s.iconButton}>
+                <FacebookIcon />
+              </button>
+              <button className={s.iconButton}>
+                <TelegramIcon />
+              </button>
+              <button className={s.iconButton}>
+                <WhatsappIcon />
+              </button>
+            </div>
           </div>
-          <div className={s.socialIcons}>
-            <a
-              href="https://www.instagram.com/bfb.official_ukraine?igsh=enFybWFmZGE3NG8z"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={s.iconButton}
-            >
-              <InstagramIcon />
-            </a>
-            <button className={s.iconButton}>
-              <FacebookIcon />
-            </button>
-            <button className={s.iconButton}>
-              <TelegramIcon />
-            </button>
-            <button className={s.iconButton}>
-              <WhatsappIcon />
-            </button>
-          </div>
-        </div>
 
-        {/* Адреса */}
-        <div className={s.addressSection}>
-          <h3 className={s.sectionTitle}>АДРЕСА:</h3>
-          <address className={s.address}>
-            <p className={s.addressText}>Мукачево, вул. Духновича 40</p>
-            <p className={s.scheduleItem}>
-              понеділок - пятниця: 09:00 - 22:00,
-            </p>
-            <p className={s.scheduleItem}>субота - неділя: 10:00 - 20:00</p>
-          </address>
+          {/* Адреса */}
+          <div className={s.addressSection}>
+            <h3 className={s.sectionTitle}>АДРЕСА:</h3>
+            <address className={s.address}>
+              <p className={s.addressText}>Мукачево, вул. Духновича 40</p>
+              <p className={s.scheduleItem}>
+                понеділок - пятниця: 09:00 - 22:00,
+              </p>
+              <p className={s.scheduleItem}>субота - неділя: 10:00 - 20:00</p>
+            </address>
+          </div>
         </div>
 
         {/* Документація */}

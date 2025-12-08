@@ -12,11 +12,14 @@ import {
 interface SizeFilterProps {
   selectedSizes: string[];
   onChange: (sizes: string[]) => void;
+  loading?: boolean;
 }
 
-export const SizeFilter = ({ selectedSizes, onChange }: SizeFilterProps) => {
+export const SizeFilter = ({ selectedSizes, onChange, loading }: SizeFilterProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const { data: attrs = [], isLoading, isError } = useProductAttributesQuery();
+  
+  const showSkeleton = loading || isLoading;
   const sizeAttr = (attrs || []).find((a) => {
     const slug = (a.slug || "").toLowerCase();
     const name = (a.name || "").toLowerCase();
@@ -34,7 +37,7 @@ export const SizeFilter = ({ selectedSizes, onChange }: SizeFilterProps) => {
   );
 
   // Обчислюємо terms на льоту без useEffect
-  const terms = (termsData || []) as Array<{
+  const terms = [...(termsData || [])].reverse() as Array<{
     id: number;
     name: string;
     slug: string;
@@ -70,11 +73,14 @@ export const SizeFilter = ({ selectedSizes, onChange }: SizeFilterProps) => {
           isExpanded ? styles.expanded : styles.collapsed
         }`}
       >
-        {isLoading ? (
+        {showSkeleton ? (
           <div className={styles.sizeButtons}>
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} width={80 + Math.random() * 40} height={40} borderRadius={8} />
-            ))}
+            {[...Array(3)].map((_, i) => {
+              const widths = [90, 100, 85]; // Фіксовані ширини замість Math.random()
+              return (
+                <Skeleton key={i} width={widths[i]} height={40} borderRadius={8} />
+              );
+            })}
           </div>
         ) : isError ? (
           <div className={styles.error}>Помилка завантаження</div>

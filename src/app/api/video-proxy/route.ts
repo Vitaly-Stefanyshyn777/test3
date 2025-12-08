@@ -62,6 +62,20 @@ export async function GET(request: NextRequest) {
     );
 
     // Перевіряємо, чи hostname відповідає базовому домену або його варіантам
+    // Витягуємо кореневий домен для порівняння (наприклад, bfb.projection-learn.website)
+    const getRootDomain = (hostname: string): string => {
+      const parts = hostname.split('.');
+      // Якщо домен має більше 2 частин, беремо останні 2-3 частини
+      if (parts.length > 2) {
+        // Для доменів типу www.api.bfb.projection-learn.website беремо bfb.projection-learn.website
+        return parts.slice(-3).join('.');
+      }
+      return hostname;
+    };
+
+    const baseRootDomain = baseHostname ? getRootDomain(baseHostname) : '';
+    const videoRootDomain = getRootDomain(videoHostname);
+
     const hostnameMatches =
       baseHostname &&
       (videoHostname === baseHostname ||
@@ -72,24 +86,68 @@ export async function GET(request: NextRequest) {
         baseHostname === `api.${videoHostname}` ||
         baseHostname === `www.api.${videoHostname}` ||
         videoHostname.endsWith(`.${baseHostname}`) ||
-        baseHostname.endsWith(`.${videoHostname}`));
+        baseHostname.endsWith(`.${videoHostname}`) ||
+        // Додаємо перевірку кореневого домену
+        (baseRootDomain && videoRootDomain === baseRootDomain) ||
+        videoHostname.includes(baseRootDomain) ||
+        baseHostname.includes(videoRootDomain));
 
     const isAllowed = startsWithAllowed || hostnameMatches;
 
     if (!isAllowed) {
-      return NextResponse.json({ error: "Недопустимий URL" }, { status: 400 });
+      console.error("[video-proxy] Недопустимий URL:", {
+        videoUrl,
+        videoHostname,
+        baseHostname,
+        baseRootDomain,
+        videoRootDomain,
+        startsWithAllowed,
+        hostnameMatches,
+      });
+      return NextResponse.json(
+        { 
+          error: "Недопустимий URL",
+          details: {
+            videoHostname,
+            baseHostname,
+            baseRootDomain,
+            videoRootDomain,
+          }
+        }, 
+        { status: 400 }
+      );
     }
 
     // Завантажуємо відео з оригінального сервера
-    const response = await fetch(videoUrl, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; VideoProxy/1.0)",
-      },
-    });
+    let response: Response;
+    try {
+      response = await fetch(videoUrl, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (compatible; VideoProxy/1.0)",
+        },
+      });
+    } catch (fetchError) {
+      console.error("[video-proxy] Помилка fetch:", fetchError);
+      return NextResponse.json(
+        { 
+          error: "Не вдалося завантажити відео",
+          details: fetchError instanceof Error ? fetchError.message : "Unknown error"
+        },
+        { status: 500 }
+      );
+    }
 
     if (!response.ok) {
+      console.error("[video-proxy] Помилка відповіді:", {
+        status: response.status,
+        statusText: response.statusText,
+        videoUrl,
+      });
       return NextResponse.json(
-        { error: `Не вдалося завантажити відео: ${response.status}` },
+        { 
+          error: `Не вдалося завантажити відео: ${response.status}`,
+          statusText: response.statusText
+        },
         { status: response.status }
       );
     }

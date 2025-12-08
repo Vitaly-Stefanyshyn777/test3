@@ -7,13 +7,13 @@ import {
   User2Icon,
   Weight3Icon,
   InstagramIcon,
-} from "../../../Icons/Icons";
+} from "@/components/Icons/Icons";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import type { SwiperRef } from "swiper/react";
 import s from "./Team.module.css";
-import SliderNav from "../../../ui/SliderNav/SliderNavActions";
-import { normalizeImageUrl } from "../../../../lib/imageUtils";
+import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
+import { normalizeImageUrl } from "@/lib/imageUtils";
 import TeamSkeleton from "./TeamSkeleton";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -69,9 +69,7 @@ export default function Team() {
   const [active, setActive] = useState(0);
   const [members, setMembers] = useState<TeamMemberUi[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [imageLoadedStates, setImageLoadedStates] = useState<
-    Record<string | number, boolean>
-  >({});
+  const [imageLoadedStates, setImageLoadedStates] = useState<Record<string | number, boolean>>({});
 
   const baseMembers: TeamMemberUi[] = useMemo(
     () => [
@@ -121,32 +119,27 @@ export default function Team() {
             const acf = i?.acf || {};
             const name: string = i?.title?.rendered || "";
             // Використовуємо нові acf поля з fallback на старі
-            const role: string =
-              (acf.input_text_status as string) || i?.Status || "";
+            const role: string = (acf.input_text_status as string) || i?.Status || "";
             // Нормалізуємо avatar URL (може бути JSON рядком)
-            const rawImage =
-              (acf.img_link_data_avatar as string) || i?.Avatar || "";
+            const rawImage = (acf.img_link_data_avatar as string) || i?.Avatar || "";
             const normalizedImage = normalizeImageUrl(rawImage);
-            const image: string =
-              normalizedImage !== "/placeholder.svg"
-                ? normalizedImage
-                : "/images/Rectangle5898.png";
-            const instagram: string =
-              (acf.instagram as { title?: string })?.title ||
-              i?.Text_instagram ||
-              "";
+            const image: string = normalizedImage !== "/placeholder.svg" ? normalizedImage : "/images/Rectangle5898.png";
+            const instagram: string = (acf.instagram as { title?: string })?.title || i?.Text_instagram || "";
             const achievements: TeamMemberUi["achievements"] = [];
-
+            
+            if (role) {
+              achievements.push({
+                icon: <WalkingIcon className={s.achievementIconSvg} />,
+                text: role,
+              });
+            }
+            
             // Використовуємо points з acf або старі Point_1, Point_2
             const points = acf.points as Array<{ point?: string }> | undefined;
             if (points && Array.isArray(points) && points.length > 0) {
               points.forEach((point, index) => {
                 if (point.point) {
-                  const icons = [
-                    <StudentHatIcon className={s.achievementIconSvg} />,
-                    <User2Icon className={s.achievementIconSvg} />,
-                    <Weight3Icon className={s.achievementIconSvg} />,
-                  ];
+                  const icons = [<StudentHatIcon className={s.achievementIconSvg} />, <User2Icon className={s.achievementIconSvg} />, <Weight3Icon className={s.achievementIconSvg} />];
                   achievements.push({
                     icon: icons[index % icons.length],
                     text: point.point,
@@ -166,20 +159,13 @@ export default function Team() {
                   text: i.Point_2,
                 });
             }
-
+            
             // Додаємо досвід з acf або старого поля
-            const experience =
-              (acf.input_text_experience as string) || i?.Experience;
+            const experience = (acf.input_text_experience as string) || i?.Experience;
             if (experience)
               achievements.push({
                 icon: <Weight3Icon className={s.achievementIconSvg} />,
                 text: `Досвід: ${experience}`,
-              });
-
-            if (achievements.length === 0 && role)
-              achievements.push({
-                icon: <WalkingIcon className={s.achievementIconSvg} />,
-                text: role,
               });
             return {
               id: i?.id ?? name,

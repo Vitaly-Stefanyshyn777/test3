@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { UseFormRegister } from "react-hook-form";
-import { PasswordsIcon } from "../../Icons/Icons";
+import { PasswordsIcon } from "@/components/Icons/Icons";
 import s from "./LoginModal.module.css";
 
 interface PasswordInputProps {

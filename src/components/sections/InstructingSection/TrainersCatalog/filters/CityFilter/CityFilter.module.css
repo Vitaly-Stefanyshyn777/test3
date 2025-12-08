@@ -52,7 +52,6 @@
   font-weight: 500;
   font-size: 18px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -76,7 +75,6 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 140%;
-  letter-spacing: -0.02em;
   color: var(--black);
 
   border: none;
@@ -96,7 +94,6 @@
   opacity: 0.24;
   color: #666;
   font-size: 14px;
-  letter-spacing: 0.5px;
   transition: all 0.3s ease;
 }
 
@@ -156,7 +153,6 @@
   font-weight: 500;
   font-size: 14px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--violet);
   background: none;
   border: none;
@@ -175,7 +171,6 @@
   font-weight: 500;
   font-size: 14px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: #666;
   background: none;
   border: none;
@@ -257,7 +252,6 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 140%;
-  letter-spacing: -0.02em;
   color: var(--black);
 }
 
@@ -349,7 +343,6 @@
   font-weight: 500;
   font-size: 18px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -396,7 +389,6 @@
     font-size: mvw(16);
     font-weight: 500;
     line-height: 140%;
-    letter-spacing: -0.01em;
     margin-bottom: 0;
   }
 
@@ -489,7 +481,6 @@
     font-size: mvw(14);
     font-weight: 400;
     line-height: 140%;
-    letter-spacing: -0.02em;
   }
 
   .showMoreBtn,
@@ -497,7 +488,6 @@
     font-size: mvw(14);
     font-weight: 500;
     line-height: 140%;
-    letter-spacing: -0.01em;
     margin-top: mvw(8);
   }
 

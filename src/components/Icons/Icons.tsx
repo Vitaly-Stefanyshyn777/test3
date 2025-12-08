@@ -2168,7 +2168,7 @@ export const HouseIcon = ({ className = "" }: { className?: string }) => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <g clip-path="url(#clip0_4152_34590)">
+    <g clipPath="url(#clip0_4152_34590)">
       <mask
         id="mask0_4152_34590"
         style={{ maskType: "luminance" }}
@@ -2184,18 +2184,18 @@ export const HouseIcon = ({ className = "" }: { className?: string }) => (
         <path
           d="M0.625 5.625L7.28137 0.852094C7.48462 0.709001 7.7325 0.625001 8 0.625001C8.2675 0.625001 8.51537 0.709001 8.71862 0.852094L15.375 5.625"
           stroke="currentColor"
-          stroke-width="1.4"
-          stroke-miterlimit="10"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="1.4"
+          strokeMiterlimit="10"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
         <path
           d="M8.71862 3.97706C8.51537 3.834 8.2675 3.75 8 3.75C7.73253 3.75 7.48466 3.834 7.28141 3.97706L2.40556 7.49678C2.07294 7.73091 1.875 8.11222 1.875 8.51897V14.125C1.875 14.8154 2.43466 15.375 3.125 15.375H6.75V12.875C6.75 12.1847 7.30966 11.625 8 11.625C8.69037 11.625 9.25 12.1847 9.25 12.875V15.375H12.875C13.5654 15.375 14.125 14.8154 14.125 14.125V8.51897C14.125 8.11222 13.9271 7.73091 13.5945 7.49678L8.71862 3.97706Z"
           stroke="currentColor"
-          stroke-width="1.4"
-          stroke-miterlimit="10"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="1.4"
+          strokeMiterlimit="10"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </g>
     </g>
@@ -3665,9 +3665,9 @@ export const ArrowIcon = ({ className = "" }: { className?: string }) => (
     <path
       d="M14.1328 5.80078H0.799479M0.799479 5.80078L5.79948 0.800781M0.799479 5.80078L5.79948 10.8008"
       stroke="#0E0E0E"
-      stroke-width="1.6"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 );

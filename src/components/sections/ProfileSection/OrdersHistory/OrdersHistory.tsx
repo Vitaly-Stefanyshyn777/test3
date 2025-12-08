@@ -2,9 +2,9 @@
 import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import styles from "./OrdersHistory.module.css";
-import PaginationNav from "../../../ui/PaginationNav/PaginationNav";
-import { useAuthStore } from "../../../../store/auth";
-import { adminRequest } from "../../../../lib/api";
+import PaginationNav from "@/components/ui/PaginationNav/PaginationNav";
+import { useAuthStore } from "@/store/auth";
+import { adminRequest } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 
 interface WCOrderItem {
@@ -53,7 +53,7 @@ const OrdersHistory: React.FC = () => {
       if (customerId && isNaN(Number(customerId))) {
         // Якщо ID не число (наприклад, slug "trainer_123"), отримуємо числовий ID
         try {
-          const { getMyProfile } = await import("../../../../lib/auth");
+          const { getMyProfile } = await import("@/lib/auth");
           const profile = await getMyProfile();
           if (profile?.id) {
             customerId = String(profile.id);

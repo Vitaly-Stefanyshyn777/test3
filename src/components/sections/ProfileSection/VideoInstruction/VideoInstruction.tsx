@@ -2,10 +2,10 @@
 import React, { useState, useEffect } from "react";
 import styles from "./VideoInstruction.module.css";
 // Image removed; not used when auto-playing by default
-import { СheckBrderIcon } from "../../../Icons/Icons";
+import { СheckBrderIcon } from "@/components/Icons/Icons";
 import VideoPlayer from "./VideoPlayer";
 import VideoInstructionSkeleton from "./VideoInstructionSkeleton";
-import { fetchThemeVideoUrl } from "../../../../lib/bfbApi";
+import { fetchThemeVideoUrl } from "@/lib/bfbApi";
 
 const StatusButton: React.FC<{
   watched: boolean;
@@ -39,7 +39,7 @@ interface VideoInstructionProps {
 
 const VideoInstruction: React.FC<VideoInstructionProps> = ({
   title = "Як заповнювати онлайн-кабінет",
-  description = "Перегляньте коротке відеоінструкцію, щоб дізнатися, як правильно заповнити свій онлайн-кабінет.",
+  description = "Перегляньте коротку відеоінструкцію, щоб дізнатися, як правильно заповнити свій онлайн-кабінет.",
   videoThumbnail = "/images/Frame-13213187831.jpg",
   videoUrl,
   isWatched = false,

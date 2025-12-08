@@ -1,5 +1,5 @@
 import s from "./TargetAuditorySection.module.css";
-import Container from "../../ui/Container/Container";
+import Container from "@/components/ui/Container/Container";
 import Image from "next/image";
 export default function TargetAuditorySection() {
   return (

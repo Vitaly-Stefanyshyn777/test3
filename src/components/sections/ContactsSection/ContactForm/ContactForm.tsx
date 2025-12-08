@@ -10,10 +10,10 @@ import {
   NumberIcon,
   QuestionIcon,
   UserIcon,
-} from "../../../Icons/Icons";
-import SubmitButton from "../../../ui/SubmitButton/SubmitButton";
-import InputField from "../../../ui/FormFields/InputField";
-import TextareaField from "../../../ui/FormFields/TextareaField";
+} from "@/components/Icons/Icons";
+import SubmitButton from "@/components/ui/SubmitButton/SubmitButton";
+import InputField from "@/components/ui/FormFields/InputField";
+import TextareaField from "@/components/ui/FormFields/TextareaField";
 import s from "./ContactForm.module.css";
 
 export interface ContactFormValues {
@@ -74,25 +74,25 @@ export default function ContactForm({
           <InputField
             icon={<UserIcon />}
             label="Ваше ім'я та прізвище"
-            type="text"
+                type="text"
             id="contact-form-name-field"
             hasError={!!errors.name}
             supportingText="Будь ласка, вкажіть імʼя"
-            {...register("name", { required: true })}
-          />
+                {...register("name", { required: true })}
+              />
         </div>
 
         <div className={s.inputGroup}>
           <InputField
             icon={<NumberIcon />}
             label="Ваш номер телефону"
-            type="tel"
+                type="tel"
             id="contact-form-phone-field"
             onlyDigits
             hasError={!!errors.phone}
             supportingText="Невірний номер"
-            {...register("phone")}
-          />
+                {...register("phone")}
+              />
         </div>
       </div>
 
@@ -101,27 +101,27 @@ export default function ContactForm({
           <InputField
             icon={<EmailDoggieIcon />}
             label="Нікнейм Telegram/Instagram"
-            type="text"
+                type="text"
             id="contact-form-nickname-field"
             hasError={!!errors.nickname}
             supportingText={
               (errors.nickname?.message as string) || "Некоректний нікнейм"
             }
-            {...register("nickname", {
-              // allow optional @, letters, numbers, underscore and dot
-              pattern: {
-                value: /^@?[A-Za-z0-9._]+$/, // optional @ at start
-                message: "Некоректний нікнейм",
-              },
-            })}
-          />
+                {...register("nickname", {
+                  // allow optional @, letters, numbers, underscore and dot
+                  pattern: {
+                    value: /^@?[A-Za-z0-9._]+$/, // optional @ at start
+                    message: "Некоректний нікнейм",
+                  },
+                })}
+              />
         </div>
 
         <div className={s.inputGroup}>
           <InputField
             icon={<EmailIcon />}
             label="Ваша пошта"
-            type="email"
+                type="email"
             id="contact-form-email-field"
             hasError={!!errors.email}
             supportingText={
@@ -135,7 +135,7 @@ export default function ContactForm({
                   'Електронна адреса має містити знак "@" та коректний домен',
               },
             })}
-          />
+              />
         </div>
       </div>
 
@@ -143,10 +143,10 @@ export default function ContactForm({
         <TextareaField
           icon={<QuestionIcon />}
           label="Ваше питання"
-          rows={4}
-          {...register("question")}
-        />
-      </div>
+            rows={4}
+            {...register("question")}
+          />
+        </div>
       {isError && (
         <p className={s.error}>Помилка відправки заявки. Спробуйте ще раз.</p>
       )}

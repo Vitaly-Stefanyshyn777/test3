@@ -36,7 +36,6 @@
   font-weight: 500;
   font-size: 14px;
   line-height: 100%;
-  letter-spacing: -0.02em;
   color: var(--breadcrumbs-link-color, var(--black));
 }
 
@@ -92,7 +91,6 @@
   font-weight: 500;
   font-size: 14px;
   line-height: 100%;
-  letter-spacing: -0.02em;
   color: var(--white);
 }
 
@@ -128,7 +126,6 @@
   font-weight: 500;
   font-size: 14px;
   line-height: 100%;
-  letter-spacing: -0.02em;
   color: var(--white);
 }
 
@@ -147,7 +144,6 @@
   font-weight: 500;
   font-size: 14px;
   line-height: 100%;
-  letter-spacing: -0.02em;
   color: var(--white);
 }
 
@@ -219,7 +215,6 @@
     line-height: 140%;
     font-family: var(--font-family);
     font-weight: 500;
-    letter-spacing: -0.02em;
   }
 
   .breadcrumbText {

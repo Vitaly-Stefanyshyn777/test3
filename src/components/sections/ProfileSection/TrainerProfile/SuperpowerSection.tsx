@@ -2,7 +2,7 @@
 
 import React from "react";
 import styles from "./TrainerProfile.module.css";
-import Multiline from "../../../ui/FormFields/Multiline";
+import Multiline from "@/components/ui/FormFields/Multiline";
 
 type Props = {
   value: string;

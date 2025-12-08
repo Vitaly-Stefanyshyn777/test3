@@ -1,15 +1,15 @@
 "use client";
 import React from "react";
 import styles from "./FilterModal.module.css";
-import { RangeInput } from "../RangeInput/RangeInput";
-import { ColorFilter } from "../../sections/ProductsSection/filters/ColorFilter/ColorFilter";
-import { SizeFilter } from "../../sections/ProductsSection/filters/SizeFilter/SizeFilter";
-import { CertificationFilter } from "../../sections/ProductsSection/filters/CertificationFilter/CertificationFilter";
-import { useScrollLock } from "../../hooks/useScrollLock";
+import { RangeInput } from "@/components/ui/RangeInput/RangeInput";
+import { ColorFilter } from "@/components/sections/ProductsSection/filters/ColorFilter/ColorFilter";
+import { SizeFilter } from "@/components/sections/ProductsSection/filters/SizeFilter/SizeFilter";
+import { CertificationFilter } from "@/components/sections/ProductsSection/filters/CertificationFilter/CertificationFilter";
+import { useScrollLock } from "@/components/hooks/useScrollLock";
 import { useEffect } from "react";
-import { CloseButtonIcon } from "../../Icons/Icons";
-import { ApplyFilterButton } from "../Buttons/ApplyFilterButton";
-import { ResetFilterButton } from "../Buttons/ResetFilterButton";
+import { CloseButtonIcon } from "@/components/Icons/Icons";
+import { ApplyFilterButton } from "@/components/ui/Buttons/ApplyFilterButton";
+import { ResetFilterButton } from "@/components/ui/Buttons/ResetFilterButton";
 
 interface FilterState {
   priceMin: number;

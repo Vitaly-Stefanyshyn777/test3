@@ -1,5 +1,5 @@
 import s from "./RegisterModal.module.css";
-import { CloseButtonIcon } from "../../Icons/Icons";
+import { CloseButtonIcon } from "@/components/Icons/Icons";
 
 interface RegisterModalHeaderProps {
   onClose: () => void;

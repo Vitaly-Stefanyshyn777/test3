@@ -31,7 +31,6 @@
   font-weight: 500;
   font-size: 18px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -94,7 +93,6 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 140%;
-  letter-spacing: -0.02em;
   color: var(--black);
 }
 
@@ -137,7 +135,6 @@
     font-size: mvw(16);
     font-weight: 500;
     line-height: 140%;
-    letter-spacing: -0.01em;
     margin-bottom: 0;
   }
 
@@ -185,6 +182,5 @@
     font-size: mvw(14);
     font-weight: 400;
     line-height: 140%;
-    letter-spacing: -0.02em;
   }
 }

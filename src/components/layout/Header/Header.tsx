@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useAuthStore } from "../../../store/auth";
+import { useAuthStore } from "@/store/auth";
 import s from "./Header.module.css";
 import {
   BasketHeader,
@@ -19,19 +19,20 @@ import {
   UserHeader,
   WhatsappIcon,
 } from "../../Icons/Icons";
-import RegisterModal from "../../auth/RegisterModal/RegisterModal";
-import LoginModal from "../../auth/LoginModal/LoginModal";
-import { useCartStore } from "../../../store/cart";
-import { useFavoriteStore } from "../../../store/favorites";
+import RegisterModal from "@/components/auth/RegisterModal/RegisterModal";
+import LoginModal from "@/components/auth/LoginModal/LoginModal";
+import { useCartStore } from "@/store/cart";
+import { useFavoriteStore } from "@/store/favorites";
 import CartModal from "../../CartModal/CartModal";
 import FavoritesModal from "../../FavoritesModal/FavoritesModal";
-import { mainNavigation, burgerMenuNavigation } from "../../../lib/navigation";
+import { mainNavigation, burgerMenuNavigation } from "@/lib/navigation";
+import { useThemeSettingsQuery } from "@/components/hooks/useWpQueries";
+import { getContactData } from "@/lib/themeSettingsUtils";
 
 export default function Header() {
   const [headerClass, setHeaderClass] = useState("");
   const pathname = usePathname();
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
@@ -40,6 +41,9 @@ export default function Header() {
   const [isUserHovered, setIsUserHovered] = useState(false);
   const { isLoggedIn } = useAuthStore();
   const isHydrated = useAuthStore((s) => s.isHydrated);
+  const isLoginModalOpen = useAuthStore((s) => s.isLoginModalOpen);
+  const openLoginModal = useAuthStore((s) => s.openLoginModal);
+  const closeLoginModal = useAuthStore((s) => s.closeLoginModal);
   const openCart = useCartStore((s) => s.open);
   const openFav = useFavoriteStore((s) => s.open);
   const toggleCart = useCartStore((s) => s.toggle);
@@ -62,6 +66,13 @@ export default function Header() {
     [cartItems]
   );
   const favoriteCount = useMemo(() => favoriteItems.length, [favoriteItems]);
+
+  // Отримуємо контактні дані з theme_settings
+  const { data: themeSettings } = useThemeSettingsQuery();
+  const contactData = useMemo(
+    () => getContactData(themeSettings),
+    [themeSettings]
+  );
 
   const getHeaderColorByPath = useCallback(() => {
     if (pathname.startsWith("/trainers/")) return s.headerTrainerProfile;
@@ -136,12 +147,12 @@ export default function Header() {
     if (isLoggedIn) {
       window.location.href = "/profile";
     } else {
-      setIsLoginOpen(true);
+      openLoginModal();
     }
   };
 
   const handleLoginSuccess = async () => {
-    setIsLoginOpen(false);
+    closeLoginModal();
   };
 
   const toggleMenu = () => {
@@ -456,8 +467,8 @@ export default function Header() {
         onClose={() => setIsRegisterOpen(false)}
       />
       <LoginModal
-        isOpen={isLoginOpen}
-        onClose={() => setIsLoginOpen(false)}
+        isOpen={isLoginModalOpen}
+        onClose={closeLoginModal}
         onSubmit={handleLoginSuccess}
       />
       <CartModal />
@@ -514,11 +525,15 @@ export default function Header() {
                 <div className={s.contactRow}>
                   <div className={s.contactItem}>
                     <h5 className={s.contactLabel}>Телефон</h5>
-                    <p className={s.contactValue}>+380 95 437 25 75</p>
+                    <p className={s.contactValue}>
+                      {contactData.phone || "+380 95 437 25 75"}
+                    </p>
                   </div>
                   <div className={s.contactItem}>
                     <h5 className={s.contactLabel}>Час роботи у вихідні:</h5>
-                    <p className={s.contactValue}>10:00 - 20:00</p>
+                    <p className={s.contactValue}>
+                      {contactData.weekends || "10:00 - 20:00"}
+                    </p>
                   </div>
                 </div>
 
@@ -526,12 +541,14 @@ export default function Header() {
                   <div className={s.contactItem}>
                     <h5 className={s.contactLabel}>Email</h5>
                     <p className={s.contactValue}>
-                      bfb.board.ukraine@gmail.com
+                      {contactData.email || "bfb.board.ukraine@gmail.com"}
                     </p>
                   </div>
                   <div className={s.contactItem}>
                     <h5 className={s.contactLabel}>Час роботи у будні:</h5>
-                    <p className={s.contactValue}>10:00 - 20:00</p>
+                    <p className={s.contactValue}>
+                      {contactData.weekdays || "10:00 - 20:00"}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -539,28 +556,54 @@ export default function Header() {
               <div className={s.addressSection}>
                 <h5 className={s.contactLabel}>Адреса головного залу:</h5>
                 <p className={s.contactValue}>
-                  м. Київ, Хрещатик, будинок 23/A
+                  {contactData.address || "м. Київ, Хрещатик, будинок 23/A"}
                 </p>
               </div>
 
               <div className={s.socialSection}>
-                <a
-                  href="https://www.instagram.com/bfb.official_ukraine?igsh=enFybWFmZGE3NG8z"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={s.socialIcon}
-                >
-                  <InstagramIcon />
-                </a>
-                <div className={s.socialIcon}>
-                  <FacebookIcon />
-                </div>
-                <div className={s.socialIcon}>
-                  <TelegramIcon />
-                </div>
-                <div className={s.socialIcon}>
-                  <WhatsappIcon />
-                </div>
+                {contactData.socialLinks.length > 0 ? (
+                  contactData.socialLinks.map((social, index) => {
+                    const iconMap: Record<string, React.ComponentType> = {
+                      Instagram: InstagramIcon,
+                      Facebook: FacebookIcon,
+                      Telegram: TelegramIcon,
+                      WhatsApp: WhatsappIcon,
+                    };
+                    const Icon = iconMap[social.name] || null;
+                    if (!Icon) return null;
+                    return (
+                      <a
+                        key={index}
+                        href={social.link || "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={s.socialIcon}
+                      >
+                        <Icon />
+                      </a>
+                    );
+                  })
+                ) : (
+                  <>
+                    <a
+                      href="https://www.instagram.com/bfb.official_ukraine?igsh=enFybWFmZGE3NG8z"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={s.socialIcon}
+                    >
+                      <InstagramIcon />
+                    </a>
+                    <div className={s.socialIcon}>
+                      <FacebookIcon />
+                    </div>
+                    <div className={s.socialIcon}>
+                      <TelegramIcon />
+                    </div>
+                    <div className={s.socialIcon}>
+                      <WhatsappIcon />
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

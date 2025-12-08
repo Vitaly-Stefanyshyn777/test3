@@ -27,7 +27,6 @@
   font-weight: 500;
   font-size: 26px;
   line-height: 120%;
-  letter-spacing: 0.03em;
   color: var(--black);
 }
 .grid2 {
@@ -570,7 +569,6 @@
   font-weight: 500;
   font-size: 36px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .summaryTotalAmount {
@@ -578,7 +576,6 @@
   font-weight: 500;
   font-size: 36px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .summaryCurrency {
@@ -586,7 +583,6 @@
   font-weight: 500;
   font-size: 30px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .summaryCard {
@@ -613,7 +609,6 @@
   font-weight: 500;
   font-size: 36px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .summaryDivider {
@@ -778,7 +773,6 @@
   font-weight: 500;
   font-size: 36px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .rowTotalBlock {
@@ -792,7 +786,6 @@
   font-weight: 500;
   font-size: 36px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .rowCurrencyTotal {
@@ -800,7 +793,6 @@
   font-weight: 500;
   font-size: 30px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .costValuePrice {
@@ -813,7 +805,6 @@
   font-weight: 600;
   font-size: 36px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .costValueCurrency {
@@ -821,7 +812,6 @@
   font-weight: 500;
   font-size: 30px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .back {
@@ -893,6 +883,13 @@
 .color {
   color: rgba(14, 14, 14, 0.6);
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.colorCode {
+  color: rgba(14, 14, 14, 0.4);
+  font-size: 12px;
 }
 .name {
   font-weight: 500;
@@ -926,7 +923,6 @@
   font-weight: 500;
   font-size: 18px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   text-align: right;
   color: var(--style);
 }
@@ -935,7 +931,6 @@
   font-weight: 500;
   font-size: 22px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   text-align: right;
   color: var(--style);
 }
@@ -1259,7 +1254,6 @@
     font-size: mvw(14);
     font-weight: 500;
     line-height: 125%;
-    letter-spacing: -0.01em;
     flex: 1;
     min-width: 0;
   }
@@ -1267,8 +1261,12 @@
   .color {
     font-size: mvw(12);
     line-height: 125%;
-    letter-spacing: -0.01em;
     opacity: 0.6;
+    gap: mvw(4);
+  }
+  .colorCode {
+    font-size: mvw(10);
+    opacity: 0.4;
   }
 
   .controlsBlock {
@@ -1339,7 +1337,6 @@
     gap: mvw(4);
     font-weight: 500;
     line-height: 125%;
-    letter-spacing: -0.01em;
     color: var(--style);
   }
 
@@ -1347,7 +1344,6 @@
     font-size: mvw(14);
     font-weight: 500;
     line-height: 125%;
-    letter-spacing: -0.01em;
   }
 
   .oldPrice {

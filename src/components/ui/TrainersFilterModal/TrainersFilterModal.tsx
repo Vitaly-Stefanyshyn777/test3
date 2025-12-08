@@ -1,13 +1,13 @@
 "use client";
 import React from "react";
 import styles from "./TrainersFilterModal.module.css";
-import { CloseButtonIcon } from "../../Icons/Icons";
-import TrainersFilter from "../../sections/InstructingSection/TrainersCatalog/TrainersFilter/TrainersFilter";
-import { useCoachesQuery } from "../../hooks/useCoachesQuery";
-import { useScrollLock } from "../../hooks/useScrollLock";
-import type { CoachUiItem } from "../../../lib/coaches";
-import { ApplyFilterButton } from "../Buttons/ApplyFilterButton";
-import { ResetFilterButton } from "../Buttons/ResetFilterButton";
+import { CloseButtonIcon } from "@/components/Icons/Icons";
+import TrainersFilter from "@/components/sections/InstructingSection/TrainersCatalog/TrainersFilter/TrainersFilter";
+import { useCoachesQuery } from "@/components/hooks/useCoachesQuery";
+import { useScrollLock } from "@/components/hooks/useScrollLock";
+import type { CoachUiItem } from "@/lib/coaches";
+import { ApplyFilterButton } from "@/components/ui/Buttons/ApplyFilterButton";
+import { ResetFilterButton } from "@/components/ui/Buttons/ResetFilterButton";
 
 interface FilterState {
   country: string;
@@ -27,7 +27,7 @@ interface TrainersFilterModalProps {
   trainers: Array<{ location?: string }>;
   searchTerm: string;
   onApply: () => void;
-  onTrainersChange?: (trainers: unknown[]) => void;
+  onTrainersChange?: (trainers: unknown[] | undefined) => void;
 }
 
 const TrainersFilterModal: React.FC<TrainersFilterModalProps> = ({
@@ -106,6 +106,10 @@ const TrainersFilterModal: React.FC<TrainersFilterModalProps> = ({
 
   const handleReset = () => {
     onReset();
+    // Скидаємо відфільтровані тренери, щоб показати всіх тренерів
+    if (onTrainersChange) {
+      onTrainersChange(undefined);
+    }
   };
 
   return (

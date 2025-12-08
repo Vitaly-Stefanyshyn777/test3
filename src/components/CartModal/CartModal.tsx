@@ -1,14 +1,18 @@
 "use client";
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useMemo, useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import s from "./CartModal.module.css";
-import { useCartStore, selectCartTotal } from "../../store/cart";
-import { useScrollLock } from "../hooks/useScrollLock";
+import { useCartStore, selectCartTotal } from "@/store/cart";
+import { useScrollLock } from "@/components/hooks/useScrollLock";
 import CartHeader from "./CartHeader";
 import CartItemsList from "./CartItemsList";
 import CartSummary from "./CartSummary";
 import CartRecommendations from "./CartRecommendations";
 import CartModalSkeleton from "./CartModalSkeleton";
+import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
+import type { Swiper as SwiperType } from "swiper";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
 
 export default function CartModal() {
   const isOpen = useCartStore((st) => st.isOpen);
@@ -36,10 +40,25 @@ export default function CartModal() {
 
   const [isMounted, setIsMounted] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(false);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const swiperRef = useRef<SwiperType | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
     return () => setIsMounted(false);
+  }, []);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      if (typeof window === "undefined") return;
+      setIsMobile(window.innerWidth <= 1000);
+    };
+    checkMobile();
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", checkMobile);
+      return () => window.removeEventListener("resize", checkMobile);
+    }
   }, []);
 
   useScrollLock(isOpen);
@@ -58,6 +77,46 @@ export default function CartModal() {
     window.location.href = "/checkout";
   };
 
+  const itemsContent = (() => {
+    if (items.length === 0) {
+      return <div className={s.empty}>Кошик порожній</div>;
+    }
+
+    if (isMobile) {
+      return (
+        <>
+          <Swiper
+            onSwiper={(sw) => (swiperRef.current = sw)}
+            onSlideChange={(sw) => setActiveIndex(sw.activeIndex)}
+            slidesPerView={1}
+            spaceBetween={8}
+            className={s.recoSwiper}
+          >
+            {items.map((it) => (
+              <SwiperSlide key={it.id}>
+                <CartItemsList items={[it]} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+
+          {items.length > 1 && (
+            <div className={s.navWrap}>
+              <SliderNav
+                activeIndex={activeIndex}
+                dots={items.length}
+                onPrev={() => swiperRef.current?.slidePrev()}
+                onNext={() => swiperRef.current?.slideNext()}
+                onDotClick={(idx) => swiperRef.current?.slideTo(idx)}
+              />
+            </div>
+          )}
+        </>
+      );
+    }
+
+    return <CartItemsList items={items} />;
+  })();
+
   const modalContent = showSkeleton ? (
     <CartModalSkeleton />
   ) : (
@@ -66,7 +125,7 @@ export default function CartModal() {
         <div className={s.topbarListBlock}>
           <CartHeader onClose={close} />
           <div className={s.bodyTwoCols}>
-            <CartItemsList items={items} />
+            {itemsContent}
             <CartSummary
               total={total}
               discount={discount}

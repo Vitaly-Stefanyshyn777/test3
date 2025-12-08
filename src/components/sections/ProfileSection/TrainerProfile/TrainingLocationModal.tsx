@@ -12,7 +12,7 @@ import {
   CloudUploadIcon,
   DumpUploadIcon,
   LocationIcon,
-} from "../../../Icons/Icons";
+} from "@/components/Icons/Icons";
 
 type Props = {
   isOpen: boolean;
@@ -45,13 +45,13 @@ type Props = {
   } | null;
 };
 
-import { uploadMedia } from "../../../../lib/bfbApi";
-import { useAuthStore } from "../../../../store/auth";
-import { useUserProfileQuery } from "../../../hooks/useUserProfileQuery";
+import { uploadMedia } from "@/lib/bfbApi";
+import { useAuthStore } from "@/store/auth";
+import { useUserProfileQuery } from "@/components/hooks/useUserProfileQuery";
 import { useQuery } from "@tanstack/react-query";
-import api from "../../../../lib/api";
-import InputField from "../../../ui/FormFields/InputField";
-import SecondaryInput from "../../../ui/FormFields/SecondaryInput";
+import api from "@/lib/api";
+import InputField from "@/components/ui/FormFields/InputField";
+import SecondaryInput from "@/components/ui/FormFields/SecondaryInput";
 
 export default function TrainingLocationModal({
   isOpen,

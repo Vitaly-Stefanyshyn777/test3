@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useAuthInit } from "../hooks/useAuthInit";
+import { useAuthInit } from "@/components/hooks/useAuthInit";
 
 let queryClient: QueryClient | null = null;
 

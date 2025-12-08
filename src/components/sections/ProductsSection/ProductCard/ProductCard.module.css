@@ -133,7 +133,6 @@
   font-weight: 400;
   font-size: 12px;
   line-height: 140%;
-  letter-spacing: -0.02em;
   color: var(--black);
   opacity: 0.6;
 }
@@ -150,6 +149,7 @@
   width: 100%;
   height: auto;
   display: flex;
+  justify-content: space-between;
 }
 
 .subscriptionPrice {
@@ -266,7 +266,6 @@
   font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
   z-index: 3;
   box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3);
   border: none;
@@ -293,7 +292,6 @@
   transform: translate(-50%, -50%);
   background: rgba(255, 68, 68, 0.9);
 
-  letter-spacing: 0.5px;
   z-index: 10;
   pointer-events: none;
 
@@ -406,7 +404,6 @@
     font-family: var(--font-family);
     font-weight: 500;
     line-height: 140%;
-    letter-spacing: -0.01em;
     color: var(--black);
   }
   .pricing {
@@ -428,7 +425,6 @@
     font-family: var(--second-family);
     font-weight: 500;
     line-height: 100%;
-    letter-spacing: -0.01em;
     color: var(--grey-for-cards);
   }
 

@@ -1,6 +1,6 @@
 import React from "react";
-import ProfileSection from "../../../components/sections/ProfileSection/ProfileSection";
-import PersonalData from "../../../components/sections/ProfileSection/PersonalData/PersonalData";
+import ProfileSection from "@/components/sections/ProfileSection/ProfileSection";
+import PersonalData from "@/components/sections/ProfileSection/PersonalData/PersonalData";
 
 const PersonalDataPage: React.FC = () => {
   return (

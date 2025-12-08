@@ -72,7 +72,6 @@
   font-weight: 600;
   font-size: 32px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -81,7 +80,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: rgba(14, 14, 14, 0.4);
 }
 
@@ -257,7 +255,6 @@
   font-weight: 700;
   font-size: 56px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -342,7 +339,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: #8426d7;
 }
 
@@ -455,7 +451,6 @@
   font-weight: 600;
   font-size: 20px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -464,7 +459,6 @@
   font-weight: 500;
   font-size: 12px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   text-align: right;
   color: var(--black);
 }
@@ -530,7 +524,6 @@
   font-weight: 600;
   font-size: 24px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
   margin: 0;
 }
@@ -540,7 +533,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: rgba(14, 14, 14, 0.7);
   margin: 0;
 }
@@ -596,7 +588,6 @@
   font-weight: 500;
   font-size: 24px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   text-align: right;
   color: #8426d7;
 }
@@ -629,7 +620,6 @@
   font-weight: 600;
   font-size: 24px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
   margin: 0;
 }
@@ -639,7 +629,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: rgba(14, 14, 14, 0.7);
   margin: 0;
 }
@@ -916,7 +905,6 @@
   font-weight: 600;
   font-size: 32px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--white);
 }
 .discountText {
@@ -924,7 +912,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: rgba(255, 254, 252, 0.6);
 }
 
@@ -984,7 +971,6 @@
   font-weight: 600;
   font-size: 32px;
   line-height: 120%;
-  letter-spacing: -0.02em;
   color: var(--black);
 }
 .audienceText {
@@ -992,7 +978,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: rgba(14, 14, 14, 0.4);
 }
 
@@ -1013,7 +998,6 @@
   font-weight: 600;
   font-size: 32px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--white);
 }
 
@@ -1055,7 +1039,6 @@
   font-weight: 600;
   font-size: 28px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -1064,7 +1047,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: rgba(14, 14, 14, 0.4);
 }
 
@@ -1145,7 +1127,6 @@
   font-weight: 700;
   font-size: 28px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
   margin: 0 0 8px 0;
 }
@@ -1247,7 +1228,6 @@
   .advantagesTitle {
     font-size: mvw(28);
     line-height: 120%;
-    letter-spacing: -0.01em;
     width: mvw(238);
     display: flex;
     align-items: center;
@@ -1305,7 +1285,6 @@
   .advantageTitle {
     font-size: mvw(20);
     line-height: 120%;
-    letter-spacing: -0.01em;
 
     font-family: var(--second-family);
     font-weight: 600;
@@ -1400,7 +1379,6 @@
 
     font-family: var(--font-family);
     font-weight: 500;
-    letter-spacing: -0.01em;
     color: var(--violet);
   }
   .arcWrap {
@@ -1551,7 +1529,6 @@
     font-weight: 400;
 
     line-height: 140%;
-    letter-spacing: -0.02em;
   }
 
   /* Блок 5 - Розширення цільової аудиторії */

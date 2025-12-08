@@ -34,7 +34,6 @@
   font-weight: 500;
   font-size: 18px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -133,7 +132,6 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 140%;
-  letter-spacing: -0.02em;
   color: var(--black);
   cursor: pointer;
 }

@@ -65,7 +65,6 @@
   font-family: var(--font-family);
   font-weight: 500;
   line-height: 100%;
-  letter-spacing: -0.01em;
 }
 
 .hitBadge {
@@ -80,7 +79,6 @@
   font-weight: 500;
   font-size: 12px;
   line-height: 100%;
-  letter-spacing: -0.01em;
   color: var(--white);
 }
 
@@ -100,7 +98,6 @@
   font-weight: 500;
   font-size: 12px;
   line-height: 100%;
-  letter-spacing: -0.01em;
   color: #fffefc;
 }
 
@@ -161,7 +158,6 @@
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .courseDescription {
@@ -169,7 +165,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   margin: 0;
   color: var(--black);
   opacity: 0.6;
@@ -188,7 +183,6 @@
   font-weight: 600;
   font-size: 32px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   /* text-align: right; */
   color: var(--black);
 }
@@ -214,7 +208,6 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 140%;
-  letter-spacing: -0.02em;
   color: #1a1a1a;
 }
 
@@ -261,7 +254,6 @@
   font-weight: 600;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--black);
 }
@@ -304,7 +296,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
   opacity: 0.6;
 }
@@ -323,6 +314,12 @@
   flex: 0 0 auto;
 }
 
+.pricingActionsBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .pricingActionsBlock .pricing {
   display: flex;
   align-items: center;
@@ -336,7 +333,6 @@
   font-weight: 600;
   font-size: 36px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
   display: flex;
   align-items: baseline;
@@ -348,7 +344,6 @@
   font-weight: 600;
   font-size: 28px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
   margin: 0;
 }
@@ -358,7 +353,6 @@
   font-weight: 400;
   font-size: 28px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--grey-for-cards);
   text-decoration: line-through;
   display: flex;
@@ -371,7 +365,6 @@
   font-weight: 400;
   font-size: 20px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--grey-for-cards);
   text-decoration: line-through;
   margin: 0;
@@ -396,7 +389,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: #8426d7;
 }
 
@@ -551,7 +543,6 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 140%;
-  letter-spacing: -0.02em;
   color: var(--black);
   opacity: 0.4;
   margin: 0;
@@ -562,7 +553,6 @@
   font-weight: 500;
   font-size: 14px;
   line-height: 140%;
-  letter-spacing: -0.02em;
   color: var(--black);
   margin: 0;
 }
@@ -579,7 +569,6 @@
   font-weight: 600;
   font-size: 12px;
   line-height: 140%;
-  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--black);
   margin: 0;

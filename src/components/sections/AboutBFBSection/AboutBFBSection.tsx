@@ -6,7 +6,7 @@ import LearningFormats from "./LearningFormats/LearningFormats";
 import Team from "./Team/Team";
 import s from "./AboutBFBSection.module.css";
 import TrainingFocusSection from "./Hero/TrainingFocusSection";
-import TrainersShowcase from "../../TrainersShowcase/TrainersShowcase";
+import TrainersShowcase from "@/components/TrainersShowcase/TrainersShowcase";
 
 export default function AboutBFBSection() {
   return (

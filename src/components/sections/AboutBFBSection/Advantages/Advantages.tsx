@@ -13,9 +13,9 @@ import {
   ArcIcon2,
   Сlockcon,
   PauseIcon,
-} from "../../../Icons/Icons";
+} from "@/components/Icons/Icons";
 import s from "./Advantages.module.css";
-import SliderNav from "../../../ui/SliderNav/SliderNavActions";
+import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
 
 import "swiper/css";
 import "swiper/css/navigation";

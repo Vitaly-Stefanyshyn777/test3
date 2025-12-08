@@ -12,7 +12,7 @@ import { CourseData } from "@/lib/bfbApi";
 import CourseHeroSkeleton from "./CourseHeroSkeleton";
 
 interface CourseHeroProps {
-  courseId?: number;
+  courseId?: string | number;
 }
 
 const CourseHero: React.FC<CourseHeroProps> = ({ courseId = 169 }) => {
@@ -23,7 +23,11 @@ const CourseHero: React.FC<CourseHeroProps> = ({ courseId = 169 }) => {
   React.useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`/api/wc/v3/products/${courseId}`);
+        // Використовуємо ID для API запиту (якщо це slug, useCourseQuery вже отримав курс)
+        const courseIdForApi = typeof courseId === "number" ? courseId : 
+                                /^\d+$/.test(String(courseId)) ? parseInt(String(courseId)) : 
+                                courseId;
+        const response = await fetch(`/api/wc/v3/products/${courseIdForApi}`);
         if (response.ok) {
           const data = await response.json();
           const categoryIds = data.categories?.map((cat: { id: number }) => cat.id) || [];

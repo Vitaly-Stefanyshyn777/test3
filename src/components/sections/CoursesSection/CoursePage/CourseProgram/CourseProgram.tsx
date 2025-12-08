@@ -21,7 +21,7 @@ interface CourseModule {
 }
 
 interface CourseProgramProps {
-  courseId?: number;
+  courseId?: string | number;
 }
 
 const CourseProgram: React.FC<CourseProgramProps> = ({ courseId = 169 }) => {

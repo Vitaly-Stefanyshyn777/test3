@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import styles from "./VideoPlayer.module.css";
-import { CloseButtonIcon } from "../../../Icons/Icons";
+import { CloseButtonIcon } from "@/components/Icons/Icons";
 import VideoPlayerSkeleton from "./VideoPlayerSkeleton";
 
 interface VideoPlayerProps {
@@ -59,12 +59,23 @@ export default function VideoPlayer({
 
     const handleLoadedData = () => {
       setIsLoading(false);
+
+      // Сповіщаємо глобально, що відео успішно завантажилось (для PageLoader на головній)
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("hero-video-ready"));
+      }
     };
 
     const handleError = () => {
       setIsLoading(false);
       const errorMsg = video.error?.message || "Не вдалося завантажити відео";
       setError(errorMsg);
+
+      // Сповіщаємо глобально про помилку відео, щоб PageLoader не висів вічно
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("hero-video-error"));
+      }
+
       if (process.env.NODE_ENV !== "production") {
         console.error("[VideoPlayer] Error loading video:", {
           url: videoUrl,
@@ -184,10 +195,7 @@ export default function VideoPlayer({
         </button>
       )}
       {isLoading && !showPreview && (
-        <VideoPlayerSkeleton
-          showCloseButton={showCloseButton}
-          asOverlay={true}
-        />
+        <VideoPlayerSkeleton showCloseButton={showCloseButton} asOverlay={true} />
       )}
 
       <video

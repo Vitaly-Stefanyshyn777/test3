@@ -3,13 +3,17 @@ import React, { useMemo, useState, useEffect } from "react";
 import styles from "./CoursesCatalog.module.css";
 import ProductsFilter from "../CoursesFilters/CoursesFilters";
 import { useProducts } from "@/components/hooks/useProducts";
-import FilterSortPanel from "@/components/ui/FilterSortPanel/FilterSortPanel";
+import FilterSortPanel, {
+  type SortType,
+} from "@/components/ui/FilterSortPanel/FilterSortPanel";
 import ProductsCatalogContainer from "../ProductsCatalogContainer/CourseCatalogContainer";
-import { useCoursesQuery } from "@/lib/coursesQueries";
 import { useFilteredCourses } from "@/lib/useFilteredCourses";
 import FAQSection from "../../FAQSection/FAQSection";
 import CoursesFilterModal from "@/components/ui/CoursesFilterModal/CoursesFilterModal";
 import { FilterMobileIcon, SortArrowIcon } from "@/components/Icons/Icons";
+import SortDropdown from "@/components/ui/FilterSortPanel/SortDropdown";
+import { SORT_OPTIONS } from "@/components/ui/FilterSortPanel/FilterSortPanel";
+import { mapSortTypeToWcParams } from "@/lib/sortMapping";
 
 type CoursesUIFilters = {
   priceMin: number;
@@ -24,16 +28,34 @@ type CoursesUIFilters = {
 
 const CoursesCatalog = () => {
   const { filters, updateFilters, resetFilters } = useProducts();
-  const { data: courses = [], isLoading, isError } = useCoursesQuery();
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const [isMobile, setIsMobile] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  
-  const filtersForQuery = useMemo(
-    () => ({ category: selectedCategoryIds.map((id) => String(id)) }),
-    [selectedCategoryIds]
-  );
-  const { data: filteredCourses = [] } = useFilteredCourses(filtersForQuery);
+  const [sortBy, setSortBy] = useState<SortType>("popular");
+  const [itemsPerPage, setItemsPerPage] = useState<number>(12);
+
+  // Формуємо фільтри з сортуванням та пагінацією
+  const sortParams = useMemo(() => mapSortTypeToWcParams(sortBy), [sortBy]);
+
+  const filtersForQuery = useMemo(() => {
+    const filters = {
+      ...(selectedCategoryIds.length > 0 && {
+        category: selectedCategoryIds.map((id) => String(id)),
+      }),
+      orderby: sortParams.orderby,
+      order: sortParams.order,
+      per_page: itemsPerPage,
+      ...(sortParams.on_sale !== undefined && { on_sale: sortParams.on_sale }),
+    };
+
+    return filters;
+  }, [selectedCategoryIds, sortParams, itemsPerPage]);
+
+  const {
+    data: coursesToDisplay = [],
+    isLoading,
+    isError,
+  } = useFilteredCourses(filtersForQuery);
 
   const searchTerm = "";
 
@@ -69,15 +91,22 @@ const CoursesCatalog = () => {
                   <span className={styles.filterMobileLabel}>Фільтр</span>
                 </button>
                 <div className={styles.sortSection}>
-                  <div className={styles.sortOptionWrapper}>
-                    <span className={styles.sortOptionLabel}>Сортування</span>
-                    <SortArrowIcon className={styles.sortIcon} />
-                  </div>
+                  <SortDropdown
+                    label="Сортування"
+                    value={sortBy}
+                    options={SORT_OPTIONS}
+                    onChange={(value) => setSortBy(value as SortType)}
+                  />
                 </div>
               </div>
             </div>
           ) : (
-            <FilterSortPanel />
+            <FilterSortPanel
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              itemsPerPage={itemsPerPage}
+              onItemsPerPageChange={setItemsPerPage}
+            />
           )}
           <div className={styles.catalogContent}>
             {(() => {
@@ -125,10 +154,9 @@ const CoursesCatalog = () => {
                     resetFilters();
                     setSelectedCategoryIds([]);
                   }}
-                  products={courses}
+                  products={coursesToDisplay}
                   searchTerm={searchTerm}
                   onApplyCategories={(categoryIds) => {
-                    // Selected categories
                     setSelectedCategoryIds(categoryIds);
                   }}
                 />
@@ -139,15 +167,10 @@ const CoursesCatalog = () => {
                 subtitle: "Наші товари",
                 title: "Каталог товарів",
               }}
-              filteredProducts={
-                selectedCategoryIds.length > 0 ? filteredCourses : courses
-              }
+              filteredProducts={coursesToDisplay}
+              isLoading={isLoading}
+              hasFilters={selectedCategoryIds.length > 0}
             />
-
-            {isError && (
-              <div className={styles.error}>Не вдалося завантажити товари</div>
-            )}
-            {isLoading && <div className={styles.loading}>Завантаження…</div>}
           </div>
         </div>
         <FAQSection />
@@ -185,7 +208,7 @@ const CoursesCatalog = () => {
             resetFilters();
             setSelectedCategoryIds([]);
           }}
-          products={courses}
+          products={coursesToDisplay}
           searchTerm={searchTerm}
           onApply={handleApplyFilters}
           onApplyCategories={(categoryIds) => {

@@ -8,8 +8,8 @@ import {
   fetchInstructor,
   fetchWcPaymentGateways,
   fetchCourse,
-} from "../../lib/bfbApi";
-import api from "../../lib/api";
+} from "@/lib/bfbApi";
+import api from "@/lib/api";
 
 export const useThemeSettingsQuery = () =>
   useQuery({
@@ -108,7 +108,7 @@ export const useInstructorQuery = (id: number) =>
   });
 
 // Extra WC helpers for Course page
-import { fetchWcProducts, fetchWcCategories } from "../../lib/bfbApi";
+import { fetchWcProducts, fetchWcCategories } from "@/lib/bfbApi";
 
 export const useWcProductsQuery = (params?: Record<string, string | number>) =>
   useQuery({
@@ -151,10 +151,11 @@ export const useFaqCategoriesQuery = () =>
     gcTime: 20 * 60 * 1000,
   });
 
-export const useCourseQuery = (courseId?: number) =>
+export const useCourseQuery = (courseIdOrSlug?: number | string) =>
   useQuery({
-    queryKey: ["course", courseId],
-    queryFn: () => fetchCourse(courseId),
+    queryKey: ["course", courseIdOrSlug],
+    queryFn: () => fetchCourse(courseIdOrSlug),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
+    enabled: !!courseIdOrSlug, // Не виконуємо запит, якщо немає ID або slug
   });

@@ -1,11 +1,11 @@
 "use client";
 import React, { useEffect } from "react";
 import styles from "./CoursesFilterModal.module.css";
-import CoursesFilters from "../../sections/CoursesSection/CoursesFilters/CoursesFilters";
-import { CloseButtonIcon } from "../../Icons/Icons";
-import { useScrollLock } from "../../hooks/useScrollLock";
-import { ApplyFilterButton } from "../Buttons/ApplyFilterButton";
-import { ResetFilterButton } from "../Buttons/ResetFilterButton";
+import CoursesFilters from "@/components/sections/CoursesSection/CoursesFilters/CoursesFilters";
+import { CloseButtonIcon } from "@/components/Icons/Icons";
+import { useScrollLock } from "@/components/hooks/useScrollLock";
+import { ApplyFilterButton } from "@/components/ui/Buttons/ApplyFilterButton";
+import { ResetFilterButton } from "@/components/ui/Buttons/ResetFilterButton";
 
 interface FilterState {
   priceMin: number;
@@ -20,16 +20,16 @@ interface Product {
   id: string;
   name: string;
   price: string;
-  regularPrice: string;
-  salePrice: string;
-  onSale: boolean;
-  image: string;
-  categories: Array<{
+  regularPrice?: string;
+  salePrice?: string;
+  onSale?: boolean;
+  image?: string;
+  categories?: Array<{
     id: number;
     name: string;
     slug: string;
   }>;
-  stockStatus: string;
+  stockStatus?: string;
 }
 
 interface CoursesFilterModalProps {

@@ -1,4 +1,4 @@
-import ProductPage from "../../../components/sections/ProductsSection/ProductPage/ProductPage";
+import ProductPage from "@/components/sections/ProductsSection/ProductPage/ProductPage";
 import React from "react";
 
 interface ProductPageProps {

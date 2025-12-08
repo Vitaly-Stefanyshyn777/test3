@@ -129,7 +129,6 @@
   font-weight: 700;
   font-size: 56px;
   line-height: 100%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -259,7 +258,6 @@
   font-weight: 600;
   font-size: 20px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -268,7 +266,6 @@
   font-weight: 500;
   font-size: 12px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   text-align: right;
   color: var(--black);
 }
@@ -338,7 +335,6 @@
   font-weight: 600;
   font-size: 24px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
   margin: 0;
 }
@@ -348,7 +344,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: rgba(14, 14, 14, 0.7);
   margin: 0;
 }
@@ -404,7 +399,6 @@
   font-weight: 500;
   font-size: 24px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   text-align: right;
   color: #8426d7;
 }
@@ -437,7 +431,6 @@
   font-weight: 600;
   font-size: 24px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
   margin: 0;
 }
@@ -447,7 +440,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: rgba(14, 14, 14, 0.7);
   margin: 0;
 }
@@ -694,7 +686,6 @@
   font-weight: 600;
   font-size: 32px;
   line-height: 120%;
-  letter-spacing: -0.01em;
 
   color: var(--black);
 }
@@ -704,7 +695,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: rgba(14, 14, 14, 0.4);
 }
 
@@ -824,7 +814,6 @@
   .advantageTitle {
     font-size: mvw(20);
     line-height: 120%;
-    letter-spacing: -0.01em;
   }
   .advantageDescription {
     font-size: mvw(14);
@@ -1095,7 +1084,6 @@
     font-weight: 600;
     font-size: mvw(18);
     line-height: 120%;
-    letter-spacing: -0.01em;
     color: var(--black);
   }
   .infoSubtitle {
@@ -1103,7 +1091,6 @@
     font-weight: 500;
     font-size: mvw(12);
     line-height: 120%;
-    letter-spacing: -0.01em;
     text-align: right;
     color: var(--black);
   }
@@ -1112,7 +1099,6 @@
     font-weight: 500;
     font-size: mvw(14);
     line-height: 140%;
-    letter-spacing: -0.01em;
     color: rgba(14, 14, 14, 0.4);
   }
 }

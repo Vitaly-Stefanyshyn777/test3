@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import styles from "./CommunityChats.module.css";
-import { TelegramIcon } from "../../../Icons/Icons";
+import { TelegramIcon } from "@/components/Icons/Icons";
 
 interface ChatItem {
   id: string;

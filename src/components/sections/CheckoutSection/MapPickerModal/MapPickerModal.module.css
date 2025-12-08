@@ -155,7 +155,6 @@
   font-family: var(--font-family);
   font-weight: 400;
   font-size: 14px;
-  letter-spacing: -0.02em;
   color: var(--black);
   opacity: 0.3;
 }
@@ -262,7 +261,6 @@
   font-weight: 500;
   font-size: 20px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .panelDivider {
@@ -337,7 +335,6 @@
   font-weight: 400;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.02em;
   color: #cac9c9;
 
   width: 100%;
@@ -385,14 +382,12 @@
   font-family: var(--font-family);
   font-weight: 500;
   font-size: 16px;
-  letter-spacing: -0.02em;
   color: var(--black);
 }
 .itemMeta {
   font-family: var(--font-family);
   font-weight: 400;
   font-size: 14px;
-  letter-spacing: -0.02em;
   color: var(--black);
   opacity: 0.3;
 }

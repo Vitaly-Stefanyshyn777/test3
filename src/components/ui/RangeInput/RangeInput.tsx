@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styles from "./RangeInput.module.css";
-import { MinuswIcon, PlusIcon } from "../../Icons/Icons";
+import { MinuswIcon, PlusIcon } from "@/components/Icons/Icons";
 
 interface RangeInputProps {
   min: number;

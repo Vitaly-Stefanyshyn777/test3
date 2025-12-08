@@ -8,8 +8,8 @@ const CourseSidebarImageSkeleton: React.FC = () => {
   return (
     <div className={styles.imageContainer}>
       <Skeleton 
-        width="100%" 
-        height={300} 
+        width={584}
+        height={400}
         borderRadius={0}
         className={styles.courseImage}
       />

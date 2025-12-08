@@ -1,10 +1,10 @@
 "use client";
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { useCasesQuery } from "../hooks/useCoachesQuery";
+import { useCasesQuery } from "@/components/hooks/useCoachesQuery";
 import styles from "./TrainersShowcase.module.css";
 import { InstagramIcon } from "../Icons/Icons";
-import SliderNav from "../ui/SliderNav/SliderNavActions";
+import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { A11y } from "swiper/modules";
 import type { Swiper as SwiperClass } from "swiper/types";
@@ -36,9 +36,7 @@ const TrainersShowcase: React.FC<TrainersShowcaseProps> = ({
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [activeMobile, setActiveMobile] = useState(0);
   const mobileSwiperRef = useRef<SwiperClass | null>(null);
-  const [imageLoadedStates, setImageLoadedStates] = useState<
-    Record<string | number, boolean>
-  >({});
+  const [imageLoadedStates, setImageLoadedStates] = useState<Record<string | number, boolean>>({});
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -80,13 +78,19 @@ const TrainersShowcase: React.FC<TrainersShowcaseProps> = ({
       }) => ({
         id: c.id,
         name: c?.title?.rendered || "",
-        image: c?.acf?.img_link_data_avatar || c?.Avatar || "/placeholder.svg",
+        image:
+          c?.acf?.img_link_data_avatar ||
+          c?.Avatar ||
+          "/placeholder.svg",
         location:
           c?.acf?.instagram?.title ||
           c?.acf?.instagram?.url ||
           c?.Text_instagram ||
           "",
-        specialization: c?.acf?.textarea_description || c?.Description || "",
+        specialization:
+          c?.acf?.textarea_description ||
+          c?.Description ||
+          "",
         superPower: undefined,
       })
     );
@@ -204,9 +208,7 @@ const TrainersShowcase: React.FC<TrainersShowcaseProps> = ({
                         <div className={styles.trainerInfo}>
                           <h3 className={styles.trainerName}>{coach.name}</h3>
                           <p className={styles.trainerDescription}>
-                            {coach.superPower ||
-                              coach.specialization ||
-                              "Тренер BFB"}
+                            {coach.superPower || coach.specialization || "Тренер BFB"}
                           </p>
                         </div>
                       </article>
@@ -254,9 +256,7 @@ const TrainersShowcase: React.FC<TrainersShowcaseProps> = ({
                     <div className={styles.trainerInfo}>
                       <h3 className={styles.trainerName}>{coach.name}</h3>
                       <p className={styles.trainerDescription}>
-                        {coach.superPower ||
-                          coach.specialization ||
-                          "Тренер BFB"}
+                        {coach.superPower || coach.specialization || "Тренер BFB"}
                       </p>
                     </div>
                   </article>
@@ -264,28 +264,30 @@ const TrainersShowcase: React.FC<TrainersShowcaseProps> = ({
               </div>
             )}
 
-            {isMobile
-              ? list.length > 1 && (
-                  <SliderNav
-                    activeIndex={activeMobile}
-                    dots={Math.min(list.length, limit)}
-                    onPrev={() => mobileSwiperRef.current?.slidePrev()}
-                    onNext={() => mobileSwiperRef.current?.slideNext()}
-                    onDotClick={(idx) => mobileSwiperRef.current?.slideTo(idx)}
-                    buttonBgColor="var(--white)"
-                  />
-                )
-              : showPagination &&
-                totalPages > 1 && (
-                  <SliderNav
-                    activeIndex={page}
-                    dots={totalPages}
-                    onPrev={goPrev}
-                    onNext={goNext}
-                    onDotClick={goTo}
-                    buttonBgColor="var(--white)"
-                  />
-                )}
+            {isMobile ? (
+              list.length > 1 && (
+                <SliderNav
+                  activeIndex={activeMobile}
+                  dots={Math.min(list.length, limit)}
+                  onPrev={() => mobileSwiperRef.current?.slidePrev()}
+                  onNext={() => mobileSwiperRef.current?.slideNext()}
+                  onDotClick={(idx) => mobileSwiperRef.current?.slideTo(idx)}
+                  buttonBgColor="var(--white)"
+                />
+              )
+            ) : (
+              showPagination &&
+              totalPages > 1 && (
+                <SliderNav
+                  activeIndex={page}
+                  dots={totalPages}
+                  onPrev={goPrev}
+                  onNext={goNext}
+                  onDotClick={goTo}
+                  buttonBgColor="var(--white)"
+                />
+              )
+            )}
           </>
         )}
       </div>

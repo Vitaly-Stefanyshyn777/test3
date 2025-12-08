@@ -1,0 +1,28 @@
+.close {
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background-color: #f2f2f2;
+  width: 46px;
+  height: 46px;
+  color: var(--black);
+  transition: background-color 0.2s ease;
+}
+
+.close:hover {
+  background-color: var(--violet);
+  color: var(--white);
+}
+
+.close svg {
+  width: 14px;
+  height: 14px;
+}
+
+
+
+

@@ -1,6 +1,6 @@
 import s from "./TrainingFocusSection.module.css";
-import Container from "../../../ui/Container/Container";
-import { Certifi3cateIcon, ReadEwspaperIcon } from "../../../Icons/Icons";
+import Container from "@/components/ui/Container/Container";
+import { Certifi3cateIcon, ReadEwspaperIcon } from "@/components/Icons/Icons";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 

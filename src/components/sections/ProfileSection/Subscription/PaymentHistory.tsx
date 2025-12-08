@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import styles from "./Subscription.module.css";
-import { ChevronDownIcon } from "../../../Icons/Icons";
+import { ChevronDownIcon } from "@/components/Icons/Icons";
 
 interface PaymentRecord {
   id: number;

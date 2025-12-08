@@ -4,11 +4,11 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from "./ProductsShowcase.module.css";
-import type { Product } from "../../lib/products";
+import type { Product } from "@/lib/products";
 import { PlusIcon } from "../Icons/Icons";
-import { fetchWcCategories } from "../../lib/bfbApi";
-import Badge from "../ui/Badge/Badge";
-import BadgeContainer from "../ui/Badge/BadgeContainer";
+import { fetchWcCategories } from "@/lib/bfbApi";
+import Badge from "@/components/ui/Badge/Badge";
+import BadgeContainer from "@/components/ui/Badge/BadgeContainer";
 import ProductsShowcaseSkeleton from "./ProductsShowcaseSkeleton";
 
 interface ProductsShowcaseProps {
@@ -34,7 +34,7 @@ export function ProductsShowcase({
   };
 
   const [categories, setCategories] = useState<InventoryCategory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // Вже встановлено в true
   const [showAll, setShowAll] = useState(false);
   const [hasNewInCategory, setHasNewInCategory] = useState<
     Record<number, boolean>
@@ -44,7 +44,7 @@ export function ProductsShowcase({
   useEffect(() => {
     (async () => {
       try {
-        setIsLoading(true);
+        // isLoading вже true з початкового стану, не потрібно встановлювати знову
         const cats = (await fetchWcCategories({
           parent: 85, // Інвентар
           per_page: 50,
@@ -136,22 +136,21 @@ export function ProductsShowcase({
   })();
 
   const visibleCategories = (() => {
-    if (!categories || categories.length === 0)
-      return [] as InventoryCategory[];
-
+    if (!categories || categories.length === 0) return [] as InventoryCategory[];
+    
     // Сортуємо: категорії з новинками першими
     const sorted = [...categories].sort((a, b) => {
       const aHasNew = hasNewInCategory[a.id] || false;
       const bHasNew = hasNewInCategory[b.id] || false;
-
+      
       // Якщо одна категорія має новинку, а інша ні - та з новинкою першою
       if (aHasNew && !bHasNew) return -1;
       if (!aHasNew && bHasNew) return 1;
-
+      
       // Якщо обидві мають або не мають новинку - зберігаємо поточний порядок (за датою)
       return 0;
     });
-
+    
     if (!showAll && sorted.length > 6) return sorted.slice(0, 6);
     return sorted;
   })();

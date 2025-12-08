@@ -67,6 +67,10 @@ export function normalizeImageUrl(
 
     // Перевіряємо, чи це валідний URL
     if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("/")) {
+      // Замінюємо порожній placeholder.png на placeholder.svg
+      if (trimmed === "/placeholder.png") {
+        return "/placeholder.svg";
+      }
       return trimmed;
     }
 

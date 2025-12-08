@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
-import { useCartStore } from "../../../store/cart";
-import { BasketIcon, SmitnikIcon } from "../../Icons/Icons";
+import { useCartStore } from "@/store/cart";
+import { useAuthStore } from "@/store/auth";
+import { BasketIcon, SmitnikIcon } from "@/components/Icons/Icons";
 import s from "./CartButton.module.css";
 
 type Props = {
@@ -24,11 +25,20 @@ export default function CartButton({
   const addItem = useCartStore((s) => s.addItem);
   const removeItem = useCartStore((s) => s.removeItem);
   const cartItems = useCartStore((s) => s.items);
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const openLoginModal = useAuthStore((s) => s.openLoginModal);
   const inCart = !!cartItems[id] && cartItems[id].quantity > 0;
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    // Якщо користувач не залогінений і намагається додати до корзини
+    if (!isLoggedIn && !inCart) {
+      openLoginModal();
+      return;
+    }
+    
     if (inCart) removeItem(id);
     else addItem({ id, name, price, image }, 1);
   };

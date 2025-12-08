@@ -4,7 +4,7 @@ import { ProductsShowcase } from "./ProductsShowcase";
 import {
   useNewProductsQuery,
   useProductsQuery,
-} from "../hooks/useProductsQuery";
+} from "@/components/hooks/useProductsQuery";
 
 export function ProductsNewShowcase() {
   const { data: newProducts = [], isLoading: isLoadingNew } =

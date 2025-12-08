@@ -4,13 +4,12 @@ import React, { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import s from "./HeroSection.module.css";
 import { ArrowLeftIcon, ArrowRightIcon, TimePayIcon } from "../Icons/Icons";
-import { fetchBanners, BannerPost } from "../../lib/bfbApi";
+import { fetchBanners, BannerPost } from "@/lib/bfbApi";
 import VideoPlayer from "./ProfileSection/VideoInstruction/VideoPlayer";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { A11y } from "swiper/modules";
 import type { Swiper as SwiperClass } from "swiper/types";
 import "swiper/css";
-import HeroSectionSkeleton from "./HeroSectionSkeleton";
 
 const HeroSection = () => {
   const [banners, setBanners] = useState<BannerPost[]>([]);
@@ -19,7 +18,7 @@ const HeroSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [swiper, setSwiper] = useState<SwiperClass | null>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [, setIsLoading] = useState(true);
 
   // Визначення мобільної версії
   useEffect(() => {
@@ -48,11 +47,7 @@ const HeroSection = () => {
         // Встановлюємо активний банер за пріоритетом: той, що має відео -> той, що має постер -> перший
         const bannerWithVideo = normalized.find((b) => {
           // Нова структура: acf.video.url (якщо video є об'єктом)
-          if (
-            b.acf?.video &&
-            typeof b.acf.video === "object" &&
-            !Array.isArray(b.acf.video)
-          ) {
+          if (b.acf?.video && typeof b.acf.video === "object" && !Array.isArray(b.acf.video)) {
             if (b.acf.video.url) {
               return true;
             }
@@ -63,9 +58,7 @@ const HeroSection = () => {
             b.acf?.Aside_video ||
             b.video ||
             (typeof b.acf?.video === "string" ? b.acf.video : undefined) ||
-            (Array.isArray(b.acf?.video) && b.acf.video.length > 0
-              ? b.acf.video[0]
-              : undefined) ||
+            (Array.isArray(b.acf?.video) && b.acf.video.length > 0 ? b.acf.video[0] : undefined) ||
             b.video_url ||
             b.acf?.video_url;
           return (
@@ -75,11 +68,7 @@ const HeroSection = () => {
         });
         const bannerWithPoster = normalized.find((b) => {
           // Нова структура: acf.video.preview (якщо video є об'єктом)
-          if (
-            b.acf?.video &&
-            typeof b.acf.video === "object" &&
-            !Array.isArray(b.acf.video)
-          ) {
+          if (b.acf?.video && typeof b.acf.video === "object" && !Array.isArray(b.acf.video)) {
             if (b.acf.video.preview) {
               return true;
             }
@@ -175,11 +164,7 @@ const HeroSection = () => {
       rawVideoUrl = `${baseUrl}/wp-content/uploads/2025/11/videopreview.mp4`;
     } else {
       // Нова структура: acf.video.url (якщо video є об'єктом)
-      if (
-        b.acf?.video &&
-        typeof b.acf.video === "object" &&
-        !Array.isArray(b.acf.video)
-      ) {
+      if (b.acf?.video && typeof b.acf.video === "object" && !Array.isArray(b.acf.video)) {
         if (b.acf.video.url) {
           rawVideoUrl = b.acf.video.url;
         }
@@ -192,9 +177,7 @@ const HeroSection = () => {
           b.acf?.Aside_video ||
           b.video ||
           (typeof b.acf?.video === "string" ? b.acf.video : undefined) ||
-          (Array.isArray(b.acf?.video) && b.acf.video.length > 0
-            ? b.acf.video[0]
-            : undefined) ||
+          (Array.isArray(b.acf?.video) && b.acf.video.length > 0 ? b.acf.video[0] : undefined) ||
           b.video_url ||
           b.acf?.video_url;
 
@@ -225,11 +208,7 @@ const HeroSection = () => {
     if (!b) return "";
 
     // Нова структура: acf.video.preview (якщо video є об'єктом)
-    if (
-      b.acf?.video &&
-      typeof b.acf.video === "object" &&
-      !Array.isArray(b.acf.video)
-    ) {
+    if (b.acf?.video && typeof b.acf.video === "object" && !Array.isArray(b.acf.video)) {
       if (b.acf.video.preview) {
         return b.acf.video.preview;
       }
@@ -276,11 +255,6 @@ const HeroSection = () => {
     activeBanner?.acf?.description ||
     (activeBanner?.Description as string) ||
     "";
-
-  // Показуємо skeleton поки дані завантажуються
-  if (isLoading) {
-    return <HeroSectionSkeleton />;
-  }
 
   return (
     <section className={s.hero} data-hero-section>

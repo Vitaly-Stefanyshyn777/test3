@@ -4,17 +4,16 @@ import {
   HeartbeatIcon,
   DumbbellsIcon,
   DiplomaIcon,
-} from "../../../Icons/Icons";
+} from "@/components/Icons/Icons";
 import s from "./Founder.module.css";
-import { useInstructorQuery } from "../../../hooks/useWpQueries";
+import { useInstructorQuery } from "@/components/hooks/useWpQueries";
 import {
   InstagramIcon,
   StudentHatIcon,
   HonorsIcon,
   BulbIcon,
-} from "../../../Icons/Icons";
-import { normalizeImageUrl } from "../../../../lib/imageUtils";
-import FounderSkeleton from "./FounderSkeleton";
+} from "@/components/Icons/Icons";
+import { normalizeImageUrl } from "@/lib/imageUtils";
 
 interface Instructor {
   title: string;
@@ -123,11 +122,6 @@ export default function Founder() {
         "Сертифікувала сотні тренерів по всій Україні та за її межами",
     },
   ];
-
-  // Показуємо skeleton поки дані завантажуються
-  if (isLoading) {
-    return <FounderSkeleton />;
-  }
 
   if (isError) {
     return (

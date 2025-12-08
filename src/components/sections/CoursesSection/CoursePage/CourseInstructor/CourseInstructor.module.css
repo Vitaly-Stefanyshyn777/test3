@@ -39,7 +39,6 @@
   font-weight: 600;
   font-size: 32px;
   line-height: 140%;
-  letter-spacing: -0.02em;
   color: var(--black);
 }
 
@@ -48,7 +47,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
   opacity: 0.6;
 }
@@ -70,7 +68,6 @@
   font-weight: 600;
   font-size: 12px;
   line-height: 140%;
-  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--black);
 }
@@ -141,7 +138,6 @@
   font-weight: 600;
   font-size: 24px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   text-align: right;
   color: var(--black);
 }
@@ -151,7 +147,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: rgba(14, 14, 14, 0.6);
 }
 
@@ -198,7 +193,6 @@
   font-weight: 600;
   font-size: 32px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
   display: flex;
 }
@@ -255,7 +249,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--white);
 }
 

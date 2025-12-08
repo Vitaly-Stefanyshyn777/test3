@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { login as loginApi, getMyProfile } from "../lib/auth";
+import { login as loginApi, getMyProfile } from "@/lib/auth";
 
 function readInitialAuth(): {
   token: string | null;
@@ -25,6 +25,7 @@ interface AuthState {
   token: string | null;
   isLoggedIn: boolean;
   isHydrated: boolean;
+  isLoginModalOpen: boolean;
   setAuth: (token: string, user?: AuthUser | null) => void;
   setUser: (user: AuthUser | null) => void;
   clear: () => void;
@@ -32,6 +33,8 @@ interface AuthState {
   logout: () => Promise<void>;
   initAuth: () => void;
   checkTokenValidity: () => Promise<boolean>;
+  openLoginModal: () => void;
+  closeLoginModal: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -41,6 +44,7 @@ export const useAuthStore = create<AuthState>()(
       token: initial.token,
       isLoggedIn: initial.isLoggedIn,
       isHydrated: initial.isHydrated,
+      isLoginModalOpen: false,
 
       setAuth: (token: string, user: AuthUser | null = null) => {
         set({ token, user, isLoggedIn: true });
@@ -86,9 +90,7 @@ export const useAuthStore = create<AuthState>()(
           }
 
           // SSOT: first_name + last_name має бути головним джерелом імені
-          const fullName = `${profile?.first_name ?? ""} ${
-            profile?.last_name ?? ""
-          }`.trim();
+          const fullName = `${profile?.first_name ?? ""} ${profile?.last_name ?? ""}`.trim();
           const resolvedName = fullName || profile?.name || "";
           const resolvedEmail =
             profile?.email || profile?.user_email || user?.email;
@@ -98,8 +100,7 @@ export const useAuthStore = create<AuthState>()(
           try {
             const raw = localStorage.getItem("bfb_user");
             if (raw) {
-              previousSavedAvatar =
-                (JSON.parse(raw) as AuthUser | null)?.avatar || undefined;
+              previousSavedAvatar = (JSON.parse(raw) as AuthUser | null)?.avatar || undefined;
             }
           } catch {}
 
@@ -115,8 +116,7 @@ export const useAuthStore = create<AuthState>()(
               const anyAvatar = profile?.avatar;
               const avatar96 = profile?.avatar_urls?.["96"];
 
-              const serverCandidate =
-                metaAvatar || anyAvatar || avatar96 || undefined;
+              const serverCandidate = metaAvatar || anyAvatar || avatar96 || undefined;
               const serverHasUploads =
                 typeof serverCandidate === "string" &&
                 serverCandidate.includes("/wp-content/uploads/");
@@ -163,11 +163,42 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: async () => {
+        // Спочатку очищаємо стор
         set({ user: null, token: null, isLoggedIn: false });
+        
+        // Очищаємо всі дані з localStorage
+        if (typeof window !== "undefined") {
+          try {
+            // Очищаємо токени користувача
+            localStorage.removeItem("bfb_token");
+            localStorage.removeItem("bfb_token_old");
+            localStorage.removeItem("wp_jwt");
+            localStorage.removeItem("wp_jwt_override");
+            
+            // Очищаємо zustand persist (bfb-auth)
+            localStorage.removeItem("bfb-auth");
+            
+            // Очищаємо інші дані користувача
+            localStorage.removeItem("bfb_user");
+            
+            // Очищаємо тимчасові дані форм
+            localStorage.removeItem("trainer_certificates_preview");
+            localStorage.removeItem("orderData");
+            localStorage.removeItem("userLocationConfirmed");
+            localStorage.removeItem("userLocation");
+          } catch (error) {
+            console.error("[logout] Помилка очищення localStorage:", error);
+          }
+        }
+        
+        // Очищаємо httpOnly cookie
         try {
           await fetch("/api/set-user-cookie", { method: "DELETE" });
         } catch {}
       },
+
+      openLoginModal: () => set({ isLoginModalOpen: true }),
+      closeLoginModal: () => set({ isLoginModalOpen: false }),
     }),
     {
       name: "bfb-auth",

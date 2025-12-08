@@ -3,8 +3,8 @@
 import React from "react";
 import styles from "./PurchasedCourses.module.css";
 import Image from "next/image";
-import { GlobeIcon } from "../../../Icons/Icons";
-import { formatCurrencyUA } from "../../../../lib/format";
+import { GlobeIcon } from "@/components/Icons/Icons";
+import { formatCurrencyUA } from "@/lib/format";
 
 export interface Course {
   id: string;

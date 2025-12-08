@@ -51,7 +51,6 @@
   font-weight: 600;
   font-size: 36px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -90,7 +89,6 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 140%;
-  letter-spacing: -0.02em;
   color: var(--black);
   opacity: 0.4;
 }
@@ -100,7 +98,6 @@
   font-weight: 500;
   font-size: 14px;
   line-height: 140%;
-  letter-spacing: -0.02em;
   color: var(--black);
 }
 
@@ -132,7 +129,6 @@
   font-weight: 600;
   font-size: 12px;
   line-height: 140%;
-  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--black);
 }

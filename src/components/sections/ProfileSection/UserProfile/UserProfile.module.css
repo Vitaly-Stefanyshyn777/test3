@@ -32,7 +32,6 @@
   font-weight: 600;
   font-size: 28px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -48,7 +47,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: rgba(14, 14, 14, 0.6);
 }
 

@@ -90,6 +90,12 @@ export const register = async (
     first_name: credentials.first_name,
     last_name: credentials.last_name,
     roles: credentials.roles || ["bfb_coach"],
+    // Додаємо acf для збереження phone (для консистентності з PersonalData)
+    acf: {
+      phone: credentials.phone,
+      telegram: "",
+      instagram: "",
+    },
     meta: {
       phone: credentials.phone,
       input_text_position: "Фітнес тренер",

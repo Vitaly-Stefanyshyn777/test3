@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { FormData } from "./types";
-import { useWcPaymentGatewaysQuery } from "../../hooks/useWpQueries";
+import { useWcPaymentGatewaysQuery } from "@/components/hooks/useWpQueries";
 import s from "./CheckoutSection.module.css";
 
 interface PaymentFormProps {

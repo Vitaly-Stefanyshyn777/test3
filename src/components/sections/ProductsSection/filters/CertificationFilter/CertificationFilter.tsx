@@ -9,15 +9,17 @@ import { useWcCategoriesQuery } from "@/components/hooks/useWpQueries";
 interface CertificationFilterProps {
   value: string;
   onChange: (value: string) => void;
+  loading?: boolean;
 }
 
 export const CertificationFilter = ({
   value,
   onChange,
+  loading,
 }: CertificationFilterProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const { data: cats = [], isLoading, isError } = useWcCategoriesQuery(77);
-
+  
   // Обчислюємо опції на льоту без useEffect
   // Додаємо категорії 78 та 79 в кінець списку
   const fetchedOptions = (cats || [])
@@ -28,6 +30,8 @@ export const CertificationFilter = ({
       if (a.id === 78 && b.id === 79) return 1;
       return 0;
     });
+  
+  const showSkeleton = loading || (isLoading && fetchedOptions.length === 0);
 
   const fallbackOptions = [
     { id: 79, name: "Є сертифікат", slug: "with-cert", parent: 77 },
@@ -55,14 +59,17 @@ export const CertificationFilter = ({
           isExpanded ? styles.expanded : styles.collapsed
         }`}
       >
-        {isLoading && fetchedOptions.length === 0 ? (
+        {showSkeleton ? (
           <div className={styles.radioGroup}>
-            {[...Array(2)].map((_, i) => (
-              <div key={i} className={styles.radioItem}>
-                <Skeleton circle width={20} height={20} />
-                <Skeleton width={150 + Math.random() * 30} height={16} />
-              </div>
-            ))}
+            {[...Array(2)].map((_, i) => {
+              const widths = [170, 165]; // Фіксовані ширини замість Math.random()
+              return (
+                <div key={i} className={styles.radioItem}>
+                  <Skeleton circle width={20} height={20} />
+                  <Skeleton width={widths[i]} height={16} />
+                </div>
+              );
+            })}
           </div>
         ) : isError && fetchedOptions.length === 0 ? (
           <div className={styles.error}>Помилка завантаження</div>

@@ -13,6 +13,7 @@ interface ColorFilterProps {
   selectedColors: string[];
   onChange: (colors: string[]) => void;
   products: Product[];
+  loading?: boolean;
 }
 
 interface Product {
@@ -33,9 +34,11 @@ interface Product {
 
 type Term = { id: number; name: string; slug: string; count?: number };
 
-export const ColorFilter = ({ selectedColors, onChange }: ColorFilterProps) => {
+export const ColorFilter = ({ selectedColors, onChange, loading }: ColorFilterProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const { data: attrs = [], isLoading, isError } = useProductAttributesQuery();
+  
+  const showSkeleton = loading || isLoading;
   const colorAttr = (attrs || []).find((a) => {
     const slug = (a.slug || "").toLowerCase();
     const name = (a.name || "").toLowerCase();
@@ -84,15 +87,20 @@ export const ColorFilter = ({ selectedColors, onChange }: ColorFilterProps) => {
           isExpanded ? styles.expanded : styles.collapsed
         }`}
       >
-        {isLoading ? (
+        {showSkeleton ? (
           <div className={styles.colorList}>
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className={styles.colorItem}>
-                <Skeleton width={24} height={24} borderRadius={8} />
-                <Skeleton width={100 + Math.random() * 50} height={16} />
-                <Skeleton width={30} height={16} />
-              </div>
-            ))}
+            {[...Array(3)].map((_, i) => {
+              const widths = [120, 110, 100]; // Фіксовані ширини замість Math.random()
+              return (
+                <div key={i} className={styles.colorItem}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <Skeleton width={24} height={24} borderRadius={8} />
+                    <Skeleton width={widths[i]} height={16} />
+                  </div>
+                  <Skeleton width={30} height={16} />
+                </div>
+              );
+            })}
           </div>
         ) : isError ? (
           <div className={styles.error}>Помилка завантаження</div>

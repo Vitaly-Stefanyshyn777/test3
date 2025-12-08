@@ -120,7 +120,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -129,7 +128,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -228,7 +226,6 @@
   font-weight: 600;
   font-size: 36px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   text-align: right;
   color: var(--black);
 }
@@ -238,7 +235,6 @@
   font-weight: 600;
   font-size: 28px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   text-align: right;
   color: var(--black);
 }
@@ -247,7 +243,6 @@
   font-weight: 600;
   font-size: 28px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .priceCurrency {
@@ -256,7 +251,6 @@
   font-weight: 600;
   font-size: 28px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -265,7 +259,6 @@
   font-weight: 500;
   font-size: 22px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   text-align: right;
   color: var(--grey-for-cards);
   text-decoration: line-through;
@@ -275,7 +268,6 @@
   font-weight: 500;
   font-size: 22px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--grey-for-cards);
 }
 .priceOldCurrency {
@@ -284,7 +276,6 @@
   font-weight: 500;
   font-size: 22px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--grey-for-cards);
 }
 
@@ -325,7 +316,6 @@
   .title {
     font-size: mvw(24);
     line-height: 120%;
-    letter-spacing: -0.01em;
   }
 
   .cards {
@@ -408,7 +398,6 @@
     font-weight: 500;
 
     line-height: 140%;
-    letter-spacing: -0.02em;
     color: var(--black);
   }
   .pillIcon {
@@ -432,7 +421,6 @@
     font-weight: 600;
     font-size: mvw(26);
     line-height: 120%;
-    letter-spacing: -0.01em;
     text-align: right;
     color: var(--black);
   }
@@ -467,7 +455,6 @@
     font-weight: 500;
     font-size: mvw(14);
     line-height: 140%;
-    letter-spacing: -0.02em;
     color: var(--black);
   }
 }

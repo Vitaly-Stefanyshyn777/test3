@@ -1,8 +1,12 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { useCartStore, CartItem } from "../../store/cart";
-import { MinuswIcon, PlusIcon, CloseButtonIcon } from "../Icons/Icons";
+import { useCartStore, CartItem } from "@/store/cart";
+import {
+  MinuswIcon,
+  PlusIcon,
+  CloseButtonIcon,
+} from "@/components/Icons/Icons";
 import s from "./CartModal.module.css";
 
 interface CartItemsListProps {

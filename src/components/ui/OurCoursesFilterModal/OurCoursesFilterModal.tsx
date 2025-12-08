@@ -1,11 +1,11 @@
 "use client";
 import React, { useEffect, useRef } from "react";
 import styles from "./OurCoursesFilterModal.module.css";
-import OurCoursesFilter from "../../sections/CoursesSection/OurCoursesSection/filters/OurCoursesFilter/OurCoursesFilter";
-import { CloseButtonIcon } from "../../Icons/Icons";
-import { useScrollLock } from "../../hooks/useScrollLock";
-import { ApplyFilterButton } from "../Buttons/ApplyFilterButton";
-import { ResetFilterButton } from "../Buttons/ResetFilterButton";
+import OurCoursesFilter from "@/components/sections/CoursesSection/OurCoursesSection/filters/OurCoursesFilter/OurCoursesFilter";
+import { CloseButtonIcon } from "@/components/Icons/Icons";
+import { useScrollLock } from "@/components/hooks/useScrollLock";
+import { ApplyFilterButton } from "@/components/ui/Buttons/ApplyFilterButton";
+import { ResetFilterButton } from "@/components/ui/Buttons/ResetFilterButton";
 
 interface FilterState {
   priceMin: number;
@@ -16,19 +16,19 @@ interface FilterState {
 }
 
 interface Product {
-  id: string;
-  name: string;
-  price: string;
-  regularPrice: string;
-  salePrice: string;
-  onSale: boolean;
-  image: string;
-  categories: Array<{
-    id: number;
+  id?: string;
+  name?: string;
+  price?: string;
+  regularPrice?: string;
+  salePrice?: string;
+  onSale?: boolean;
+  image?: string;
+  categories?: Array<{
+    id?: number;
     name: string;
-    slug: string;
+    slug?: string;
   }>;
-  stockStatus: string;
+  stockStatus?: string;
 }
 
 interface OurCoursesFilterModalProps {
@@ -118,3 +118,6 @@ const OurCoursesFilterModal: React.FC<OurCoursesFilterModalProps> = ({
 };
 
 export default OurCoursesFilterModal;
+
+
+

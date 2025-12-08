@@ -2,7 +2,11 @@
 
 import React from "react";
 import styles from "./TrainerProfile.module.css";
-import { DumbbellsIcon, HandleIcon, GarbagerIcon } from "../../../Icons/Icons";
+import {
+  DumbbellsIcon,
+  HandleIcon,
+  GarbagerIcon,
+} from "@/components/Icons/Icons";
 
 type Props = {
   title: string;

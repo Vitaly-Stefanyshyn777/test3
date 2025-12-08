@@ -1,5 +1,5 @@
 import React from "react";
-import TrainerProfile from "../../../components/sections/InstructingSection/TrainerProfile/TrainerProfile";
+import TrainerProfile from "@/components/sections/InstructingSection/TrainerProfile/TrainerProfile";
 
 interface TrainersCatalogPageProps {
   params: Promise<{ slug: string }>;

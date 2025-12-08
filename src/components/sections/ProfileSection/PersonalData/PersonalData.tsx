@@ -5,10 +5,10 @@ import HeaderBlock from "./HeaderBlock";
 import ProfilePhotoSection from "./ProfilePhotoSection";
 import ContactsSection from "./ContactsSection";
 import UsernameSection from "./UsernameSection";
-import { adminRequest } from "../../../../lib/api";
-import { useUserProfileQuery } from "../../../hooks/useUserProfileQuery";
+import { adminRequest } from "@/lib/api";
+import { useUserProfileQuery } from "@/components/hooks/useUserProfileQuery";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAuthStore } from "../../../../store/auth";
+import { useAuthStore } from "@/store/auth";
 
 interface PersonalDataForm {
   firstName: string;
@@ -33,8 +33,9 @@ const PersonalData: React.FC = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
   // TanStack Query: завантаження та оновлення профілю
-  const { data: profile } = useUserProfileQuery();
+  const { data: profile, isLoading: isLoadingProfile, error: profileError } = useUserProfileQuery();
   const queryClient = useQueryClient();
+
 
   const handleInputChange = (field: keyof PersonalDataForm, value: string) => {
     setFormData((prev) => ({
@@ -67,15 +68,10 @@ const PersonalData: React.FC = () => {
     fetch("/api/profile/avatar", { method: "DELETE" })
       .then(async (res) => {
         if (!res.ok) throw new Error(await res.text());
-        if (process.env.NODE_ENV !== "production") {
-          console.log("[PersonalData] remove avatar → success");
-        }
         setProfileImage(null);
       })
       .catch((e) => {
-        if (process.env.NODE_ENV !== "production") {
-          console.error("[PersonalData] remove avatar → failed", e);
-        }
+        console.error("[PersonalData] remove avatar → failed", e);
       });
   };
 
@@ -85,8 +81,6 @@ const PersonalData: React.FC = () => {
     const targetId = String(numericOrServerId ?? user?.id ?? "");
     if (!targetId) return;
 
-    // Отримуємо свіжі дані з бекенду перед збереженням (як для TrainerProfile)
-    // РЕДАГУВАННЯ: так як отримав так і міняєш - усі поля отримуємо в ключі acf, то так і відправляємо
     let freshAcf: Record<string, unknown> = {};
     let freshMeta: Record<string, unknown> = {};
     try {
@@ -105,32 +99,18 @@ const PersonalData: React.FC = () => {
         const freshProfile = await freshProfileRes.json();
         freshAcf = (freshProfile?.acf as Record<string, unknown>) || {};
         freshMeta = (freshProfile?.meta as Record<string, unknown>) || {};
-        if (process.env.NODE_ENV !== "production") {
-          console.log("[PersonalData] Отримано свіжі дані з бекенду:", {
-            acfKeys: Object.keys(freshAcf),
-            metaKeys: Object.keys(freshMeta),
-            acf_phone: freshAcf.phone,
-            acf_telegram: freshAcf.telegram,
-            acf_instagram: freshAcf.instagram,
-            hasPosition: !!freshMeta.input_text_position,
-            hasLocations: !!freshMeta.hl_data_my_wlocation,
-          });
-        }
       }
     } catch (error) {
       console.error("[PersonalData] Помилка отримання свіжих даних:", error);
     }
 
-    // РЕДАГУВАННЯ: зберігаємо через acf (так як отримали, так і відправляємо)
-    // Зберігаємо всі поточні acf поля + оновлюємо тільки контактні дані
     const acfToSave: Record<string, unknown> = {
-      ...freshAcf, // Зберігаємо всі поточні acf поля (включаючи дані з TrainerProfile)
+      ...freshAcf,
       phone: formData.phone,
       telegram: formData.telegram,
       instagram: formData.instagram,
     };
 
-    // Зберігаємо важливі meta поля з TrainerProfile (якщо вони є)
     const metaToSave: Record<string, unknown> = {
       ...(freshMeta.input_text_position !== undefined
         ? { input_text_position: freshMeta.input_text_position }
@@ -140,36 +120,30 @@ const PersonalData: React.FC = () => {
         : {}),
     };
 
-    if (process.env.NODE_ENV !== "production") {
-      console.log("[PersonalData] Зберігаємо через acf (так як отримали):", {
-        acfKeys: Object.keys(acfToSave),
-        phone: formData.phone,
-        telegram: formData.telegram,
-        instagram: formData.instagram,
-        hasMetaFields: Object.keys(metaToSave).length > 0,
-      });
+    const numericId = targetId ? parseInt(targetId, 10) : null;
+    if (!numericId || isNaN(numericId)) {
+      console.error("[PersonalData] Невірний ID користувача:", targetId);
+      return;
     }
 
-    // Зберігаємо через PUT метод з acf об'єктом (згідно з документацією)
     const payload: {
-      id?: string | number;
+      id?: number;
       first_name?: string;
       last_name?: string;
       email?: string;
       acf?: Record<string, unknown>;
       meta?: Record<string, unknown>;
     } = {
+      id: numericId,
       first_name: formData.firstName,
       last_name: formData.lastName,
       email: formData.email,
-      acf: acfToSave, // Контактні дані через acf (так як отримали)
+      acf: acfToSave,
     };
-    if (targetId) payload.id = targetId;
+    
     if (Object.keys(metaToSave).length > 0) {
-      payload.meta = metaToSave; // Важливі meta поля з TrainerProfile
+      payload.meta = metaToSave;
     }
-
-    // Використовуємо PATCH метод через адмінський проксі
     try {
       const res = await fetch(
         `/api/proxy?path=${encodeURIComponent(
@@ -193,10 +167,6 @@ const PersonalData: React.FC = () => {
           error: errorText,
         });
       } else {
-        if (process.env.NODE_ENV !== "production") {
-          console.log("[PersonalData] Дані збережено через acf");
-        }
-        // Інвалідуємо кеш після збереження
         queryClient.invalidateQueries({ queryKey: ["user-profile", "me"] });
         queryClient.invalidateQueries({ queryKey: ["trainer-profile-full"] });
       }
@@ -205,11 +175,29 @@ const PersonalData: React.FC = () => {
     }
   };
 
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const token = useAuthStore((s) => s.token);
+
+  useEffect(() => {
+    if (!isLoggedIn && !token) {
+      setFormData({
+        firstName: "",
+        lastName: "",
+        phone: "",
+        telegram: "",
+        email: "",
+        instagram: "",
+      });
+      setProfileImage(null);
+    }
+  }, [isLoggedIn, token]);
+
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
         if (!profile) return;
+
         const data = profile as unknown as {
           first_name?: string;
           last_name?: string;
@@ -235,36 +223,45 @@ const PersonalData: React.FC = () => {
           lastName = "";
         }
         const email = data?.email || data?.user_email || "";
-        // РЕДАГУВАННЯ: отримуємо контактні дані з acf (так як вони зберігаються там)
         const acf = (data as { acf?: Record<string, unknown> })?.acf || {};
         const meta = (data?.meta || {}) as Record<string, string>;
-        setFormData((prev) => ({
-          ...prev,
-          firstName,
-          lastName,
-          email,
-          // Пріоритет: acf.phone > meta.input_text_social_phone > meta.phone > data.social_phone
-          phone:
-            (acf.phone as string) ||
-            meta.input_text_social_phone ||
-            meta.phone ||
-            data?.social_phone ||
-            "",
-          // Пріоритет: acf.telegram > meta.input_text_social_telegram > meta.social_telegram > data.social_telegram
-          telegram:
-            (acf.telegram as string) ||
-            meta.input_text_social_telegram ||
-            meta.social_telegram ||
-            data?.social_telegram ||
-            "",
-          // Пріоритет: acf.instagram > meta.input_text_social_instagram > meta.social_instagram > data.social_instagram
-          instagram:
-            (acf.instagram as string) ||
-            meta.input_text_social_instagram ||
-            meta.social_instagram ||
-            data?.social_instagram ||
-            "",
-        }));
+        
+        const newPhone = (acf.phone as string) ||
+          meta.input_text_social_phone ||
+          meta.phone ||
+          data?.social_phone ||
+          "";
+        const newTelegram = (acf.telegram as string) ||
+          meta.input_text_social_telegram ||
+          meta.social_telegram ||
+          data?.social_telegram ||
+          "";
+        const newInstagram = (acf.instagram as string) ||
+          meta.input_text_social_instagram ||
+          meta.social_instagram ||
+          data?.social_instagram ||
+          "";
+        setFormData((prev) => {
+          if (
+            prev.firstName === firstName &&
+            prev.lastName === lastName &&
+            prev.email === email &&
+            prev.phone === newPhone &&
+            prev.telegram === newTelegram &&
+            prev.instagram === newInstagram
+          ) {
+            return prev;
+          }
+          
+          return {
+            firstName,
+            lastName,
+            email,
+            phone: newPhone,
+            telegram: newTelegram,
+            instagram: newInstagram,
+          };
+        });
 
         // Синхронізуємо превʼю аватарки з бекенду
         const firstUploadUrl = Object.values(meta || {}).find(
@@ -288,20 +285,7 @@ const PersonalData: React.FC = () => {
           }
         }
 
-        // Пріоритет: спочатку стандартне поле avatar, потім мета
-        if (process.env.NODE_ENV !== "production") {
-          console.log("[PersonalData] profile avatar candidates", {
-            avatar: data?.avatar,
-            metaAvatar: (data?.meta as { img_link_data_avatar?: string })
-              ?.img_link_data_avatar,
-            topLevelAvatar: topLevelAvatar,
-            firstUploadUrl,
-            avatarUrls: data?.avatar_urls,
-          });
-        }
-
         const avatar96 = data?.avatar_urls?.["96"];
-        // Пріоритет: topLevelAvatar (розпарсений) > meta.img_link_data_avatar > avatar > firstUploadUrl > avatar96
         const backendAvatar =
           topLevelAvatar ||
           (meta as { img_link_data_avatar?: string })?.img_link_data_avatar ||
@@ -309,9 +293,6 @@ const PersonalData: React.FC = () => {
           firstUploadUrl ||
           avatar96 ||
           null;
-        if (process.env.NODE_ENV !== "production") {
-          console.log("[PersonalData] resolved backendAvatar", backendAvatar);
-        }
         if (backendAvatar) {
           setProfileImage(backendAvatar);
         }

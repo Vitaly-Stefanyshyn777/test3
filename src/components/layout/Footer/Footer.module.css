@@ -64,7 +64,7 @@
   gap: 16px;
   height: 52px;
   width: auto;
-  display: none;
+  /* display: none; */
 }
 
 .loginButton,
@@ -129,6 +129,7 @@
   text-decoration: none;
   opacity: 0.9;
   transition: opacity 0.25s ease, color 0.25s ease;
+  margin-bottom: 24px;
   color: #ffffff;
 }
 
@@ -139,8 +140,8 @@
   font-weight: 700;
   font-size: 36px;
   line-height: 110%;
-  letter-spacing: -0.02em;
   color: var(--white);
+  margin-bottom: 24px;
 }
 
 .mailLink {
@@ -245,7 +246,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: #fff;
 }
 

@@ -1,10 +1,11 @@
+/* Базовий блок фільтра в сайдбарі курсів */
 .filterSection {
   width: 100%;
   height: auto;
   display: flex;
   flex-direction: column;
-  gap: 30px;
-  padding: 24px 24px 28px;
+  gap: 20px; /* було 30px – зменшуємо вертикальні відступи всередині секції */
+  padding: 20px 24px; /* було 24px 24px 28px */
   border-bottom: 1px solid #e1e1e1;
 }
 
@@ -29,10 +30,9 @@
 }
 
 .sectionContent {
-  transition: all 0.3s ease-in-out;
   display: flex;
-  gap: 30px;
   flex-direction: column;
+  gap: 16px; /* було 30px */
   height: auto;
   opacity: 1;
   overflow: hidden;
@@ -52,7 +52,6 @@
   font-weight: 500;
   font-size: 18px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -75,7 +74,6 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 140%;
-  letter-spacing: -0.02em;
   color: var(--black);
 
   border: none;
@@ -94,7 +92,6 @@
 .cityInput::placeholder {
   color: #666;
   font-size: 13px;
-  letter-spacing: 0.5px;
   transition: all 0.3s ease;
 }
 
@@ -107,7 +104,6 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-
   overflow-y: auto;
   padding-right: 8px;
   height: auto;
@@ -151,7 +147,6 @@
   font-weight: 500;
   font-size: 14px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--violet);
   background: none;
   border: none;
@@ -170,7 +165,6 @@
   font-weight: 500;
   font-size: 14px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: #666;
   background: none;
   border: none;
@@ -240,7 +234,6 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 140%;
-  letter-spacing: -0.02em;
   color: var(--black);
 }
 
@@ -304,24 +297,10 @@
   cursor: pointer;
 }
 
-.filterSection {
-  width: 100%;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  padding: 24px 24px 28px;
-}
-
-.filterSection:last-of-type {
-  border-bottom: none;
-  margin-bottom: 0;
-}
-
 @media (max-width: 1000px) {
   .filterSection {
-    padding: mvw(20) 0;
-    gap: mvw(20);
+    padding: mvw(16) 0;
+    gap: mvw(16);
     border-bottom: none;
   }
 
@@ -346,7 +325,6 @@
     font-weight: 500;
     font-size: mvw(16);
     line-height: 140%;
-    letter-spacing: -0.01em;
     color: var(--black);
   }
 

@@ -20,16 +20,16 @@ interface Product {
   id: string;
   name: string;
   price: string;
-  regularPrice: string;
-  salePrice: string;
-  onSale: boolean;
-  image: string;
-  categories: Array<{
+  regularPrice?: string;
+  salePrice?: string;
+  onSale?: boolean;
+  image?: string;
+  categories?: Array<{
     id: number;
     name: string;
     slug: string;
   }>;
-  stockStatus: string;
+  stockStatus?: string;
 }
 
 type CoursesFiltersVariant = "default" | "modal";
@@ -124,15 +124,22 @@ const CoursesFilters = ({
     })();
   }, []);
 
-  // Побудова мапи name -> id для простого зіставлення існуючими компонентами (які працюють зі строками)
+  // Побудова мапи name -> id з даних API
+  // Використовуємо тільки дані з API - якщо категорії немає в API, вона не буде доступна для фільтрації
   const nameToIdMap = useMemo(() => {
     const map = new Map<string, number>();
-    // Мапимо саме підкатегорії як опції
+    
+    // Мапимо підкатегорії з усіх груп
     Object.values(childrenByGroup).forEach((arr) =>
       arr.forEach((c) => map.set(c.name, c.id))
     );
+    
+    // Мапимо категорії з "Оберіть тип тренування" (parent = 61)
     trainingPickTypeChildren.forEach((c) => map.set(c.name, c.id));
+    
+    // Мапимо категорії з "Тип тренування" (parent = 56)
     trainingTypeChildren.forEach((c) => map.set(c.name, c.id));
+
     return map;
   }, [childrenByGroup, trainingPickTypeChildren, trainingTypeChildren]);
 
@@ -151,13 +158,18 @@ const CoursesFilters = ({
       ...(filters.certification || []),
       ...((filters.workoutTypes as string[]) || []),
     ];
+    
+    // Конвертуємо назви в ID, використовуючи тільки дані з API
+    // Якщо назва не знайдена в API - просто пропускаємо її
     const categoryIds = selectedNames
       .map((name) => nameToIdMap.get(name))
       .filter((v): v is number => typeof v === "number");
 
-    // Selected categories
-
-    onApplyCategories?.(categoryIds);
+    if (onApplyCategories) {
+      onApplyCategories(categoryIds);
+    } else {
+      console.warn("[CoursesFilters] ⚠️ onApplyCategories не передано!");
+    }
   };
 
   // Нормалізація назв: без двокрапок, пробілів та в нижньому регістрі
@@ -212,7 +224,6 @@ const CoursesFilters = ({
   ]);
 
   // Debug data
-
   return (
     <div
       className={`${styles.filterContainer} ${
@@ -261,7 +272,11 @@ const CoursesFilters = ({
       </div>
 
       {!isModalVariant && (
-        <ButtonFilter onApply={handleApply} onReset={onReset} loading={loading} />
+        <ButtonFilter
+          onApply={handleApply}
+          onReset={onReset}
+          loading={loading}
+        />
       )}
     </div>
   );

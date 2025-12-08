@@ -1,6 +1,6 @@
 import React from "react";
 import s from "./SliderNav.module.css";
-import { ArrowLeftIcon, ArrowRightIcon } from "../../Icons/Icons";
+import { ArrowLeftIcon, ArrowRightIcon } from "@/components/Icons/Icons";
 
 export default function SliderNav({
   activeIndex,

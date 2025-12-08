@@ -42,7 +42,6 @@
           font-style: normal;
           font-weight: 500;
           line-height: 1.4;
-          letter-spacing: 0.96px;
           text-transform: uppercase;
           color: var(--text-black);
         }
@@ -65,7 +64,6 @@
             font-style: normal;
             font-weight: 500;
             line-height: 1.4;
-            letter-spacing: -0.16px;
             color: var(--text-black);
 
             svg {
@@ -93,7 +91,6 @@
         font-style: normal;
         font-weight: 500;
         line-height: 1.4;
-        letter-spacing: 0.96px;
         text-transform: uppercase;
         color: rgba(255, 254, 252, 0.6);
       }
@@ -106,7 +103,6 @@
         font-style: normal;
         font-weight: 500;
         line-height: 120%;
-        letter-spacing: -1.68px;
         color: var(--white);
 
         span {
@@ -122,7 +118,6 @@
           font-weight: 500;
           font-size: 32px;
           line-height: 120%;
-          letter-spacing: -0.03em;
           color: var(--white);
           text-align: center;
         }
@@ -162,6 +157,7 @@
             flex-direction: column;
             gap: 16px;
             flex: 1;
+            justify-content: space-between;
           }
 
           .cardContent .cardNumber {
@@ -169,7 +165,6 @@
             font-weight: 500;
             font-size: 32px;
             line-height: 120%;
-            letter-spacing: -0.03em;
           }
 
           .cardContent .cardDescription {
@@ -177,7 +172,6 @@
             font-weight: 500;
             font-size: 16px;
             line-height: 120%;
-            letter-spacing: -0.02em;
           }
         }
 
@@ -253,7 +247,6 @@
           p {
             margin-bottom: mvw(12);
             font-size: mvw(10);
-            letter-spacing: mvw(0.96);
           }
 
           ul {
@@ -275,7 +268,6 @@
               font-weight: 500;
 
               line-height: 140%;
-              letter-spacing: -0.01em;
               color: var(--black);
 
               svg {
@@ -305,7 +297,6 @@
           font-weight: 500;
 
           line-height: 140%;
-          letter-spacing: 0.08em;
 
           color: rgba(255, 254, 252, 0.6);
         }
@@ -314,7 +305,6 @@
           width: 100%;
           margin-bottom: mvw(16);
           font-size: mvw(28);
-          letter-spacing: -0.03em;
         }
 
         ul {
@@ -328,7 +318,6 @@
             border-radius: mvw(16);
             font-size: mvw(14);
             line-height: 130%;
-            letter-spacing: -0.02em;
             display: flex;
             flex-direction: row;
             align-items: center;
@@ -387,7 +376,6 @@
     font-weight: 500;
     font-size: mvw(14) !important;
     line-height: 140%;
-    letter-spacing: -0.02em;
     color: var(--black);
   }
 
@@ -397,7 +385,6 @@
     font-weight: 500;
     font-size: mvw(14);
     line-height: 140%;
-    letter-spacing: -0.02em;
     color: var(--black);
     margin-right: mvw(3);
     display: inline;

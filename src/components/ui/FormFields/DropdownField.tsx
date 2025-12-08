@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./DropdownField.module.css";
-import { Check4Icon } from "../../Icons/Icons";
+import { Check4Icon } from "@/components/Icons/Icons";
 
 export interface DropdownOption {
   value: string;

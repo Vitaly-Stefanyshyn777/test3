@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import type { Swiper as SwiperType } from "swiper";
 import styles from "./CourseReviews.module.css";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -8,8 +8,9 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
-
-import { fetchWcReviews } from "@/lib/bfbApi";
+import ReviewModal from "@/components/ReviewModal/ReviewModal";
+import { fetchWcReviews, createWcReview, type WcReview } from "@/lib/bfbApi";
+import type { LoginFormValues } from "@/components/ReviewModal/ReviewForm";
 interface ReviewUi {
   id: number;
   name: string;
@@ -18,44 +19,70 @@ interface ReviewUi {
   text: string;
 }
 
-const CourseReviews: React.FC = () => {
+interface CourseReviewsProps {
+  courseId?: string | number;
+}
+
+const CourseReviews: React.FC<CourseReviewsProps> = ({ courseId }) => {
   const [reviews, setReviews] = useState<ReviewUi[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const loadReviews = useCallback(async () => {
+    try {
+      const params: Record<string, string | number> = {
+        per_page: 12,
+        orderby: "date",
+        order: "desc",
+      };
+      // WooCommerce API використовує параметр 'product' для фільтрації за product_id
+      if (courseId) {
+        params.product = courseId;
+      }
+      const data = await fetchWcReviews(params);
+      
+      const ui: ReviewUi[] = (data as WcReview[]).map((r: WcReview) => ({
+        id: r.id,
+        name: r.reviewer_name || r.reviewer || "Користувач",
+        date: new Date(
+          r.date_created_gmt || r.date_created || Date.now()
+        ).toLocaleDateString("uk-UA"),
+        rating: r.rating || 0,
+        text: r.review?.replace(/<[^>]*>/g, "") || "",
+      }));
+      setReviews(ui);
+    } catch {
+      setReviews([]);
+    }
+  }, [courseId]);
+
   useEffect(() => {
-    let mounted = true;
-    fetchWcReviews({ per_page: 12, orderby: "date", order: "desc" })
-      .then(
-        (
-          data: Array<{
-            id: number;
-            reviewer_name?: string;
-            reviewer?: string;
-            date_created_gmt?: string;
-            date_created?: string;
-            rating?: number;
-            review?: string;
-          }>
-        ) => {
-          if (!mounted) return;
-          const ui: ReviewUi[] = data.map((r) => ({
-            id: r.id,
-            name: r.reviewer_name || r.reviewer || "Користувач",
-            date: new Date(
-              r.date_created_gmt || r.date_created || Date.now()
-            ).toLocaleDateString("uk-UA"),
-            rating: r.rating || 0,
-            text: r.review?.replace(/<[^>]*>/g, "") || "",
-          }));
-          setReviews(ui);
-        }
-      )
-      .catch(() => setReviews([]));
-    return () => {
-      mounted = false;
-    };
-  }, []);
+    loadReviews();
+  }, [loadReviews]);
 
   const swiperRef = useRef<SwiperType | null>(null);
   const [active, setActive] = useState(0);
+
+  const handleSubmitReview = async (data: LoginFormValues) => {
+    if (!courseId) {
+      throw new Error("ID курсу не вказано");
+    }
+
+    const productId = typeof courseId === "string" ? parseInt(courseId, 10) : courseId;
+    if (isNaN(productId)) {
+      throw new Error("Невірний ID курсу");
+    }
+
+    await createWcReview({
+      product_id: productId,
+      review: data.question || "",
+      reviewer: data.first_name,
+      reviewer_email: data.email || "",
+      rating: data.rating,
+    });
+
+    // Оновлюємо список відгуків після створення
+    await loadReviews();
+  };
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, index) => (
@@ -75,7 +102,12 @@ const CourseReviews: React.FC = () => {
       <div className={styles.containerReviews}>
         <div className={styles.header}>
           <h2 className={styles.title}>Відгуки покупців</h2>
-          <button className={styles.leaveReviewButton}>Залишити відгук</button>
+          <button 
+            className={styles.leaveReviewButton}
+            onClick={() => setIsModalOpen(true)}
+          >
+            Залишити відгук
+          </button>
         </div>
 
         <div className={styles.reviewsCarousel}>
@@ -129,7 +161,7 @@ const CourseReviews: React.FC = () => {
           )}
         </div>
 
-        {reviews.length > 0 && (
+        {reviews.length > 2 && (
           <SliderNav
             activeIndex={active}
             dots={reviews.length}
@@ -139,6 +171,11 @@ const CourseReviews: React.FC = () => {
           />
         )}
       </div>
+      <ReviewModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmitReview}
+      />
     </section>
   );
 };

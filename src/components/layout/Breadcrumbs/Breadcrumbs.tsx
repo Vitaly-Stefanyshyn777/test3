@@ -4,7 +4,7 @@ import React, { useState, useLayoutEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import styles from "./Breadcrumbs.module.css";
-import { useProductQuery } from "../../hooks/useProductsQuery";
+import { useProductQuery } from "@/components/hooks/useProductsQuery";
 
 interface BreadcrumbItem {
   label: string;
@@ -20,10 +20,11 @@ const Breadcrumbs: React.FC = () => {
   const [isEventsModalOpen, setIsEventsModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Якщо ми на сторінці продукту /products/[id] — підтягнемо назву
-  const productIdMatch = pathname.match(/^\/products\/(\d+)/);
-  const productId = productIdMatch?.[1] || "";
-  const { data: productData } = useProductQuery(productId);
+  // Якщо ми на сторінці продукту /products/[slug] — підтягнемо назву
+  const productSlugMatch = pathname.match(/^\/products\/(.+)$/);
+  const productSlug = productSlugMatch?.[1] || "";
+  // Викликаємо useProductQuery тільки якщо є slug (не порожній)
+  const { data: productData } = useProductQuery(productSlug || "skip");
 
   // Обробка кліку на breadcrumb item
   const handleBreadcrumbClick = (item: BreadcrumbItem, e: React.MouseEvent) => {
@@ -72,10 +73,21 @@ const Breadcrumbs: React.FC = () => {
       } else if (segment === "contact" || segment === "contacts") {
         label = "Контакти";
       } else if (segments[0] === "products" && index === 1) {
-        // Сторінка продукту: замінити ID на назву товару
-        const maybeId = segment;
-        if (/^\d+$/.test(maybeId) && productData?.name) {
+        // Сторінка продукту: замінити slug/ID на назву товару
+        // Декодуємо segment, якщо він encoded
+        let decodedSegment = segment;
+        try {
+          decodedSegment = decodeURIComponent(segment);
+        } catch {
+          // Якщо не вдалося декодувати, використовуємо як є
+        }
+        
+        // Використовуємо назву продукту, якщо вона доступна
+        if (productData?.name) {
           label = productData.name;
+        } else {
+          // Якщо назва недоступна, використовуємо декодований segment
+          label = decodedSegment;
         }
       }
       const isActive = index === segments.length - 1;

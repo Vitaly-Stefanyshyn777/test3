@@ -4,7 +4,6 @@ import styles from "./CourseCatalogContainer.module.css";
 import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
 import type SwiperType from "swiper";
 import ProductsGrid from "../CoursesGrid/CoursesGrid";
-import { useProductsQuery } from "@/components/hooks/useProductsQuery";
 
 interface Props {
   block: {
@@ -12,39 +11,55 @@ interface Props {
     title: string;
   };
   filteredProducts: unknown[];
+  isLoading?: boolean;
+  hasFilters?: boolean; // Чи є активні фільтри
 }
 
-const CourseCatalogContainer = ({ filteredProducts }: Props) => {
-  const { data: products = [], isLoading, isError } = useProductsQuery();
+// Тип для курсу з useFilteredCourses
+type Course = {
+  id: string | number;
+  name: string;
+  price: string | number;
+  originalPrice?: string | number;
+  image?: string;
+  rating?: number;
+  reviewsCount?: number;
+  requirements?: string;
+  courseData?: unknown;
+  categories?: Array<{
+    id: number;
+    name: string;
+    slug: string;
+  }>;
+};
 
+const CourseCatalogContainer = ({
+  filteredProducts,
+  isLoading,
+  hasFilters,
+}: Props) => {
   // Component state
-
   const [sortBy] = useState("name");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(12);
 
-  // Використовуємо відфільтровані товари, якщо вони передані
-  type ProductLike = {
-    id: string | number;
-    name: string;
-    price: string;
-    regularPrice?: string;
-    salePrice?: string;
-    onSale?: boolean;
-    images?: Array<{ src: string }>;
-    categories?: unknown;
-    stockStatus?: string;
-  };
-  const sourceProducts: ProductLike[] =
-    filteredProducts && filteredProducts.length > 0
-      ? (filteredProducts as ProductLike[])
-      : (products as ProductLike[]);
+  // Використовуємо ТІЛЬКИ відфільтровані курси - якщо порожній, показуємо порожній список
+  const sourceProducts: Course[] = (filteredProducts as Course[]) || [];
 
   const sortedProducts = useMemo(() => {
     const copy = [...sourceProducts];
-    if (sortBy === "name") copy.sort((a, b) => a.name.localeCompare(b.name));
-    if (sortBy === "price")
-      copy.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+    if (sortBy === "name") {
+      copy.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    if (sortBy === "price") {
+      copy.sort((a, b) => {
+        const priceA =
+          typeof a.price === "string" ? parseFloat(a.price) || 0 : a.price || 0;
+        const priceB =
+          typeof b.price === "string" ? parseFloat(b.price) || 0 : b.price || 0;
+        return priceA - priceB;
+      });
+    }
     return copy;
   }, [sourceProducts, sortBy]);
 
@@ -55,29 +70,13 @@ const CourseCatalogContainer = ({ filteredProducts }: Props) => {
   const start = (currentPage - 1) * itemsPerPage;
   const pageData = sortedProducts.slice(start, start + itemsPerPage);
 
-  const productsForGrid = pageData.map((product) => ({
-    id: String(product.id),
-    name: product.name,
-    price: String(product.price ?? "0"),
-    regularPrice: String(product.regularPrice ?? ""),
-    salePrice: String(product.salePrice ?? ""),
-    onSale: Boolean(product.onSale),
-    image: product.images?.[0]?.src || "",
-    categories:
-      (product.categories as Array<{
-        id: number;
-        name: string;
-        slug: string;
-      }>) || [],
-    stockStatus: String(product.stockStatus ?? ""),
-  }));
-
   // Products for grid
 
   const [activeIndex, setActiveIndex] = useState(0);
   const swiperRef = useRef<SwiperType | null>(null);
 
   useEffect(() => {
+    setCurrentPage(1);
     setActiveIndex(0);
     swiperRef.current?.slideTo(0);
   }, [filteredProducts]);
@@ -89,10 +88,23 @@ const CourseCatalogContainer = ({ filteredProducts }: Props) => {
   return (
     <div className={styles.catalogContainer}>
       <div className={styles.mainContent}>
-        {isError && (
-          <div className={styles.error}>Не вдалося завантажити товари</div>
-        )}
-        <ProductsGrid />
+        <ProductsGrid
+          courses={pageData.map((course: Course) => ({
+            id: String(course.id),
+            name: course.name,
+            image: course.image || "",
+            price:
+              typeof course.price === "string"
+                ? parseFloat(course.price) || 0
+                : course.price || 0,
+            rating: course.rating || 0,
+            reviewsCount: course.reviewsCount || 0,
+            requirements: course.requirements,
+            courseData: course.courseData as { excerpt?: { rendered: string } } | undefined,
+          }))}
+          isLoading={isLoading}
+          hasFilters={hasFilters}
+        />
         {sortedProducts.length > 12 && (
           <SliderNav
             activeIndex={activeIndex}

@@ -8,7 +8,6 @@
   font-weight: 600;
   font-size: 32px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
   margin: 0 0 32px 0;
 }
@@ -49,7 +48,6 @@
   font-weight: 400;
   font-size: 16px;
   line-height: 110%;
-  letter-spacing: -0.02em;
   color: rgba(14, 14, 14, 0.4);
 }
 
@@ -61,7 +59,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 110%;
-  letter-spacing: -0.02em;
   color: var(--black);
 }
 
@@ -168,7 +165,6 @@
   font-weight: 400;
   font-size: 16px;
   line-height: 110%;
-  letter-spacing: -0.02em;
   color: rgba(14, 14, 14, 0.4);
 }
 
@@ -177,7 +173,6 @@
   font-weight: 500;
   font-size: 18px;
   line-height: 130%;
-  letter-spacing: -0.02em;
   color: var(--black);
 }
 
@@ -192,7 +187,6 @@
   font-weight: 400;
   font-size: 16px;
   line-height: 110%;
-  letter-spacing: -0.02em;
   color: rgba(14, 14, 14, 0.4);
 }
 
@@ -201,7 +195,6 @@
   font-weight: 500;
   font-size: 18px;
   line-height: 110%;
-  letter-spacing: -0.02em;
   color: var(--black);
 }
 

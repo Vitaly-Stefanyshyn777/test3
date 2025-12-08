@@ -8,7 +8,7 @@ import {
   LockIcon2,
   EntranceIcon,
   QuestionBorderIcon,
-} from "../../../Icons/Icons";
+} from "@/components/Icons/Icons";
 import type { NavigationItem } from "./types";
 
 export const navigationItems: NavigationItem[] = [

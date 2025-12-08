@@ -8,13 +8,14 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import s from "./FavoritesModal.module.css";
-import { useFavoriteStore } from "../../store/favorites";
-import { useCartStore } from "../../store/cart";
-import ProductCard from "../sections/ProductsSection/ProductCard/ProductCard";
-import SliderNav from "../ui/SliderNav/SliderNavActions";
-import { CloseButtonIcon } from "../Icons/Icons";
-import { useScrollLock } from "../hooks/useScrollLock";
+import { useFavoriteStore } from "@/store/favorites";
+import { useCartStore } from "@/store/cart";
+import ProductCard from "@/components/sections/ProductsSection/ProductCard/ProductCard";
+import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import { useScrollLock } from "@/components/hooks/useScrollLock";
 import FavoritesModalSkeleton from "./FavoritesModalSkeleton";
+import { normalizeImageUrl } from "@/lib/imageUtils";
 
 export default function FavoritesModal() {
   const isOpen = useFavoriteStore((st) => st.isOpen);
@@ -27,6 +28,7 @@ export default function FavoritesModal() {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const swiperRef = useRef<SwiperType | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [desktopSlideIdx, setDesktopSlideIdx] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -38,9 +40,8 @@ export default function FavoritesModal() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const [page, setPage] = useState(0);
   const [showSkeleton, setShowSkeleton] = useState(false);
-  // Короткий скелетон при відкритті, щоб уникнути стрибка контенту
+
   useEffect(() => {
     if (!isOpen) return;
     setShowSkeleton(true);
@@ -48,9 +49,7 @@ export default function FavoritesModal() {
     return () => clearTimeout(timer);
   }, [isOpen]);
 
-  const pageSize = 4;
-  const pageCount = Math.ceil(items.length / pageSize) || 1;
-  const pageItems = items.slice(page * pageSize, page * pageSize + pageSize);
+  /** MOBILKA — залишаємо як було */
   const mobileChunkSize = 4;
   const mobilePages = useMemo(() => {
     const chunks: (typeof items)[] = [];
@@ -59,10 +58,33 @@ export default function FavoritesModal() {
     }
     return chunks;
   }, [items]);
+
   const mobilePageItems =
     isMobile && mobilePages.length > 0
       ? mobilePages[Math.min(activeIndex, mobilePages.length - 1)]
       : [];
+
+  /** DESKTOP — логіка як в ProductPage */
+  const desktopItemsPerView = 4;
+  const desktopTotalSlides = Math.max(
+    1,
+    items.length > desktopItemsPerView
+      ? items.length - desktopItemsPerView + 1
+      : 1
+  );
+  const desktopStart = desktopSlideIdx;
+  const desktopVisible = items.slice(
+    desktopStart,
+    desktopStart + desktopItemsPerView
+  );
+  const onDesktopPrev = () =>
+    setDesktopSlideIdx(
+      (idx) => (idx - 1 + desktopTotalSlides) % desktopTotalSlides
+    );
+  const onDesktopNext = () =>
+    setDesktopSlideIdx((idx) => (idx + 1) % desktopTotalSlides);
+
+  /** -------- */
 
   useEffect(() => {
     setIsMounted(true);
@@ -70,14 +92,34 @@ export default function FavoritesModal() {
   }, []);
 
   useEffect(() => {
+    // Виправляємо activeIndex тільки якщо він дійсно некоректний (щоб уникнути безкінечних циклів)
     if (mobilePages.length === 0) {
-      if (activeIndex !== 0) setActiveIndex(0);
+      if (activeIndex !== 0) {
+        setActiveIndex(0);
+      }
       return;
     }
     if (activeIndex >= mobilePages.length) {
-      setActiveIndex(mobilePages.length - 1);
+      const newIndex = Math.max(0, mobilePages.length - 1);
+      if (activeIndex !== newIndex) {
+        setActiveIndex(newIndex);
+      }
     }
   }, [activeIndex, mobilePages.length]);
+
+  useEffect(() => {
+    setDesktopSlideIdx(0);
+  }, [isMobile]);
+
+  useEffect(() => {
+    // Виправляємо desktopSlideIdx тільки якщо він дійсно некоректний (щоб уникнути безкінечних циклів)
+    if (desktopSlideIdx >= desktopTotalSlides) {
+      const newIdx = Math.max(0, desktopTotalSlides - 1);
+      if (desktopSlideIdx !== newIdx) {
+        setDesktopSlideIdx(newIdx);
+      }
+    }
+  }, [desktopSlideIdx, desktopTotalSlides, items.length]);
 
   useScrollLock(isOpen);
 
@@ -92,13 +134,15 @@ export default function FavoritesModal() {
           <div className={s.topbarListBlock}>
             <div className={s.topbar}>
               <span className={s.topbarTitle}>Обране</span>
-              <button className={s.close} onClick={close} aria-label="Закрити">
-                <CloseButtonIcon />
-              </button>
+              <ModalCloseButton onClose={close} className={s.close} />
             </div>
+
             {isMobile ? (
+              /** ========= MOBILE ========= */
               <div className={s.mobileSliderWrap}>
                 {items.length === 0 ? (
+                  <div className={s.empty}>Список порожній</div>
+                ) : mobilePages.length === 0 ? (
                   <div className={s.empty}>Список порожній</div>
                 ) : (
                   <Swiper
@@ -118,21 +162,25 @@ export default function FavoritesModal() {
                         className={s.mobileSlide}
                       >
                         <div className={s.mobileSlideGrid}>
-                          {group.map((it) => (
-                            <div key={it.id} className={s.mobileCardWrapper}>
-                              <ProductCard
-                                id={it.id}
-                                slug={it.slug}
-                                name={it.name}
-                                price={it.price || 0}
-                                originalPrice={it.originalPrice}
-                                discount={it.discount}
-                                isNew={it.isNew}
-                                isHit={it.isHit}
-                                image={it.image}
-                              />
-                            </div>
-                          ))}
+                          {group.map((it) => {
+                            const isCourse = it.id.startsWith("course-");
+                            const courseId = isCourse ? it.id.replace("course-", "") : undefined;
+                            const normalizedImage = normalizeImageUrl(it.image);
+                            return (
+                              <div
+                                key={it.id}
+                                className={s.mobileCardWrapper}
+                                onClick={() => close()}
+                              >
+                                <ProductCard 
+                                  {...it} 
+                                  price={it.price || 0} 
+                                  image={normalizedImage}
+                                  slug={isCourse && courseId ? `/courses/${courseId}` : it.slug}
+                                />
+                              </div>
+                            );
+                          })}
                         </div>
                       </SwiperSlide>
                     ))}
@@ -140,89 +188,92 @@ export default function FavoritesModal() {
                 )}
               </div>
             ) : (
-              <div className={s.list}>
+              /** ========= DESKTOP ========= */
+              <div className={s.desktopSliderWrap}>
                 {items.length === 0 ? (
                   <div className={s.empty}>Список порожній</div>
                 ) : (
-                  pageItems.map((it) => (
-                    <ProductCard
-                      key={it.id}
-                      id={it.id}
-                      slug={it.slug}
-                      name={it.name}
-                      price={it.price || 0}
-                      originalPrice={it.originalPrice}
-                      discount={it.discount}
-                      isNew={it.isNew}
-                      isHit={it.isHit}
-                      image={it.image}
-                    />
-                  ))
+                  <div className={s.desktopGrid}>
+                    {desktopVisible.map((it) => {
+                      const isCourse = it.id.startsWith("course-");
+                      const courseId = isCourse ? it.id.replace("course-", "") : undefined;
+                      const normalizedImage = normalizeImageUrl(it.image);
+                      return (
+                        <div key={it.id} onClick={() => close()}>
+                          <ProductCard 
+                            {...it} 
+                            price={it.price || 0} 
+                            image={normalizedImage}
+                            slug={isCourse && courseId ? `/courses/${courseId}` : it.slug}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
             )}
           </div>
 
-          <div className={s.actionsRow}>
-            <div className={s.buttonsWrap}>
-              {isMobile
-                ? mobilePages.length > 0 && (
-                    <div className={s.navWrap}>
+          {items.length > 0 && (
+            <div className={s.actionsRow}>
+              <div className={s.buttonsWrap}>
+                <div className={s.navWrap}>
+                  {isMobile ? (
+                    <SliderNav
+                      activeIndex={activeIndex}
+                      dots={mobilePages.length}
+                      onPrev={() => swiperRef.current?.slidePrev()}
+                      onNext={() => swiperRef.current?.slideNext()}
+                      onDotClick={(idx) => swiperRef.current?.slideTo(idx)}
+                    />
+                  ) : (
+                    items.length > 4 && (
                       <SliderNav
-                        activeIndex={activeIndex}
-                        dots={mobilePages.length}
-                        onPrev={() => swiperRef.current?.slidePrev()}
-                        onNext={() => swiperRef.current?.slideNext()}
-                        onDotClick={(idx) => swiperRef.current?.slideTo(idx)}
+                        activeIndex={desktopSlideIdx}
+                        dots={desktopTotalSlides}
+                        onPrev={onDesktopPrev}
+                        onNext={onDesktopNext}
+                        onDotClick={(idx) => setDesktopSlideIdx(idx)}
                       />
-                    </div>
-                  )
-                : items.length > 4 && (
-                    <div className={s.navWrap}>
-                      <SliderNav
-                        activeIndex={page}
-                        dots={pageCount}
-                        onPrev={() => setPage((p) => Math.max(0, p - 1))}
-                        onNext={() =>
-                          setPage((p) => Math.min(pageCount - 1, p + 1))
-                        }
-                        onDotClick={(idx) => setPage(idx)}
-                      />
-                    </div>
+                    )
                   )}
+                </div>
 
-              <button
-                className={s.secondary}
-                onClick={() => {
-                  const itemsToAdd = isMobile ? mobilePageItems : pageItems;
-                  itemsToAdd.forEach((it) => {
-                    if (typeof it.price === "number") {
-                      addToCart(
-                        {
-                          id: it.id,
-                          name: it.name,
-                          price: it.price,
-                          image: it.image,
-                        },
-                        1
-                      );
-                    }
-                  });
-                }}
-              >
-                Додати усе в кошик
-              </button>
-              <button
-                className={s.remove}
-                onClick={() => {
-                  const itemsToRemove = isMobile ? mobilePageItems : pageItems;
-                  itemsToRemove.forEach((it) => remove(it.id));
-                }}
-              >
-                Видалити все
-              </button>
+                <button
+                  className={s.secondary}
+                  onClick={() => {
+                    const itemsToAdd = isMobile ? mobilePageItems : items;
+                    itemsToAdd.forEach((it) => {
+                      if (typeof it.price === "number") {
+                        addToCart(
+                          {
+                            id: it.id,
+                            name: it.name,
+                            price: it.price,
+                            image: it.image,
+                          },
+                          1
+                        );
+                      }
+                    });
+                  }}
+                >
+                  Додати усе в кошик
+                </button>
+
+                <button
+                  className={s.remove}
+                  onClick={() => {
+                    const itemsToRemove = isMobile ? mobilePageItems : items;
+                    itemsToRemove.forEach((it) => remove(it.id));
+                  }}
+                >
+                  Видалити все
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     );

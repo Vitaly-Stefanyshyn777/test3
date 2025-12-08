@@ -87,7 +87,6 @@
   font-weight: 600;
   font-size: 32px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -96,7 +95,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   text-align: center;
   color: var(--black);
 }
@@ -216,7 +214,6 @@
     font-weight: 500;
 
     line-height: 140%;
-    letter-spacing: -0.01em;
     text-align: center;
     color: var(--black);
     opacity: 0.6;

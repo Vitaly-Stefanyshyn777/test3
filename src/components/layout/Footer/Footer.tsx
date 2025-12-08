@@ -18,13 +18,26 @@ import {
   VisardIcon,
   MonoPayIcon,
 } from "../../Icons/Icons";
-import RegisterModal from "../../auth/RegisterModal/RegisterModal";
-import LoginModal from "../../auth/LoginModal/LoginModal";
+import RegisterModal from "@/components/auth/RegisterModal/RegisterModal";
+import LoginModal from "@/components/auth/LoginModal/LoginModal";
+import { useAuthStore } from "@/store/auth";
+import { useThemeSettingsQuery } from "@/components/hooks/useWpQueries";
+import { getContactData } from "@/lib/themeSettingsUtils";
+import { useMemo } from "react";
 
 const Footer = () => {
   const pathname = usePathname();
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const isLoginModalOpen = useAuthStore((s) => s.isLoginModalOpen);
+  const openLoginModal = useAuthStore((s) => s.openLoginModal);
+  const closeLoginModal = useAuthStore((s) => s.closeLoginModal);
+
+  // Отримуємо контактні дані з theme_settings
+  const { data: themeSettings } = useThemeSettingsQuery();
+  const contactData = useMemo(
+    () => getContactData(themeSettings),
+    [themeSettings]
+  );
 
   // Не показуємо футер на сторінках order-success та checkout
   if (pathname === "/order-success" || pathname === "/checkout") {
@@ -54,7 +67,7 @@ const Footer = () => {
         <div className={s.authButtons}>
           <button
             className={s.loginButton}
-            onClick={() => setIsLoginOpen(true)}
+            onClick={openLoginModal}
           >
             Вхід
           </button>
@@ -77,36 +90,66 @@ const Footer = () => {
               <h3 className={s.sectionTitle}>КОНТАКТИ:</h3>
               <div className={s.contactInfo}>
                 <a
-                  href="tel:+380954372575"
+                  href={`tel:${contactData.phone.replace(/\s/g, "") || "+380954372575"}`}
                   className={`${s.contactLink} ${s.phoneLink}`}
                 >
-                  +380 95 437 25 75
+                  {contactData.phone || "+380 95 437 25 75"}
                 </a>
                 <a
-                  href="mailto:bfb.board.ukraine@gmail.com"
+                  href={`mailto:${contactData.email || "bfb.board.ukraine@gmail.com"}`}
                   className={`${s.contactLink} ${s.mailLink}`}
                 >
-                  bfb.board.ukraine@gmail.com
+                  {contactData.email || "bfb.board.ukraine@gmail.com"}
                 </a>
               </div>
               <div className={s.socialIcons}>
-                <a
-                  href="https://www.instagram.com/bfb.official_ukraine?igsh=enFybWFmZGE3NG8z"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={s.iconButton}
-                >
-                  <InstagramIcon />
-                </a>
-                <button className={s.iconButton}>
-                  <FacebookIcon />
-                </button>
-                <button className={s.iconButton}>
-                  <TelegramIcon />
-                </button>
-                <button className={s.iconButton}>
-                  <WhatsappIcon />
-                </button>
+                {contactData.socialLinks.length > 0 ? (
+                  contactData.socialLinks.map((social, index) => {
+                    const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+                      Instagram: InstagramIcon,
+                      Facebook: FacebookIcon,
+                      Telegram: TelegramIcon,
+                      WhatsApp: WhatsappIcon,
+                    };
+                    const Icon = iconMap[social.name] || null;
+                    if (!Icon) return null;
+                    return social.link ? (
+                      <a
+                        key={index}
+                        href={social.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={s.iconButton}
+                      >
+                        <Icon />
+                      </a>
+                    ) : (
+                      <button key={index} className={s.iconButton}>
+                        <Icon />
+                      </button>
+                    );
+                  })
+                ) : (
+                  <>
+                    <a
+                      href="https://www.instagram.com/bfb.official_ukraine?igsh=enFybWFmZGE3NG8z"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={s.iconButton}
+                    >
+                      <InstagramIcon />
+                    </a>
+                    <button className={s.iconButton}>
+                      <FacebookIcon />
+                    </button>
+                    <button className={s.iconButton}>
+                      <TelegramIcon />
+                    </button>
+                    <button className={s.iconButton}>
+                      <WhatsappIcon />
+                    </button>
+                  </>
+                )}
               </div>
             </div>
 
@@ -114,11 +157,27 @@ const Footer = () => {
             <div className={s.addressSection}>
               <h3 className={s.sectionTitle}>АДРЕСА:</h3>
               <address className={s.address}>
-                <p className={s.addressText}>Мукачево, вул. Духновича 40</p>
-                <p className={s.scheduleItem}>
-                  понеділок - пятниця: 09:00 - 22:00
+                <p className={s.addressText}>
+                  {contactData.address || "Мукачево, вул. Духновича 40"}
                 </p>
-                <p className={s.scheduleItem}>субота - неділя: 10:00 - 20:00</p>
+                {contactData.weekdays && (
+                  <p className={s.scheduleItem}>
+                    понеділок - пятниця: {contactData.weekdays}
+                  </p>
+                )}
+                {contactData.weekends && (
+                  <p className={s.scheduleItem}>
+                    субота - неділя: {contactData.weekends}
+                  </p>
+                )}
+                {!contactData.weekdays && !contactData.weekends && (
+                  <>
+                    <p className={s.scheduleItem}>
+                      понеділок - пятниця: 09:00 - 22:00
+                    </p>
+                    <p className={s.scheduleItem}>субота - неділя: 10:00 - 20:00</p>
+                  </>
+                )}
               </address>
             </div>
           </div>
@@ -275,7 +334,7 @@ const Footer = () => {
         isOpen={isRegisterOpen}
         onClose={() => setIsRegisterOpen(false)}
       />
-      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
     </footer>
   );
 };

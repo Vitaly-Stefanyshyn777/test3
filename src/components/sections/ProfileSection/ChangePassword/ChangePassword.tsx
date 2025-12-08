@@ -4,11 +4,11 @@ import styles from "./ChangePassword.module.css";
 import SectionDivider from "../SectionDivider/SectionDivider";
 
 import { useForm } from "react-hook-form";
-import api from "../../../../lib/api";
-import { useAuthStore } from "../../../../store/auth";
-import PasswordField from "../../../ui/FormFields/PasswordField";
-import { PasswordsIcon } from "../../../Icons/Icons";
-import SubmitButton from "../../../ui/SubmitButton/SubmitButton";
+import api from "@/lib/api";
+import { useAuthStore } from "@/store/auth";
+import PasswordField from "@/components/ui/FormFields/PasswordField";
+import { PasswordsIcon } from "@/components/Icons/Icons";
+import SubmitButton from "@/components/ui/SubmitButton/SubmitButton";
 
 const ChangePassword: React.FC = () => {
   const user = useAuthStore((s) => s.user);

@@ -15,14 +15,14 @@ import {
   User3Icon,
   Heart2Icon,
   FIcon,
-} from "../../Icons/Icons";
+} from "@/components/Icons/Icons";
 import s from "./InstructorAdvantages.module.css";
-import SliderNav from "../../ui/SliderNav/SliderNavActions";
+import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
 import {
   fetchInstructorAdvantages,
   InstructorAdvantagePost,
-} from "../../../lib/bfbApi";
-import { normalizeImageUrl } from "../../../lib/imageUtils";
+} from "@/lib/bfbApi";
+import { normalizeImageUrl } from "@/lib/imageUtils";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -305,11 +305,11 @@ export default function InstructorAdvantages() {
                                     <div className={s.advInfoBlock}>
                                       <div className={s.advInfoBlockText}>
                                         <h3 className={s.cardTitle}>
-                                          Доступ до інвентарю
+                                          Навчання й інвентар
                                         </h3>
                                         <p className={s.cardText}>
-                                          Можливість придбати борд та супутній
-                                          інвентар після сертифікації
+                                          Доступ до інвентарю, воркшопів та
+                                          повторних навчань
                                         </p>
                                       </div>
                                     </div>

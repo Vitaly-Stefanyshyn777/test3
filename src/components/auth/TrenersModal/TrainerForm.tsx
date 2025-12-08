@@ -9,9 +9,9 @@ import {
   NumberIcon,
   QuestionIcon,
   UserIcon,
-} from "../../Icons/Icons";
-import InputField from "../../ui/FormFields/InputField";
-import TextareaField from "../../ui/FormFields/TextareaField";
+} from "@/components/Icons/Icons";
+import InputField from "@/components/ui/FormFields/InputField";
+import TextareaField from "@/components/ui/FormFields/TextareaField";
 import s from "./TrenersModal.module.css";
 
 export interface TrainerFormValues {

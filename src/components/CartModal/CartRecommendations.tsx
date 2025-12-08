@@ -1,9 +1,9 @@
 "use client";
-import React, { useRef, useState } from "react";
-import { useCartStore } from "../../store/cart";
-import { useProductsQuery } from "../hooks/useProductsQuery";
-import SliderNav from "../ui/SliderNav/SliderNavActions";
-import { PlusIcon, CloseButtonIcon } from "../Icons/Icons";
+import React, { useRef, useState, useEffect } from "react";
+import { useCartStore } from "@/store/cart";
+import { useProductsQuery } from "@/components/hooks/useProductsQuery";
+import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
+import { PlusIcon, CloseButtonIcon } from "@/components/Icons/Icons";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import s from "./CartModal.module.css";
@@ -19,11 +19,35 @@ export default function CartRecommendations() {
     slideTo: (i: number) => void;
   } | null>(null);
   const [recoPage, setRecoPage] = useState(0);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      if (typeof window === "undefined") return;
+      setIsMobile(window.innerWidth <= 1000);
+    };
+    checkMobile();
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", checkMobile);
+      return () => window.removeEventListener("resize", checkMobile);
+    }
+  }, []);
+
+  const productsList = products || [];
 
   return (
     <div className={s.recommendations}>
       <div className={s.recoHeader}>
         <div className={s.recoTitle}>Рекомендовані товари</div>
+        {isMobile === false && productsList.length > 1 && (
+          <SliderNav
+            activeIndex={recoPage}
+            dots={productsList.length}
+            onPrev={() => swiperRef.current?.slidePrev()}
+            onNext={() => swiperRef.current?.slideNext()}
+            onDotClick={(idx) => swiperRef.current?.slideTo(idx)}
+          />
+        )}
       </div>
       <div className={s.recoRow}>
         <Swiper
@@ -33,7 +57,7 @@ export default function CartRecommendations() {
           spaceBetween={8}
           className={s.recoSwiper}
         >
-          {(products || []).map((p) => (
+          {productsList.map((p) => (
             <SwiperSlide key={p.id} className={s.recoSlide}>
               <div className={s.recoItem}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -101,6 +125,8 @@ export default function CartRecommendations() {
             </SwiperSlide>
           ))}
         </Swiper>
+
+        {/* SliderNav тільки на десктопі: на мобільному свайп руками */}
       </div>
     </div>
   );

@@ -1,7 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import styles from "./TrainerProfile.module.css";
-// import SectionDivider from "../SectionDivider/SectionDivider";
 import PersonalDataSection from "./PersonalDataSection";
 import SuperpowerSection from "./SuperpowerSection";
 import TagsSection from "./TagsSection";
@@ -10,15 +9,17 @@ import type {
   TrainingLocation,
   WorkExperienceEntry,
 } from "./types";
-import { useUpdateTrainerProfile } from "../../../../lib/useMutation";
-import { useAuthStore } from "../../../../store/auth";
-import { useUserProfileQuery } from "../../../hooks/useUserProfileQuery";
-import { useQuery } from "@tanstack/react-query";
-import api from "../../../../lib/api";
+import { useUpdateTrainerProfile } from "@/lib/useMutation";
+import { useAuthStore } from "@/store/auth";
+import { useUserProfileQuery } from "@/components/hooks/useUserProfileQuery";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import api from "@/lib/api";
 import WorkExperienceSection from "./WorkExperienceSection";
 import TrainingLocationsSection from "./TrainingLocationsSection";
 import TrainingLocationModal from "./TrainingLocationModal";
 import CertificatesSection from "./CertificatesSection";
+import PersonalGallerySection from "./PersonalGallerySection";
+import { uploadCoachMedia } from "@/lib/bfbApi";
 
 const emptyExperience: WorkExperienceEntry = {
   gym: "",
@@ -29,10 +30,8 @@ const emptyExperience: WorkExperienceEntry = {
   description: "",
 };
 
-// Форматуємо дату для work_experience (формат MM/DD/YYYY)
 const formatWorkExperienceDate = (year: string, month: string) => {
   if (!year || !month) return "";
-  // Місяць має бути в форматі MM, рік YYYY
   const monthPadded = month.padStart(2, "0");
   return `${monthPadded}/01/${year}`;
 };
@@ -56,16 +55,8 @@ const TrainerProfile: React.FC = () => {
     location: "",
     desiredBoards: "",
     superpower: "",
-    favoriteExercises: [
-      "Ведення груп і персональних занять",
-      "Ведення груп і персональних занять",
-      "Ведення груп і персональних занять",
-    ],
-    specializations: [
-      "Розвиток усіх груп м'язів",
-      "Розвиток усіх груп м'язів",
-      "Розвиток усіх груп м'язів",
-    ],
+    favoriteExercises: [],
+    specializations: [],
     trainingLocations: [],
   });
 
@@ -75,12 +66,26 @@ const TrainerProfile: React.FC = () => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const { mutateAsync: updateProfile, isPending } = useUpdateTrainerProfile();
   const [certificateFiles, setCertificateFiles] = useState<File[]>([]);
+  const [personalGalleryFiles, setPersonalGalleryFiles] = useState<File[]>([]);
+  const [getGalleryUrlsFn, setGetGalleryUrlsFn] = useState<
+    (() => string[]) | null
+  >(null);
+  const [getGalleryFilesFn, setGetGalleryFilesFn] = useState<
+    (() => File[]) | null
+  >(null);
+  const [getCertificatesUrlsFn, setGetCertificatesUrlsFn] = useState<
+    (() => string[]) | null
+  >(null);
+  const [getCertificatesFilesFn, setGetCertificatesFilesFn] = useState<
+    (() => File[]) | null
+  >(null);
   const authUserId = useAuthStore((s) => s.user?.id);
 
   const [workExperienceDraft, setWorkExperienceDraft] =
     useState<WorkExperienceEntry>(emptyExperience);
   const [currentMeta, setCurrentMeta] = useState<Record<string, unknown>>({});
   const [certificateUrls, setCertificateUrls] = useState<string[]>([]);
+  const [personalGalleryUrls, setPersonalGalleryUrls] = useState<string[]>([]);
   const [personalErrors, setPersonalErrors] = useState<{
     position?: string;
     experience?: string;
@@ -88,22 +93,18 @@ const TrainerProfile: React.FC = () => {
     desiredBoards?: string;
   }>({});
 
-  // Використовуємо React Query для автоматичного оновлення даних після збереження
-  // Спочатку отримуємо базовий профіль для ID
+  const [forceUpdate, setForceUpdate] = useState(0);
   const { data: baseProfile } = useUserProfileQuery();
-
-  // Потім отримуємо повний профіль тренера з усіма meta полями через той самий endpoint, що використовує fetchTrainer
+  const queryClient = useQueryClient();
   const { data: profile, refetch: refetchProfile } = useQuery({
     queryKey: ["trainer-profile-full", baseProfile?.id, token],
     queryFn: async () => {
       if (!baseProfile?.id) return null;
       const id = String(baseProfile.id);
-      // Використовуємо токен поточного користувача для запиту його профілю
       const headers: Record<string, string> = {};
       if (token) {
         headers.Authorization = `Bearer ${token}`;
       }
-      // Використовуємо той самий endpoint, що і fetchTrainer, щоб отримати всі meta поля
       const response = await api.get("/api/proxy", {
         params: {
           path: `/wp-json/wp/v2/users/${id}?context=edit`,
@@ -116,75 +117,42 @@ const TrainerProfile: React.FC = () => {
     staleTime: 60_000,
   });
 
-  // Оновлюємо форму при зміні профілю з React Query (як в PersonalData)
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+
   useEffect(() => {
-    if (!profile) {
-      if (process.env.NODE_ENV !== "production") {
-        console.log("[TrainerProfile] useEffect: profile відсутній");
-      }
+    if (!isLoggedIn && !token) {
+      setFormData({
+        position: "",
+        experience: "",
+        location: "",
+        desiredBoards: "",
+        superpower: "",
+        favoriteExercises: [],
+        specializations: [],
+        trainingLocations: [],
+      });
+      setWorkExperienceDraft(emptyExperience);
+      setCertificateUrls([]);
+      setCurrentMeta({});
       return;
     }
+  }, [isLoggedIn, token]);
 
-    if (process.env.NODE_ENV !== "production") {
-      console.log("[TrainerProfile] useEffect: отримано profile:", {
-        id: profile.id,
-        hasMeta: !!profile.meta,
-        metaKeys: profile.meta
-          ? Object.keys(profile.meta as Record<string, unknown>)
-          : [],
-      });
-    }
+  useEffect(() => {
+    if (!profile) return;
 
     try {
       const rawData = profile as Record<string, unknown>;
       const meta = rawData.meta as Record<string, unknown> | undefined;
       const acf = rawData.acf as Record<string, unknown> | undefined;
 
-      if (process.env.NODE_ENV !== "production") {
-        console.log("[TrainerProfile] useEffect: rawData:", {
-          hasMeta: !!meta,
-          hasAcf: !!acf,
-          metaKeys: meta ? Object.keys(meta) : [],
-          acfKeys: acf ? Object.keys(acf) : [],
-        });
-        console.log("[TrainerProfile] useEffect: acf дані:", {
-          position: acf?.position || rawData.position,
-          experience: acf?.expierence || rawData.experience,
-          city: acf?.city || rawData.location_city,
-          boards: acf?.boards || rawData.boards,
-          super_power: acf?.super_power || rawData.super_power,
-          favourite_exercise:
-            acf?.favourite_exercise || rawData.favourite_exercise,
-          speciality: acf?.speciality || rawData.my_specialty,
-        });
-        console.log("[TrainerProfile] useEffect: повні acf дані:", acf);
-        console.log("[TrainerProfile] useEffect: повні rawData дані:", rawData);
-        const metaRecord = meta as Record<string, unknown> | undefined;
-        const rawDataMeta = rawData.meta as Record<string, unknown> | undefined;
-        console.log(
-          "[TrainerProfile] useEffect: детальна перевірка position:",
-          {
-            "acf?.position": acf?.position,
-            "rawData.position": rawData.position,
-            "meta?.input_text_position": metaRecord?.input_text_position,
-            "acf?.input_text_position": acf?.input_text_position,
-            "rawData.meta?.input_text_position":
-              rawDataMeta?.input_text_position,
-          }
-        );
-      }
-
-      // Зберігаємо поточні acf дані для об'єднання при збереженні
-      // Також зберігаємо my_wlocation з meta, якщо його немає в acf (бо це поле не змінювалося)
       const acfData = acf ? { ...acf } : {};
-      // Зберігаємо локації з meta, якщо вони є (вони не оновлюються через acf)
       if (meta?.my_wlocation && !acfData.my_wlocation) {
         acfData.my_wlocation = meta.my_wlocation;
       }
       if (meta?.hl_data_my_wlocation && !acfData.hl_data_my_wlocation) {
         acfData.hl_data_my_wlocation = meta.hl_data_my_wlocation;
       }
-      // Також зберігаємо локації з rawData, якщо вони є там
       if (
         rawData.my_wlocation &&
         Array.isArray(rawData.my_wlocation) &&
@@ -197,46 +165,33 @@ const TrainerProfile: React.FC = () => {
         setCurrentMeta(acfData as Record<string, unknown>);
       }
 
-      // Відновлюємо локації залів з hl_data_my_wlocation (перевіряємо rawData, acf та meta)
       let restoredLocations: TrainingLocation[] = [];
-
-      // Перевіряємо всі можливі джерела локацій
       let rawWlocation: unknown = undefined;
-
-      // Пріоритет 1: rawData.my_wlocation (перевіряємо, що це масив і він не порожній)
       if (
         rawData.my_wlocation &&
         Array.isArray(rawData.my_wlocation) &&
         rawData.my_wlocation.length > 0
       ) {
         rawWlocation = rawData.my_wlocation;
-      }
-      // Пріоритет 2: acf.my_wlocation
-      else if (
+      } else if (
         acf?.my_wlocation &&
         Array.isArray(acf.my_wlocation) &&
         acf.my_wlocation.length > 0
       ) {
         rawWlocation = acf.my_wlocation;
-      }
-      // Пріоритет 3: acf.hl_data_my_wlocation
-      else if (
+      } else if (
         acf?.hl_data_my_wlocation &&
         Array.isArray(acf.hl_data_my_wlocation) &&
         acf.hl_data_my_wlocation.length > 0
       ) {
         rawWlocation = acf.hl_data_my_wlocation;
-      }
-      // Пріоритет 4: meta.my_wlocation
-      else if (
+      } else if (
         meta?.my_wlocation &&
         Array.isArray(meta.my_wlocation) &&
         meta.my_wlocation.length > 0
       ) {
         rawWlocation = meta.my_wlocation;
-      }
-      // Пріоритет 5: meta.hl_data_my_wlocation
-      else if (
+      } else if (
         meta?.hl_data_my_wlocation &&
         Array.isArray(meta.hl_data_my_wlocation) &&
         meta.hl_data_my_wlocation.length > 0
@@ -244,43 +199,10 @@ const TrainerProfile: React.FC = () => {
         rawWlocation = meta.hl_data_my_wlocation;
       }
 
-      if (process.env.NODE_ENV !== "production") {
-        console.log("[TrainerProfile] Відновлення локацій:", {
-          hasRawDataMyWlocation: !!rawData.my_wlocation,
-          rawDataMyWlocationType: typeof rawData.my_wlocation,
-          rawDataMyWlocationIsArray: Array.isArray(rawData.my_wlocation),
-          rawDataMyWlocationValue: rawData.my_wlocation,
-          hasAcfMyWlocation: !!acf?.my_wlocation,
-          hasAcfHlDataMyWlocation: !!acf?.hl_data_my_wlocation,
-          hasMetaMyWlocation: !!meta?.my_wlocation,
-          hasMetaHlDataMyWlocation: !!meta?.hl_data_my_wlocation,
-          rawWlocation: rawWlocation,
-          rawWlocationType: typeof rawWlocation,
-          isArray: Array.isArray(rawWlocation),
-          length: Array.isArray(rawWlocation) ? rawWlocation.length : 0,
-        });
-      }
-
-      // Обробляємо rawWlocation якщо він є масивом
       if (Array.isArray(rawWlocation) && rawWlocation.length > 0) {
-        if (process.env.NODE_ENV !== "production") {
-          console.log(
-            "[TrainerProfile] Обробка локацій, кількість:",
-            rawWlocation.length
-          );
-        }
         restoredLocations = (
           rawWlocation as Array<Record<string, unknown>>
-        ).map((item, index) => {
-          if (process.env.NODE_ENV !== "production") {
-            console.log(`[TrainerProfile] Обробка локації ${index}:`, {
-              item: item,
-              title: item.hl_input_text_title,
-              phone: item.hl_input_text_phone,
-              email: item.hl_input_text_email,
-            });
-          }
-          // Формуємо координати з lat та lng, якщо вони є
+        ).map((item) => {
           let coordinates = "";
           const lat = item.hl_input_text_coord_lat as string | undefined;
           const lng = item.hl_input_text_coord_ln as string | undefined;
@@ -303,29 +225,8 @@ const TrainerProfile: React.FC = () => {
               : [],
           };
         });
-
-        if (process.env.NODE_ENV !== "production") {
-          console.log(
-            "[TrainerProfile] Відновлено локацій:",
-            restoredLocations.length,
-            restoredLocations
-          );
-        }
-      } else {
-        if (process.env.NODE_ENV !== "production") {
-          console.log(
-            "[TrainerProfile] rawWlocation не є масивом або порожній:",
-            {
-              rawWlocation,
-              isArray: Array.isArray(rawWlocation),
-              type: typeof rawWlocation,
-            }
-          );
-        }
       }
 
-      // Оновлюємо formData з даними з сервера (використовуємо acf як пріоритет)
-      // Обробляємо favourite_exercise та speciality з acf (масиви об'єктів з полями exercise/point)
       const favouriteExerciseArray = acf?.favourite_exercise as
         | Array<{ exercise?: string }>
         | undefined;
@@ -347,108 +248,95 @@ const TrainerProfile: React.FC = () => {
         : [];
 
       const newFormData = {
-        // Перевіряємо всі можливі джерела для position (як в utils.ts)
-        // Пріоритет: rawData.position (основне джерело) > meta.input_text_position > acf.position > acf.input_text_position
         position: (() => {
-          // Пріоритет 1: rawData.position (основне джерело, куди зберігається з meta.input_text_position)
           if (rawData.position && String(rawData.position).trim()) {
             return String(rawData.position).trim();
           }
-          // Пріоритет 2: meta.input_text_position (джерело для збереження)
           if (
             meta?.input_text_position &&
             String(meta.input_text_position).trim()
           ) {
             return String(meta.input_text_position).trim();
           }
-          // Пріоритет 3: acf.position (fallback, якщо є)
           if (acf?.position && String(acf.position).trim()) {
             return String(acf.position).trim();
           }
-          // Пріоритет 4: acf.input_text_position (fallback)
           if (
             acf?.input_text_position &&
             String(acf.input_text_position).trim()
           ) {
             return String(acf.input_text_position).trim();
           }
-          // Якщо нічого не знайдено, зберігаємо поточне значення з formData (щоб не втратити при refetch)
-          return (formData.position || "") as string;
+          return "";
         })(),
-        experience: (acf?.expierence || rawData.experience || "") as string, // Примітка: в acf може бути "expierence" (опечатка)
-        location: (acf?.city || rawData.location_city || "") as string,
+        experience: (acf?.expierence || rawData.experience || "") as string,
+        location: (() => {
+          const locationValue = (acf?.city ||
+            rawData.location_city ||
+            "") as string;
+          return locationValue.trim() === "" ? "" : locationValue;
+        })(),
         desiredBoards: (acf?.boards || rawData.boards || "") as string,
-        superpower: (acf?.super_power || rawData.super_power || "") as string,
+        superpower: (() => {
+          const superPowerValue = (acf?.super_power ||
+            rawData.super_power ||
+            "") as string;
+          return superPowerValue.trim() === "" ? "" : superPowerValue;
+        })(),
         favoriteExercises: favoriteExercises,
         specializations: specializations,
-        trainingLocations: restoredLocations, // Використовуємо відновлені локації
+        trainingLocations: restoredLocations,
       };
 
-      if (process.env.NODE_ENV !== "production") {
-        console.log(
-          "[TrainerProfile] newFormData.trainingLocations перед setFormData:",
-          {
-            count: newFormData.trainingLocations.length,
-            locations: newFormData.trainingLocations,
-          }
-        );
+      const hasChanged =
+        formData.position !== newFormData.position ||
+        formData.experience !== newFormData.experience ||
+        formData.location !== newFormData.location ||
+        formData.desiredBoards !== newFormData.desiredBoards ||
+        formData.superpower !== newFormData.superpower ||
+        JSON.stringify(formData.favoriteExercises) !==
+          JSON.stringify(newFormData.favoriteExercises) ||
+        JSON.stringify(formData.specializations) !==
+          JSON.stringify(newFormData.specializations) ||
+        JSON.stringify(formData.trainingLocations) !==
+          JSON.stringify(newFormData.trainingLocations);
+
+      if (!hasChanged && forceUpdate === 0) {
+        return;
       }
 
-      if (process.env.NODE_ENV !== "production") {
-        console.log("[TrainerProfile] useEffect: новий formData:", {
-          ...newFormData,
-          trainingLocationsCount: newFormData.trainingLocations.length,
-          trainingLocations: newFormData.trainingLocations.map((l) => ({
-            title: l.title,
-            phone: l.phone,
-            email: l.email,
-          })),
-        });
+      if (forceUpdate > 0) {
+        setForceUpdate(0);
       }
 
       setFormData(newFormData);
 
-      // Відновлюємо досвід роботи (перевіряємо acf.work_experience, rawData.my_experience, meta та acf.my_experience)
-      // Пріоритет 1: acf.work_experience (нова структура: {name, date_start, date_ended, description})
-      // Пріоритет 2: acf.my_experience (стара структура: {hl_input_text_gym, hl_input_date_date_start, ...})
-      // Пріоритет 3: rawData.my_experience
-      // Пріоритет 4: meta.my_experience
       let rawExperience: unknown = undefined;
-
-      // Перевіряємо acf.work_experience (нова структура)
       if (
         acf?.work_experience &&
         Array.isArray(acf.work_experience) &&
         acf.work_experience.length > 0
       ) {
         rawExperience = acf.work_experience;
-      }
-      // Перевіряємо acf.my_experience (стара структура)
-      else if (
+      } else if (
         acf?.my_experience &&
         Array.isArray(acf.my_experience) &&
         acf.my_experience.length > 0
       ) {
         rawExperience = acf.my_experience;
-      }
-      // Перевіряємо rawData.my_experience
-      else if (
+      } else if (
         rawData.my_experience &&
         Array.isArray(rawData.my_experience) &&
         rawData.my_experience.length > 0
       ) {
         rawExperience = rawData.my_experience;
-      }
-      // Перевіряємо meta.my_experience
-      else if (
+      } else if (
         meta?.my_experience &&
         Array.isArray(meta.my_experience) &&
         meta.my_experience.length > 0
       ) {
         rawExperience = meta.my_experience;
-      }
-      // Перевіряємо meta.hl_data_my_experience
-      else if (
+      } else if (
         meta?.hl_data_my_experience &&
         Array.isArray(meta.hl_data_my_experience) &&
         meta.hl_data_my_experience.length > 0
@@ -456,31 +344,14 @@ const TrainerProfile: React.FC = () => {
         rawExperience = meta.hl_data_my_experience;
       }
 
-      if (process.env.NODE_ENV !== "production") {
-        console.log("[TrainerProfile] Відновлення досвіду роботи:", {
-          hasAcfWorkExperience: !!acf?.work_experience,
-          hasAcfMyExperience: !!acf?.my_experience,
-          hasRawDataMyExperience: !!rawData.my_experience,
-          hasMetaMyExperience: !!meta?.my_experience,
-          hasMetaHlDataMyExperience: !!meta?.hl_data_my_experience,
-          rawExperience: rawExperience,
-          isArray: Array.isArray(rawExperience),
-          length: Array.isArray(rawExperience) ? rawExperience.length : 0,
-        });
-      }
-
       if (Array.isArray(rawExperience) && rawExperience.length) {
         const first = rawExperience[0] as Record<string, unknown>;
-
-        // Перевіряємо, яка структура: нова (work_experience) чи стара (my_experience)
         const isNewStructure =
           first.name !== undefined || first.date_start !== undefined;
 
         let experienceData: WorkExperienceEntry;
 
         if (isNewStructure) {
-          // Нова структура: {name, date_start, date_ended, description}
-          // Парсимо дати з формату "MM/DD/YYYY"
           const parseNewDate = (dateStr: string | undefined) => {
             if (!dateStr) return { month: "", year: "" };
             const parts = (dateStr as string).split("/");
@@ -502,7 +373,6 @@ const TrainerProfile: React.FC = () => {
             description: (first.description as string) || "",
           };
         } else {
-          // Стара структура: {hl_input_text_gym, hl_input_date_date_start, hl_input_date_date_end, hl_textarea_ex_description}
           const start = parseExperienceDate(
             first.hl_input_date_date_start as string | undefined
           );
@@ -520,37 +390,147 @@ const TrainerProfile: React.FC = () => {
           };
         }
 
-        if (process.env.NODE_ENV !== "production") {
-          console.log(
-            "[TrainerProfile] Встановлюємо workExperienceDraft:",
-            experienceData
-          );
-        }
         setWorkExperienceDraft(experienceData);
       } else {
-        if (process.env.NODE_ENV !== "production") {
-          console.log(
-            "[TrainerProfile] Досвід роботи не знайдено, встановлюємо emptyExperience"
-          );
-        }
         setWorkExperienceDraft(emptyExperience);
       }
 
-      // Відновлюємо сертифікати з профілю (тільки з поля certificate)
-      const rawCertificates = meta?.certificate || rawData.certificate;
+      // Отримуємо сертифікати з різних полів
+      const rawCertificates =
+        meta?.img_link_data_certificate_ ||
+        meta?.certificate ||
+        rawData.img_link_data_certificate_ ||
+        rawData.certificate;
 
+      // Обробляємо сертифікати (можуть бути масивом або рядком)
       if (Array.isArray(rawCertificates) && rawCertificates.length > 0) {
         const certUrls = rawCertificates.filter(
           (url): url is string => typeof url === "string" && url.length > 0
         );
         setCertificateUrls(certUrls);
+      } else if (
+        typeof rawCertificates === "string" &&
+        rawCertificates.length > 0
+      ) {
+        // Якщо це рядок, перевіряємо чи це JSON
+        try {
+          const trimmed = rawCertificates.trim();
+          if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
+            const parsed = JSON.parse(trimmed);
+            if (Array.isArray(parsed)) {
+              const urls = parsed.filter(
+                (url): url is string =>
+                  typeof url === "string" && url.length > 0
+              );
+              setCertificateUrls(urls);
+            } else {
+              setCertificateUrls([trimmed]);
+            }
+          } else {
+            setCertificateUrls([trimmed]);
+          }
+        } catch {
+          setCertificateUrls([rawCertificates]);
+        }
       } else {
         setCertificateUrls([]);
       }
+
+      const rawGallery =
+        (rawData as Record<string, unknown>).gallery ||
+        ((rawData as Record<string, unknown>).meta &&
+          ((rawData as Record<string, unknown>).meta as Record<string, unknown>)
+            ?.gallery) ||
+        ((rawData as Record<string, unknown>).meta &&
+          ((rawData as Record<string, unknown>).meta as Record<string, unknown>)
+            ?.img_link_data_gallery_) ||
+        ((rawData as Record<string, unknown>).acf &&
+          ((rawData as Record<string, unknown>).acf as Record<string, unknown>)
+            ?.gallery) ||
+        ((rawData as Record<string, unknown>).acf &&
+          ((rawData as Record<string, unknown>).acf as Record<string, unknown>)
+            ?.img_link_data_gallery_) ||
+        meta?.gallery ||
+        meta?.img_link_data_gallery_ ||
+        (rawData as Record<string, unknown>).personal_gallery ||
+        meta?.personal_gallery;
+
+      if (process.env.NODE_ENV !== "production") {
+        console.log("[TrainerProfile] Завантаження галереї:", {
+          rawGallery,
+          gallery: (rawData as Record<string, unknown>).gallery,
+          metaGallery: meta?.gallery,
+          metaImgLink: meta?.img_link_data_gallery_,
+        });
+      }
+
+      if (Array.isArray(rawGallery) && rawGallery.length > 0) {
+        const galleryUrls = rawGallery
+          .map((item) => {
+            if (typeof item === "string") {
+              // Перевіряємо, чи це JSON-рядок
+              try {
+                const trimmed = item.trim();
+                if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
+                  const parsed = JSON.parse(trimmed);
+                  if (Array.isArray(parsed)) {
+                    return parsed.filter(
+                      (url): url is string => typeof url === "string"
+                    );
+                  }
+                  return null;
+                }
+                return trimmed;
+              } catch {
+                return item;
+              }
+            }
+            if (typeof item === "object" && item !== null && "url" in item) {
+              return (item as { url: string }).url;
+            }
+            return null;
+          })
+          .flat()
+          .filter(
+            (url): url is string => typeof url === "string" && url.length > 0
+          );
+
+        if (process.env.NODE_ENV !== "production") {
+          console.log(
+            "[TrainerProfile] Встановлення personalGalleryUrls:",
+            galleryUrls
+          );
+        }
+
+        setPersonalGalleryUrls(galleryUrls);
+      } else if (typeof rawGallery === "string" && rawGallery.length > 0) {
+        // Перевіряємо, чи це JSON-рядок
+        try {
+          const trimmed = rawGallery.trim();
+          if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
+            const parsed = JSON.parse(trimmed);
+            if (Array.isArray(parsed)) {
+              const urls = parsed.filter(
+                (url): url is string =>
+                  typeof url === "string" && url.length > 0
+              );
+              setPersonalGalleryUrls(urls);
+            } else {
+              setPersonalGalleryUrls([trimmed]);
+            }
+          } else {
+            setPersonalGalleryUrls([trimmed]);
+          }
+        } catch {
+          setPersonalGalleryUrls([rawGallery]);
+        }
+      } else {
+        setPersonalGalleryUrls([]);
+      }
     } catch (e) {
-      console.warn("[TrainerProfile] Не вдалося завантажити профіль:", e);
+      // Помилка завантаження профілю
     }
-  }, [profile]);
+  }, [profile, forceUpdate]);
 
   const handleInputChange = (
     field: keyof TrainerProfileForm,
@@ -607,8 +587,32 @@ const TrainerProfile: React.FC = () => {
     }));
   };
 
+  const handleReset = async () => {
+    setFormData({
+      position: "",
+      experience: "",
+      location: "",
+      desiredBoards: "",
+      superpower: "",
+      favoriteExercises: [],
+      specializations: [],
+      trainingLocations: [],
+    });
+
+    setPersonalErrors({});
+    setEditingIndex(null);
+    setWorkExperienceDraft(emptyExperience);
+    setNewFavoriteExercise("");
+    setNewSpecialization("");
+    setForceUpdate((prev) => prev + 1);
+
+    await queryClient.invalidateQueries({
+      queryKey: ["trainer-profile-full", baseProfile?.id, token],
+    });
+    await refetchProfile();
+  };
+
   const handleSave = async () => {
-    // Валідація особистих даних
     const nextErrors: typeof personalErrors = {};
     if (!formData.position.trim()) {
       nextErrors.position = "Поле обов'язкове";
@@ -627,7 +631,6 @@ const TrainerProfile: React.FC = () => {
       return;
     }
 
-    // Використовуємо токен з useAuthStore (як в інших компонентах)
     const authToken =
       token ||
       (typeof window !== "undefined"
@@ -636,61 +639,30 @@ const TrainerProfile: React.FC = () => {
           undefined
         : undefined);
 
-    if (process.env.NODE_ENV !== "production") {
-      console.log("[TrainerProfile] Токен для збереження:", {
-        fromStore: !!token,
-        fromLocalStorage: !!(
-          typeof window !== "undefined" &&
-          (localStorage.getItem("wp_jwt_override") ||
-            localStorage.getItem("wp_jwt"))
-        ),
-        hasToken: !!authToken,
-      });
-    }
-
-    // Починаємо з поточних acf даних, щоб не втратити існуючі поля
-    // Виключаємо з оновлення: Аватар, Місце проведення тренувань, Сертифікати, Галерея
     const acf: Record<string, unknown> = { ...currentMeta };
 
-    // Видаляємо поля, які не повинні оновлюватися
     delete acf.avatar;
     delete acf.my_wlocation;
     delete acf.hl_data_my_wlocation;
     delete acf.certificate;
     delete acf.gallery;
 
-    if (process.env.NODE_ENV !== "production") {
-      console.group("[TrainerProfile] handleSave");
-      console.log("certificateFiles:", certificateFiles);
-      console.log("certificateFiles.length:", certificateFiles.length);
-      console.log("formData.trainingLocations:", formData.trainingLocations);
-      console.log("formData.desiredBoards:", formData.desiredBoards);
-      console.log("formData.position:", formData.position);
-      console.log("Поточні meta дані:", currentMeta);
-    }
-
-    // Оновлюємо тільки змінені поля в форматі acf
-    // Примітка: position зберігається в meta.input_text_position, а не в acf.position
-    // Тому ми не додаємо його в acf, а збережемо окремо в meta
     if (formData.experience !== undefined) {
-      acf.expierence = formData.experience || ""; // Примітка: в acf може бути "expierence" (опечатка)
+      acf.expierence = formData.experience || "";
     }
     if (formData.location !== undefined) {
       acf.city = formData.location || "";
     }
     if (formData.desiredBoards !== undefined) {
       acf.boards = formData.desiredBoards || "";
-      if (process.env.NODE_ENV !== "production") {
-        console.log(
-          "[TrainerProfile] Зберігаємо boards:",
-          formData.desiredBoards
-        );
-      }
     }
     if (formData.superpower !== undefined) {
-      acf.super_power = formData.superpower || "";
+      if (formData.superpower.trim() === "") {
+        acf.super_power = "";
+      } else {
+        acf.super_power = formData.superpower;
+      }
     }
-    // favourite_exercise має бути масивом об'єктів з полем exercise
     if (formData.favoriteExercises && formData.favoriteExercises.length) {
       acf.favourite_exercise = formData.favoriteExercises.map((exercise) => ({
         exercise: exercise,
@@ -698,7 +670,6 @@ const TrainerProfile: React.FC = () => {
     } else {
       acf.favourite_exercise = [];
     }
-    // speciality має бути масивом об'єктів з полем point
     if (formData.specializations && formData.specializations.length) {
       acf.speciality = formData.specializations.map((point) => ({
         point: point,
@@ -706,27 +677,12 @@ const TrainerProfile: React.FC = () => {
     } else {
       acf.speciality = [];
     }
-    // Досвід роботи (my_experience) - зберігаємо в acf
     const hasExperienceDraft =
       workExperienceDraft.gym.trim() ||
       (workExperienceDraft.startMonth && workExperienceDraft.startYear) ||
       workExperienceDraft.description.trim();
 
-    if (process.env.NODE_ENV !== "production") {
-      console.log("[TrainerProfile] Збереження досвіду роботи:", {
-        workExperienceDraft,
-        hasExperienceDraft,
-        gym: workExperienceDraft.gym,
-        startMonth: workExperienceDraft.startMonth,
-        startYear: workExperienceDraft.startYear,
-        endMonth: workExperienceDraft.endMonth,
-        endYear: workExperienceDraft.endYear,
-        description: workExperienceDraft.description,
-      });
-    }
-
     if (hasExperienceDraft) {
-      // Зберігаємо в acf.work_experience (нова структура: {name, date_start, date_ended, description})
       const experienceData = {
         name: workExperienceDraft.gym,
         date_start: formatWorkExperienceDate(
@@ -740,43 +696,13 @@ const TrainerProfile: React.FC = () => {
         description: workExperienceDraft.description || "",
       };
 
-      if (process.env.NODE_ENV !== "production") {
-        console.log(
-          "[TrainerProfile] Зберігаємо досвід роботи в acf.work_experience:",
-          experienceData
-        );
-      }
-
       acf.work_experience = [experienceData];
     } else if (currentMeta.work_experience) {
-      // Якщо досвід не заповнений, але є в поточних даних, зберігаємо його
-      if (process.env.NODE_ENV !== "production") {
-        console.log(
-          "[TrainerProfile] Зберігаємо існуючий досвід з currentMeta.work_experience:",
-          currentMeta.work_experience
-        );
-      }
       acf.work_experience = currentMeta.work_experience;
     } else if (currentMeta.my_experience) {
-      // Fallback на стару структуру
-      if (process.env.NODE_ENV !== "production") {
-        console.log(
-          "[TrainerProfile] Зберігаємо існуючий досвід з currentMeta.my_experience:",
-          currentMeta.my_experience
-        );
-      }
       acf.my_experience = currentMeta.my_experience;
-    } else {
-      if (process.env.NODE_ENV !== "production") {
-        console.log("[TrainerProfile] Досвід роботи порожній, не зберігаємо");
-      }
     }
 
-    // Місце проведення тренувань (my_wlocation) - НЕ оновлюємо, виключено з оновлення
-    // Сертифікати (certificate) - НЕ оновлюємо, виключено з оновлення
-    // Галерея (gallery) - НЕ оновлюємо, виключено з оновлення
-
-    // Отримуємо ID з профілю (як в PersonalData)
     const numericOrServerId = (profile as unknown as { id?: number | string })
       ?.id;
     const targetId = String(numericOrServerId ?? authUserId ?? "");
@@ -786,23 +712,9 @@ const TrainerProfile: React.FC = () => {
     };
     if (targetId) payload.id = targetId;
 
-    if (process.env.NODE_ENV !== "production") {
-      console.log(
-        "[TrainerProfile] Фінальний payload:",
-        JSON.stringify(payload, null, 2)
-      );
-      console.log("[TrainerProfile] acf keys:", Object.keys(acf));
-    }
-
-    // Submitting payload
     try {
       await updateProfile({ payload, token: authToken });
-      if (process.env.NODE_ENV !== "production") {
-        console.log("[TrainerProfile] Профіль оновлено, оновлюємо дані...");
-      }
 
-      // Зберігаємо локації та position разом в meta (щоб не втратити одне при збереженні іншого)
-      // Зберігаємо завжди, навіть якщо масив порожній (щоб очистити старі дані)
       try {
         const locationsPayload = (formData.trainingLocations || []).map(
           (loc) => {
@@ -826,8 +738,6 @@ const TrainerProfile: React.FC = () => {
           }
         );
 
-        // ВАРІАНТ 1: Перед PATCH витягувати свіжий профіль з бекенду (не з кешу, не зі стейту)
-        // ВАРІАНТ 2: Відправляти тільки змінені значення, НЕ весь meta
         let freshMeta: Record<string, unknown> = {};
         try {
           const freshProfileRes = await fetch(
@@ -844,28 +754,266 @@ const TrainerProfile: React.FC = () => {
           if (freshProfileRes.ok) {
             const freshProfile = await freshProfileRes.json();
             freshMeta = (freshProfile?.meta as Record<string, unknown>) || {};
+          }
+        } catch (error) {
+          // Помилка отримання свіжих даних
+        }
+
+        // Спочатку завантажуємо нові файли галереї на сервер (якщо є)
+        const filesToUpload = getGalleryFilesFn ? getGalleryFilesFn() : [];
+        let uploadedUrls: string[] = [];
+
+        if (filesToUpload.length > 0 && authToken) {
+          try {
             if (process.env.NODE_ENV !== "production") {
               console.log(
-                "[TrainerProfile] Отримано свіжі meta дані з бекенду:",
+                "[TrainerProfile] Завантаження нових файлів галереї:",
                 {
-                  metaKeys: Object.keys(freshMeta),
-                  hasPhone: !!freshMeta.input_text_social_phone,
-                  hasTelegram: !!freshMeta.input_text_social_telegram,
-                  hasInstagram: !!freshMeta.input_text_social_instagram,
+                  filesCount: filesToUpload.length,
                 }
               );
             }
+
+            // Завантажуємо файли послідовно
+            for (const file of filesToUpload) {
+              try {
+                const resp = await uploadCoachMedia({
+                  token: authToken,
+                  fieldType: "img_link_data_gallery_",
+                  files: [file],
+                });
+
+                if (resp?.success && resp.current_field_value) {
+                  let parsedValue: unknown = resp.current_field_value;
+                  if (typeof resp.current_field_value === "string") {
+                    try {
+                      const trimmed = resp.current_field_value.trim();
+                      if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
+                        parsedValue = JSON.parse(trimmed);
+                      } else {
+                        parsedValue = trimmed;
+                      }
+                    } catch {
+                      parsedValue = resp.current_field_value;
+                    }
+                  }
+
+                  const galleryUrls = Array.isArray(parsedValue)
+                    ? parsedValue.filter(
+                        (url): url is string =>
+                          typeof url === "string" && url.length > 0
+                      )
+                    : typeof parsedValue === "string" && parsedValue.length > 0
+                    ? [parsedValue]
+                    : [];
+
+                  // Оновлюємо uploadedUrls з останнім значенням з сервера
+                  uploadedUrls = galleryUrls;
+                }
+              } catch (error) {
+                if (process.env.NODE_ENV !== "production") {
+                  console.error(
+                    "[TrainerProfile] Помилка завантаження файлу:",
+                    file.name,
+                    error
+                  );
+                }
+              }
+            }
+          } catch (error) {
+            if (process.env.NODE_ENV !== "production") {
+              console.error(
+                "[TrainerProfile] Помилка завантаження файлів галереї:",
+                error
+              );
+            }
           }
-        } catch (error) {
-          console.error(
-            "[TrainerProfile] Помилка отримання свіжих даних:",
-            error
-          );
         }
 
-        // Відправляємо тільки змінені поля + зберігаємо важливі поля з іншого компонента
+        // Завантажуємо нові файли сертифікатів на сервер (якщо є)
+        const certificatesFilesToUpload = getCertificatesFilesFn
+          ? getCertificatesFilesFn()
+          : [];
+        let uploadedCertificatesUrls: string[] = [];
+
+        if (certificatesFilesToUpload.length > 0 && authToken) {
+          try {
+            if (process.env.NODE_ENV !== "production") {
+              console.log(
+                "[TrainerProfile] Завантаження нових файлів сертифікатів:",
+                {
+                  filesCount: certificatesFilesToUpload.length,
+                }
+              );
+            }
+
+            // Завантажуємо файли послідовно
+            for (const file of certificatesFilesToUpload) {
+              try {
+                const resp = await uploadCoachMedia({
+                  token: authToken,
+                  fieldType: "img_link_data_certificate_",
+                  files: [file],
+                });
+
+                if (resp?.success && resp.current_field_value) {
+                  let parsedValue: unknown = resp.current_field_value;
+                  if (typeof resp.current_field_value === "string") {
+                    try {
+                      const trimmed = resp.current_field_value.trim();
+                      if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
+                        parsedValue = JSON.parse(trimmed);
+                      } else {
+                        parsedValue = trimmed;
+                      }
+                    } catch {
+                      parsedValue = resp.current_field_value;
+                    }
+                  }
+
+                  const certificateUrls = Array.isArray(parsedValue)
+                    ? parsedValue.filter(
+                        (url): url is string =>
+                          typeof url === "string" && url.length > 0
+                      )
+                    : typeof parsedValue === "string" && parsedValue.length > 0
+                    ? [parsedValue]
+                    : [];
+
+                  // Оновлюємо uploadedCertificatesUrls з останнім значенням з сервера
+                  uploadedCertificatesUrls = certificateUrls;
+                }
+              } catch (error) {
+                if (process.env.NODE_ENV !== "production") {
+                  console.error(
+                    "[TrainerProfile] Помилка завантаження файлу сертифіката:",
+                    file.name,
+                    error
+                  );
+                }
+              }
+            }
+          } catch (error) {
+            if (process.env.NODE_ENV !== "production") {
+              console.error(
+                "[TrainerProfile] Помилка завантаження файлів сертифікатів:",
+                error
+              );
+            }
+          }
+        }
+
+        // Отримуємо поточний стан галереї з PersonalGallerySection (з урахуванням видалених фото)
+        const currentGalleryFromState = getGalleryUrlsFn
+          ? getGalleryUrlsFn()
+          : [];
+
+        // Отримуємо поточний стан сертифікатів з CertificatesSection (з урахуванням видалених сертифікатів)
+        const currentCertificatesFromState = getCertificatesUrlsFn
+          ? getCertificatesUrlsFn()
+          : [];
+
+        // Формуємо фінальний масив галереї:
+        // 1. Беремо currentGalleryFromState як основу (вона вже містить видалені фото)
+        // 2. Якщо були завантажені нові файли, додаємо їх з uploadedUrls
+        let galleryUrls: string[] = [];
+
+        if (uploadedUrls.length > 0) {
+          // Якщо були завантажені нові файли:
+          // uploadedUrls містить всі фото з сервера після завантаження (включаючи нові)
+          // currentGalleryFromState містить тільки ті фото, які не були видалені локально
+          // Потрібно: взяти uploadedUrls і залишити тільки ті, що є в currentGalleryFromState + нові завантажені
+          const currentUrlsSet = new Set(currentGalleryFromState);
+
+          // Фільтруємо uploadedUrls: залишаємо тільки ті, що є в currentGalleryFromState (не видалені)
+          const existingUrls = uploadedUrls.filter((url) =>
+            currentUrlsSet.has(url)
+          );
+
+          // Знаходимо нові завантажені файли (ті, що в uploadedUrls, але не в currentGalleryFromState)
+          const newUploadedUrls = uploadedUrls.filter(
+            (url) => !currentUrlsSet.has(url)
+          );
+
+          // Об'єднуємо: існуючі (не видалені) + нові завантажені
+          galleryUrls = [...existingUrls, ...newUploadedUrls];
+        } else {
+          // Якщо нових файлів не було, використовуємо поточний стан (з урахуванням видалених)
+          const currentGalleryValue =
+            freshMeta.img_link_data_gallery_ || freshMeta.gallery;
+          galleryUrls =
+            currentGalleryFromState.length > 0
+              ? currentGalleryFromState
+              : personalGalleryUrls.length > 0
+              ? personalGalleryUrls
+              : Array.isArray(currentGalleryValue)
+              ? currentGalleryValue.filter(
+                  (url): url is string => typeof url === "string"
+                )
+              : typeof currentGalleryValue === "string"
+              ? [currentGalleryValue]
+              : [];
+        }
+
+        if (process.env.NODE_ENV !== "production") {
+          console.log("[TrainerProfile] Збереження галереї:", {
+            uploadedUrlsCount: uploadedUrls.length,
+            currentGalleryFromStateCount: currentGalleryFromState.length,
+            finalGalleryUrlsCount: galleryUrls.length,
+            uploadedUrls,
+            currentGalleryFromState,
+            galleryUrls,
+          });
+        }
+
+        // Формуємо фінальний масив сертифікатів (аналогічно до галереї)
+        let certificatesUrls: string[] = [];
+
+        if (uploadedCertificatesUrls.length > 0) {
+          // Якщо були завантажені нові файли
+          const currentCertificatesSet = new Set(currentCertificatesFromState);
+          const existingCertificates = uploadedCertificatesUrls.filter((url) =>
+            currentCertificatesSet.has(url)
+          );
+          const newUploadedCertificates = uploadedCertificatesUrls.filter(
+            (url) => !currentCertificatesSet.has(url)
+          );
+          certificatesUrls = [
+            ...existingCertificates,
+            ...newUploadedCertificates,
+          ];
+        } else {
+          // Якщо нових файлів не було, використовуємо поточний стан (з урахуванням видалених)
+          const currentCertificatesValue =
+            freshMeta.img_link_data_certificate_ || freshMeta.certificate;
+          certificatesUrls =
+            currentCertificatesFromState.length > 0
+              ? currentCertificatesFromState
+              : certificateUrls.length > 0
+              ? certificateUrls
+              : Array.isArray(currentCertificatesValue)
+              ? currentCertificatesValue.filter(
+                  (url): url is string => typeof url === "string"
+                )
+              : typeof currentCertificatesValue === "string" &&
+                currentCertificatesValue.length > 0
+              ? [currentCertificatesValue]
+              : [];
+        }
+
+        if (process.env.NODE_ENV !== "production") {
+          console.log("[TrainerProfile] Збереження сертифікатів:", {
+            uploadedCertificatesUrlsCount: uploadedCertificatesUrls.length,
+            currentCertificatesFromStateCount:
+              currentCertificatesFromState.length,
+            finalCertificatesUrlsCount: certificatesUrls.length,
+            uploadedCertificatesUrls,
+            currentCertificatesFromState,
+            certificatesUrls,
+          });
+        }
+
         const metaToSave: Record<string, unknown> = {
-          // Зберігаємо важливі поля з PersonalData, якщо вони є в свіжих даних
           ...(freshMeta.input_text_social_phone !== undefined
             ? { input_text_social_phone: freshMeta.input_text_social_phone }
             : {}),
@@ -881,41 +1029,27 @@ const TrainerProfile: React.FC = () => {
                   freshMeta.input_text_social_instagram,
               }
             : {}),
-          // Відправляємо тільки змінені поля (локації та position)
           hl_data_my_wlocation: locationsPayload,
           ...(formData.position !== undefined
-            ? { input_text_position: formData.position || "" }
+            ? { input_text_position: formData.position.trim() || "" }
             : {}),
+          // Завжди відправляємо галерею (навіть якщо порожня), щоб зберегти зміни
+          img_link_data_gallery_: galleryUrls,
+          // Завжди відправляємо сертифікати (навіть якщо порожні), щоб зберегти зміни
+          // Якщо сертифікатів більше одного - відправляємо масив, інакше - рядок (для сумісності)
+          img_link_data_certificate_:
+            certificatesUrls.length > 1
+              ? certificatesUrls
+              : certificatesUrls.length === 1
+              ? certificatesUrls[0]
+              : "",
         };
-
-        if (process.env.NODE_ENV !== "production") {
-          console.log("[TrainerProfile] Відправляємо тільки змінені поля:", {
-            metaKeys: Object.keys(metaToSave),
-            locationsCount: locationsPayload.length,
-            hasPosition: formData.position !== undefined,
-            position: formData.position || "",
-          });
-        }
 
         const metaPayload = {
           id: targetId,
-          meta: metaToSave, // Відправляємо тільки змінені поля + важливі поля з іншого компонента
+          meta: metaToSave,
         };
 
-        if (process.env.NODE_ENV !== "production") {
-          console.log(
-            "[TrainerProfile] Зберігаємо локації та position в meta:",
-            {
-              ...metaPayload,
-              locationsCount: locationsPayload.length,
-              hasPosition: formData.position !== undefined,
-              position: formData.position || "",
-            }
-          );
-        }
-
-        // Використовуємо адмінський проксі для збереження meta полів (як для локацій)
-        // ВАЖЛИВО: використовуємо PATCH замість PUT, бо PUT може перезаписати всі поля
         const metaProxyUrl = `/api/proxy?path=${encodeURIComponent(
           `/wp-json/wp/v2/users/${targetId}`
         )}`;
@@ -923,89 +1057,25 @@ const TrainerProfile: React.FC = () => {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            "x-internal-admin": "1", // Дозволяє використовувати адмінський токен з cookie
+            "x-internal-admin": "1",
           },
           body: JSON.stringify(metaPayload),
         });
 
         if (!metaRes.ok) {
-          const errorText = await metaRes.text();
-          console.error(
-            "[TrainerProfile] Помилка збереження локацій та position:",
-            {
-              status: metaRes.status,
-              statusText: metaRes.statusText,
-              error: errorText,
-            }
-          );
-        } else {
-          if (process.env.NODE_ENV !== "production") {
-            console.log(
-              "[TrainerProfile] Локації та position збережено в meta:",
-              {
-                locationsCount: locationsPayload.length,
-                hasPosition: formData.position !== undefined,
-                position: formData.position || "",
-              }
-            );
-          }
+          // Помилка збереження локацій та position
         }
       } catch (metaError) {
-        console.error(
-          "[TrainerProfile] Помилка збереження локацій та position в meta:",
-          metaError
-        );
+        // Помилка збереження локацій та position в meta
       }
-      // Після збереження явно викликаємо refetch для оновлення даних
-      // (invalidateQueries може не оновити дані одразу через кеш)
-      // Чекаємо трохи, щоб сервер встиг обробити запит
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      const { data: refetchedData } = await refetchProfile();
-      if (process.env.NODE_ENV !== "production") {
-        const refetchedMeta = refetchedData?.meta as
-          | Record<string, unknown>
-          | undefined;
-        const refetchedRawData = refetchedData as
-          | Record<string, unknown>
-          | undefined;
-        console.log(
-          "[TrainerProfile] Дані оновлено після refetch:",
-          refetchedData
-            ? {
-                hasMeta: !!refetchedMeta,
-                metaKeys: refetchedMeta ? Object.keys(refetchedMeta) : [],
-                position:
-                  refetchedMeta?.input_text_position ||
-                  refetchedRawData?.input_text_position ||
-                  refetchedRawData?.position,
-                boards:
-                  refetchedMeta?.input_text_boards ||
-                  refetchedRawData?.input_text_boards,
-                fullMeta: refetchedMeta,
-                fullRawData: refetchedRawData,
-              }
-            : "no data"
-        );
-        console.log("[TrainerProfile] useEffect автоматично оновить форму");
-      }
-      // Profile updated
+      await refetchProfile();
     } catch (e) {
-      console.error("[TrainerProfile] Помилка оновлення профілю:", e);
-    } finally {
-      if (process.env.NODE_ENV !== "production") {
-        console.groupEnd();
-      }
+      // Помилка оновлення профілю
     }
   };
 
   const handleModalSave = (location: TrainingLocation) => {
-    if (process.env.NODE_ENV !== "production") {
-      console.log("[TrainerProfile] handleModalSave отримав локацію:", {
-        title: location.title,
-        photos: location.photos,
-        photosCount: location.photos?.length || 0,
-      });
-    }
     setFormData((prev) => {
       const current = [...(prev.trainingLocations || [])];
       if (
@@ -1016,16 +1086,6 @@ const TrainerProfile: React.FC = () => {
         current[editingIndex] = location;
       } else {
         current.push(location);
-      }
-      if (process.env.NODE_ENV !== "production") {
-        console.log(
-          "[TrainerProfile] Оновлені локації:",
-          current.map((l) => ({
-            title: l.title,
-            photos: l.photos,
-            photosCount: l.photos?.length || 0,
-          }))
-        );
       }
       return { ...prev, trainingLocations: current };
     });
@@ -1054,7 +1114,6 @@ const TrainerProfile: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  // Listen to edit/delete events from TrainingLocationsSection
   useEffect(() => {
     const handleEdit = (e: Event) => {
       const idx = (e as CustomEvent).detail?.index as number;
@@ -1121,7 +1180,6 @@ const TrainerProfile: React.FC = () => {
         <h2 className={styles.title}>Профіль тренера</h2>
       </div>
 
-      {/* <SectionDivider /> */}
       <div className={styles.divider1}></div>
 
       <div className={styles.form}>
@@ -1130,13 +1188,112 @@ const TrainerProfile: React.FC = () => {
           onChange={(field, value) => handleInputChange(field, value)}
           errors={personalErrors}
         />
-        {/* <SectionDivider /> */}
+        <div className={styles.divider}></div>
+        <PersonalGallerySection
+          onChange={setPersonalGalleryFiles}
+          initialImages={personalGalleryUrls}
+          userId={baseProfile?.id || authUserId}
+          onGetGalleryUrls={useCallback((fn: () => string[]) => {
+            setGetGalleryUrlsFn(() => fn);
+          }, [])}
+          onGetFiles={useCallback((fn: () => File[]) => {
+            setGetGalleryFilesFn(() => fn);
+          }, [])}
+          onUploadSuccess={async () => {
+            // Оновлюємо тільки галерею, не весь профіль, щоб не перезаписати інші поля
+            // Інвалідуємо кеш для оновлення галереї
+            await queryClient.invalidateQueries({
+              queryKey: ["trainer-profile-full", baseProfile?.id, token],
+            });
+            // Невелика затримка, щоб сервер встиг оновити дані
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            // Оновлюємо тільки галерею, не весь профіль
+            const updatedProfile = await refetchProfile();
+            if (updatedProfile.data) {
+              const rawData = updatedProfile.data as Record<string, unknown>;
+              const meta = rawData.meta as Record<string, unknown> | undefined;
+              const acf = rawData.acf as Record<string, unknown> | undefined;
+              const rawGallery =
+                rawData.gallery ||
+                (meta?.gallery as unknown) ||
+                (meta?.img_link_data_gallery_ as unknown) ||
+                (acf?.gallery as unknown) ||
+                (acf?.img_link_data_gallery_ as unknown) ||
+                (rawData as Record<string, unknown>).personal_gallery ||
+                (meta?.personal_gallery as unknown);
+
+              if (Array.isArray(rawGallery) && rawGallery.length > 0) {
+                const galleryUrls = rawGallery
+                  .map((item) => {
+                    if (typeof item === "string") {
+                      try {
+                        const trimmed = item.trim();
+                        if (
+                          trimmed.startsWith("[") ||
+                          trimmed.startsWith("{")
+                        ) {
+                          const parsed = JSON.parse(trimmed);
+                          if (Array.isArray(parsed)) {
+                            return parsed.filter(
+                              (url): url is string => typeof url === "string"
+                            );
+                          }
+                          return null;
+                        }
+                        return trimmed;
+                      } catch {
+                        return item;
+                      }
+                    }
+                    if (
+                      typeof item === "object" &&
+                      item !== null &&
+                      "url" in item
+                    ) {
+                      return (item as { url: string }).url;
+                    }
+                    return null;
+                  })
+                  .flat()
+                  .filter(
+                    (url): url is string =>
+                      typeof url === "string" && url.length > 0
+                  );
+                setPersonalGalleryUrls(galleryUrls);
+              } else if (
+                typeof rawGallery === "string" &&
+                rawGallery.length > 0
+              ) {
+                try {
+                  const trimmed = rawGallery.trim();
+                  if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
+                    const parsed = JSON.parse(trimmed);
+                    if (Array.isArray(parsed)) {
+                      const urls = parsed.filter(
+                        (url): url is string =>
+                          typeof url === "string" && url.length > 0
+                      );
+                      setPersonalGalleryUrls(urls);
+                    } else {
+                      setPersonalGalleryUrls([trimmed]);
+                    }
+                  } else {
+                    setPersonalGalleryUrls([trimmed]);
+                  }
+                } catch {
+                  setPersonalGalleryUrls([rawGallery]);
+                }
+              } else {
+                setPersonalGalleryUrls([]);
+              }
+            }
+          }}
+        />
         <div className={styles.divider}></div>
         <SuperpowerSection
           value={formData.superpower}
           onChange={(value) => handleInputChange("superpower", value)}
         />
-        {/* <SectionDivider /> */}
         <div className={styles.divider}></div>
         <TagsSection
           title="Моя улюблена вправа:"
@@ -1147,7 +1304,6 @@ const TrainerProfile: React.FC = () => {
           onAdd={handleAddFavoriteExercise}
           onRemove={handleRemoveFavoriteExercise}
         />
-        {/* <SectionDivider /> */}
         <div className={styles.divider}></div>
         <TagsSection
           title="Спеціалізація:"
@@ -1158,7 +1314,6 @@ const TrainerProfile: React.FC = () => {
           onAdd={handleAddSpecialization}
           onRemove={handleRemoveSpecialization}
         />
-        {/* <SectionDivider /> */}
         <div className={styles.divider}></div>
         <WorkExperienceSection
           value={workExperienceDraft}
@@ -1166,19 +1321,22 @@ const TrainerProfile: React.FC = () => {
             setWorkExperienceDraft((prev) => ({ ...prev, [field]: value }))
           }
         />
-        {/* <SectionDivider /> */}
         <div className={styles.divider}></div>
         <TrainingLocationsSection
           onAddClick={openModal}
           locations={formData.trainingLocations || []}
         />
-        {/* <SectionDivider /> */}
         <div className={styles.divider}></div>
         <CertificatesSection
           onChange={setCertificateFiles}
           initialCertificates={certificateUrls}
+          onGetCertificatesUrls={useCallback((fn: () => string[]) => {
+            setGetCertificatesUrlsFn(() => fn);
+          }, [])}
+          onGetCertificatesFiles={useCallback((fn: () => File[]) => {
+            setGetCertificatesFilesFn(() => fn);
+          }, [])}
         />
-        {/* Bottom Action Buttons */}
         <div className={styles.bottomActions}>
           <button
             className={styles.saveBtn}
@@ -1187,7 +1345,13 @@ const TrainerProfile: React.FC = () => {
           >
             Зберегти дані
           </button>
-          <button className={styles.clearBtn}>Стерти всю інформацію</button>
+          <button
+            className={styles.clearBtn}
+            onClick={handleReset}
+            disabled={isPending}
+          >
+            Стерти всю інформацію
+          </button>
         </div>
       </div>
 

@@ -1,15 +1,17 @@
 "use client";
 import React from "react";
 import styles from "./NavigationMenu.module.css";
-import { useAuthStore } from "../../../../store/auth";
+import { useAuthStore } from "@/store/auth";
 import { usePathname } from "next/navigation";
 import { navigationItems } from "./data";
 import NavigationLink from "./NavigationLink";
 import LogoutButton from "./LogoutButton";
+import { useQueryClient } from "@tanstack/react-query";
 
 const NavigationMenu: React.FC = () => {
   const pathname = usePathname();
   const logout = useAuthStore((s) => s.logout);
+  const queryClient = useQueryClient();
 
   return (
     <nav className={styles.navigationMenu}>
@@ -25,6 +27,8 @@ const NavigationMenu: React.FC = () => {
                 isActive={isActive}
                 onLogout={async () => {
                   try {
+                    // Очищаємо весь React Query кеш перед виходом
+                    queryClient.clear();
                     await logout();
                     window.location.href = "/";
                   } catch {}

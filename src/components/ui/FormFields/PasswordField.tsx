@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { EyeIcon, NoEyesIcon } from "../../Icons/Icons";
+import { EyeIcon, NoEyesIcon } from "@/components/Icons/Icons";
 import styles from "./PasswordField.module.css";
 
 interface PasswordFieldProps

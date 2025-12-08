@@ -1,7 +1,10 @@
 "use client";
 import React from "react";
-import { useFavoriteStore, selectIsFavorite } from "../../../store/favorites";
-import { Favorite2Icon, FavoriteBlacIcon } from "../../Icons/Icons";
+import { useFavoriteStore, selectIsFavorite } from "@/store/favorites";
+import {
+  Favorite2Icon,
+  FavoriteBlacIcon,
+} from "@/components/Icons/Icons";
 import s from "./FavoriteButton.module.css";
 
 type Props = {

@@ -6,7 +6,6 @@
   font-weight: 600;
   font-size: 12px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   text-align: right;
   color: var(--white);
   background: var(--style);
@@ -18,7 +17,6 @@
     font-size: mvw(6);
     border-radius: mvw(999);
     line-height: 120%;
-    letter-spacing: -0.01em;
   }
 }
 

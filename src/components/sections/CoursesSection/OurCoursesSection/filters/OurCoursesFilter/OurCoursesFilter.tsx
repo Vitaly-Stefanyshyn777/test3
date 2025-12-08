@@ -15,19 +15,19 @@ interface FilterState {
 }
 
 interface Product {
-  id: string;
-  name: string;
-  price: string;
-  regularPrice: string;
-  salePrice: string;
-  onSale: boolean;
-  image: string;
-  categories: Array<{
-    id: number;
+  id?: string;
+  name?: string;
+  price?: string;
+  regularPrice?: string;
+  salePrice?: string;
+  onSale?: boolean;
+  image?: string;
+  categories?: Array<{
+    id?: number;
     name: string;
-    slug: string;
+    slug?: string;
   }>;
-  stockStatus: string;
+  stockStatus?: string;
 }
 
 type OurCoursesFilterVariant = "default" | "modal";

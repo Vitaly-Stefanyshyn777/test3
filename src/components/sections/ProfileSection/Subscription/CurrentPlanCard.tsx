@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import styles from "./Subscription.module.css";
-import { СheckIcon } from "../../../Icons/Icons";
-import { useAuthStore } from "../../../../store/auth";
+import { СheckIcon } from "@/components/Icons/Icons";
+import { useAuthStore } from "@/store/auth";
 
 export default function CurrentPlanCard() {
   const [hasActivePlan, setHasActivePlan] = useState(false);

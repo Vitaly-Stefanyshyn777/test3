@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import styles from "./InstructingSlider.module.css";
-import SliderNav from "../../../ui/SliderNav/SliderNavActions";
-import { CloseButtonIcon } from "../../../Icons/Icons";
+import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
+import { CloseButtonIcon } from "@/components/Icons/Icons";
 
 interface InstructingSliderProps {
   images: string[];

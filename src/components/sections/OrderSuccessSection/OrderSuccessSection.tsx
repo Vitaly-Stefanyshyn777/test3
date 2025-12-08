@@ -1,41 +1,23 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useCartStore, selectCartTotal } from "../../../store/cart";
-import CheckoutHeader from "../../layout/CheckoutHeader/CheckoutHeader";
-import CheckoutFooter from "../../layout/CheckoutFooter/CheckoutFooter";
+import { useCartStore, selectCartTotal } from "@/store/cart";
+import CheckoutHeader from "@/components/layout/CheckoutHeader/CheckoutHeader";
+import CheckoutFooter from "@/components/layout/CheckoutFooter/CheckoutFooter";
 import OrderHeader from "./OrderHeader";
 import OrderHeaderSkeleton from "./OrderHeaderSkeleton";
 import OrderProducts from "./OrderProducts";
 import OrderDetails from "./OrderDetails";
 import OrderSummary from "./OrderSummary";
 import s from "./OrderSuccessSection.module.css";
-
-interface OrderData {
-  fullName: string;
-  lastName: string;
-  phone: string;
-  email: string;
-  hasDifferentRecipient: boolean;
-  recipientName?: string;
-  recipientLastName?: string;
-  recipientPhone?: string;
-  recipientEmail?: string;
-  deliveryType: string;
-  city: string;
-  branch: string;
-  house?: string;
-  building?: string;
-  apartment?: string;
-  paymentMethod: string;
-  comment: string;
-}
+import type { WooCommerceOrder } from "@/lib/bfbApi";
 
 export default function OrderSuccessSection() {
   const total = useCartStore(selectCartTotal);
   const itemsMap = useCartStore((st) => st.items);
   const items = Object.values(itemsMap);
-  const [orderData, setOrderData] = useState<OrderData | null>(null);
+  const [order, setOrder] = useState<WooCommerceOrder | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isHeaderSkeleton, setIsHeaderSkeleton] = useState(true);
 
   const safeTotal = total || 0;
@@ -54,67 +36,107 @@ export default function OrderSuccessSection() {
   );
 
   useEffect(() => {
-    const savedOrderData = localStorage.getItem("orderData");
-    if (savedOrderData) {
-      setOrderData(JSON.parse(savedOrderData));
-    }
+    const fetchOrder = async () => {
+      try {
+        // Спочатку перевіряємо URL параметр
+        const urlParams = new URLSearchParams(window.location.search);
+        let orderId = urlParams.get("orderId");
+        
+        // Якщо немає в URL, перевіряємо localStorage
+        if (!orderId) {
+          const savedOrderData = localStorage.getItem("orderData");
+          if (savedOrderData) {
+            const parsed = JSON.parse(savedOrderData);
+            orderId = parsed.orderId;
+          }
+        }
+        
+        if (orderId) {
+          const response = await fetch(`/api/wc/orders/${orderId}`);
+          if (response.ok) {
+            const orderData = await response.json();
+            setOrder(orderData);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch order:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchOrder();
   }, []);
 
-  const orderNumber = `№${Math.floor(Math.random() * 900000) + 100000}`;
+  const orderNumber = order?.number 
+    ? `№${order.number}` 
+    : order?.id 
+    ? `№${order.id}` 
+    : `№${Math.floor(Math.random() * 900000) + 100000}`;
 
-  const formattedDate = new Date().toLocaleDateString("uk-UA", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const formattedDate = order?.date_created
+    ? new Date(order.date_created).toLocaleDateString("uk-UA", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : new Date().toLocaleDateString("uk-UA", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
 
-  const deliveryCost = safeTotal >= 1999 ? 0 : 100;
-  const finalTotal = safeTotal - discount + deliveryCost;
+  const deliveryCost = order?.shipping_total
+    ? parseFloat(order.shipping_total)
+    : safeTotal >= 1999
+    ? 0
+    : 100;
+  
+  const orderTotal = order?.total ? parseFloat(order.total) : safeTotal;
+  const orderDiscount = order?.discount_total ? parseFloat(order.discount_total) : discount;
+  const finalTotal = orderTotal || safeTotal - discount + deliveryCost;
 
-  const firstNameRaw = orderData?.fullName?.trim() || "";
-  const lastNameRaw = orderData?.lastName?.trim() || "";
-  const phoneRaw = orderData?.phone?.trim() || "";
+  // Дані з замовлення
+  const firstNameRaw = order?.billing?.first_name?.trim() || "";
+  const lastNameRaw = order?.billing?.last_name?.trim() || "";
+  const phoneRaw = order?.billing?.phone?.trim() || "";
 
-  const deliveryType = orderData?.deliveryType || "branch";
-  const cityRaw = orderData?.city?.trim() || "";
-  const branchRaw = orderData?.branch?.trim() || "";
-  const houseRaw = orderData?.house?.trim() || "";
-  const buildingRaw = orderData?.building?.trim() || "";
-  const apartmentRaw = orderData?.apartment?.trim() || "";
+  const shipping = order?.shipping;
+  const cityRaw = shipping?.city?.trim() || "";
+  const address1Raw = shipping?.address_1?.trim() || "";
+  const address2Raw = shipping?.address_2?.trim() || "";
 
-  const paymentMethodDisplay = (orderData?.paymentMethod?.trim() || "").length
-    ? (orderData?.paymentMethod as string)
-    : "Не вказано";
+  const paymentMethodDisplay = order?.payment_method_title?.trim() || "Не вказано";
 
-  const recipientNameRaw = orderData?.recipientName?.trim() || "";
-  const recipientLastNameRaw = orderData?.recipientLastName?.trim() || "";
-  const recipientPhoneRaw = orderData?.recipientPhone?.trim() || "";
-
-  const deliveryAddressParts: string[] = [];
-  if (cityRaw) deliveryAddressParts.push(cityRaw);
-  if (deliveryType === "courier") {
-    if (houseRaw) deliveryAddressParts.push(`вул. ${houseRaw}`);
-    if (buildingRaw) deliveryAddressParts.push(`корп. ${buildingRaw}`);
-    if (apartmentRaw) deliveryAddressParts.push(`кв. ${apartmentRaw}`);
-  } else {
-    deliveryAddressParts.push(branchRaw || "Відділення не вказано");
-  }
-  const deliveryAddress = deliveryAddressParts.filter(Boolean).length
-    ? deliveryAddressParts.join(", ")
-    : "Адреса не вказана";
-
-  const hasAltRecipient = !!orderData?.hasDifferentRecipient;
-  const chosenFirstName = hasAltRecipient ? recipientNameRaw : firstNameRaw;
-  const chosenLastName = hasAltRecipient ? recipientLastNameRaw : lastNameRaw;
+  // Одержувач з shipping або billing
+  const recipientFirstName = shipping?.first_name?.trim() || firstNameRaw;
+  const recipientLastName = shipping?.last_name?.trim() || lastNameRaw;
   const recipientDisplay =
-    chosenFirstName || chosenLastName
-      ? `${chosenFirstName}${
-          chosenFirstName && chosenLastName ? " " : ""
-        }${chosenLastName}`
+    recipientFirstName || recipientLastName
+      ? `${recipientFirstName}${
+          recipientFirstName && recipientLastName ? " " : ""
+        }${recipientLastName}`
       : "Одержувач не вказаний";
 
-  const chosenPhone = hasAltRecipient ? recipientPhoneRaw : phoneRaw;
-  const phoneDisplay = chosenPhone.length ? chosenPhone : "Телефон не вказано";
+  const recipientPhone = shipping?.phone?.trim() || phoneRaw;
+  const phoneDisplay = recipientPhone.length ? recipientPhone : "Телефон не вказано";
+
+  // Адреса доставки
+  const deliveryAddressParts: string[] = [];
+  if (cityRaw) deliveryAddressParts.push(cityRaw);
+  if (address1Raw) {
+    // Перевіряємо, чи це відділення Нової Пошти або адреса
+    if (address1Raw.includes("Відділення") || address1Raw.includes("№")) {
+      deliveryAddressParts.push(address1Raw);
+    } else {
+      deliveryAddressParts.push(`вул. ${address1Raw}`);
+    }
+  }
+  if (address2Raw) deliveryAddressParts.push(address2Raw);
+  
+  const deliveryAddress = deliveryAddressParts.filter(Boolean).length
+    ? deliveryAddressParts.join(", ")
+    : "Відділення не вказано";
 
   useEffect(() => {
     const timer = setTimeout(() => setIsHeaderSkeleton(false), 300);
@@ -129,7 +151,7 @@ export default function OrderSuccessSection() {
           <div className={s.card}>
             {isHeaderSkeleton ? <OrderHeaderSkeleton /> : <OrderHeader />}
 
-            <OrderProducts orderNumber={orderNumber} />
+            <OrderProducts orderNumber={orderNumber} order={order} />
 
             <div className={s.productsBlock}>
               <OrderDetails
@@ -141,8 +163,8 @@ export default function OrderSuccessSection() {
               />
 
               <OrderSummary
-                safeTotal={safeTotal}
-                discount={discount}
+                safeTotal={orderTotal || safeTotal}
+                discount={orderDiscount || discount}
                 deliveryCost={deliveryCost}
                 finalTotal={finalTotal}
               />

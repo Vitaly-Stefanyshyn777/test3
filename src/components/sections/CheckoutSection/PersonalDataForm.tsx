@@ -2,7 +2,7 @@
 import React from "react";
 import { FormData } from "./types";
 import s from "./CheckoutSection.module.css";
-import SecondaryInput from "../../ui/FormFields/SecondaryInput";
+import SecondaryInput from "@/components/ui/FormFields/SecondaryInput";
 import secondaryInputStyles from "@/components/ui/FormFields/SecondaryInput.module.css";
 
 interface PersonalDataFormProps {

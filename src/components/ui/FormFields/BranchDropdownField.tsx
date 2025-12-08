@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./DropdownField.module.css";
-import { Check4Icon } from "../../Icons/Icons";
+import { Check4Icon } from "@/components/Icons/Icons";
 
 export interface BranchDropdownOption {
   value: string;
@@ -35,8 +35,7 @@ const BranchDropdownField: React.FC<BranchDropdownFieldProps> = ({
   onOpenChange,
 }) => {
   const [internalIsOpen, setInternalIsOpen] = useState(false);
-  const isOpen =
-    controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
+  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -135,3 +134,4 @@ const BranchDropdownField: React.FC<BranchDropdownFieldProps> = ({
 };
 
 export default BranchDropdownField;
+

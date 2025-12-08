@@ -2,6 +2,7 @@
 import React from "react";
 import styles from "./TrainersGrid.module.css";
 import TrainerCard from "../TrainerCard/TrainerCard";
+import EmptyState from "@/components/ui/EmptyState";
 
 interface Trainer {
   id: string;
@@ -16,6 +17,10 @@ interface TrainersGridProps {
 }
 
 const TrainersGrid = ({ trainers }: TrainersGridProps) => {
+  if (trainers.length === 0) {
+    return <EmptyState variant="instructors" />;
+  }
+
   return (
     <div className={styles.trainersGridContainer}>
       <div className={styles.trainersGrid}>

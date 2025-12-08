@@ -8,8 +8,8 @@ import {
   CloseButtonIcon,
   NovaPoshtaIcon,
   Dandruff2Icon,
-} from "../../../Icons/Icons";
-import { useScrollLock } from "../../../hooks/useScrollLock";
+} from "@/components/Icons/Icons";
+import { useScrollLock } from "@/components/hooks/useScrollLock";
 
 // Додаємо типи для Google Maps
 declare global {

@@ -23,6 +23,7 @@
   flex-direction: column;
   border-radius: 20px;
   padding: 52px;
+  min-width: 600px;
 }
 .topbarListBlock {
   display: flex;
@@ -41,7 +42,6 @@
   font-weight: 500;
   font-size: 36px;
   line-height: 110%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 .close {
@@ -60,6 +60,23 @@
     width: 14px;
     height: 14px;
   }
+}
+.close:hover {
+  background-color: var(--violet);
+  color: var(--white);
+}
+.desktopSliderWrap {
+  width: 100%;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+}
+
+.desktopGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 332px);
+  justify-content: center;
+  gap: 20px;
 }
 .list {
   overflow: auto;
@@ -131,7 +148,6 @@
 .secondary:hover {
   color: var(--white);
   background: var(--black);
-  border: 2px solid var(--black);
 }
 .remove {
   color: var(--violet);
@@ -153,6 +169,7 @@
 .empty {
   padding: 24px;
   text-align: center;
+  color: var(--black);
 }
 
 .footer {
@@ -192,7 +209,8 @@
 @media (max-width: 1000px) {
   .backdrop {
     padding: 0;
-    align-items: flex-end;
+    /* На мобільному центруємо модалку по вертикалі */
+    align-items: center;
     z-index: 1000;
   }
 
@@ -294,12 +312,14 @@
   .actionsRow {
     flex-direction: column;
     gap: mvw(16);
+    align-items: center;
   }
 
   .buttonsWrap {
     flex-direction: column;
     gap: mvw(12);
     width: 100%;
+    align-items: center;
   }
 
   .secondary {
@@ -320,7 +340,7 @@
 
   .navWrap {
     width: 100%;
-    /* justify-content: center; */
+    justify-content: center;
   }
 
   .empty {

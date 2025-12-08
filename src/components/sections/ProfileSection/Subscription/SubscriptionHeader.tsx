@@ -2,7 +2,7 @@
 
 import React from "react";
 import styles from "./Subscription.module.css";
-import { RightArrowIcon } from "../../../Icons/Icons";
+import { RightArrowIcon } from "@/components/Icons/Icons";
 
 export default function SubscriptionHeader() {
   return (

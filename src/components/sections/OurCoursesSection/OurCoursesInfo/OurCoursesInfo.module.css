@@ -50,7 +50,6 @@
   font-size: 14px;
   width: fit-content;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .title {
@@ -116,7 +115,6 @@
   font-weight: 600;
   font-size: 14px;
   text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 .features {

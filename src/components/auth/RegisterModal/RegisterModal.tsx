@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { useRegister } from "../../../lib/useMutation";
+import { useRegister } from "@/lib/useMutation";
 import { useScrollLock } from "../../hooks/useScrollLock";
 import { useRegisterResult } from "./useRegisterResult";
 import RegisterModalHeader from "./RegisterModalHeader";

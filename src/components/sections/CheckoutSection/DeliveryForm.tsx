@@ -1,15 +1,15 @@
 "use client";
 import React, { useState } from "react";
-import { NovaPoshtaIcon } from "../../Icons/Icons";
+import { NovaPoshtaIcon } from "@/components/Icons/Icons";
 import { FormData } from "./types";
 import s from "./CheckoutSection.module.css";
 import DropdownField, {
   DropdownOption,
-} from "../../ui/FormFields/DropdownField";
+} from "@/components/ui/FormFields/DropdownField";
 import BranchDropdownField, {
   BranchDropdownOption,
-} from "../../ui/FormFields/BranchDropdownField";
-import SecondaryInput from "../../ui/FormFields/SecondaryInput";
+} from "@/components/ui/FormFields/BranchDropdownField";
+import SecondaryInput from "@/components/ui/FormFields/SecondaryInput";
 import secondaryInputStyles from "@/components/ui/FormFields/SecondaryInput.module.css";
 
 interface DeliveryFormProps {

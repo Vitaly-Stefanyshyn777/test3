@@ -31,6 +31,7 @@ interface ProductCardProps {
   categories?: Array<{ id: number; name: string; slug: string }>; // Категорії продукту
   stockStatus?: string;
   dateCreated?: string; // Дата створення продукту
+  sku?: string; // Код товару (SKU)
   // WooCommerce v3 API data
   wcProduct?: {
     id: number;
@@ -44,6 +45,7 @@ interface ProductCardProps {
     regular_price: string;
     sale_price: string;
     images: Array<{ src: string; alt: string }>;
+    sku?: string;
   };
   // All products for top 10 calculation
   allProducts?: Array<{ total_sales?: number }>;
@@ -64,6 +66,7 @@ const ProductCard = ({
   image,
   categories,
   dateCreated,
+  sku,
   wcProduct,
   allProducts,
   isNoCertificationFilter = false,
@@ -83,6 +86,17 @@ const ProductCard = ({
   const imageUrl = normalizeImageUrl(
     wcProduct?.images?.[0]?.src || image
   );
+  
+  // Обробка помилок завантаження зображення
+  const [imageError, setImageError] = React.useState(false);
+  const handleImageError = () => {
+    setImageError(true);
+  };
+  
+  // Скидаємо помилку при зміні зображення
+  React.useEffect(() => {
+    setImageError(false);
+  }, [imageUrl]);
 
   const handleCartClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -90,7 +104,13 @@ const ProductCard = ({
     if (isInCart) {
       removeItem(id);
     } else {
-      addItem({ id, name, price: price || 0, image: imageUrl }, 1);
+      addItem({ 
+        id, 
+        name, 
+        price: price || 0, 
+        image: imageUrl,
+        sku: sku || wcProduct?.sku,
+      }, 1);
     }
   };
 
@@ -262,19 +282,32 @@ const ProductCard = ({
   const shouldShowDisabledButton =
     hasNoCertification || isNoCertificationFilter;
 
+  // Визначаємо правильний URL для переходу
+  const getHref = () => {
+    if (slug) {
+      // Якщо slug вже містить повний шлях (наприклад, /courses/123), використовуємо його
+      if (slug.startsWith("/")) {
+        return slug;
+      }
+      return `/products/${slug}`;
+    }
+    return `/products/${id}`;
+  };
+
   return (
     <Link
-      href={`/products/${slug || id}`}
+      href={getHref()}
       className={`${styles.productCard} ${isFluid ? styles.productCardFluid : ""}`}
       data-category={hasNoCertification ? "78" : undefined}
     >
       <div className={styles.cardImage}>
         <Image
-          src={imageUrl}
+          src={imageError ? "/placeholder.svg" : imageUrl}
           alt={name || "Товар без назви"}
           width={280}
           height={280}
           className={styles.productImage}
+          onError={handleImageError}
         />
 
         <BadgeContainer>

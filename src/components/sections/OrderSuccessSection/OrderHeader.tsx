@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { SuccessIcon } from "../../Icons/Icons";
+import { SuccessIcon } from "@/components/Icons/Icons";
 import s from "./OrderSuccessSection.module.css";
 
 export default function OrderHeader() {

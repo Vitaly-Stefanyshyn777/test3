@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useCartStore, selectCartTotal } from "../../../store/cart";
-import { useCreateWcOrder } from "../../../lib/useMutation";
-import { useWcPaymentGatewaysQuery } from "../../hooks/useWpQueries";
-import MapPickerModal from "./MapPickerModal/MapPickerModal";
-import CheckoutHeader from "../../layout/CheckoutHeader/CheckoutHeader";
-import CheckoutFooter from "../../layout/CheckoutFooter/CheckoutFooter";
+import { useCartStore, selectCartTotal } from "@/store/cart";
+import { useCreateWcOrder } from "@/lib/useMutation";
+import { useWcPaymentGatewaysQuery } from "@/components/hooks/useWpQueries";
+import MapPickerModal from "@/components/sections/CheckoutSection/MapPickerModal/MapPickerModal";
+import CheckoutHeader from "@/components/layout/CheckoutHeader/CheckoutHeader";
+import CheckoutFooter from "@/components/layout/CheckoutFooter/CheckoutFooter";
 import PersonalDataForm from "./PersonalDataForm";
 import DeliveryForm from "./DeliveryForm";
 import PaymentForm from "./PaymentForm";
@@ -274,8 +274,8 @@ export default function CheckoutSection() {
         })
       );
 
-      // Перенаправлення на сторінку успіху
-      window.location.href = "/order-success";
+      // Перенаправлення на сторінку успіху з orderId в URL
+      window.location.href = `/order-success?orderId=${result.id}`;
     } catch (error) {
       // Silent error handling
       alert("Помилка створення замовлення. Спробуйте ще раз.");

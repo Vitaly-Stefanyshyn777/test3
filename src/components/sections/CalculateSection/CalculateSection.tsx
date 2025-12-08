@@ -1,6 +1,6 @@
 "use client";
-import Container from "../../ui/Container/Container";
-import UpperDescription from "../../ui/UpperDescription/UpperDescription";
+import Container from "@/components/ui/Container/Container";
+import UpperDescription from "@/components/ui/UpperDescription/UpperDescription";
 import s from "./CalculateSection.module.css";
 import { useEffect, useState } from "react";
 import { Formik, Form, Field } from "formik";
@@ -55,8 +55,7 @@ type CalculationResults = {
 
 export default function CalculateSection() {
   const [isMobile, setIsMobile] = useState(false);
-  const [calculationResults, setCalculationResults] =
-    useState<CalculationResults | null>(null);
+  const [calculationResults, setCalculationResults] = useState<CalculationResults | null>(null);
 
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 1000px)");
@@ -95,11 +94,9 @@ export default function CalculateSection() {
             const trainingTypeCost = DEFAULT_TRAINING_TYPE_COST;
 
             const weeklyIncome =
-              averageTrainingCost * trainingsPerWeek * boardsCount -
-              rentPerHour;
+              averageTrainingCost * trainingsPerWeek * boardsCount - rentPerHour;
             const monthlyIncome = weeklyIncome * 4;
-            const weeklyExpenses =
-              rentPerHour * hoursPerDay * workingDaysPerWeek;
+            const weeklyExpenses = rentPerHour * hoursPerDay * workingDaysPerWeek;
             const totalInvestment =
               boardPrice * boardsCount + weeklyExpenses * 4 + trainingTypeCost;
 
@@ -123,8 +120,7 @@ export default function CalculateSection() {
               <div className={s.content}>
                 <div className={s.calculatorContainer}>
                   <h3>
-                    Дізнайтесь, коли повернете вкладення — заповніть кілька
-                    полів.
+                    Дізнайтесь, коли повернете вкладення — заповніть кілька полів.
                   </h3>
                   <Form className={s.form}>
                     <div className={s.fields}>

@@ -1,0 +1,496 @@
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  backdrop-filter: blur(10px);
+  background: rgba(14, 14, 14, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1003;
+  padding: 20px;
+}
+
+.modal {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 52px;
+  width: 100%;
+  max-width: 700px;
+  overflow-y: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  height: auto;
+  min-height: auto;
+}
+
+.headerBlock {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: auto;
+  gap: 12px;
+}
+
+.header {
+  text-align: center;
+}
+
+.header h2,
+.headerText {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 110%;
+  color: var(--black);
+}
+
+.subtitle {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  text-align: center;
+  color: var(--black);
+  opacity: 0.6;
+}
+
+.close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  background-color: var(--bg-light);
+
+  border-radius: 10px;
+  fill: #f2f2f2;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.close:hover {
+  background: var(--violet);
+  color: var(--white);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.fieldsBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.privacyLinkBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 17px;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 12px;
+}
+
+.inputBlock {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.input {
+  width: 100%;
+  padding: 20px 20px 20px 48px;
+  border-radius: 12px;
+  transition: all 0.2s;
+  background: var(--white);
+  box-sizing: border-box;
+  height: auto;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 130%;
+  color: rgba(14, 14, 14, 0.4);
+  border: none;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.input::placeholder {
+  color: #999;
+  font-size: 14px;
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+  align-items: center;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.passwordToggle:hover {
+  color: #666;
+  background: #f5f5f5;
+}
+
+.submit {
+  background: var(--violet);
+  border: none;
+  padding: 24px 42px;
+  border-radius: 18px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  font-family: var(--third-family);
+  font-weight: 800;
+  line-height: 135%;
+  color: var(--white);
+}
+
+.submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.error {
+  color: #e74c3c;
+  font-size: 14px;
+  margin: 0;
+  text-align: center;
+}
+
+.privacyText {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  color: rgba(14, 14, 14, 0.4);
+}
+
+.privacyLink {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  color: rgba(14, 14, 14, 0.4);
+  text-decoration: underline;
+  text-decoration-skip-ink: none;
+}
+
+.privacyLink:hover {
+  color: #667eea;
+}
+
+.ratingRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.ratingLabel {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  text-align: center;
+  opacity: 0.6;
+  color: var(--black);
+}
+
+.stars {
+  display: flex;
+  gap: 8px;
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.starButton {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1000px) {
+  .backdrop {
+    padding: mvw(33) mvw(16) mvw(23) mvw(16);
+    backdrop-filter: blur(mvw(10));
+    background: rgba(14, 14, 14, 0.2);
+  }
+
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: 90vh;
+    height: auto;
+    min-height: auto;
+    border-radius: mvw(16);
+    padding: mvw(24) mvw(16) mvw(24) mvw(16);
+    gap: mvw(34);
+    box-shadow: none;
+    position: relative;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    animation: slideUp 0.3s ease;
+  }
+
+  .headerBlock {
+    gap: mvw(8);
+    flex-shrink: 0;
+  }
+
+  .header {
+    position: relative;
+    width: 100%;
+  }
+
+  .header h2,
+  .headerText {
+    font-size: mvw(20);
+    line-height: 120%;
+    padding-right: mvw(40);
+    display: flex;
+  }
+
+  .subtitle {
+    font-size: mvw(12);
+    line-height: 140%;
+    text-align: center;
+    display: none;
+  }
+
+  .close {
+    top: mvw(-6);
+    right: mvw(7);
+    width: mvw(45);
+    height: mvw(45);
+    border-radius: mvw(10);
+    font-size: mvw(24);
+    background: #f2f2f2;
+  }
+
+  .close svg {
+    color: var(--black);
+    width: mvw(14);
+    height: mvw(14);
+  }
+
+  .form {
+    gap: mvw(8);
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .privacyLinkBlock {
+    gap: mvw(12);
+    margin-top: mvw(8);
+    flex-shrink: 0;
+  }
+
+  .inputGroup {
+    width: 100%;
+    gap: mvw(14);
+  }
+
+  .inputWrapper {
+    width: 100%;
+  }
+
+  .inputContainer {
+    gap: mvw(8);
+  }
+
+  .inputIcon {
+    left: mvw(16);
+    width: mvw(20);
+    height: mvw(20);
+  }
+
+  .inputIcon svg {
+    width: mvw(20);
+    height: mvw(20);
+  }
+
+  .input {
+    padding: mvw(20) mvw(20) mvw(20) mvw(48);
+    border-radius: mvw(12);
+    font-size: mvw(14);
+    line-height: 130%;
+  }
+
+  .input::placeholder {
+    font-size: mvw(14);
+  }
+
+  /* Стилі для InputField в LoginModal на мобілці */
+  .loginInputLabel {
+    top: 55% !important;
+  }
+
+  .ratingRow {
+    align-items: flex-start;
+  }
+
+  .loginInputBlock:has(input:focus) .loginInputLabel,
+  .loginInputBlock:has(input:not(:placeholder-shown)) .loginInputLabel {
+    top: mvw(10) !important;
+  }
+
+  /* Стилі для PasswordField в LoginModal на мобілці */
+  .loginPasswordLabel {
+    position: relative;
+  }
+
+  .loginPasswordBlock:has(input:focus) .loginPasswordLabel,
+  .loginPasswordBlock:has(input:not(:placeholder-shown)) .loginPasswordLabel {
+    top: mvw(10) !important;
+    transform: translateY(0) !important;
+  }
+
+  .loginPasswordEyeBtn {
+    right: mvw(15) !important;
+  }
+
+  .passwordToggle {
+    right: mvw(20);
+  }
+
+  .ratingLabel {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(14);
+    line-height: 140%;
+
+    text-align: center;
+    color: var(--black);
+    opacity: 0.6;
+  }
+
+  .passwordToggle svg {
+    width: mvw(20);
+    height: mvw(20);
+  }
+
+  .stars {
+    svg {
+      width: mvw(16);
+      height: mvw(16);
+    }
+  }
+  .submit {
+    padding: mvw(16) mvw(24);
+    border-radius: mvw(16);
+    font-size: mvw(16);
+    line-height: 135%;
+    width: 100%;
+  }
+
+  .error {
+    font-size: mvw(14);
+  }
+
+  .privacyText {
+    font-size: mvw(12);
+    line-height: 140%;
+  }
+
+  .privacyLink {
+    font-size: mvw(12);
+    line-height: 140%;
+  }
+}

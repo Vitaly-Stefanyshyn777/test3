@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import styles from "./ProductsGrid.module.css";
 import ProductCard from "../ProductCard/ProductCard";
 import { normalizeImageUrl } from "@/lib/imageUtils";
+import EmptyState from "@/components/ui/EmptyState";
 // Видалено fetchProductCategoriesFromWp - використовуємо категорії з продуктів
 
 interface Product {
@@ -12,6 +13,7 @@ interface Product {
   price: string;
   regular_price?: string;
   sale_price?: string;
+  sku?: string; // Код товару (SKU)
   images: Array<{ src: string; alt: string }>;
   categories: Array<{ id: number; name: string; slug: string }>;
   attributes: Array<{ name: string; options: string[] }>;
@@ -86,15 +88,7 @@ export default function ProductsGrid({
   }, [selectedCertificationFilter]);
 
   if (products.length === 0) {
-    return (
-      <div className={styles.emptyState}>
-        <div className={styles.emptyIcon}>🔍</div>
-        <h3 className={styles.emptyTitle}>Продукти не знайдено</h3>
-        <p className={styles.emptyDescription}>
-          Спробуйте змінити фільтри або пошукові критерії
-        </p>
-      </div>
-    );
+    return <EmptyState variant="products" />;
   }
 
   // Об'єднуємо товари: спочатку основні, потім товари без сертифікації внизу
@@ -150,6 +144,7 @@ export default function ProductsGrid({
             price={priceNum}
             originalPrice={original}
             image={image}
+            sku={p.sku}
             categories={productCategories[p.id] || p.categories}
             dateCreated={p.date_created}
             wcProduct={storeProduct}

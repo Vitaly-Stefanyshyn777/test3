@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
-import TrainerMap from "./TrainerMap/TrainerMap";
-import { TrainerUser } from "../types";
-import ContactsSection from "./ContactsSection";
+import TrainerMap from "@/components/sections/ContactsSection/TrainerMap/TrainerMap";
+import { TrainerUser } from "@/components/sections/types";
+import ContactsSection from "@/components/sections/ContactsSection/ContactsSection";
 import s from "./ContactsPageSection.module.css";
 
 const ContactsPageSection: React.FC = () => {

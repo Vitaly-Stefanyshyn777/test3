@@ -6,7 +6,6 @@ import { ColorFilter } from "../filters/ColorFilter/ColorFilter";
 import { SizeFilter } from "../filters/SizeFilter/SizeFilter";
 import { CertificationFilter } from "../filters/CertificationFilter/CertificationFilter";
 import ButtonFilter from "@/components/ui/ButtonFilter/ButtonFilter";
-import ProductsFilterSkeleton from "./ProductsFilterSkeleton";
 import { useMemo } from "react";
 import {
   useFilteredProducts,
@@ -105,10 +104,6 @@ const ProductsFilter = ({
   }, [filters]);
 
   const { data: filteredProducts = [] } = useFilteredProducts(wcFilters);
-
-  if (loading) {
-    return <ProductsFilterSkeleton />;
-  }
 
   return (
     <div className={styles.filterContainer}>

@@ -9,51 +9,54 @@ const CourseSidebarCourseInfoSkeleton: React.FC = () => {
     <div className={styles.courseInfo}>
       <div className={styles.courseTitleBlock}>
         <div className={styles.categoryTagBlock}>
-          <Skeleton width={80} height={20} style={{ marginBottom: "15px" }} />
+          <Skeleton width={80} height={20} className={styles.categoryTag} />
           <div className={styles.titleWithDateRow}>
             <div className={styles.titleWithBadges}>
-              <Skeleton width="70%" height={38} />
-              <Skeleton width={60} height={24} borderRadius={6} />
+              <Skeleton width={376} height={25} className={styles.courseTitle} />
             </div>
             <div className={styles.dateBlock}>
-              <Skeleton width={100} height={20} />
-              <Skeleton width={80} height={20} />
+              <div className={styles.availability}>
+                <Skeleton width={14} height={14} borderRadius="50%" />
+                <Skeleton width={75} height={15} className={styles.inStock} />
+              </div>
+              <div className={styles.rating}>
+                <Skeleton width={188} height={15} />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <div className={styles.courseIncludes}>
-        <Skeleton width={200} height={20} style={{ marginBottom: "16px" }} />
+        <Skeleton width={200} height={18} className={styles.courseIncludesTitle} />
         <ul className={styles.courseIncludesList}>
-          {[...Array(4)].map((_, i) => (
+          {[...Array(5)].map((_, i) => (
             <li key={i} className={styles.courseIncludesItem}>
-              <Skeleton width={20} height={20} borderRadius="50%" />
-              <Skeleton width="80%" height={16} />
+              <Skeleton width={20} height={20} borderRadius="50%" className={styles.courseIncludesIcon} />
+              <Skeleton width={200} height={15} className={styles.courseIncludesText} />
             </li>
           ))}
         </ul>
       </div>
 
-      <div className={styles.topicsSection}>
-        <Skeleton width={250} height={20} style={{ marginBottom: "16px" }} />
-        <div className={styles.topicsGrid}>
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} width={140} height={36} borderRadius={8} />
-          ))}
+      <div className={styles.pricingCartBlock}>
+        <div className={styles.pricing}>
+          <Skeleton width={200} height={30} />
+        </div>
+        <div className={styles.subscriptionOffer}>
+          <Skeleton width={520} height={108} />
+        </div>
+        <div className={styles.registerCallout}>
+          <Skeleton width={296} height={66} borderRadius={16} className={styles.registerBlock} />
+          <Skeleton width={216} height={66} borderRadius={16} className={styles.registerBtn} />
         </div>
       </div>
 
-      <div className={styles.pricingCartBlock}>
-        <div className={styles.pricing}>
-          <Skeleton width={120} height={40} />
-          <Skeleton width={100} height={24} style={{ marginTop: "8px" }} />
+      <div className={styles.pricingActionsBlock}>
+        <div className={styles.actions}>
+          <Skeleton width={446} height={66} borderRadius={16} className={styles.addToCartButtonDisabled} />
+          <Skeleton width={66} height={66} borderRadius={15} className={styles.favoriteButtonDisabled} />
         </div>
-        <div className={styles.subscriptionOffer}>
-          <Skeleton width={30} height={30} borderRadius={4} />
-          <Skeleton width="80%" height={16} count={2} />
-        </div>
-        <Skeleton width="100%" height={60} borderRadius={12} />
       </div>
     </div>
   );

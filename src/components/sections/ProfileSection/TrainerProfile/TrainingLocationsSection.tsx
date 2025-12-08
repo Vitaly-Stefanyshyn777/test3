@@ -2,17 +2,13 @@
 
 import React, { useEffect } from "react";
 import styles from "./TrainerProfile.module.css";
-import { PlusIcon } from "../../../Icons/Icons";
+import { PlusIcon } from "@/components/Icons/Icons";
 import LocationCard from "./LocationCard";
 import TrainingLocationsSectionSkeleton from "./TrainingLocationsSectionSkeleton";
 import type { TrainingLocation } from "./types";
 // removed unused imports
 
-type Props = {
-  onAddClick?: () => void;
-  locations?: TrainingLocation[];
-  loading?: boolean;
-};
+type Props = { onAddClick?: () => void; locations?: TrainingLocation[]; loading?: boolean };
 
 export default function TrainingLocationsSection({
   onAddClick,

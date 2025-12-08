@@ -1,7 +1,7 @@
 .container {
   width: 100%;
   border-radius: 12px;
-  padding: 155px 20px 155px 20px;
+  padding: 0 20px 0 20px;
   display: flex;
   flex-direction: column;
   gap: 72px;
@@ -15,7 +15,6 @@
   font-weight: 700;
   font-size: 56px;
   line-height: 120%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -25,12 +24,13 @@
   height: 880px;
   margin-bottom: 24px;
   z-index: 1;
+  border-radius: 20px;
 }
 
 .map {
   width: 100%;
   height: 100%;
-  border-radius: 8px;
+  border-radius: 20px;
   overflow: hidden;
   border: 1px solid #e0e0e0;
 }
@@ -182,7 +182,6 @@
   font-weight: 600;
   font-size: 56px;
   line-height: 115%;
-  letter-spacing: -0.01em;
   color: var(--black);
 }
 
@@ -228,7 +227,6 @@
   font-weight: 400;
   font-size: 16px;
   line-height: 110%;
-  letter-spacing: -0.02em;
   color: rgba(14, 14, 14, 0.4);
 }
 
@@ -237,7 +235,6 @@
   font-weight: 500;
   font-size: 15px;
   line-height: 110%;
-  letter-spacing: -0.02em;
   color: var(--black);
 }
 
@@ -304,6 +301,14 @@
 .contactsTitle {
   display: none;
 }
+.mapTitle {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 135%;
+  text-align: center;
+  color: var(--violet);
+}
 
 @media (max-width: 1000px) {
   .container {
@@ -319,6 +324,15 @@
     overflow: visible;
   }
 
+  .mapTitle {
+    font-family: var(--font-family);
+    font-weight: 600;
+    font-size: mvw(14);
+    line-height: 140%;
+    text-align: center;
+    color: var(--violet);
+  }
+
   .title {
     line-height: 120%;
     text-align: center;
@@ -327,7 +341,6 @@
     font-weight: 700;
     font-size: mvw(28);
     line-height: 120%;
-    letter-spacing: -0.01em;
     color: var(--black);
   }
 
@@ -349,7 +362,6 @@
     font-weight: 600;
     font-size: mvw(16);
     line-height: 120%;
-    letter-spacing: 0.03em;
     color: var(--black);
   }
 
@@ -381,10 +393,11 @@
     position: relative;
     z-index: 1;
     overflow: visible;
+    border-radius: mvw(16);
   }
 
   .map {
-    border-radius: mvw(12);
+    border-radius: mvw(16);
   }
 
   .locationCard {

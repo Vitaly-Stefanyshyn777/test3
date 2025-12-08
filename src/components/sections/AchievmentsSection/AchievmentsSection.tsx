@@ -1,13 +1,13 @@
 "use client";
 import s from "./AchievmentsSection.module.css";
-import UpperDescription from "../../ui/UpperDescription/UpperDescription";
-import Container from "../../ui/Container/Container";
+import UpperDescription from "@/components/ui/UpperDescription/UpperDescription";
+import Container from "@/components/ui/Container/Container";
 import Image from "next/image";
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { A11y } from "swiper/modules";
 import type { Swiper as SwiperClass } from "swiper/types";
-import SliderNav from "../../ui/SliderNav/SliderNavActions";
+import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
@@ -293,7 +293,7 @@ export default function AchievmentsSection() {
                     <li>{brain}</li>
                   </ul>
                   <div className={s.instructorsText}>
-                    <h3>300+ </h3>
+                    <h3>400+ </h3>
                     <p>
                       Сертифікованих інструкторів BFB по всій Україні та за її
                       межами

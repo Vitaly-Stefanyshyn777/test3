@@ -9,7 +9,7 @@ import PurchasedCourses from "./PurchasedCourses/PurchasedCourses";
 import ContactSupport from "./ContactSupport/ContactSupport";
 import SectionDivider from "./SectionDivider/SectionDivider";
 import { useRouter, usePathname } from "next/navigation";
-import { ArrowIcon } from "../../Icons/Icons";
+import { ArrowIcon } from "@/components/Icons/Icons";
 
 interface ProfileSectionProps {
   children?: React.ReactNode;

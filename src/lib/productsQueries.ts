@@ -20,22 +20,72 @@ export const productsQuery = () => ({
 export const productQuery = (slugOrId: string) => ({
   queryKey: ["product", slugOrId] as const,
   queryFn: async () => {
+    // Якщо slug порожній або "skip", не виконуємо запит
+    if (!slugOrId || slugOrId.trim() === "" || slugOrId === "skip") {
+      throw new Error("Product slug is empty");
+    }
+    
     const products = await getAllProducts();
     
     // Next.js автоматично декодує slug з URL, тому slugOrId приходить декодованим
-    // Але slug з API може бути encoded, тому декодуємо обидва для порівняння
+    // Але slug з API може бути в різних форматах (encoded або decoded)
+    // Нормалізуємо обидва значення для порівняння
+    const normalizeSlug = (slug: string): string => {
+      if (!slug) return '';
+      try {
+        // Спробуємо декодувати, якщо це encoded
+        let decoded = slug;
+        try {
+          decoded = decodeURIComponent(slug);
+        } catch {
+          // Якщо не вдалося декодувати, використовуємо оригінал
+          decoded = slug;
+        }
+        
+        // Нормалізуємо: приводимо до нижнього регістру та прибираємо зайві пробіли
+        return decoded.toLowerCase().trim();
+      } catch {
+        // Якщо виникла помилка, повертаємо як є
+        return slug.toLowerCase().trim();
+      }
+    };
+    
+    const normalizedSlugOrId = normalizeSlug(slugOrId);
+    
     const product = products.find((p) => {
-      // Декодуємо slug з API для порівняння
-      const apiSlugDecoded = decodeURIComponent(p.slug);
+      if (!p.slug) {
+        // Якщо немає slug, перевіряємо тільки по ID
+        return p.id.toString() === slugOrId;
+      }
       
-      return (
+      // Нормалізуємо slug з API
+      const normalizedApiSlug = normalizeSlug(p.slug);
+      
+      // Порівнюємо нормалізовані значення (case-insensitive)
+      const slugMatch = 
         p.slug === slugOrId || // Exact match (якщо обидва однаково)
-        apiSlugDecoded === slugOrId || // Декодований slug з API === декодований slug з URL
-        p.id.toString() === slugOrId // Fallback to ID
-      );
+        normalizedApiSlug === normalizedSlugOrId || // Нормалізовані значення
+        p.slug.toLowerCase() === slugOrId.toLowerCase() || // Case-insensitive exact
+        normalizedApiSlug === slugOrId.toLowerCase(); // Нормалізований API slug === URL slug (lowercase)
+      
+      // Також перевіряємо ID як fallback
+      const idMatch = p.id.toString() === slugOrId;
+      
+      return slugMatch || idMatch;
     });
     
-    if (!product) throw new Error("Product not found");
+    if (!product) {
+      // Не логуємо помилку, якщо slug порожній (це очікувана поведінка)
+      if (slugOrId && slugOrId.trim() !== "" && slugOrId !== "skip") {
+        console.error("[productQuery] Product not found:", {
+          slugOrId,
+          normalizedSlugOrId,
+          availableSlugs: products.slice(0, 5).map(p => ({ id: p.id, slug: p.slug })),
+        });
+      }
+      throw new Error(`Product not found: ${slugOrId}`);
+    }
+    
     return await mapProductToUi(product);
   },
   staleTime: 5 * 60 * 1000,
@@ -112,8 +162,16 @@ export const productsWithFiltersQuery = (filters: Record<string, unknown>) => ({
     }
 
     if (filters.category) {
+      const categoryFilter = filters.category as string;
+      // Перевіряємо, чи це ID (число) чи slug
+      const isNumericId = /^\d+$/.test(categoryFilter);
+      
       filteredProducts = filteredProducts.filter((product) =>
-        product.categories.some((cat) => cat.slug === filters.category)
+        product.categories.some((cat) => 
+          // Порівнюємо по slug або по ID
+          cat.slug === categoryFilter || 
+          (isNumericId && cat.id.toString() === categoryFilter)
+        )
       );
     }
 

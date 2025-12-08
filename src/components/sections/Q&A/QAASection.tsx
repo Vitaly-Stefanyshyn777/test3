@@ -3,10 +3,7 @@ import React, { useEffect, useState } from "react";
 import { СhevronIcon } from "../../Icons/Icons";
 import styles from "./QAASection.module.css";
 import { useQuery } from "@tanstack/react-query";
-import {
-  fetchFAQByCategoryWithLogging,
-  type FaqItem,
-} from "../../../lib/bfbApi";
+import { fetchFAQByCategoryWithLogging, type FaqItem } from "@/lib/bfbApi";
 import QAASectionSkeleton from "./QAASectionSkeleton";
 
 interface QAAItem {

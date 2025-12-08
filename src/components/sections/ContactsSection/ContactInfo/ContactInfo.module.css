@@ -72,7 +72,6 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-  letter-spacing: -0.01em;
   color: var(--white);
 }
 
@@ -101,7 +100,6 @@
   font-weight: 400;
   font-size: 16px;
   line-height: 110%;
-  letter-spacing: -0.02em;
   color: rgba(255, 255, 255, 0.4);
 }
 
@@ -153,7 +151,6 @@
   font-weight: 700;
   font-size: 42px;
   line-height: 110%;
-  letter-spacing: -0.02em;
   color: var(--white);
   text-decoration: none;
   cursor: pointer;
@@ -169,7 +166,6 @@
   font-weight: 500;
   font-size: 18px;
   line-height: 110%;
-  letter-spacing: -0.02em;
   color: var(--white);
   text-decoration: none;
   cursor: pointer;
@@ -185,7 +181,6 @@
   font-weight: 500;
   font-size: 18px;
   line-height: 110%;
-  letter-spacing: -0.02em;
   color: var(--white);
 }
 
@@ -194,7 +189,6 @@
   font-weight: 500;
   font-size: 18px;
   line-height: 140%;
-  letter-spacing: -0.02em;
   color: var(--white);
 }
 
@@ -274,7 +268,6 @@
     font-weight: 500;
 
     line-height: 110%;
-    letter-spacing: -0.02em;
     color: var(--white);
   }
   .contactAddressBlock {
@@ -286,7 +279,6 @@
     font-weight: 500;
     color: var(--white);
     line-height: 110%;
-    letter-spacing: -0.02em;
   }
   .contactItem {
     gap: mvw(10);
@@ -298,7 +290,6 @@
     font-weight: 500;
 
     line-height: 140%;
-    letter-spacing: -0.02em;
   }
   .contactInfo {
     border: mvw(2) solid rgba(255, 254, 252, 0.3);
