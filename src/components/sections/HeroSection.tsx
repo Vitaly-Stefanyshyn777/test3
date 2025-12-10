@@ -205,28 +205,24 @@ const HeroSection = () => {
       }
     }
 
-    // Fallback до дефолтного відео (після отримання URL, але перед нормалізацією)
-    const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE || "";
+    // Fallback до дефолтного відео
     if (
       !rawVideoUrl ||
       rawVideoUrl.trim() === "" ||
       rawVideoUrl === "undefined"
     ) {
+      const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE || "";
       rawVideoUrl = `${baseUrl}/wp-content/uploads/2025/11/videopreview.mp4`;
     }
 
-    // Якщо URL вже є проксованим (починається з /api/video-proxy), повертаємо як є
-    if (rawVideoUrl.startsWith("/api/video-proxy")) {
-      return rawVideoUrl;
-    }
-
     // Якщо відносний URL → додаємо домен
-    if (rawVideoUrl.startsWith("/")) {
+    if (rawVideoUrl.startsWith("/") && !rawVideoUrl.startsWith("//")) {
+      const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE || "";
       rawVideoUrl = `${baseUrl}${rawVideoUrl}`;
     }
 
-    // Інакше проксуємо через /api/video-proxy для уникнення CORS проблем
-    return `/api/video-proxy?url=${encodeURIComponent(rawVideoUrl)}`;
+    // Повертаємо прямий URL без проксування (як в старому варіанті)
+    return rawVideoUrl;
   };
 
   const getPosterFromBanner = (b?: BannerPost | null): string => {
