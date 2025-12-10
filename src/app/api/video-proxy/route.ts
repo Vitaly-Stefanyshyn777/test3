@@ -80,11 +80,18 @@ export async function GET(request: NextRequest) {
     console.log("[video-proxy] Fetching video from:", videoUrl);
     let response: Response;
     try {
+      // Збільшуємо таймаут для великих відео файлів (230MB+)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 хвилин
+
       response = await fetch(videoUrl, {
         headers: {
           "User-Agent": "Mozilla/5.0 (compatible; VideoProxy/1.0)",
         },
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
       console.log("[video-proxy] Fetch response:", {
         status: response.status,
         statusText: response.statusText,
