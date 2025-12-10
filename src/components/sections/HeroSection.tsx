@@ -277,7 +277,7 @@ const HeroSection = () => {
     (activeBanner?.Description as string) ||
     "";
 
-  // Показуємо skeleton поки дані завантажуються
+  // Показуємо PageLoader поки дані завантажуються
   if (isLoading) {
     return <PageLoader />;
   }
