@@ -10,7 +10,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { A11y } from "swiper/modules";
 import type { Swiper as SwiperClass } from "swiper/types";
 import "swiper/css";
-import PageLoader from "../PageLoader";
 
 const HeroSection = () => {
   const [banners, setBanners] = useState<BannerPost[]>([]);
@@ -171,7 +170,7 @@ const HeroSection = () => {
     let rawVideoUrl = "";
 
     if (!b) {
-      const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE;
+      const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE || "";
       rawVideoUrl = `${baseUrl}/wp-content/uploads/2025/11/videopreview.mp4`;
     } else {
       // Нова структура: acf.video.url (якщо video є об'єктом)
@@ -204,17 +203,26 @@ const HeroSection = () => {
           rawVideoUrl = video;
         }
       }
+    }
 
-      // Fallback до дефолтного відео
-      if (!rawVideoUrl) {
-        const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE;
-        rawVideoUrl = `${baseUrl}/wp-content/uploads/2025/11/videopreview.mp4`;
-      }
+    // Fallback до дефолтного відео (після отримання URL, але перед нормалізацією)
+    const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE || "";
+    if (
+      !rawVideoUrl ||
+      rawVideoUrl.trim() === "" ||
+      rawVideoUrl === "undefined"
+    ) {
+      rawVideoUrl = `${baseUrl}/wp-content/uploads/2025/11/videopreview.mp4`;
     }
 
     // Якщо URL вже є проксованим (починається з /api/video-proxy), повертаємо як є
     if (rawVideoUrl.startsWith("/api/video-proxy")) {
       return rawVideoUrl;
+    }
+
+    // Якщо відносний URL → додаємо домен
+    if (rawVideoUrl.startsWith("/")) {
+      rawVideoUrl = `${baseUrl}${rawVideoUrl}`;
     }
 
     // Інакше проксуємо через /api/video-proxy для уникнення CORS проблем
@@ -276,11 +284,6 @@ const HeroSection = () => {
     activeBanner?.acf?.description ||
     (activeBanner?.Description as string) ||
     "";
-
-  // Показуємо PageLoader поки дані завантажуються
-  if (isLoading) {
-    return <PageLoader />;
-  }
 
   return (
     <section className={s.hero} data-hero-section>
@@ -344,33 +347,20 @@ const HeroSection = () => {
           </div>
         </div>
         {/* Floating video player (bottom-right like on screenshot) */}
-        {showVideo && (!!videoUrl || !!posterUrl) && (
+        {showVideo && videoUrl && (
           <div className={s.heroVideo}>
-            {videoUrl ? (
-              <VideoPlayer
-                videoUrl={videoUrl}
-                poster={posterUrl || undefined}
-                controls={false}
-                onlyPlayPause={true}
-                autoPlay={false}
-                className="w-full h-full"
-                overlayPlayButton={false}
-                showCloseButton={true}
-                onClose={() => setShowVideo(false)}
-                noBlur={true}
-              />
-            ) : (
-              <img
-                src={posterUrl}
-                alt="Video preview"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  display: "block",
-                }}
-              />
-            )}
+            <VideoPlayer
+              videoUrl={videoUrl}
+              poster={posterUrl || undefined}
+              controls={false}
+              onlyPlayPause={true}
+              autoPlay={false}
+              className="w-full h-full"
+              overlayPlayButton={false}
+              showCloseButton={true}
+              onClose={() => setShowVideo(false)}
+              noBlur={true}
+            />
           </div>
         )}
       </div>
