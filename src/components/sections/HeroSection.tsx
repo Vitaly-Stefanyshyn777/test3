@@ -212,7 +212,13 @@ const HeroSection = () => {
       }
     }
 
-    return rawVideoUrl;
+    // Якщо URL вже є проксованим (починається з /api/video-proxy), повертаємо як є
+    if (rawVideoUrl.startsWith("/api/video-proxy")) {
+      return rawVideoUrl;
+    }
+
+    // Інакше проксуємо через /api/video-proxy для уникнення CORS проблем
+    return `/api/video-proxy?url=${encodeURIComponent(rawVideoUrl)}`;
   };
 
   const getPosterFromBanner = (b?: BannerPost | null): string => {
@@ -271,10 +277,13 @@ const HeroSection = () => {
     (activeBanner?.Description as string) ||
     "";
 
+  // Показуємо skeleton поки дані завантажуються
+  if (isLoading) {
+    return <PageLoader />;
+  }
+
   return (
     <section className={s.hero} data-hero-section>
-      {/* Показуємо PageLoader поки дані завантажуються */}
-      {isLoading && <PageLoader />}
       {/* Banner slider (background) */}
       {banners.length > 0 && (
         <Swiper
