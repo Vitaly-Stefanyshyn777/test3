@@ -19,22 +19,39 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Декодуємо URL, якщо він був закодований
-    try {
-      const decodedUrl = decodeURIComponent(videoUrl);
-      console.log("[video-proxy] URL decoded:", {
-        original: videoUrl.substring(0, 100),
-        decoded: decodedUrl.substring(0, 100),
-        changed: videoUrl !== decodedUrl,
-      });
-      videoUrl = decodedUrl;
-    } catch (error) {
-      console.warn(
-        "[video-proxy] Failed to decode URL, using original:",
-        error
-      );
-      // Якщо декодування не вдалося, використовуємо оригінальний URL
+    // Декодуємо URL, якщо він був закодований (може бути двічі закодований через encodeURIComponent)
+    let decodedUrl = videoUrl;
+    let decodeAttempts = 0;
+    const maxDecodeAttempts = 3;
+
+    while (decodeAttempts < maxDecodeAttempts) {
+      try {
+        const testDecode = decodeURIComponent(decodedUrl);
+        if (testDecode === decodedUrl) {
+          // URL вже не закодований
+          break;
+        }
+        decodedUrl = testDecode;
+        decodeAttempts++;
+        console.log(`[video-proxy] URL decoded (attempt ${decodeAttempts}):`, {
+          before: videoUrl.substring(0, 100),
+          after: decodedUrl.substring(0, 100),
+        });
+      } catch (error) {
+        console.warn(
+          `[video-proxy] Failed to decode URL (attempt ${decodeAttempts}):`,
+          error
+        );
+        break;
+      }
     }
+
+    videoUrl = decodedUrl;
+    console.log("[video-proxy] Final decoded URL:", {
+      url: videoUrl.substring(0, 150),
+      decodeAttempts,
+      hasCyrillic: /[а-яА-ЯіІїЇєЄ]/.test(videoUrl),
+    });
 
     // Базова валідація URL (перевіряємо тільки формат, без перевірки доменів)
     let validatedUrl: URL;
