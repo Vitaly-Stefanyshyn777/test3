@@ -435,18 +435,33 @@ const HeroSection = () => {
         </div>
         {/* Floating video player (bottom-right like on screenshot) */}
         {(() => {
-          const shouldShowVideo = showVideo && videoUrl;
+          const shouldShowVideo =
+            showVideo && videoUrl && videoUrl.trim() !== "";
           console.log("[HeroSection] Video render decision:", {
             showVideo,
             hasVideoUrl: !!videoUrl,
+            videoUrlLength: videoUrl?.length,
             videoUrl: videoUrl?.substring(0, 100),
             hasPosterUrl: !!posterUrl,
             shouldShowVideo,
+            activeBannerId: activeBanner?.id,
           });
 
-          return shouldShowVideo ? (
+          if (!shouldShowVideo) {
+            console.log("[HeroSection] Not rendering video:", {
+              reason: !showVideo
+                ? "showVideo is false"
+                : !videoUrl
+                ? "no videoUrl"
+                : "videoUrl is empty",
+            });
+            return null;
+          }
+
+          return (
             <div className={s.heroVideo}>
               <VideoPlayer
+                key={videoUrl} // Додаємо key для форсування ре-рендеру при зміні URL
                 videoUrl={videoUrl}
                 poster={posterUrl || undefined}
                 controls={false}
@@ -459,7 +474,7 @@ const HeroSection = () => {
                 noBlur={true}
               />
             </div>
-          ) : null;
+          );
         })()}
       </div>
       {banners.length > 1 && (

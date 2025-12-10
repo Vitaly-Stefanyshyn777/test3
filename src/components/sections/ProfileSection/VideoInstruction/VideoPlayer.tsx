@@ -45,24 +45,35 @@ export default function VideoPlayer({
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !videoUrl) {
-      console.log("[VideoPlayer] Skipping load - no video element or URL:", {
-        hasVideo: !!video,
+    if (!video) {
+      console.log("[VideoPlayer] No video element yet, waiting...", {
         hasUrl: !!videoUrl,
+        videoUrl: videoUrl?.substring(0, 100),
+      });
+      return;
+    }
+
+    if (!videoUrl || videoUrl.trim() === "") {
+      console.log("[VideoPlayer] No video URL provided:", {
         videoUrl,
+        hasVideo: !!video,
       });
       return;
     }
 
     console.log("[VideoPlayer] Loading video:", {
-      url: videoUrl,
+      url: videoUrl.substring(0, 150),
       autoPlay,
       controls,
       poster,
+      videoElementReady: !!video,
     });
 
     setIsLoading(true);
     setError(null);
+    
+    // Встановлюємо src перед load()
+    video.src = videoUrl;
     video.load();
 
     const handleLoadStart = () => {
