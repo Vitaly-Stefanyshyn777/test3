@@ -10,7 +10,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { A11y } from "swiper/modules";
 import type { Swiper as SwiperClass } from "swiper/types";
 import "swiper/css";
-import PageLoader from "../PageLoader";
 
 const HeroSection = () => {
   const [banners, setBanners] = useState<BannerPost[]>([]);
@@ -195,7 +194,7 @@ const HeroSection = () => {
     let rawVideoUrl = "";
 
     if (!b) {
-      const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE;
+      const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE || "";
       rawVideoUrl = `${baseUrl}/wp-content/uploads/2025/11/videopreview.mp4`;
       console.log(
         "[HeroSection] No banner, using fallback video:",
@@ -262,16 +261,20 @@ const HeroSection = () => {
           console.log("[HeroSection] No video found in old structure fields");
         }
       }
+    }
 
-      // Fallback до дефолтного відео
-      if (!rawVideoUrl) {
-        const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE;
-        rawVideoUrl = `${baseUrl}/wp-content/uploads/2025/11/videopreview.mp4`;
-        console.log(
-          "[HeroSection] No video in banner, using fallback:",
-          rawVideoUrl
-        );
-      }
+    // Fallback до дефолтного відео (після отримання URL, але перед нормалізацією)
+    const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE || "";
+    if (
+      !rawVideoUrl ||
+      rawVideoUrl.trim() === "" ||
+      rawVideoUrl === "undefined"
+    ) {
+      rawVideoUrl = `${baseUrl}/wp-content/uploads/2025/11/videopreview.mp4`;
+      console.log(
+        "[HeroSection] No video in banner, using fallback:",
+        rawVideoUrl
+      );
     }
 
     // Якщо URL вже є проксованим (починається з /api/video-proxy), повертаємо як є
@@ -281,6 +284,12 @@ const HeroSection = () => {
         rawVideoUrl
       );
       return rawVideoUrl;
+    }
+
+    // Якщо відносний URL → додаємо домен
+    if (rawVideoUrl.startsWith("/")) {
+      rawVideoUrl = `${baseUrl}${rawVideoUrl}`;
+      console.log("[HeroSection] Relative URL, added base:", rawVideoUrl);
     }
 
     // Інакше проксуємо через /api/video-proxy для уникнення CORS проблем
@@ -334,6 +343,7 @@ const HeroSection = () => {
     console.log("[HeroSection] Final videoUrl:", {
       url,
       hasUrl: !!url,
+      urlLength: url?.length,
       activeBannerId: activeBanner?.id,
     });
     return url;
@@ -361,11 +371,6 @@ const HeroSection = () => {
     activeBanner?.acf?.description ||
     (activeBanner?.Description as string) ||
     "";
-
-  // Показуємо skeleton поки дані завантажуються
-  if (isLoading) {
-    return <PageLoader />;
-  }
 
   return (
     <section className={s.hero} data-hero-section>
@@ -430,43 +435,29 @@ const HeroSection = () => {
         </div>
         {/* Floating video player (bottom-right like on screenshot) */}
         {(() => {
-          const shouldShowVideo = showVideo && (!!videoUrl || !!posterUrl);
+          const shouldShowVideo = showVideo && videoUrl;
           console.log("[HeroSection] Video render decision:", {
             showVideo,
             hasVideoUrl: !!videoUrl,
+            videoUrl: videoUrl?.substring(0, 100),
             hasPosterUrl: !!posterUrl,
             shouldShowVideo,
-            videoUrl,
-            posterUrl,
           });
 
           return shouldShowVideo ? (
             <div className={s.heroVideo}>
-              {videoUrl ? (
-                <VideoPlayer
-                  videoUrl={videoUrl}
-                  poster={posterUrl || undefined}
-                  controls={false}
-                  onlyPlayPause={true}
-                  autoPlay={false}
-                  className="w-full h-full"
-                  overlayPlayButton={false}
-                  showCloseButton={true}
-                  onClose={() => setShowVideo(false)}
-                  noBlur={true}
-                />
-              ) : (
-                <img
-                  src={posterUrl}
-                  alt="Video preview"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
-                />
-              )}
+              <VideoPlayer
+                videoUrl={videoUrl}
+                poster={posterUrl || undefined}
+                controls={false}
+                onlyPlayPause={true}
+                autoPlay={false}
+                className="w-full h-full"
+                overlayPlayButton={false}
+                showCloseButton={true}
+                onClose={() => setShowVideo(false)}
+                noBlur={true}
+              />
             </div>
           ) : null;
         })()}
