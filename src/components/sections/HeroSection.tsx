@@ -212,27 +212,7 @@ const HeroSection = () => {
       }
     }
 
-    // Валідація URL - перевіряємо, чи URL не обрізаний і має розширення
-    if (
-      rawVideoUrl &&
-      !rawVideoUrl.match(/\.(mp4|webm|ogg|mov|avi|mkv)(\?|$)/i)
-    ) {
-      console.warn(
-        "[HeroSection] Потенційно обрізаний URL відео:",
-        rawVideoUrl
-      );
-      // Якщо URL обрізаний, використовуємо fallback
-      const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE;
-      rawVideoUrl = `${baseUrl}/wp-content/uploads/2025/11/videopreview.mp4`;
-    }
-
-    // Якщо URL вже є проксованим (починається з /api/video-proxy), повертаємо як є
-    if (rawVideoUrl.startsWith("/api/video-proxy")) {
-      return rawVideoUrl;
-    }
-
-    // Інакше проксуємо через /api/video-proxy для уникнення CORS проблем
-    return `/api/video-proxy?url=${encodeURIComponent(rawVideoUrl)}`;
+    return rawVideoUrl;
   };
 
   const getPosterFromBanner = (b?: BannerPost | null): string => {
