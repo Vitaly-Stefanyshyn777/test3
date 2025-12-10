@@ -204,21 +204,28 @@ const CoursesShowcase: React.FC = () => {
               className={s.swiper}
             >
               {displayedCourses.map((course) => {
-                const normalizedWc =
-                  course.wcProduct &&
-                  ({
-                    prices: {
-                      price: course.wcProduct.prices?.price ?? "0",
-                      regular_price:
-                        course.wcProduct.prices?.regular_price ?? "0",
-                      sale_price: course.wcProduct.prices?.sale_price ?? "0",
-                    },
-                    on_sale: course.wcProduct.on_sale,
-                    total_sales: course.wcProduct.total_sales,
-                    average_rating: course.wcProduct.average_rating,
-                    rating_count: course.wcProduct.rating_count,
-                    featured: course.wcProduct.featured,
-                  } as const);
+                // Нормалізуємо wcProduct - використовуємо реальні дані з API
+                // Якщо course.wcProduct не існує, використовуємо fallback на course.price/originalPrice
+                // Для курсу 248: regular_price має бути "90" з course.wcProduct.prices.regular_price
+                // ВАЖЛИВО: Використовуємо (course as any).wcProduct, бо TypeScript може не бачити wcProduct
+                // course.wcProduct завжди має існувати, бо він створюється в mapWcCourseToCourse
+                const courseWcProduct = (course as any).wcProduct;
+                const normalizedWc = courseWcProduct
+                  ? ({
+                      prices: {
+                        // Використовуємо реальні дані з API
+                        price: courseWcProduct.prices?.price || "0",
+                        regular_price: courseWcProduct.prices?.regular_price || "0",
+                        sale_price: courseWcProduct.prices?.sale_price || "0",
+                      },
+                      on_sale: courseWcProduct.on_sale || false,
+                      total_sales: courseWcProduct.total_sales || 0,
+                      average_rating: courseWcProduct.average_rating || "0",
+                      rating_count: courseWcProduct.rating_count || 0,
+                      featured: courseWcProduct.featured || false,
+                    } as const)
+                  : null;
+                
                 return (
                   <SwiperSlide key={course.id} className={s.slide}>
                     <CourseCard
@@ -258,7 +265,7 @@ const CoursesShowcase: React.FC = () => {
                         ""
                       }
                       dateCreated={course.dateCreated}
-                      wcProduct={normalizedWc}
+                      wcProduct={normalizedWc || undefined}
                       allProducts={allProducts}
                       subscriptionDiscount={20}
                       courseData={course.courseData}
@@ -270,21 +277,27 @@ const CoursesShowcase: React.FC = () => {
           ) : (
             <div className={s.grid}>
               {displayedCourses.map((course) => {
-                const normalizedWc =
-                  course.wcProduct &&
-                  ({
-                    prices: {
-                      price: course.wcProduct.prices?.price ?? "0",
-                      regular_price:
-                        course.wcProduct.prices?.regular_price ?? "0",
-                      sale_price: course.wcProduct.prices?.sale_price ?? "0",
-                    },
-                    on_sale: course.wcProduct.on_sale,
-                    total_sales: course.wcProduct.total_sales,
-                    average_rating: course.wcProduct.average_rating,
-                    rating_count: course.wcProduct.rating_count,
-                    featured: course.wcProduct.featured,
-                  } as const);
+                // Нормалізуємо wcProduct - використовуємо реальні дані з API
+                // Якщо course.wcProduct не існує, використовуємо fallback на course.price/originalPrice
+                // Для курсу 248: regular_price має бути "90" з course.wcProduct.prices.regular_price
+                // ВАЖЛИВО: Використовуємо (course as any).wcProduct, бо TypeScript може не бачити wcProduct
+                // course.wcProduct завжди має існувати, бо він створюється в mapWcCourseToCourse
+                const courseWcProduct = (course as any).wcProduct;
+                const normalizedWc = courseWcProduct
+                  ? {
+                      prices: {
+                        // Використовуємо реальні дані з API
+                        price: courseWcProduct.prices?.price || "0",
+                        regular_price: courseWcProduct.prices?.regular_price || "0",
+                        sale_price: courseWcProduct.prices?.sale_price || "0",
+                      },
+                      on_sale: courseWcProduct.on_sale || false,
+                      total_sales: courseWcProduct.total_sales || 0,
+                      average_rating: courseWcProduct.average_rating || "0",
+                      rating_count: courseWcProduct.rating_count || 0,
+                      featured: courseWcProduct.featured || false,
+                    }
+                  : undefined;
                 return (
                   <div key={course.id} className={s.slide}>
                     <CourseCard
@@ -324,7 +337,7 @@ const CoursesShowcase: React.FC = () => {
                         ""
                       }
                       dateCreated={course.dateCreated}
-                      wcProduct={normalizedWc}
+                      wcProduct={normalizedWc || undefined}
                       allProducts={allProducts}
                       subscriptionDiscount={20}
                       courseData={course.courseData}

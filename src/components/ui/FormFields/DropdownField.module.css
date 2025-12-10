@@ -37,6 +37,10 @@
   box-sizing: border-box;
 }
 
+.selectButtonWhite {
+  background: var(--white);
+}
+
 .selectButtonFilled {
   color: var(--black);
   border-color: var(--bg-color);

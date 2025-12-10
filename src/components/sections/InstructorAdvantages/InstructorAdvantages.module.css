@@ -1228,7 +1228,7 @@
   .advantagesTitle {
     font-size: mvw(28);
     line-height: 120%;
-    width: mvw(238);
+    width: auto;
     display: flex;
     align-items: center;
     justify-content: center;

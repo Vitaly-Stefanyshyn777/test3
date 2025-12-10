@@ -96,10 +96,14 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
 
   // Отримуємо дані курсу з coursesQueries (як в CourseCard)
   // Конвертуємо courseId в число для сумісності
-  const courseIdForQuery = typeof courseId === "number" ? courseId : 
-                           /^\d+$/.test(String(courseId)) ? parseInt(String(courseId)) : 
-                           169;
-  const { data: courseData, isLoading: isLoadingCourseData } = useCourseDataQuery(courseIdForQuery);
+  const courseIdForQuery =
+    typeof courseId === "number"
+      ? courseId
+      : /^\d+$/.test(String(courseId))
+      ? parseInt(String(courseId))
+      : 169;
+  const { data: courseData, isLoading: isLoadingCourseData } =
+    useCourseDataQuery(courseIdForQuery);
 
   // Логування для дебагу
   React.useEffect(() => {
@@ -183,10 +187,13 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
   React.useEffect(() => {
     if (courseId) {
       // Використовуємо ID з отриманого курсу, якщо він є, інакше використовуємо courseId
-      const courseIdForApi = course?.id || 
-                              (typeof courseId === "number" ? courseId : 
-                               /^\d+$/.test(String(courseId)) ? parseInt(String(courseId)) : 
-                               courseId);
+      const courseIdForApi =
+        course?.id ||
+        (typeof courseId === "number"
+          ? courseId
+          : /^\d+$/.test(String(courseId))
+          ? parseInt(String(courseId))
+          : courseId);
       const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE;
       fetch(`${baseUrl}/wp-json/wc/v3/products/${courseIdForApi}`, {
         headers: {
@@ -259,24 +266,17 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
     );
   };
 
-  // Визначаємо ціни та знижку для поточного курсу (як в CourseCard)
-  const currentPrice =
-    courseData?.wcProduct?.prices?.price ||
-    courseData?.price ||
-    storeProduct?.prices?.price ||
-    product?.sale_price ||
-    product?.price ||
-    "5000";
-  const regularPrice =
-    courseData?.wcProduct?.prices?.regular_price ||
-    courseData?.originalPrice ||
-    storeProduct?.prices?.regular_price ||
-    product?.regular_price;
-  const salePrice =
-    courseData?.wcProduct?.prices?.sale_price ||
-    storeProduct?.prices?.sale_price;
-  const isOnSale =
-    courseData?.wcProduct?.on_sale || storeProduct?.on_sale || product?.on_sale;
+  // Визначаємо ціни для поточного курсу (як в CourseCard - якщо немає або "0" - fallback)
+  const currentPrice = (courseData?.wcProduct?.prices?.price && courseData.wcProduct.prices.price !== "0")
+    ? courseData.wcProduct.prices.price
+    : courseData?.price || storeProduct?.prices?.price || product?.sale_price || product?.price || "5000";
+  const regularPrice = (courseData?.wcProduct?.prices?.regular_price && courseData.wcProduct.prices.regular_price !== "0")
+    ? courseData.wcProduct.prices.regular_price
+    : courseData?.originalPrice || storeProduct?.prices?.regular_price || product?.regular_price;
+  const salePrice = (courseData?.wcProduct?.prices?.sale_price && courseData.wcProduct.prices.sale_price !== "0")
+    ? courseData.wcProduct.prices.sale_price
+    : storeProduct?.prices?.sale_price || null;
+  const isOnSale = courseData?.wcProduct?.on_sale || false;
 
   // Додаткові дані для fallback логіки (як в CourseCard)
   const fallbackPrice = courseData?.price ? parseFloat(courseData.price) : 5000;
@@ -284,12 +284,58 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
     ? parseFloat(courseData.originalPrice)
     : 7000;
 
+  // Логіка цін з урахуванням авторизації (як в CourseCard)
+  // isLoggedIn вже визначено вище на рядку 57
+  const authDiscount = 0.2; // 20% знижка для авторизованих
+
+  // 1. Обираємо базову ціну (пріоритет: salePrice -> currentPrice -> regularPrice)
+  const basePrice = salePrice || currentPrice || regularPrice;
+
+  // 2. Розраховуємо відсоток акційної знижки
+  const baseDiscount = (() => {
+    if (salePrice && regularPrice) {
+      return (
+        ((parseFloat(regularPrice) - parseFloat(salePrice)) /
+          parseFloat(regularPrice)) *
+        100
+      );
+    }
+    if (currentPrice && regularPrice && currentPrice < regularPrice) {
+      return (
+        ((parseFloat(regularPrice) - parseFloat(currentPrice)) /
+          parseFloat(regularPrice)) *
+        100
+      );
+    }
+    return 0;
+  })();
+
+  // 3. Якщо користувач авторизований - від базової ціни віднімаємо ще 20%
+  const finalPrice = (() => {
+    if (!basePrice) return 0;
+
+    const basePriceNum = parseFloat(basePrice);
+    if (isLoggedIn) {
+      // Для авторизованих: від basePrice віднімаємо 20%
+      return basePriceNum * (1 - authDiscount);
+    } else {
+      // Для неавторизованих: показуємо basePrice
+      return basePriceNum;
+    }
+  })();
+
+  // 4. Загальна знижка для бейджа (від regular_price до finalPrice)
+  const totalDiscount =
+    regularPrice && finalPrice
+      ? ((parseFloat(regularPrice) - finalPrice) / parseFloat(regularPrice)) *
+        100
+      : 0;
+
   // Форматуємо ціни (відображаємо як є, без ділення на 100)
   const formattedCurrentPrice = formatPrice(currentPrice, false);
   const formattedRegularPrice = formatPrice(regularPrice, false);
   const formattedSalePrice = salePrice ? formatPrice(salePrice, false) : null;
-
-  // Price formatting
+  const formattedFinalPrice = formatPrice(finalPrice.toString(), false);
 
   // Перевіряємо чи є знижка (як в CourseCard)
   const hasDiscount =
@@ -351,10 +397,13 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
     const fetchCategories = async () => {
       try {
         // Використовуємо ID з отриманого курсу, якщо він є
-        const courseIdForApi = course?.id || 
-                               (typeof courseId === "number" ? courseId : 
-                                /^\d+$/.test(String(courseId)) ? parseInt(String(courseId)) : 
-                                courseId);
+        const courseIdForApi =
+          course?.id ||
+          (typeof courseId === "number"
+            ? courseId
+            : /^\d+$/.test(String(courseId))
+            ? parseInt(String(courseId))
+            : courseId);
         const response = await fetch(`/api/wc/v3/products/${courseIdForApi}`);
         if (response.ok) {
           const data = await response.json();
@@ -402,10 +451,16 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
               <Badge variant="new" />
             )}
 
-            {/* Знижка - якщо курс на розпродажі */}
-            {(hasDiscount || hasFallbackDiscount) && finalDiscount > 0 && (
-              <Badge variant="discount" text={`-${finalDiscount}%`} />
-            )}
+            {/* Знижка - використовуємо таку саму логіку, як в CourseCard */}
+            {isLoggedIn
+              ? // Авторизований: показуємо загальну знижку
+                totalDiscount > 0 && (
+                  <Badge variant="discount" text={`-${Math.round(totalDiscount)}%`} />
+                )
+              : // Неавторизований: показуємо акційну знижку
+                baseDiscount > 0 && (
+                  <Badge variant="discount" text={`-${Math.round(baseDiscount)}%`} />
+                )}
 
             {/* Хіт - якщо курс популярний на основі рейтингу та відгуків */}
             {storeProduct && isHitProduct(storeProduct) && (
@@ -464,212 +519,213 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
       ) : (
         <div className={styles.courseInfo}>
           <div className={styles.courseTitleBlock}>
-          <div className={styles.categoryTagBlock}>
-            <div className={styles.categoryTag}>Курси</div>
-            <div className={styles.titleWithDateRow}>
-              <div className={styles.titleWithBadges}>
-                <h2 className={styles.courseTitle}>
-                  {(
-                    product?.name ||
-                    course?.title?.rendered ||
-                    "Основи тренерства BFB"
-                  ).replace(/____FULL____/g, "")}
-                </h2>
-                <div className={styles.courseBadges}>
-                  {storeProduct && isHitProduct(storeProduct) && (
-                    <Badge variant="hit" />
-                  )}
+            <div className={styles.categoryTagBlock}>
+              <div className={styles.categoryTag}>Курси</div>
+              <div className={styles.titleWithDateRow}>
+                <div className={styles.titleWithBadges}>
+                  <h2 className={styles.courseTitle}>
+                    {(
+                      product?.name ||
+                      course?.title?.rendered ||
+                      "Основи тренерства BFB"
+                    ).replace(/____FULL____/g, "")}
+                  </h2>
                 </div>
-              </div>
-              <div className={styles.dateBlock}>
-                <div className={styles.availability}>
-                  <CheckMarkIcon />
-                  <span className={styles.inStock}>
-                    {storeProduct?.purchasable ||
-                    storeProduct?.is_purchasable ||
-                    product?.stock_status === "instock"
-                      ? "В наявності"
-                      : "Немає"}
-                  </span>
-                </div>
+                <div className={styles.dateBlock}>
+                  <div className={styles.availability}>
+                    <CheckMarkIcon />
+                    <span className={styles.inStock}>
+                      {storeProduct?.purchasable ||
+                      storeProduct?.is_purchasable ||
+                      product?.stock_status === "instock"
+                        ? "В наявності"
+                        : "Немає"}
+                    </span>
+                  </div>
 
-                <div className={styles.rating}>
-                  <div className={styles.stars}>{renderStars(ratingValue)}</div>
-                  <span className={styles.reviewsCount}>
-                    ({storeProduct?.rating_count || product?.rating_count || 0})
-                  </span>
+                  <div className={styles.rating}>
+                    <div className={styles.stars}>
+                      {renderStars(ratingValue)}
+                    </div>
+                    <span className={styles.reviewsCount}>
+                      (
+                      {storeProduct?.rating_count || product?.rating_count || 0}
+                      )
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <p className={styles.courseDescription}>
-          {course?.excerpt?.rendered?.replace(/<[^>]*>/g, "") ||
-            "Професійний курс для тренерів з функціонального тренування на BFB"}
-        </p>
+          <p className={styles.courseDescription}>
+            {course?.excerpt?.rendered?.replace(/<[^>]*>/g, "") ||
+              "Професійний курс для тренерів з функціонального тренування на BFB"}
+          </p>
 
-        <div className={styles.courseIncludes}>
-          <h3 className={styles.courseIncludesTitle}>ЦЕЙ КУРС ВКЛЮЧАЄ:</h3>
-          <ul className={styles.courseIncludesList}>
-            {course?.course_data.Course_include?.map((item, index) => (
-              <li key={index} className={styles.courseIncludesItem}>
-                <div className={styles.courseIncludesIcon}>
-                  <Check3Icon />
-                </div>
-                <span className={styles.courseIncludesText}>{item}</span>
-              </li>
-            )) || (
-              // Fallback статичний список
-              <>
-                <li className={styles.courseIncludesItem}>
+          <div className={styles.courseIncludes}>
+            <h3 className={styles.courseIncludesTitle}>ЦЕЙ КУРС ВКЛЮЧАЄ:</h3>
+            <ul className={styles.courseIncludesList}>
+              {course?.course_data.Course_include?.map((item, index) => (
+                <li key={index} className={styles.courseIncludesItem}>
                   <div className={styles.courseIncludesIcon}>
                     <Check3Icon />
                   </div>
+                  <span className={styles.courseIncludesText}>{item}</span>
                 </li>
-                <li className={styles.courseIncludesItem}>
-                  <div className={styles.courseIncludesIcon}>
-                    <Check3Icon />
-                  </div>
-                  {/* <span className={styles.courseIncludesText}>
+              )) || (
+                // Fallback статичний список
+                <>
+                  <li className={styles.courseIncludesItem}>
+                    <div className={styles.courseIncludesIcon}>
+                      <Check3Icon />
+                    </div>
+                  </li>
+                  <li className={styles.courseIncludesItem}>
+                    <div className={styles.courseIncludesIcon}>
+                      <Check3Icon />
+                    </div>
+                    {/* <span className={styles.courseIncludesText}>
                     8 ресурсів для завантаження
                   </span> */}
-                </li>
-                <li className={styles.courseIncludesItem}>
-                  <div className={styles.courseIncludesIcon}>
-                    <Check3Icon />
-                  </div>
-                  <span className={styles.courseIncludesText}>
-                    Доступ через мобільні пристрої та телевізор
-                  </span>
-                </li>
-                <li className={styles.courseIncludesItem}>
-                  <div className={styles.courseIncludesIcon}>
-                    <Check3Icon />
-                  </div>
-                  <span className={styles.courseIncludesText}>
-                    Повний довічний доступ
-                  </span>
-                </li>
-                <li className={styles.courseIncludesItem}>
-                  <div className={styles.courseIncludesIcon}>
-                    <Check3Icon />
-                  </div>
-                  <span className={styles.courseIncludesText}>
-                    Сертифікат про закінчення
-                  </span>
-                </li>
-              </>
-            )}
-          </ul>
-        </div>
+                  </li>
+                  <li className={styles.courseIncludesItem}>
+                    <div className={styles.courseIncludesIcon}>
+                      <Check3Icon />
+                    </div>
+                    <span className={styles.courseIncludesText}>
+                      Доступ через мобільні пристрої та телевізор
+                    </span>
+                  </li>
+                  <li className={styles.courseIncludesItem}>
+                    <div className={styles.courseIncludesIcon}>
+                      <Check3Icon />
+                    </div>
+                    <span className={styles.courseIncludesText}>
+                      Повний довічний доступ
+                    </span>
+                  </li>
+                  <li className={styles.courseIncludesItem}>
+                    <div className={styles.courseIncludesIcon}>
+                      <Check3Icon />
+                    </div>
+                    <span className={styles.courseIncludesText}>
+                      Сертифікат про закінчення
+                    </span>
+                  </li>
+                </>
+              )}
+            </ul>
+          </div>
 
-        <div className={styles.topicsSection}>
-          <h3 className={styles.topicsSectionTitle}>ЯКІ ТЕМИ ПОКРИВАЄ КУРС:</h3>
-          <div className={styles.topicsGrid}>
-            {course?.course_data.Course_themes?.map((theme, index) => (
-              <div key={index} className={styles.topicTag}>
-                <p className={styles.topicText}>{theme}</p>
+          <div className={styles.topicsSection}>
+            <h3 className={styles.topicsSectionTitle}>
+              ЯКІ ТЕМИ ПОКРИВАЄ КУРС:
+            </h3>
+            <div className={styles.topicsGrid}>
+              {course?.course_data.Course_themes?.map((theme, index) => (
+                <div key={index} className={styles.topicTag}>
+                  <p className={styles.topicText}>{theme}</p>
+                </div>
+              )) || (
+                <div className={styles.topicTag}>
+                  <p className={styles.topicText}>
+                    Ведення груп і персональних занять
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className={styles.pricingCartBlock}>
+            {/* На десктопі pricing перед subscriptionOffer */}
+            {!isMobile && (
+              <div className={styles.pricing}>
+                <span className={styles.currentPrice}>
+                  {isLoggedIn ? formattedFinalPrice : formattedCurrentPrice}
+                  <span className={styles.currentPriceCurrency}>₴</span>
+                </span>
+                {((hasDiscount || hasFallbackDiscount) && formattedRegularPrice && regularPrice !== "0") ||
+                (isLoggedIn && finalPrice > 0 && formattedRegularPrice && regularPrice !== "0") ? (
+                    <div className={styles.oldPrice}>
+                      <span>{formattedRegularPrice}</span>
+                      <span className={styles.oldPriceCurrency}>₴</span>
+                    </div>
+                  ) : null}
               </div>
-            )) || (
-              <div className={styles.topicTag}>
-                <p className={styles.topicText}>
-                  Ведення груп і персональних занять
-                </p>
+            )}
+
+            <div className={styles.subscriptionOffer}>
+              <div className={styles.subscriptionOfferIcon}>
+                <GiftIcon />
+              </div>
+              <p>
+                Оформіть підписку – отримайте знижки та доступ до ексклюзивних
+                функцій!
+              </p>
+            </div>
+
+            {!isLoggedIn && (
+              <div className={styles.registerCallout}>
+                <div
+                  className={styles.registerBlock}
+                  onClick={() => setIsRegisterModalOpen(true)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <p className={styles.registerText}>
+                    Зареєструйтесь, щоб придбати
+                  </p>
+                </div>
+                <button
+                  className={styles.registerBtn}
+                  onClick={() => setIsTrenersModalOpen(true)}
+                >
+                  Стати тренером
+                </button>
               </div>
             )}
           </div>
-        </div>
 
-        <div className={styles.pricingCartBlock}>
-          {/* На десктопі pricing перед subscriptionOffer */}
-          {!isMobile && (
-            <div className={styles.pricing}>
-              <span className={styles.currentPrice}>
-                {formattedCurrentPrice}
-                <span className={styles.currentPriceCurrency}>₴</span>
-              </span>
-              {(hasDiscount || hasFallbackDiscount) &&
-                formattedRegularPrice && (
-                  <div className={styles.oldPrice}>
-                    <span>{formattedRegularPrice}</span>
-                    <span className={styles.oldPriceCurrency}>₴</span>
-                  </div>
-                )}
-            </div>
-          )}
-
-          <div className={styles.subscriptionOffer}>
-            <div className={styles.subscriptionOfferIcon}>
-              <GiftIcon />
-            </div>
-            <p>
-              Оформіть підписку – отримайте знижки та доступ до ексклюзивних
-              функцій!
-            </p>
-          </div>
-
-          {!isLoggedIn && (
-            <div className={styles.registerCallout}>
-              <div
-                className={styles.registerBlock}
-                onClick={() => setIsRegisterModalOpen(true)}
-                style={{ cursor: "pointer" }}
-              >
-                <p className={styles.registerText}>
-                  Зареєструйтесь, щоб придбати
-                </p>
+          <div className={styles.pricingActionsBlock}>
+            {/* На мобілці pricing в pricingActionsBlock */}
+            {isMobile && (
+              <div className={styles.pricing}>
+                <span className={styles.currentPrice}>
+                  {isLoggedIn ? formattedFinalPrice : formattedCurrentPrice}
+                  <span className={styles.currentPriceCurrency}>₴</span>
+                </span>
+                {((hasDiscount || hasFallbackDiscount) && formattedRegularPrice && regularPrice !== "0") ||
+                (isLoggedIn && finalPrice > 0 && formattedRegularPrice && regularPrice !== "0") ? (
+                    <div className={styles.oldPrice}>
+                      <span>{formattedRegularPrice}</span>
+                      <span className={styles.oldPriceCurrency}>₴</span>
+                    </div>
+                  ) : null}
               </div>
+            )}
+
+            <div className={styles.actions}>
               <button
-                className={styles.registerBtn}
-                onClick={() => setIsTrenersModalOpen(true)}
+                className={`${styles.addToCartButton} ${
+                  isControlsDisabled ? styles.addToCartButtonDisabled : ""
+                }`}
+                disabled={isControlsDisabled}
+                onClick={handleAddToCart}
               >
-                Стати тренером
+                {isInCart ? "В кошику" : "Додати в кошик"}
+              </button>
+              <button
+                className={`${styles.favoriteButton} ${
+                  favorite ? styles.favoriteActive : ""
+                } ${isControlsDisabled ? styles.favoriteButtonDisabled : ""}`}
+                onClick={isControlsDisabled ? undefined : toggleFavorite}
+                disabled={isControlsDisabled}
+              >
+                {favorite ? <FavoriteBlacIcon /> : <Favorite2Icon />}
               </button>
             </div>
-          )}
-        </div>
-
-        <div className={styles.pricingActionsBlock}>
-          {/* На мобілці pricing в pricingActionsBlock */}
-          {isMobile && (
-            <div className={styles.pricing}>
-              <span className={styles.currentPrice}>
-                {formattedCurrentPrice}
-                <span className={styles.currentPriceCurrency}>₴</span>
-              </span>
-              {(hasDiscount || hasFallbackDiscount) &&
-                formattedRegularPrice && (
-                  <div className={styles.oldPrice}>
-                    <span>{formattedRegularPrice}</span>
-                    <span className={styles.oldPriceCurrency}>₴</span>
-                  </div>
-                )}
-            </div>
-          )}
-
-          <div className={styles.actions}>
-            <button
-              className={`${styles.addToCartButton} ${
-                isControlsDisabled ? styles.addToCartButtonDisabled : ""
-              }`}
-              disabled={isControlsDisabled}
-              onClick={handleAddToCart}
-            >
-              {isInCart ? "В кошику" : "Додати в кошик"}
-            </button>
-            <button
-              className={`${styles.favoriteButton} ${
-                favorite ? styles.favoriteActive : ""
-              } ${isControlsDisabled ? styles.favoriteButtonDisabled : ""}`}
-              onClick={isControlsDisabled ? undefined : toggleFavorite}
-              disabled={isControlsDisabled}
-            >
-              {favorite ? <FavoriteBlacIcon /> : <Favorite2Icon />}
-            </button>
           </div>
         </div>
-      </div>
       )}
 
       {!isLoggedIn && (

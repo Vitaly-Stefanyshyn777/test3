@@ -140,7 +140,7 @@ const PurchasedCourses: React.FC<PurchasedCoursesProps> = ({
       <div className={styles.purchasedCourses}>
         <h2 className={styles.title}>{title}</h2>
         <div className={styles.divider}></div>
-        <div className={styles.empty}>У вас поки немає придбаних курсів</div>
+        <div className={styles.empty}>У вас немає придбаних курсів</div>
       </div>
     );
   }

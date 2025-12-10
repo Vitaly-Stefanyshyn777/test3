@@ -149,7 +149,7 @@
   background: var(--black);
   color: var(--white);
   border-color: var(--black);
-  transform: translateY(-2px);
+  /* transform: translateY(-2px); */
 }
 
 .imageOverlay {

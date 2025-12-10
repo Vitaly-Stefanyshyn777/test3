@@ -19,6 +19,7 @@ interface BranchDropdownFieldProps {
   supportingText?: string;
   isOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
+  backgroundColor?: "bg-color" | "white";
 }
 
 const BranchDropdownField: React.FC<BranchDropdownFieldProps> = ({
@@ -33,6 +34,7 @@ const BranchDropdownField: React.FC<BranchDropdownFieldProps> = ({
   supportingText = "",
   isOpen: controlledIsOpen,
   onOpenChange,
+  backgroundColor = "bg-color",
 }) => {
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
@@ -87,7 +89,7 @@ const BranchDropdownField: React.FC<BranchDropdownFieldProps> = ({
             value ? styles.selectButtonFilled : ""
           } ${isOpen ? styles.selectButtonActive : ""} ${
             hasError ? styles.selectButtonError : ""
-          }`}
+          } ${backgroundColor === "white" ? styles.selectButtonWhite : ""}`}
           onClick={handleToggle}
         >
           <span className={styles.selectText}>

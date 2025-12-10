@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import styles from "./VideoPlayer.module.css";
 import { CloseButtonIcon } from "@/components/Icons/Icons";
-import VideoPlayerSkeleton from "./VideoPlayerSkeleton";
 
 interface VideoPlayerProps {
   videoUrl: string;
@@ -59,22 +58,12 @@ export default function VideoPlayer({
 
     const handleLoadedData = () => {
       setIsLoading(false);
-
-      // Сповіщаємо глобально, що відео успішно завантажилось (для PageLoader на головній)
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new Event("hero-video-ready"));
-      }
     };
 
     const handleError = () => {
       setIsLoading(false);
       const errorMsg = video.error?.message || "Не вдалося завантажити відео";
       setError(errorMsg);
-
-      // Сповіщаємо глобально про помилку відео, щоб PageLoader не висів вічно
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new Event("hero-video-error"));
-      }
 
       if (process.env.NODE_ENV !== "production") {
         console.error("[VideoPlayer] Error loading video:", {
@@ -195,7 +184,9 @@ export default function VideoPlayer({
         </button>
       )}
       {isLoading && !showPreview && (
-        <VideoPlayerSkeleton showCloseButton={showCloseButton} asOverlay={true} />
+        <div className={styles.videoLoader}>
+          <div className={styles.spinner}></div>
+        </div>
       )}
 
       <video
@@ -206,13 +197,12 @@ export default function VideoPlayer({
         muted={muted}
         loop={loop}
         poster={poster}
-        preload="metadata"
+        preload="none"
         src={videoUrl}
         style={{
           opacity: isLoading && !showPreview ? 0 : 1,
         }}
       >
-        <source src={videoUrl} type="video/mp4" />
         Ваш браузер не підтримує відео тег.
       </video>
 

@@ -161,6 +161,7 @@ export default function DeliveryForm({
               onOpenChange={(isOpen) =>
                 setOpenDropdown(isOpen ? "delivery" : null)
               }
+              backgroundColor="white"
             />
           </div>
           <div className={s.inputWrap}>
@@ -181,6 +182,7 @@ export default function DeliveryForm({
               supportingText={errors.city || ""}
               isOpen={openDropdown === "city"}
               onOpenChange={(isOpen) => setOpenDropdown(isOpen ? "city" : null)}
+              backgroundColor="white"
             />
           </div>
         </div>
@@ -206,6 +208,7 @@ export default function DeliveryForm({
               onOpenChange={(isOpen) =>
                 setOpenDropdown(isOpen ? "branch" : null)
               }
+              backgroundColor="white"
             />
           </div>
           {deliveryType === "courier" && (

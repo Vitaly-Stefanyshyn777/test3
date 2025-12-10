@@ -117,7 +117,16 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({ courseId }) => {
             <Swiper
               modules={[Navigation, Pagination, A11y]}
               onSwiper={(sw) => (swiperRef.current = sw)}
-              onSlideChange={(sw) => setActive(sw.activeIndex)}
+              onSlideChange={(sw) => {
+                // Обмежуємо максимальний індекс, щоб останній слайд не враховувався
+                const maxIndex = Math.max(0, reviews.length - 2);
+                const currentIndex = Math.min(sw.activeIndex, maxIndex);
+                if (sw.activeIndex > maxIndex) {
+                  sw.slideTo(maxIndex);
+                } else {
+                  setActive(currentIndex);
+                }
+              }}
               spaceBetween={16}
               slidesPerView={"auto"}
               centeredSlides={false}
@@ -135,6 +144,7 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({ courseId }) => {
                 clickable: true,
                 bulletClass: styles.dot,
                 bulletActiveClass: `${styles.dotActive}`,
+                dynamicBullets: false,
               }}
             >
               {reviews.map((review) => (
@@ -164,10 +174,19 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({ courseId }) => {
         {reviews.length > 2 && (
           <SliderNav
             activeIndex={active}
-            dots={reviews.length}
+            dots={Math.max(0, reviews.length - 1)}
             onPrev={() => swiperRef.current?.slidePrev()}
-            onNext={() => swiperRef.current?.slideNext()}
-            onDotClick={(idx) => swiperRef.current?.slideTo(idx)}
+            onNext={() => {
+              const maxIndex = Math.max(0, reviews.length - 2);
+              if (swiperRef.current && active < maxIndex) {
+                swiperRef.current.slideNext();
+              }
+            }}
+            onDotClick={(idx) => {
+              const maxIndex = Math.max(0, reviews.length - 2);
+              const targetIndex = Math.min(idx, maxIndex);
+              swiperRef.current?.slideTo(targetIndex);
+            }}
           />
         )}
       </div>

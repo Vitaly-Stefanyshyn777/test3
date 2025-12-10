@@ -2,7 +2,6 @@
 import React from "react";
 import Skeleton from "react-loading-skeleton";
 import s from "./HeroSection.module.css";
-import VideoPlayerSkeleton from "./ProfileSection/VideoInstruction/VideoPlayerSkeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 const HeroSectionSkeleton = () => {
@@ -80,9 +79,12 @@ const HeroSectionSkeleton = () => {
 
         {/* Skeleton для відео */}
         <div className={s.heroVideo}>
-          <VideoPlayerSkeleton
-            showCloseButton={true}
-            className="w-full h-full"
+          <Skeleton
+            height="100%"
+            width="100%"
+            borderRadius={20}
+            baseColor="rgba(0, 0, 0, 0.3)"
+            highlightColor="rgba(0, 0, 0, 0.5)"
           />
         </div>
       </div>

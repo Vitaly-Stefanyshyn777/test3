@@ -366,6 +366,13 @@
   width: auto;
   display: inline-block;
   height: 64px;
+  transition: all 0.2s ease;
+}
+
+.primary:hover {
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
 }
 
 .primary:disabled {
@@ -397,6 +404,13 @@
   font-size: 16px;
   line-height: 135%;
   color: var(--white);
+  transition: all 0.2s ease;
+}
+
+.primaryWide:hover {
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
 }
 .radio {
   font-family: var(--font-family);

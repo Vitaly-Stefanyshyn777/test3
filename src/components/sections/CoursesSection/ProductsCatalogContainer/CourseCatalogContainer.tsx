@@ -19,13 +19,16 @@ interface Props {
 type Course = {
   id: string | number;
   name: string;
+  description?: string;
   price: string | number;
   originalPrice?: string | number;
   image?: string;
   rating?: number;
   reviewsCount?: number;
   requirements?: string;
+  dateCreated?: string;
   courseData?: unknown;
+  wcProduct?: unknown;
   categories?: Array<{
     id: number;
     name: string;
@@ -92,14 +95,21 @@ const CourseCatalogContainer = ({
           courses={pageData.map((course: Course) => ({
             id: String(course.id),
             name: course.name,
+            description: course.description || undefined,
             image: course.image || "",
             price:
               typeof course.price === "string"
                 ? parseFloat(course.price) || 0
                 : course.price || 0,
+            originalPrice:
+              typeof course.originalPrice === "string"
+                ? parseFloat(course.originalPrice) || 0
+                : course.originalPrice || 0,
             rating: course.rating || 0,
             reviewsCount: course.reviewsCount || 0,
             requirements: course.requirements,
+            dateCreated: course.dateCreated,
+            wcProduct: (course as any).wcProduct, // ВАЖЛИВО: Передаємо wcProduct як є
             courseData: course.courseData as { excerpt?: { rendered: string } } | undefined,
           }))}
           isLoading={isLoading}

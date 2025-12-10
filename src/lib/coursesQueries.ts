@@ -113,10 +113,22 @@ const mapWcCourseToCourse = (wcCourse: Record<string, unknown>) => {
     requirements: requiredEquipment,
     wcProduct: {
       prices: {
-        price:
-          (wcCourse.sale_price as string) || (wcCourse.regular_price as string),
-        regular_price: wcCourse.regular_price as string,
-        sale_price: wcCourse.sale_price as string,
+        // Якщо немає ціни (порожні рядки для курсів 173, 172) - ставимо "0"
+        price: (() => {
+          const salePrice = (wcCourse.sale_price as string)?.trim();
+          const regularPrice = (wcCourse.regular_price as string)?.trim();
+          if (salePrice && salePrice !== "") return salePrice;
+          if (regularPrice && regularPrice !== "") return regularPrice;
+          return "0"; // Якщо обидві порожні (курси 173, 172)
+        })(),
+        regular_price: (() => {
+          const regularPrice = (wcCourse.regular_price as string)?.trim();
+          return regularPrice && regularPrice !== "" ? regularPrice : "0";
+        })(),
+        sale_price: (() => {
+          const salePrice = (wcCourse.sale_price as string)?.trim();
+          return salePrice && salePrice !== "" ? salePrice : "0";
+        })(),
       },
       on_sale: (wcCourse.on_sale as boolean) || false,
       total_sales: (wcCourse.total_sales as number) || 0,
@@ -194,7 +206,6 @@ export const fetchCourses = async (filters: CourseFilters = {}) => {
       throw new Error("Failed to fetch courses from WooCommerce");
     }
     const wcCourses = await wcResponse.json();
-
     return wcCourses.map(mapWcCourseToCourse);
   } catch (error) {
     throw error;

@@ -10,6 +10,7 @@ import { Manrope } from "next/font/google";
 import QueryProvider from "@/components/providers/QueryProvider";
 import AuthProvider from "@/components/providers/AuthProvider";
 import AdminAutoLogin from "@/components/providers/AdminAutoLogin";
+import AnchorHandler from "@/components/layout/AnchorHandler/AnchorHandler";
 
 export const metadata: Metadata = {
   title: "B.F.B Fitness",
@@ -47,6 +48,7 @@ export default function RootLayout({
         <QueryProvider>
           <AuthProvider>
             <AdminAutoLogin />
+            <AnchorHandler />
             <Header />
             <Suspense fallback={null}>
               <Breadcrumbs />

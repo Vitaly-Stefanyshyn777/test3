@@ -1,18 +1,14 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { useAuthStore } from "@/store/auth";
-import { useFavoriteStore, selectIsFavorite } from "@/store/favorites";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./CourseCard.module.css";
-import { FavoriteHeader, BasketIcon, SmitnikIcon } from "../../../Icons/Icons";
 import FavoriteButton from "@/components/ui/Buttons/FavoriteButton";
 import CartButton from "@/components/ui/Buttons/CartButton";
 import Badge from "@/components/ui/Badge/Badge";
 import BadgeContainer from "@/components/ui/Badge/BadgeContainer";
 import SubscriptionBadge from "@/components/ui/SubscriptionBadge/SubscriptionBadge";
-import { useCartStore } from "@/store/cart";
-import { FavoriteIcon } from "../../../Icons/Icons";
 
 interface CourseCardProps {
   id: string;
@@ -96,38 +92,10 @@ const CourseCard = ({
   wcProduct,
   allProducts = [],
 }: CourseCardProps) => {
-  // const isLoggedIn = useAuthStore((s) => s.isLoggedIn); // moved below
-  // concise debug only
-  const [favorite, setFavorite] = useState(isFavorite);
   const favoriteKey = `course-${id}`;
-  const isFav = useFavoriteStore(selectIsFavorite(favoriteKey));
-  const toggleFav = useFavoriteStore((s) => s.toggleFavorite);
-  const addItem = useCartStore((s) => s.addItem);
-  const removeItem = useCartStore((s) => s.removeItem);
-  const cartItems = useCartStore((s) => s.items);
   const cartKey = `course-${id}`;
-  const inCart = !!cartItems[cartKey] && cartItems[cartKey].quantity > 0;
-
   const imageUrl = image || "/placeholder.svg";
 
-  const toggleFavorite = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setFavorite(!favorite);
-    toggleFav({ id: favoriteKey, name, price: price || 0, image });
-  };
-
-  const handleCartClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (inCart) {
-      removeItem(cartKey);
-    } else {
-      addItem({ id: cartKey, name, price: price || 0, image }, 1);
-    }
-  };
-
-  // Функція для розрахунку "Новинка" (30 днів)
   const isNewProduct = (dateCreated?: string) => {
     if (!dateCreated) return false;
     const createdDate = new Date(dateCreated);
@@ -135,154 +103,100 @@ const CourseCard = ({
     return createdDate > thirtyDaysAgo;
   };
 
-  // Функція для розрахунку "Хіт" на основі топ 10 продажів
   const isHitProduct = (
     wcProduct?: {
       total_sales?: number;
-      average_rating?: string;
-      featured?: boolean;
-      on_sale?: boolean;
     },
     allProducts?: Array<{ total_sales?: number }>
   ) => {
-    if (!wcProduct || !allProducts || allProducts.length === 0) return false;
+    if (!wcProduct || !allProducts?.length) return false;
 
     const totalSales = parseInt(wcProduct.total_sales?.toString() || "0");
-    const rating = parseFloat(wcProduct.average_rating?.toString() || "0");
-    const isFeatured = wcProduct.featured;
-    const isOnSale = wcProduct.on_sale;
+    if (totalSales === 0) return false;
 
-    // Отримуємо топ 10 продажів
     const salesValues = allProducts
       .map((p) => parseInt(p.total_sales?.toString() || "0"))
-      .sort((a, b) => b - a)
-      .slice(0, 10);
+      .filter((sales) => sales > 0)
+      .sort((a, b) => b - a);
 
-    const top10Sales = new Set(salesValues);
-    const currentProductSales = parseInt(
-      wcProduct.total_sales?.toString() || "0"
-    );
+    if (salesValues.length === 0) return false;
 
-    // Складна логіка для визначення хіта
-    return (
-      (totalSales >= 10 && rating >= 3.5) ||
-      (isFeatured && rating >= 4.0) ||
-      (isOnSale && totalSales >= 5) ||
-      (isOnSale && rating >= 3.0) ||
-      isOnSale ||
-      top10Sales.has(currentProductSales)
-    );
+    const top10Index = Math.min(9, salesValues.length - 1);
+    const topSalesThreshold = salesValues[top10Index];
+
+    return totalSales >= topSalesThreshold;
   };
 
   // Функція для форматування ціни
-  const formatPrice = (
-    price: string | number | undefined,
-    isWcPrice: boolean = false
-  ): string => {
-    if (!price || isNaN(parseFloat(price.toString()))) return "0";
+  const formatPrice = (price: string | number | undefined): string => {
+    if (!price) return "0";
     const priceValue = parseFloat(price.toString());
     if (isNaN(priceValue)) return "0";
-    // WooCommerce ціни в копійках, fallback ціни в гривнях
-    return (isWcPrice ? priceValue / 100 : priceValue).toLocaleString("uk-UA");
+    return priceValue.toLocaleString("uk-UA");
   };
 
-  // Функція для розрахунку знижки (як в ProductCard)
-  const calculateDiscount = (salePrice: string, regularPrice: string) => {
-    if (!salePrice || !regularPrice || salePrice === regularPrice) return 0;
-    return Math.round(
-      ((parseFloat(regularPrice) - parseFloat(salePrice)) /
-        parseFloat(regularPrice)) *
-        100
-    );
-  };
+  const currentPrice =
+    wcProduct?.prices?.price &&
+    wcProduct.prices.price !== "0" &&
+    wcProduct.prices.price !== ""
+      ? wcProduct.prices.price
+      : price.toString();
 
-  // Визначаємо ціни та знижку з WooCommerce API або fallback
-  const currentPrice = wcProduct?.prices?.price || price.toString();
   const regularPrice =
-    wcProduct?.prices?.regular_price || originalPrice?.toString();
-  const salePrice = wcProduct?.prices?.sale_price;
-  const isOnSale =
-    wcProduct?.on_sale || (originalPrice && originalPrice > price);
+    wcProduct?.prices?.regular_price &&
+    wcProduct.prices.regular_price !== "0" &&
+    wcProduct.prices.regular_price !== ""
+      ? wcProduct.prices.regular_price
+      : originalPrice?.toString() || "0";
 
-  // Форматуємо ціни (WooCommerce ціни в копійках)
-  const formattedCurrentPrice = formatPrice(currentPrice, !!wcProduct);
-  const formattedRegularPrice = formatPrice(regularPrice, !!wcProduct);
-  const formattedSalePrice = salePrice
-    ? formatPrice(salePrice, !!wcProduct)
-    : null;
+  const salePrice =
+    wcProduct?.prices?.sale_price &&
+    wcProduct.prices.sale_price !== "0" &&
+    wcProduct.prices.sale_price !== ""
+      ? wcProduct.prices.sale_price
+      : null;
 
-  // Логіка цін з урахуванням авторизації (відповідно до детального алгоритму)
+  const isOnSale = wcProduct?.on_sale || false;
+
+  const formattedCurrentPrice = formatPrice(currentPrice);
+  const formattedRegularPrice = formatPrice(regularPrice);
+  const formattedSalePrice = salePrice ? formatPrice(salePrice) : null;
+
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-  const authDiscount = 0.2; // 20% знижка для авторизованих
+  const authDiscount = 0.2;
 
-  // 1. Обираємо базову ціну (пріоритет: salePrice -> currentPrice -> regularPrice)
   const basePrice = salePrice || currentPrice || regularPrice;
 
-  // 2. Розраховуємо відсоток акційної знижки
-  const baseDiscount = (() => {
-    if (salePrice && regularPrice) {
-      return (
-        ((parseFloat(regularPrice) - parseFloat(salePrice)) /
+  const baseDiscount =
+    salePrice && regularPrice
+      ? ((parseFloat(regularPrice) - parseFloat(salePrice)) /
           parseFloat(regularPrice)) *
         100
-      );
-    }
-    if (currentPrice && regularPrice && currentPrice < regularPrice) {
-      return (
-        ((parseFloat(regularPrice) - parseFloat(currentPrice)) /
+      : currentPrice &&
+        regularPrice &&
+        parseFloat(currentPrice) < parseFloat(regularPrice)
+      ? ((parseFloat(regularPrice) - parseFloat(currentPrice)) /
           parseFloat(regularPrice)) *
         100
-      );
-    }
-    return 0;
-  })();
+      : 0;
 
-  // 3. Якщо користувач авторизований - від базової ціни віднімаємо ще 20%
-  const finalPrice = (() => {
-    if (!basePrice) return 0;
+  const finalPrice = basePrice
+    ? isLoggedIn
+      ? parseFloat(basePrice) * (1 - authDiscount)
+      : parseFloat(basePrice)
+    : 0;
 
-    const basePriceNum = parseFloat(basePrice);
-    if (isLoggedIn) {
-      // Для авторизованих: від basePrice віднімаємо 20%
-      return basePriceNum * (1 - authDiscount);
-    } else {
-      // Для неавторизованих: показуємо basePrice
-      return basePriceNum;
-    }
-  })();
-
-  // 4. Загальна знижка для бейджа (від regular_price до finalPrice)
   const totalDiscount =
     regularPrice && finalPrice
       ? ((parseFloat(regularPrice) - finalPrice) / parseFloat(regularPrice)) *
         100
       : 0;
 
-  // Перевіряємо чи є знижка (як в ProductCard)
-  const hasDiscount =
-    isOnSale && salePrice && regularPrice && salePrice !== regularPrice;
-
-  // Додаткова перевірка для fallback цін
-  const hasFallbackDiscount =
-    !hasDiscount &&
-    originalPrice &&
-    price &&
-    originalPrice > price &&
-    price > 0;
-
-  // Розраховуємо знижку на основі форматованих цін
-  const finalDiscount = hasDiscount
-    ? calculateDiscount(salePrice, regularPrice)
-    : hasFallbackDiscount
-    ? Math.round(((originalPrice - price) / originalPrice) * 100)
-    : 0; // Не показуємо знижку якщо немає реальних даних
-
-  // Визначаємо чи є продукт новинкою
   const isActuallyNew = isNewProduct(dateCreated) || isNew;
-
-  // Визначаємо чи є продукт хітом
   const isActuallyHit =
-    wcProduct && allProducts ? isHitProduct(wcProduct, allProducts) : isHit;
+    wcProduct && allProducts?.length
+      ? isHitProduct(wcProduct, allProducts)
+      : isHit;
 
   const truncateDescription = (text: string, maxLength: number = 80) => {
     if (text.length <= maxLength) return text;
@@ -326,13 +240,17 @@ const CourseCard = ({
         <BadgeContainer>
           {isActuallyNew && <Badge variant="new" />}
           {isLoggedIn
-            ? // Авторизований: показуємо загальну знижку
-              totalDiscount > 0 && (
-                <Badge variant="discount" text={`-${Math.round(totalDiscount)}%`} />
+            ? totalDiscount > 0 && (
+                <Badge
+                  variant="discount"
+                  text={`-${Math.round(totalDiscount)}%`}
+                />
               )
-            : // Неавторизований: показуємо акційну знижку
-              baseDiscount > 0 && (
-                <Badge variant="discount" text={`-${Math.round(baseDiscount)}%`} />
+            : baseDiscount > 0 && (
+                <Badge
+                  variant="discount"
+                  text={`-${Math.round(baseDiscount)}%`}
+                />
               )}
           {isActuallyHit && <Badge variant="hit" />}
         </BadgeContainer>
@@ -365,9 +283,7 @@ const CourseCard = ({
 
           <div className={styles.rating}>
             {renderStars(rating || 0)}
-            <span className={styles.reviewsCount}>
-              ({reviewsCount || 0})
-            </span>
+            <span className={styles.reviewsCount}>({reviewsCount || 0})</span>
           </div>
 
           {(courseData?.Required_equipment || requirements) && (
@@ -388,45 +304,47 @@ const CourseCard = ({
 
             <div className={styles.pricing}>
               {isLoggedIn ? (
-                // Авторизовані: показуємо finalPrice та regularPrice (перекреслена)
                 <>
                   {finalPrice > 0 && (
                     <span className={styles.currentPrice}>
                       <span className={styles.currentPriceValue}>
-                        {formatPrice(finalPrice.toString(), !!wcProduct)}
+                        {formatPrice(finalPrice.toString())}
                       </span>
                       <span className={styles.priceCurrency}>₴</span>
                     </span>
                   )}
-                  {regularPrice && parseFloat(regularPrice) > 0 && totalDiscount > 0 && (
-                    <span className={styles.originalPrice}>
-                      <span className={styles.originalPriceValue}>
-                        {formattedRegularPrice}
+                  {regularPrice &&
+                    parseFloat(regularPrice) > 0 &&
+                    totalDiscount > 0 && (
+                      <span className={styles.originalPrice}>
+                        <span className={styles.originalPriceValue}>
+                          {formattedRegularPrice}
+                        </span>
+                        <span className={styles.originalPriceCurrency}>₴</span>
                       </span>
-                      <span className={styles.originalPriceCurrency}>₴</span>
-                    </span>
-                  )}
+                    )}
                 </>
               ) : (
-                // Неавторизовані: показуємо basePrice та regularPrice (якщо є знижка)
                 <>
-                  {(formattedSalePrice || formattedCurrentPrice) && 
+                  {(formattedSalePrice || formattedCurrentPrice) &&
                     parseFloat(salePrice || currentPrice || "0") > 0 && (
-                    <span className={styles.currentPrice}>
-                      <span className={styles.currentPriceValue}>
-                        {formattedSalePrice || formattedCurrentPrice}
+                      <span className={styles.currentPrice}>
+                        <span className={styles.currentPriceValue}>
+                          {formattedSalePrice || formattedCurrentPrice}
+                        </span>
+                        <span className={styles.priceCurrency}>₴</span>
                       </span>
-                      <span className={styles.priceCurrency}>₴</span>
-                    </span>
-                  )}
-                  {salePrice && regularPrice && parseFloat(regularPrice) > 0 && (
-                    <span className={styles.originalPrice}>
-                      <span className={styles.originalPriceValue}>
-                        {formattedRegularPrice}
+                    )}
+                  {salePrice &&
+                    regularPrice &&
+                    parseFloat(regularPrice) > 0 && (
+                      <span className={styles.originalPrice}>
+                        <span className={styles.originalPriceValue}>
+                          {formattedRegularPrice}
+                        </span>
+                        <span className={styles.originalPriceCurrency}>₴</span>
                       </span>
-                      <span className={styles.originalPriceCurrency}>₴</span>
-                    </span>
-                  )}
+                    )}
                 </>
               )}
             </div>

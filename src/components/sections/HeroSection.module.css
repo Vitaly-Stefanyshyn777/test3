@@ -371,6 +371,7 @@
     border-radius: 0 0 mvw(16) mvw(16);
     overflow: hidden;
     pointer-events: auto; /* Дозволяємо взаємодію з Swiper на мобільній */
+    position: static !important;
   }
 
   .heroBanner :global(.swiper),

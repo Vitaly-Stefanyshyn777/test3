@@ -43,7 +43,7 @@
   color: var(--violet);
   text-decoration: none;
   background: rgba(111, 66, 193, 0.05);
-  transform: translateY(-1px);
+  /* transform: translateY(-1px); */
 }
 
 .breadcrumbText {
@@ -171,7 +171,7 @@
 
 @media (max-width: 1000px) {
   .breadcrumbs {
-    position: relative;
+    position: absolute;
     top: 0;
     padding: mvw(85) mvw(16) mvw(15);
     z-index: 10;

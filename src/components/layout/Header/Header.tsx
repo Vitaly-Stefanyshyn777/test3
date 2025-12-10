@@ -357,11 +357,48 @@ export default function Header() {
                 <BurgerMenu />
               </button>
               <nav className={s.nav}>
-                {mainNavigation.map((item) => (
-                  <Link key={item.href} href={item.href}>
-                    {item.label}
-                  </Link>
-                ))}
+                {mainNavigation.map((item) => {
+                  // Спеціальна обробка для посилання на воркшопи
+                  if (item.href === "/#events") {
+                    return (
+                      <a
+                        key={item.href}
+                        href="/#events"
+                        onClick={(e) => {
+                          // Якщо ми вже на головній сторінці, обробляємо прокрутку вручну
+                          if (pathname === "/") {
+                            e.preventDefault();
+                            const eventsElement = document.getElementById("events");
+                            if (eventsElement) {
+                              const headerHeight = 120;
+                              const targetPosition =
+                                eventsElement.offsetTop - headerHeight;
+                              window.scrollTo({
+                                top: Math.max(0, targetPosition),
+                                behavior: "smooth",
+                              });
+                            } else {
+                              // Якщо елемент ще не завантажений, встановлюємо хеш і чекаємо
+                              window.location.hash = "events";
+                            }
+                          } else {
+                            // Якщо ми на іншій сторінці, використовуємо window.location
+                            // для гарантованого переходу з хешем
+                            e.preventDefault();
+                            window.location.href = "/#events";
+                          }
+                        }}
+                      >
+                        {item.label}
+                      </a>
+                    );
+                  }
+                  return (
+                    <Link key={item.href} href={item.href}>
+                      {item.label}
+                    </Link>
+                  );
+                })}
               </nav>
             </div>
 

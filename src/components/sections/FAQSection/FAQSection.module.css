@@ -4,6 +4,7 @@
 
 .container {
   padding: 0 20px;
+  /* flex: 1 1; */
 }
 .contentBlock {
   width: 100%;
@@ -23,10 +24,16 @@
 }
 
 .content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* display: grid; */
+  /* grid-template-columns: 1fr 1fr; */
+  display: flex;
+  /* flex-direction: column; */
   gap: 32px;
   align-items: flex-start;
+
+  display: flex;
+  width: 100%;
+  justify-content: center;
 }
 
 .leftColumn {
@@ -90,11 +97,14 @@
   border-radius: 16px;
   object-fit: cover;
   display: block;
+  width: 893px;
 }
 
 .rightColumn {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 900px;
 }
 
 .faqList {
@@ -302,7 +312,7 @@
   }
 
   .content {
-    grid-template-columns: 1fr;
+    /* grid-template-columns: 1fr; */
     gap: mvw(16);
   }
 

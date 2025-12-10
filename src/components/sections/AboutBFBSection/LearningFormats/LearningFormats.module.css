@@ -427,8 +427,17 @@
   .priceFrom {
     font-size: mvw(20);
   }
+  .priceValue {
+    font-family: var(--second-family);
+    font-weight: 600;
+    font-size: mvw(26);
+    line-height: 120%;
+    letter-spacing: -0.01em;
+    text-align: right;
+    color: var(--black);
+  }
+
   .price,
-  .priceValue,
   .priceCurrency {
     font-size: mvw(20);
   }

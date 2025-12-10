@@ -553,7 +553,7 @@
   backdrop-filter: blur(11.699999809265137px);
   background: #8426d7;
   color: var(--white);
-  transform: translateY(-1px);
+  /* transform: translateY(-1px); */
 }
 
 /* Додати після існуючих стилів для headerTrainerProfile */
@@ -717,6 +717,11 @@
     width: 14px;
     height: 14px;
   }
+}
+
+.menuClose:hover {
+  background: var(--violet);
+  color: var(--white);
 }
 
 .close:hover {
@@ -1079,7 +1084,7 @@
   }
 
   .mobileHeader {
-    padding: mvw(12) mvw(16);
+    padding: mvw(7) mvw(16);
     background: var(--white);
   }
 

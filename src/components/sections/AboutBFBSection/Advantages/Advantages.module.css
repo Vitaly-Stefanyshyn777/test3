@@ -759,11 +759,11 @@
   }
   .advantagesHeader {
     padding: 0 mvw(16);
-    gap: mvw(8);
+    gap: mvw(6);
     align-items: center;
   }
   .advantagesSubtitle {
-    font-size: mvw(12);
+    font-size: mvw(14);
     text-align: left;
   }
   .advantagesTitle {

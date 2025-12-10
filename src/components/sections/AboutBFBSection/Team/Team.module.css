@@ -165,7 +165,7 @@
   }
   .teamContainer {
     padding: 0;
-    gap: mvw(16);
+    gap: mvw(32);
   }
   .teamHeader {
     padding: 0 mvw(16);
@@ -249,5 +249,14 @@
   .achievementText {
     font-size: mvw(14);
     line-height: 140%;
+  }
+
+  /* SliderNav стилі для мобільної версії */
+  .teamContainer :global(.navContainer) {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin-top: mvw(24);
+    padding: 0 mvw(16);
   }
 }

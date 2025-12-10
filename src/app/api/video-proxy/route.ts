@@ -118,6 +118,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Валідація URL - перевіряємо, чи URL не обрізаний
+    if (!videoUrl.match(/\.(mp4|webm|ogg|mov|avi|mkv)(\?|$)/i)) {
+      console.error("[video-proxy] Обрізаний або невалідний URL відео:", videoUrl);
+      return NextResponse.json(
+        { 
+          error: "Недопустимий формат URL відео (відсутнє розширення файлу)",
+          videoUrl
+        },
+        { status: 400 }
+      );
+    }
+
     // Завантажуємо відео з оригінального сервера
     let response: Response;
     try {
@@ -155,6 +167,18 @@ export async function GET(request: NextRequest) {
     // Отримуємо тип контенту
     const contentType = response.headers.get("content-type") || "video/mp4";
     const contentLength = response.headers.get("content-length");
+    
+    // Перевіряємо, чи це дійсно відео
+    if (!contentType.startsWith("video/")) {
+      console.error("[video-proxy] Невалідний тип контенту:", contentType);
+      return NextResponse.json(
+        { 
+          error: "Отримано невідео контент",
+          contentType
+        },
+        { status: 400 }
+      );
+    }
 
     // Створюємо новий response з відео даними
     const videoBuffer = await response.arrayBuffer();

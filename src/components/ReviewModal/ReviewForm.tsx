@@ -3,6 +3,7 @@ import {
   UseFormRegister,
   FieldErrors,
   UseFormHandleSubmit,
+  UseFormSetValue,
 } from "react-hook-form";
 import { NumberIcon, UserIcon, QuestionIcon, EmailIcon } from "@/components/Icons/Icons";
 import InputField from "@/components/ui/FormFields/InputField";
@@ -47,6 +48,7 @@ interface LoginFormProps {
   isSubmitting: boolean;
   isPending: boolean;
   isError: boolean;
+  setValue: UseFormSetValue<LoginFormValues>;
 }
 
 export default function LoginForm({
@@ -57,12 +59,19 @@ export default function LoginForm({
   isSubmitting,
   isPending,
   isError,
+  setValue,
 }: LoginFormProps) {
-  const [rating, setRating] = useState<number>(3);
+  const [rating, setRating] = useState<number>(0);
+
+  // Синхронізуємо рейтинг з формою при зміні
+  const handleRatingChange = (value: number) => {
+    setRating(value);
+    setValue("rating", value, { shouldValidate: true });
+  };
 
   return (
     <form className={s.form} onSubmit={handleSubmit(onSubmit)} noValidate>
-      <input type="hidden" value={rating} {...register("rating")} />
+      <input type="hidden" {...register("rating", { value: rating })} />
 
       <div className={s.fieldsBlock}>
         <div className={s.inputGroup}>
@@ -134,7 +143,7 @@ export default function LoginForm({
                 key={value}
                 type="button"
                 className={s.starButton}
-                onClick={() => setRating(value)}
+                onClick={() => handleRatingChange(value)}
               >
                 <StarIcon filled={filled} className={s.star} />
               </button>

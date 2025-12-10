@@ -10,6 +10,27 @@
   width: 100%;
 }
 
+.textareaWrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 52px;
+  background: #f9f9f9;
+  border: 1px solid #f9f9f9;
+  border-bottom: none;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 24px 24px 0 0;
+  transition: all 0.2s;
+  visibility: hidden;
+}
+
+.fieldWrapper:has(.textarea:focus) .textareaWrapper::before {
+  border-color: #000;
+}
+
 .textareaIcon {
   position: absolute;
   left: 16px;
@@ -19,6 +40,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 2;
 }
 
 .textarea {
@@ -37,6 +59,13 @@
   color: #000;
   background: #f9f9f9;
   border: 1px solid #f9f9f9;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.textarea::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .textarea:focus {
@@ -60,6 +89,7 @@
   line-height: 130%;
   color: rgba(14, 14, 14, 0.4);
   transition: all 0.15s ease;
+  z-index: 2;
 }
 
 .textarea:focus + .label,
@@ -67,6 +97,12 @@
   top: 10px;
   transform: translateY(0);
   font-size: 11px;
+}
+
+.fieldWrapper:has(.textarea:focus) .textareaWrapper::before,
+.fieldWrapper:has(.textarea:not(:placeholder-shown)) .textareaWrapper::before {
+  height: 20px;
+  visibility: visible;
 }
 
 /* Заповнений стан без фокусу */
@@ -158,6 +194,25 @@
 
   .textareaWrapper {
     display: block;
+  }
+
+  .textareaWrapper::before {
+    height: mvw(52);
+    border-radius: mvw(12) mvw(12) 0 0;
+    border: 1px solid #f9f9f9;
+    border-bottom: none;
+    visibility: hidden;
+  }
+
+  .fieldWrapper:has(.textarea:focus) .textareaWrapper::before {
+    border-color: #000;
+  }
+
+  .fieldWrapper:has(.textarea:focus) .textareaWrapper::before,
+  .fieldWrapper:has(.textarea:not(:placeholder-shown))
+    .textareaWrapper::before {
+    height: mvw(28);
+    visibility: visible;
   }
 
   .supportingTextWrapper {

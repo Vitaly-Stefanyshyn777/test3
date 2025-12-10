@@ -450,7 +450,7 @@
   .missionCard {
     width: 100%;
     height: mvw(200);
-    padding: mvw(16) mvw(87);
+    padding: mvw(16);
     border-radius: mvw(16);
     align-items: flex-end;
     justify-content: flex-end;
@@ -458,6 +458,8 @@
     background-position: initial;
     background-repeat: no-repeat;
     background-size: cover;
+    /* align-items: center; */
+    justify-content: center;
   }
   .missionCardContent {
     gap: mvw(8);

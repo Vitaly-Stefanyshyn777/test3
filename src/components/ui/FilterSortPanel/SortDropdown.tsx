@@ -14,6 +14,7 @@ interface SortDropdownProps {
   options: SortOption[];
   onChange: (value: string) => void;
   className?: string;
+  variant?: "itemsPerPage" | "sort";
 }
 
 const SortDropdown: React.FC<SortDropdownProps> = ({
@@ -22,6 +23,7 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
   options,
   onChange,
   className = "",
+  variant = "sort",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -45,25 +47,62 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
   }, [isOpen]);
 
   return (
-    <div ref={containerRef} className={`${styles.dropdownContainer} ${className}`}>
+    <div
+      ref={containerRef}
+      className={`${
+        variant === "itemsPerPage"
+          ? styles.itemsPerPageContainer
+          : styles.sortContainer
+      } ${className}`}
+    >
       <button
         type="button"
-        className={styles.dropdownButton}
+        className={
+          variant === "itemsPerPage"
+            ? styles.itemsPerPageButton
+            : styles.sortButton
+        }
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className={styles.label}>{label}</span>
+        <span
+          className={
+            variant === "itemsPerPage"
+              ? styles.itemsPerPageLabel
+              : styles.sortLabel
+          }
+        >
+          {label}
+        </span>
         <SortArrowIcon
-          className={`${styles.icon} ${isOpen ? styles.iconRotated : ""}`}
+          className={`${
+            variant === "itemsPerPage"
+              ? styles.itemsPerPageIcon
+              : styles.sortIcon
+          } ${isOpen ? styles.iconRotated : ""}`}
         />
       </button>
       {isOpen && (
-        <div className={styles.dropdown}>
+        <div
+          className={
+            variant === "itemsPerPage"
+              ? styles.itemsPerPageDropdown
+              : styles.sortDropdown
+          }
+        >
           {options.map((option) => (
             <button
               key={option.value}
               type="button"
-              className={`${styles.dropdownItem} ${
-                value === option.value ? styles.dropdownItemActive : ""
+              className={`${
+                variant === "itemsPerPage"
+                  ? styles.itemsPerPageDropdownItem
+                  : styles.sortDropdownItem
+              } ${
+                value === option.value
+                  ? variant === "itemsPerPage"
+                    ? styles.itemsPerPageDropdownItemActive
+                    : styles.sortDropdownItemActive
+                  : ""
               }`}
               onClick={() => {
                 onChange(option.value);
@@ -80,4 +119,3 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
 };
 
 export default SortDropdown;
-

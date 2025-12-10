@@ -35,21 +35,59 @@ type YoastHeadJson = {
 
 async function fetchHomeSeo(): Promise<YoastHeadJson | null> {
   try {
-    // Використовуємо змінну середовища або fallback для статичної генерації
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
-                    (process.env.VERCEL_URL 
-                      ? `https://${process.env.VERCEL_URL}`
-                      : process.env.NODE_ENV === "production"
-                        ? "https://bfb.com.ua"
-                        : "http://localhost:3000");
-    
-    const res = await fetch(`${baseUrl}/api/banners`, {
-      cache: "no-store",
+    // Викликаємо WordPress API напряму для статичної генерації
+    const UPSTREAM_BASE = process.env.UPSTREAM_BASE;
+    if (!UPSTREAM_BASE) {
+      console.warn("[generateMetadata] UPSTREAM_BASE not configured");
+      return null;
+    }
+
+    // Отримуємо токен для авторизації
+    const normalize = (v?: string) => (v || "").replace(/^['"]|['"]$/g, "");
+    const username = normalize(process.env.ADMIN_USER);
+    const password = normalize(process.env.ADMIN_PASS);
+
+    let freshToken: string | undefined;
+    if (username && password) {
+      try {
+        const tokenRes = await fetch(
+          `${UPSTREAM_BASE}/wp-json/jwt-auth/v1/token`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+            next: { revalidate: 3600 }, // Кешуємо токен на 1 годину
+          }
+        );
+
+        if (tokenRes.ok) {
+          const tokenData = await tokenRes.json();
+          freshToken = tokenData?.token;
+        }
+      } catch (tokenError) {
+        console.warn("[generateMetadata] Failed to get auth token:", tokenError);
+      }
+    }
+
+    // Запитуємо дані банерів напряму з WordPress
+    const targetUrl = new URL(`${UPSTREAM_BASE}/wp-json/wp/v2/banner`);
+
+    const headers: Record<string, string> = {};
+    if (freshToken) {
+      headers["Authorization"] = `Bearer ${freshToken}`;
+    }
+
+    const res = await fetch(targetUrl.toString(), {
+      method: "GET",
+      headers,
+      next: { revalidate: 3600 }, // Кешуємо банери на 1 годину
     });
+
     if (!res.ok) {
       console.error("[generateMetadata] Failed to fetch banners:", res.status);
       return null;
     }
+
     const data = await res.json();
     const first = Array.isArray(data) && data.length > 0 ? data[0] : data;
     const yoast = first?.yoast_head_json as YoastHeadJson | undefined;

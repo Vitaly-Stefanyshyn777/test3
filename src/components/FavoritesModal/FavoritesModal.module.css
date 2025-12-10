@@ -23,7 +23,8 @@
   flex-direction: column;
   border-radius: 20px;
   padding: 52px;
-  min-width: 600px;
+  min-width: 1500px;
+  min-height: 700px;
 }
 .topbarListBlock {
   display: flex;

@@ -214,9 +214,10 @@
   color: var(--white);
 }
 
-.submit:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+.submit:hover {
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
 }
 
 .submit:disabled {

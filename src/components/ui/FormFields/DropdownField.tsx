@@ -20,6 +20,7 @@ interface DropdownFieldProps {
   supportingText?: string;
   isOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
+  backgroundColor?: "bg-color" | "white";
 }
 
 const DropdownField: React.FC<DropdownFieldProps> = ({
@@ -34,6 +35,7 @@ const DropdownField: React.FC<DropdownFieldProps> = ({
   supportingText = "",
   isOpen: controlledIsOpen,
   onOpenChange,
+  backgroundColor = "bg-color",
 }) => {
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const isOpen =
@@ -90,7 +92,7 @@ const DropdownField: React.FC<DropdownFieldProps> = ({
             value ? styles.selectButtonFilled : ""
           } ${isOpen ? styles.selectButtonActive : ""} ${
             hasError ? styles.selectButtonError : ""
-          }`}
+          } ${backgroundColor === "white" ? styles.selectButtonWhite : ""}`}
           onClick={handleToggle}
         >
           <span className={styles.selectText}>

@@ -185,7 +185,7 @@
 
 .watchButton:hover {
   background-color: #7c3aed;
-  transform: translateY(-1px);
+  /* transform: translateY(-1px); */
 }
 
 .watchButton:active {

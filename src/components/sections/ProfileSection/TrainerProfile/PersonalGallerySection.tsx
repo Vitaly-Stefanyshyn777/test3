@@ -283,7 +283,7 @@ export default function PersonalGallerySection({
               <span className={styles.uploadLink}>Загрузіть</span>
               <span className={styles.uploadHint}>
                 {" "}
-                або перетащіть сюди файл
+                або перетягніть сюди файл
               </span>
             </p>
             <p className={styles.uploadFormats}>.pdf .doc .jpg .png до 10 МБ</p>

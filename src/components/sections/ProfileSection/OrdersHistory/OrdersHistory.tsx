@@ -158,10 +158,15 @@ const OrdersHistory: React.FC = () => {
 
       <div className={styles.divider}></div>
 
-      <div className={styles.ordersList}>
-        {(orders.length ? orders : [])
-          .slice((currentPage - 1) * ordersPerPage, currentPage * ordersPerPage)
-          .map((order, index) => (
+      {isLoading ? (
+        <div className={styles.loading}>Завантаження...</div>
+      ) : orders.length === 0 ? (
+        <div className={styles.empty}>У вас немає замовлень</div>
+      ) : (
+        <div className={styles.ordersList}>
+          {orders
+            .slice((currentPage - 1) * ordersPerPage, currentPage * ordersPerPage)
+            .map((order, index) => (
             <React.Fragment key={order.id}>
               <div className={styles.orderCard}>
                 <div className={styles.productImageContainer}>
@@ -229,16 +234,13 @@ const OrdersHistory: React.FC = () => {
               )}
             </React.Fragment>
           ))}
-        {/* {isLoading && <div style={{ padding: 12 }}>Завантаження...</div>}
-        {!isLoading && !orders.length && !isError && (
-          <div style={{ padding: 12 }}>Замовлень ще немає</div>
-        )} */}
-        {!isLoading && isError && (
-          <div className={styles.error}>Не вдалося завантажити замовлення</div>
-        )}
-      </div>
+          {isError && (
+            <div className={styles.error}>Не вдалося завантажити замовлення</div>
+          )}
+        </div>
+      )}
 
-      {orders.length > 4 && (
+      {!isLoading && orders.length > 4 && (
         <div className={styles.pagination}>
           <PaginationNav
             currentPage={currentPage}

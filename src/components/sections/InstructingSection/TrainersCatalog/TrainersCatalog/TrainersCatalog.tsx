@@ -90,6 +90,7 @@ const TrainersCatalog = () => {
             onSortChange={setSortBy}
             itemsPerPage={itemsPerPage}
             onItemsPerPageChange={setItemsPerPage}
+            hideSort={true}
           />
         )}
         <div className={styles.catalogContent}>
