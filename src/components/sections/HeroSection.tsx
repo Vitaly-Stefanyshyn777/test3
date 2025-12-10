@@ -221,8 +221,26 @@ const HeroSection = () => {
       rawVideoUrl = `${baseUrl}${rawVideoUrl}`;
     }
 
-    // Повертаємо прямий URL без проксування (як в старому варіанті)
-    return rawVideoUrl;
+    // Кодуємо URL для правильної обробки кирилиці та спеціальних символів
+    try {
+      const urlObj = new URL(rawVideoUrl);
+      // Кодуємо кожну частину шляху окремо (між слешами)
+      const pathParts = urlObj.pathname.split("/").map((part) => {
+        if (!part) return part; // Зберігаємо порожні частини (початковий слеш)
+        try {
+          // Спочатку декодуємо (якщо вже закодовано), потім кодуємо
+          return encodeURIComponent(decodeURIComponent(part));
+        } catch {
+          // Якщо декодування не вдалося, просто кодуємо
+          return encodeURIComponent(part);
+        }
+      });
+      urlObj.pathname = pathParts.join("/");
+      return urlObj.toString();
+    } catch {
+      // Якщо не вдалося розпарсити URL, повертаємо як є
+      return rawVideoUrl;
+    }
   };
 
   const getPosterFromBanner = (b?: BannerPost | null): string => {
