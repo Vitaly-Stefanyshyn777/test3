@@ -29,7 +29,7 @@
       }
 
       .target {
-        padding: 32px;
+        padding: 28px;
         border-radius: 20px;
         background-color: var(--white);
 
@@ -119,14 +119,15 @@
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          padding: 32px;
+          padding: 30px;
           border-radius: 32px;
 
           font-family: "Inter Tight";
-          font-size: 32px;
+          font-size: 30px;
           font-style: normal;
           font-weight: 500;
           line-height: 120%;
+          height: 335px;
 
           span {
             width: 64px;

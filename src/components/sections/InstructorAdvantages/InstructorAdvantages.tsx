@@ -64,20 +64,20 @@ export default function InstructorAdvantages() {
   const renderVisual = (type: string) => {
     switch (type) {
       case "inventory":
-        return (
-          <div className={s.inventoryVisual}>
-            <div className={s.inventoryOrbits} />
-            <div className={`${s.inventoryIcon} ${s.large}`}>
-              <LockIcon2 />
-            </div>
-            <div className={`${s.inventoryIcon} ${s.smallLeft}`}>
-              <WalkingIcon />
-            </div>
-            <div className={`${s.inventoryIcon} ${s.smallRight}`}>
-              <BarbellIcon />
-            </div>
-          </div>
-        );
+      // return (
+      //   <div className={s.inventoryVisual}>
+      //     <div className={s.inventoryOrbits} />
+      //     <div className={`${s.inventoryIcon} ${s.large}`}>
+      //       <LockIcon2 />
+      //     </div>
+      //     <div className={`${s.inventoryIcon} ${s.smallLeft}`}>
+      //       <WalkingIcon />
+      //     </div>
+      //     <div className={`${s.inventoryIcon} ${s.smallRight}`}>
+      //       <BarbellIcon />
+      //     </div>
+      //   </div>
+      // );
       default:
         return null;
     }

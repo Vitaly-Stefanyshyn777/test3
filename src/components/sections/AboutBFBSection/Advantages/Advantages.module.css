@@ -132,13 +132,26 @@
   color: var(--black);
 }
 
+.swiperContainer {
+  width: 100%;
+  overflow: hidden;
+}
+
 .swiper {
   padding: 0 20px;
+  width: 100%;
+}
+
+.swiperContainer :global(.swiper-wrapper) {
+  display: flex;
+  align-items: stretch;
 }
 
 .swiperSlide {
   height: auto;
-  width: 485px;
+  width: 485px !important;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .advantageVisualContainer {

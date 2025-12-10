@@ -36,7 +36,7 @@
 }
 
 .inventorySlide {
-  background-image: url(/images/Frame\ 1321318854.png);
+  background-image: url(/Frame13213181007.png);
   background-position: 100%;
   background-repeat: no-repeat;
   background-size: cover;
@@ -64,7 +64,7 @@
   flex-direction: column;
 
   gap: 8px;
-  justify-content: flex-start;
+  /* justify-content: flex-start; */
 }
 
 .cardTitle {
@@ -83,14 +83,14 @@
   color: rgba(14, 14, 14, 0.4);
 }
 
-.advInfoBlock {
+/* .advInfoBlock {
   width: 100%;
   height: 100%;
   min-height: 200px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-}
+} */
 .advInfoBlockIcon {
   flex-shrink: 0;
   border-radius: 65px;
@@ -111,19 +111,15 @@
 
 .advInventoryCardInner {
   display: flex;
-  align-items: flex-start;
+  /* align-items: flex-start; */
   justify-content: space-between;
   gap: 24px;
 }
-.advInventoryText {
+/* .advInventoryText {
   flex: 1 1 auto;
   min-width: 0;
-}
-.advInventoryVisualWrap {
-  position: relative;
-  flex: 0 0 360px;
-  height: 220px;
-}
+} */
+
 .peopleGrid {
   display: grid;
   grid-template-columns: repeat(3, 100px);
