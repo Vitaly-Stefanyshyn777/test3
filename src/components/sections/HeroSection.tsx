@@ -277,10 +277,13 @@ const HeroSection = () => {
     (activeBanner?.Description as string) ||
     "";
 
+  // Показуємо PageLoader поки дані завантажуються
+  if (isLoading) {
+    return <PageLoader />;
+  }
+
   return (
     <section className={s.hero} data-hero-section>
-      {/* Показуємо PageLoader поки дані завантажуються */}
-      {isLoading && <PageLoader />}
       {/* Banner slider (background) */}
       {banners.length > 0 && (
         <Swiper
