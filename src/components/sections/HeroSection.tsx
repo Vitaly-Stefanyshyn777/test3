@@ -193,13 +193,10 @@ const HeroSection = () => {
 
     let rawVideoUrl = "";
 
+    // Не використовуємо фолбек, якщо банера немає - повертаємо порожній рядок
     if (!b) {
-      const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE || "";
-      rawVideoUrl = `${baseUrl}/wp-content/uploads/2025/11/videopreview.mp4`;
-      console.log(
-        "[HeroSection] No banner, using fallback video:",
-        rawVideoUrl
-      );
+      console.log("[HeroSection] No banner, returning empty video URL");
+      return "";
     } else {
       const videoObj =
         b.acf?.video &&
@@ -263,19 +260,17 @@ const HeroSection = () => {
       }
     }
 
-    // Fallback до дефолтного відео (після отримання URL, але перед нормалізацією)
-    const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE || "";
+    // Якщо немає відео у банера, повертаємо порожній рядок (не використовуємо фолбек)
     if (
       !rawVideoUrl ||
       rawVideoUrl.trim() === "" ||
       rawVideoUrl === "undefined"
     ) {
-      rawVideoUrl = `${baseUrl}/wp-content/uploads/2025/11/videopreview.mp4`;
-      console.log(
-        "[HeroSection] No video in banner, using fallback:",
-        rawVideoUrl
-      );
+      console.log("[HeroSection] No video in banner, returning empty URL");
+      return "";
     }
+
+    const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE || "";
 
     // Якщо URL вже є проксованим (починається з /api/video-proxy), повертаємо як є
     if (rawVideoUrl.startsWith("/api/video-proxy")) {
