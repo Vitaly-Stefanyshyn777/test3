@@ -10,6 +10,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { A11y } from "swiper/modules";
 import type { Swiper as SwiperClass } from "swiper/types";
 import "swiper/css";
+import PageLoader from "../PageLoader";
 
 const HeroSection = () => {
   const [banners, setBanners] = useState<BannerPost[]>([]);
@@ -98,6 +99,13 @@ const HeroSection = () => {
         });
         const initial =
           bannerWithVideo ?? bannerWithPoster ?? normalized[0] ?? null;
+        console.log("[HeroSection] Setting initial banner:", {
+          bannerWithVideo: bannerWithVideo?.id,
+          bannerWithPoster: bannerWithPoster?.id,
+          firstBanner: normalized[0]?.id,
+          initialBannerId: initial?.id,
+          totalBanners: normalized.length,
+        });
         setActiveBannerId(initial ? initial.id : null);
         if (initial) {
           const idx = normalized.findIndex((b) => b.id === initial.id);
@@ -125,8 +133,19 @@ const HeroSection = () => {
   }, [banners, activeBannerId]);
 
   const activeBanner: BannerPost | null = useMemo(() => {
-    if (!activeBannerId) return null;
-    return banners.find((b) => b.id === activeBannerId) ?? null;
+    if (!activeBannerId) {
+      console.log("[HeroSection] No activeBannerId set");
+      return null;
+    }
+    const banner = banners.find((b) => b.id === activeBannerId) ?? null;
+    console.log("[HeroSection] Active banner found:", {
+      activeBannerId,
+      found: !!banner,
+      bannerId: banner?.id,
+      bannerTitle:
+        banner?.acf?.title || banner?.Title || banner?.title?.rendered,
+    });
+    return banner;
   }, [banners, activeBannerId]);
 
   // Helpers to read fields from a banner
@@ -167,12 +186,41 @@ const HeroSection = () => {
   );
 
   const getVideoUrlFromBanner = (b?: BannerPost | null): string => {
+    console.log("[HeroSection] getVideoUrlFromBanner called", {
+      hasBanner: !!b,
+      bannerId: b?.id,
+      bannerTitle: b?.acf?.title || b?.Title || b?.title?.rendered,
+    });
+
     let rawVideoUrl = "";
 
     if (!b) {
-      const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE || "";
+      const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE;
       rawVideoUrl = `${baseUrl}/wp-content/uploads/2025/11/videopreview.mp4`;
+      console.log(
+        "[HeroSection] No banner, using fallback video:",
+        rawVideoUrl
+      );
     } else {
+      const videoObj =
+        b.acf?.video &&
+        typeof b.acf.video === "object" &&
+        !Array.isArray(b.acf.video)
+          ? (b.acf.video as { url?: string; preview?: string })
+          : null;
+      console.log("[HeroSection] Checking banner video fields:", {
+        "acf.video": b.acf?.video,
+        "acf.video type": typeof b.acf?.video,
+        "acf.video.url": videoObj?.url,
+        Aside_video: b.Aside_video,
+        "acf.Aside_video": b.acf?.Aside_video,
+        video: b.video,
+        "acf.video (string)":
+          typeof b.acf?.video === "string" ? b.acf.video : undefined,
+        video_url: b.video_url,
+        "acf.video_url": b.acf?.video_url,
+      });
+
       // Нова структура: acf.video.url (якщо video є об'єктом)
       if (
         b.acf?.video &&
@@ -181,6 +229,10 @@ const HeroSection = () => {
       ) {
         if (b.acf.video.url) {
           rawVideoUrl = b.acf.video.url;
+          console.log(
+            "[HeroSection] Found video in acf.video.url:",
+            rawVideoUrl
+          );
         }
       }
 
@@ -199,36 +251,47 @@ const HeroSection = () => {
 
         if (Array.isArray(video) && video.length > 0) {
           rawVideoUrl = video[0];
+          console.log("[HeroSection] Found video in array field:", rawVideoUrl);
         } else if (typeof video === "string" && video.length > 0) {
           rawVideoUrl = video;
+          console.log(
+            "[HeroSection] Found video in string field:",
+            rawVideoUrl
+          );
+        } else {
+          console.log("[HeroSection] No video found in old structure fields");
         }
       }
-    }
 
-    // Fallback до дефолтного відео
-    if (
-      !rawVideoUrl ||
-      rawVideoUrl.trim() === "" ||
-      rawVideoUrl === "undefined"
-    ) {
-      const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE || "";
-      rawVideoUrl = `${baseUrl}/wp-content/uploads/2025/11/videopreview.mp4`;
-    }
-
-    // Якщо відносний URL → додаємо домен
-    if (rawVideoUrl.startsWith("/") && !rawVideoUrl.startsWith("//")) {
-      const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE || "";
-      rawVideoUrl = `${baseUrl}${rawVideoUrl}`;
+      // Fallback до дефолтного відео
+      if (!rawVideoUrl) {
+        const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE;
+        rawVideoUrl = `${baseUrl}/wp-content/uploads/2025/11/videopreview.mp4`;
+        console.log(
+          "[HeroSection] No video in banner, using fallback:",
+          rawVideoUrl
+        );
+      }
     }
 
     // Якщо URL вже є проксованим (починається з /api/video-proxy), повертаємо як є
     if (rawVideoUrl.startsWith("/api/video-proxy")) {
+      console.log(
+        "[HeroSection] URL already proxied, returning as is:",
+        rawVideoUrl
+      );
       return rawVideoUrl;
     }
 
-    // Використовуємо проксування для правильної обробки кирилиці та уникнення CORS проблем
-    // URL передається як є (може бути вже закодований або ні), проксі сам його обробить
-    return `/api/video-proxy?url=${encodeURIComponent(rawVideoUrl)}`;
+    // Інакше проксуємо через /api/video-proxy для уникнення CORS проблем
+    const proxiedUrl = `/api/video-proxy?url=${encodeURIComponent(
+      rawVideoUrl
+    )}`;
+    console.log("[HeroSection] Proxying video URL:", {
+      original: rawVideoUrl,
+      proxied: proxiedUrl,
+    });
+    return proxiedUrl;
   };
 
   const getPosterFromBanner = (b?: BannerPost | null): string => {
@@ -267,11 +330,23 @@ const HeroSection = () => {
   };
 
   const videoUrl = useMemo(() => {
-    return getVideoUrlFromBanner(activeBanner);
+    const url = getVideoUrlFromBanner(activeBanner);
+    console.log("[HeroSection] Final videoUrl:", {
+      url,
+      hasUrl: !!url,
+      activeBannerId: activeBanner?.id,
+    });
+    return url;
   }, [activeBanner]);
 
   const posterUrl = useMemo(() => {
-    return getPosterFromBanner(activeBanner);
+    const url = getPosterFromBanner(activeBanner);
+    console.log("[HeroSection] Final posterUrl:", {
+      url,
+      hasUrl: !!url,
+      activeBannerId: activeBanner?.id,
+    });
+    return url;
   }, [activeBanner]);
 
   const title =
@@ -286,6 +361,11 @@ const HeroSection = () => {
     activeBanner?.acf?.description ||
     (activeBanner?.Description as string) ||
     "";
+
+  // Показуємо skeleton поки дані завантажуються
+  if (isLoading) {
+    return <PageLoader />;
+  }
 
   return (
     <section className={s.hero} data-hero-section>
@@ -349,22 +429,47 @@ const HeroSection = () => {
           </div>
         </div>
         {/* Floating video player (bottom-right like on screenshot) */}
-        {showVideo && videoUrl && (
-          <div className={s.heroVideo}>
-            <VideoPlayer
-              videoUrl={videoUrl}
-              poster={posterUrl || undefined}
-              controls={false}
-              onlyPlayPause={true}
-              autoPlay={false}
-              className="w-full h-full"
-              overlayPlayButton={false}
-              showCloseButton={true}
-              onClose={() => setShowVideo(false)}
-              noBlur={true}
-            />
-          </div>
-        )}
+        {(() => {
+          const shouldShowVideo = showVideo && (!!videoUrl || !!posterUrl);
+          console.log("[HeroSection] Video render decision:", {
+            showVideo,
+            hasVideoUrl: !!videoUrl,
+            hasPosterUrl: !!posterUrl,
+            shouldShowVideo,
+            videoUrl,
+            posterUrl,
+          });
+
+          return shouldShowVideo ? (
+            <div className={s.heroVideo}>
+              {videoUrl ? (
+                <VideoPlayer
+                  videoUrl={videoUrl}
+                  poster={posterUrl || undefined}
+                  controls={false}
+                  onlyPlayPause={true}
+                  autoPlay={false}
+                  className="w-full h-full"
+                  overlayPlayButton={false}
+                  showCloseButton={true}
+                  onClose={() => setShowVideo(false)}
+                  noBlur={true}
+                />
+              ) : (
+                <img
+                  src={posterUrl}
+                  alt="Video preview"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block",
+                  }}
+                />
+              )}
+            </div>
+          ) : null;
+        })()}
       </div>
       {banners.length > 1 && (
         <div className={s.heroNavigation}>

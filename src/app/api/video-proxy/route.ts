@@ -5,7 +5,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     let videoUrl = searchParams.get("url");
 
+    console.log("[video-proxy] Request received:", {
+      hasUrl: !!videoUrl,
+      urlLength: videoUrl?.length,
+      urlPreview: videoUrl ? videoUrl.substring(0, 100) : null,
+    });
+
     if (!videoUrl) {
+      console.error("[video-proxy] URL parameter missing");
       return NextResponse.json(
         { error: "URL параметр не надано" },
         { status: 400 }
@@ -14,15 +21,35 @@ export async function GET(request: NextRequest) {
 
     // Декодуємо URL, якщо він був закодований
     try {
-      videoUrl = decodeURIComponent(videoUrl);
-    } catch {
+      const decodedUrl = decodeURIComponent(videoUrl);
+      console.log("[video-proxy] URL decoded:", {
+        original: videoUrl.substring(0, 100),
+        decoded: decodedUrl.substring(0, 100),
+        changed: videoUrl !== decodedUrl,
+      });
+      videoUrl = decodedUrl;
+    } catch (error) {
+      console.warn(
+        "[video-proxy] Failed to decode URL, using original:",
+        error
+      );
       // Якщо декодування не вдалося, використовуємо оригінальний URL
     }
 
     // Базова валідація URL (перевіряємо тільки формат, без перевірки доменів)
+    let validatedUrl: URL;
     try {
-      new URL(videoUrl);
-    } catch {
+      validatedUrl = new URL(videoUrl);
+      console.log("[video-proxy] URL validated:", {
+        hostname: validatedUrl.hostname,
+        pathname: validatedUrl.pathname.substring(0, 100),
+        protocol: validatedUrl.protocol,
+      });
+    } catch (error) {
+      console.error("[video-proxy] Invalid URL format:", {
+        videoUrl: videoUrl.substring(0, 100),
+        error,
+      });
       return NextResponse.json(
         { error: "Недопустимий формат URL" },
         { status: 400 }
@@ -33,6 +60,7 @@ export async function GET(request: NextRequest) {
     // Прибираємо строгу валідацію, щоб не блокувати валідні URL, які можуть не мати розширення в кінці
 
     // Завантажуємо відео з оригінального сервера
+    console.log("[video-proxy] Fetching video from:", videoUrl);
     let response: Response;
     try {
       response = await fetch(videoUrl, {
@@ -40,8 +68,20 @@ export async function GET(request: NextRequest) {
           "User-Agent": "Mozilla/5.0 (compatible; VideoProxy/1.0)",
         },
       });
+      console.log("[video-proxy] Fetch response:", {
+        status: response.status,
+        statusText: response.statusText,
+        contentType: response.headers.get("content-type"),
+        contentLength: response.headers.get("content-length"),
+        ok: response.ok,
+      });
     } catch (fetchError) {
-      console.error("[video-proxy] Помилка fetch:", fetchError);
+      console.error("[video-proxy] Fetch error:", {
+        error: fetchError,
+        message:
+          fetchError instanceof Error ? fetchError.message : "Unknown error",
+        videoUrl: videoUrl.substring(0, 100),
+      });
       return NextResponse.json(
         {
           error: "Не вдалося завантажити відео",
@@ -53,10 +93,11 @@ export async function GET(request: NextRequest) {
     }
 
     if (!response.ok) {
-      console.error("[video-proxy] Помилка відповіді:", {
+      console.error("[video-proxy] Response error:", {
         status: response.status,
         statusText: response.statusText,
-        videoUrl,
+        videoUrl: videoUrl.substring(0, 100),
+        headers: Object.fromEntries(response.headers.entries()),
       });
       return NextResponse.json(
         {

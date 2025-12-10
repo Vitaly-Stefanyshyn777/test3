@@ -45,18 +45,39 @@ export default function VideoPlayer({
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !videoUrl) return;
+    if (!video || !videoUrl) {
+      console.log("[VideoPlayer] Skipping load - no video element or URL:", {
+        hasVideo: !!video,
+        hasUrl: !!videoUrl,
+        videoUrl,
+      });
+      return;
+    }
+
+    console.log("[VideoPlayer] Loading video:", {
+      url: videoUrl,
+      autoPlay,
+      controls,
+      poster,
+    });
 
     setIsLoading(true);
     setError(null);
     video.load();
 
     const handleLoadStart = () => {
+      console.log("[VideoPlayer] Load started:", videoUrl);
       setIsLoading(true);
       setError(null);
     };
 
     const handleLoadedData = () => {
+      console.log("[VideoPlayer] Video loaded successfully:", {
+        url: videoUrl,
+        duration: video.duration,
+        videoWidth: video.videoWidth,
+        videoHeight: video.videoHeight,
+      });
       setIsLoading(false);
     };
 
@@ -65,13 +86,16 @@ export default function VideoPlayer({
       const errorMsg = video.error?.message || "Не вдалося завантажити відео";
       setError(errorMsg);
 
-      if (process.env.NODE_ENV !== "production") {
-        console.error("[VideoPlayer] Error loading video:", {
-          url: videoUrl,
-          error: video.error,
-          code: video.error?.code,
-        });
-      }
+      console.error("[VideoPlayer] Error loading video:", {
+        url: videoUrl,
+        error: video.error,
+        code: video.error?.code,
+        message: video.error?.message,
+        MEDIA_ERR_ABORTED: video.error?.code === 1,
+        MEDIA_ERR_NETWORK: video.error?.code === 2,
+        MEDIA_ERR_DECODE: video.error?.code === 3,
+        MEDIA_ERR_SRC_NOT_SUPPORTED: video.error?.code === 4,
+      });
     };
 
     const handlePlay = () => setIsPlaying(true);
