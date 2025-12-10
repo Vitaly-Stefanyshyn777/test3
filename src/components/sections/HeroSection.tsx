@@ -123,7 +123,24 @@ const HeroSection = () => {
     };
   }, []);
 
-  // Ініціалізація активного банера, якщо ще не встановлено, але банери є
+  useEffect(() => {
+    const upstreamBase = process.env.NEXT_PUBLIC_UPSTREAM_BASE;
+    if (upstreamBase) {
+      try {
+        const apiDomain = new URL(upstreamBase).origin;
+        const existingPreconnect = document.querySelector(`link[href="${apiDomain}"]`);
+        if (!existingPreconnect) {
+          const preconnect = document.createElement("link");
+          preconnect.rel = "preconnect";
+          preconnect.href = apiDomain;
+          document.head.appendChild(preconnect);
+        }
+      } catch (e) {
+        // Ignore URL parsing errors
+      }
+    }
+  }, []);
+
   useEffect(() => {
     if (activeBannerId == null && banners.length > 0) {
       const first = banners[0];
@@ -334,25 +351,43 @@ const HeroSection = () => {
   };
 
   const videoUrl = useMemo(() => {
-    const url = getVideoUrlFromBanner(activeBanner);
-    console.log("[HeroSection] Final videoUrl:", {
-      url,
-      hasUrl: !!url,
-      urlLength: url?.length,
-      activeBannerId: activeBanner?.id,
-    });
-    return url;
+    if (!activeBanner) return "";
+    return getVideoUrlFromBanner(activeBanner);
   }, [activeBanner]);
 
   const posterUrl = useMemo(() => {
-    const url = getPosterFromBanner(activeBanner);
-    console.log("[HeroSection] Final posterUrl:", {
-      url,
-      hasUrl: !!url,
-      activeBannerId: activeBanner?.id,
-    });
-    return url;
+    if (!activeBanner) return "";
+    return getPosterFromBanner(activeBanner);
   }, [activeBanner]);
+
+  useEffect(() => {
+    if (activeBanner && getBackgroundFromBanner && getPosterFromBanner) {
+      const bgUrl = getBackgroundFromBanner(activeBanner);
+      if (bgUrl) {
+        const existingLink = document.querySelector(`link[href="${bgUrl}"]`);
+        if (!existingLink) {
+          const link = document.createElement("link");
+          link.rel = "preload";
+          link.as = "image";
+          link.href = bgUrl;
+          link.setAttribute("fetchpriority", "high");
+          document.head.appendChild(link);
+        }
+      }
+
+      const posterUrl = getPosterFromBanner(activeBanner);
+      if (posterUrl) {
+        const existingPosterLink = document.querySelector(`link[href="${posterUrl}"]`);
+        if (!existingPosterLink) {
+          const posterLink = document.createElement("link");
+          posterLink.rel = "preload";
+          posterLink.as = "image";
+          posterLink.href = posterUrl;
+          document.head.appendChild(posterLink);
+        }
+      }
+    }
+  }, [activeBanner, getBackgroundFromBanner, getPosterFromBanner]);
 
   const title =
     activeBanner?.acf?.title ||
@@ -385,19 +420,20 @@ const HeroSection = () => {
           allowTouchMove={true}
           touchEventsTarget="container"
         >
-          {banners.map((b) => (
-            <SwiperSlide key={b.id}>
-              <div
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  background: `url(${getBackgroundFromBanner(
-                    b
-                  )}) center / cover no-repeat`,
-                }}
-              />
-            </SwiperSlide>
-          ))}
+          {banners.map((b, index) => {
+            const bgUrl = getBackgroundFromBanner(b);
+            return (
+              <SwiperSlide key={b.id}>
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    background: `url(${bgUrl}) center / cover no-repeat`,
+                  }}
+                />
+              </SwiperSlide>
+            );
+          })}
         </Swiper>
       )}
       <div className={s.heroContainer}>

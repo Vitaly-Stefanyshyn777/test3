@@ -65,10 +65,7 @@ const Footer = () => {
           </div>
         </div>
         <div className={s.authButtons}>
-          <button
-            className={s.loginButton}
-            onClick={openLoginModal}
-          >
+          <button className={s.loginButton} onClick={openLoginModal}>
             Вхід
           </button>
           <button
@@ -90,13 +87,17 @@ const Footer = () => {
               <h3 className={s.sectionTitle}>КОНТАКТИ:</h3>
               <div className={s.contactInfo}>
                 <a
-                  href={`tel:${contactData.phone.replace(/\s/g, "") || "+380954372575"}`}
+                  href={`tel:${
+                    contactData.phone.replace(/\s/g, "") || "+380954372575"
+                  }`}
                   className={`${s.contactLink} ${s.phoneLink}`}
                 >
                   {contactData.phone || "+380 95 437 25 75"}
                 </a>
                 <a
-                  href={`mailto:${contactData.email || "bfb.board.ukraine@gmail.com"}`}
+                  href={`mailto:${
+                    contactData.email || "bfb.board.ukraine@gmail.com"
+                  }`}
                   className={`${s.contactLink} ${s.mailLink}`}
                 >
                   {contactData.email || "bfb.board.ukraine@gmail.com"}
@@ -105,7 +106,10 @@ const Footer = () => {
               <div className={s.socialIcons}>
                 {contactData.socialLinks.length > 0 ? (
                   contactData.socialLinks.map((social, index) => {
-                    const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+                    const iconMap: Record<
+                      string,
+                      React.ComponentType<{ className?: string }>
+                    > = {
                       Instagram: InstagramIcon,
                       Facebook: FacebookIcon,
                       Telegram: TelegramIcon,
@@ -175,7 +179,9 @@ const Footer = () => {
                     <p className={s.scheduleItem}>
                       понеділок - пятниця: 09:00 - 22:00
                     </p>
-                    <p className={s.scheduleItem}>субота - неділя: 10:00 - 20:00</p>
+                    <p className={s.scheduleItem}>
+                      субота - неділя: 10:00 - 20:00
+                    </p>
                   </>
                 )}
               </address>
@@ -319,7 +325,7 @@ const Footer = () => {
         </div>
 
         <p className={s.credits}>
-          Сайт розроблено агентами:{" "}
+          Сайт розроблено агентством:{" "}
           <a
             href="https://before-after.agency/"
             target="_blank"

@@ -71,7 +71,7 @@ export default function VideoPlayer({
 
     setIsLoading(true);
     setError(null);
-    
+
     // Встановлюємо src перед load()
     video.src = videoUrl;
     video.load();
