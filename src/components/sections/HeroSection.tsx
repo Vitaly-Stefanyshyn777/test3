@@ -221,26 +221,14 @@ const HeroSection = () => {
       rawVideoUrl = `${baseUrl}${rawVideoUrl}`;
     }
 
-    // Кодуємо URL для правильної обробки кирилиці та спеціальних символів
-    try {
-      const urlObj = new URL(rawVideoUrl);
-      // Кодуємо кожну частину шляху окремо (між слешами)
-      const pathParts = urlObj.pathname.split("/").map((part) => {
-        if (!part) return part; // Зберігаємо порожні частини (початковий слеш)
-        try {
-          // Спочатку декодуємо (якщо вже закодовано), потім кодуємо
-          return encodeURIComponent(decodeURIComponent(part));
-        } catch {
-          // Якщо декодування не вдалося, просто кодуємо
-          return encodeURIComponent(part);
-        }
-      });
-      urlObj.pathname = pathParts.join("/");
-      return urlObj.toString();
-    } catch {
-      // Якщо не вдалося розпарсити URL, повертаємо як є
+    // Якщо URL вже є проксованим (починається з /api/video-proxy), повертаємо як є
+    if (rawVideoUrl.startsWith("/api/video-proxy")) {
       return rawVideoUrl;
     }
+
+    // Використовуємо проксування для правильної обробки кирилиці та уникнення CORS проблем
+    // URL передається як є (може бути вже закодований або ні), проксі сам його обробить
+    return `/api/video-proxy?url=${encodeURIComponent(rawVideoUrl)}`;
   };
 
   const getPosterFromBanner = (b?: BannerPost | null): string => {

@@ -19,108 +19,12 @@ export async function GET(request: NextRequest) {
       // Якщо декодування не вдалося, використовуємо оригінальний URL
     }
 
-    // Перевіряємо, чи URL належить до дозволених доменів (whitelist)
-    const upstreamBase =
-      process.env.UPSTREAM_BASE || process.env.NEXT_PUBLIC_UPSTREAM_BASE;
-    if (!upstreamBase) {
-      return NextResponse.json(
-        { error: "UPSTREAM_BASE is not configured" },
-        { status: 500 }
-      );
-    }
-
-    // Нормалізуємо upstreamBase (прибираємо trailing slash)
-    const normalizedBase = upstreamBase.endsWith("/")
-      ? upstreamBase.slice(0, -1)
-      : upstreamBase;
-
-    // Витягуємо домен з upstreamBase для більш гнучкої перевірки
-    let baseHostname = "";
+    // Базова валідація URL (перевіряємо тільки формат, без перевірки доменів)
     try {
-      const baseUrl = new URL(normalizedBase);
-      baseHostname = baseUrl.hostname;
-    } catch {
-      // Якщо не вдалося розпарсити, використовуємо як є
-    }
-
-    // Перевіряємо hostname URL відео
-    let videoHostname = "";
-    try {
-      const videoUrlObj = new URL(videoUrl);
-      videoHostname = videoUrlObj.hostname;
+      new URL(videoUrl);
     } catch {
       return NextResponse.json(
         { error: "Недопустимий формат URL" },
-        { status: 400 }
-      );
-    }
-
-    // Перевіряємо, чи URL належить до дозволених доменів
-    const allowedOrigins = [
-      normalizedBase,
-      `${normalizedBase}/`,
-      // Додаємо dev-відео для тестування плеєра
-      "https://commondatastorage.googleapis.com/gtv-videos-bucket/",
-    ];
-
-    // Перевіряємо, чи URL починається з дозволеного домену
-    const startsWithAllowed = allowedOrigins.some((origin) =>
-      videoUrl.startsWith(origin)
-    );
-
-    // Перевіряємо, чи hostname відповідає базовому домену або його варіантам
-    // Витягуємо кореневий домен для порівняння (наприклад, bfb.projection-learn.website)
-    const getRootDomain = (hostname: string): string => {
-      const parts = hostname.split(".");
-      // Якщо домен має більше 2 частин, беремо останні 2-3 частини
-      if (parts.length > 2) {
-        // Для доменів типу www.api.bfb.projection-learn.website беремо bfb.projection-learn.website
-        return parts.slice(-3).join(".");
-      }
-      return hostname;
-    };
-
-    const baseRootDomain = baseHostname ? getRootDomain(baseHostname) : "";
-    const videoRootDomain = getRootDomain(videoHostname);
-
-    const hostnameMatches =
-      baseHostname &&
-      (videoHostname === baseHostname ||
-        videoHostname === `www.${baseHostname}` ||
-        videoHostname === `api.${baseHostname}` ||
-        videoHostname === `www.api.${baseHostname}` ||
-        baseHostname === `www.${videoHostname}` ||
-        baseHostname === `api.${videoHostname}` ||
-        baseHostname === `www.api.${videoHostname}` ||
-        videoHostname.endsWith(`.${baseHostname}`) ||
-        baseHostname.endsWith(`.${videoHostname}`) ||
-        // Додаємо перевірку кореневого домену
-        (baseRootDomain && videoRootDomain === baseRootDomain) ||
-        videoHostname.includes(baseRootDomain) ||
-        baseHostname.includes(videoRootDomain));
-
-    const isAllowed = startsWithAllowed || hostnameMatches;
-
-    if (!isAllowed) {
-      console.error("[video-proxy] Недопустимий URL:", {
-        videoUrl,
-        videoHostname,
-        baseHostname,
-        baseRootDomain,
-        videoRootDomain,
-        startsWithAllowed,
-        hostnameMatches,
-      });
-      return NextResponse.json(
-        {
-          error: "Недопустимий URL",
-          details: {
-            videoHostname,
-            baseHostname,
-            baseRootDomain,
-            videoRootDomain,
-          },
-        },
         { status: 400 }
       );
     }
@@ -190,8 +94,11 @@ export async function GET(request: NextRequest) {
         "Accept-Ranges": "bytes",
         "Cache-Control": "public, max-age=3600", // Кешуємо на годину
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET",
-        "Access-Control-Allow-Headers": "Range",
+        "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+        "Access-Control-Allow-Headers": "Range, Content-Type, Accept",
+        "Access-Control-Expose-Headers":
+          "Content-Length, Content-Range, Accept-Ranges",
+        "Access-Control-Max-Age": "86400",
       },
     });
   } catch (error) {
@@ -209,8 +116,11 @@ export async function OPTIONS() {
     status: 200,
     headers: {
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, OPTIONS",
-      "Access-Control-Allow-Headers": "Range",
+      "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+      "Access-Control-Allow-Headers": "Range, Content-Type, Accept",
+      "Access-Control-Expose-Headers":
+        "Content-Length, Content-Range, Accept-Ranges",
+      "Access-Control-Max-Age": "86400",
     },
   });
 }
