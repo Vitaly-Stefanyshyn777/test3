@@ -3,13 +3,20 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const videoUrl = searchParams.get("url");
+    let videoUrl = searchParams.get("url");
 
     if (!videoUrl) {
       return NextResponse.json(
         { error: "URL параметр не надано" },
         { status: 400 }
       );
+    }
+
+    // Декодуємо URL, якщо він був закодований
+    try {
+      videoUrl = decodeURIComponent(videoUrl);
+    } catch {
+      // Якщо декодування не вдалося, використовуємо оригінальний URL
     }
 
     // Перевіряємо, чи URL належить до дозволених доменів (whitelist)
@@ -64,16 +71,16 @@ export async function GET(request: NextRequest) {
     // Перевіряємо, чи hostname відповідає базовому домену або його варіантам
     // Витягуємо кореневий домен для порівняння (наприклад, bfb.projection-learn.website)
     const getRootDomain = (hostname: string): string => {
-      const parts = hostname.split('.');
+      const parts = hostname.split(".");
       // Якщо домен має більше 2 частин, беремо останні 2-3 частини
       if (parts.length > 2) {
         // Для доменів типу www.api.bfb.projection-learn.website беремо bfb.projection-learn.website
-        return parts.slice(-3).join('.');
+        return parts.slice(-3).join(".");
       }
       return hostname;
     };
 
-    const baseRootDomain = baseHostname ? getRootDomain(baseHostname) : '';
+    const baseRootDomain = baseHostname ? getRootDomain(baseHostname) : "";
     const videoRootDomain = getRootDomain(videoHostname);
 
     const hostnameMatches =
@@ -105,30 +112,21 @@ export async function GET(request: NextRequest) {
         hostnameMatches,
       });
       return NextResponse.json(
-        { 
+        {
           error: "Недопустимий URL",
           details: {
             videoHostname,
             baseHostname,
             baseRootDomain,
             videoRootDomain,
-          }
-        }, 
-        { status: 400 }
-      );
-    }
-
-    // Валідація URL - перевіряємо, чи URL не обрізаний
-    if (!videoUrl.match(/\.(mp4|webm|ogg|mov|avi|mkv)(\?|$)/i)) {
-      console.error("[video-proxy] Обрізаний або невалідний URL відео:", videoUrl);
-      return NextResponse.json(
-        { 
-          error: "Недопустимий формат URL відео (відсутнє розширення файлу)",
-          videoUrl
+          },
         },
         { status: 400 }
       );
     }
+
+    // Валідація URL - перевіряємо, чи URL не обрізаний (але не блокуємо, якщо це може бути валідний URL)
+    // Прибираємо строгу валідацію, щоб не блокувати валідні URL, які можуть не мати розширення в кінці
 
     // Завантажуємо відео з оригінального сервера
     let response: Response;
@@ -141,9 +139,10 @@ export async function GET(request: NextRequest) {
     } catch (fetchError) {
       console.error("[video-proxy] Помилка fetch:", fetchError);
       return NextResponse.json(
-        { 
+        {
           error: "Не вдалося завантажити відео",
-          details: fetchError instanceof Error ? fetchError.message : "Unknown error"
+          details:
+            fetchError instanceof Error ? fetchError.message : "Unknown error",
         },
         { status: 500 }
       );
@@ -156,9 +155,9 @@ export async function GET(request: NextRequest) {
         videoUrl,
       });
       return NextResponse.json(
-        { 
+        {
           error: `Не вдалося завантажити відео: ${response.status}`,
-          statusText: response.statusText
+          statusText: response.statusText,
         },
         { status: response.status }
       );
@@ -167,14 +166,14 @@ export async function GET(request: NextRequest) {
     // Отримуємо тип контенту
     const contentType = response.headers.get("content-type") || "video/mp4";
     const contentLength = response.headers.get("content-length");
-    
+
     // Перевіряємо, чи це дійсно відео
     if (!contentType.startsWith("video/")) {
       console.error("[video-proxy] Невалідний тип контенту:", contentType);
       return NextResponse.json(
-        { 
+        {
           error: "Отримано невідео контент",
-          contentType
+          contentType,
         },
         { status: 400 }
       );
