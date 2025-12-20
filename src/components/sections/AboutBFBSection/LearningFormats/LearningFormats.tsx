@@ -62,7 +62,6 @@ export default function LearningFormats() {
         const data = await fetchMainCourses();
         setCourses(data);
       } catch (error) {
-        console.error("[LearningFormats] Помилка завантаження:", error);
         setError("Не вдалося завантажити курси формату");
       } finally {
         setIsLoading(false);
@@ -217,11 +216,9 @@ export default function LearningFormats() {
                           <span className={s.priceValue}>
                             {typeof current === "number"
                               ? Math.round(current)
-                              : "—"}
+                              : "0"}
                           </span>
-                          {typeof current === "number" ? (
                             <span className={s.priceCurrency}>₴</span>
-                          ) : null}
                         </span>
                         {old && current && old > current ? (
                           <span className={s.priceOld}>
@@ -345,11 +342,9 @@ export default function LearningFormats() {
                           <span className={s.priceValue}>
                             {typeof current === "number"
                               ? Math.round(current)
-                              : "—"}
+                              : "0"}
                           </span>
-                          {typeof current === "number" ? (
                             <span className={s.priceCurrency}>₴</span>
-                          ) : null}
                         </span>
                         {old && current && old > current ? (
                           <span className={s.priceOld}>

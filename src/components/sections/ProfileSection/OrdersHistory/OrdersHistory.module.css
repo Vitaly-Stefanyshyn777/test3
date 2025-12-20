@@ -355,4 +355,8 @@
   .divider {
     height: mvw(1);
   }
+  .empty {
+    /* padding: mvw(40) mvw(20); */
+    font-size: mvw(14);
+  }
 }

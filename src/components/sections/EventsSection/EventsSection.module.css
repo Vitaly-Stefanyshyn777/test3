@@ -513,7 +513,6 @@
 
 .eventCardButton:hover {
   background: var(--black);
-  transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
@@ -576,7 +575,9 @@
 }
 
 .modalCloseButton:hover {
-  background: #f0f0f0;
+  background: var(--violet);
+  color: var(--white);
+  border-color: var(--violet);
 }
 
 .eventImage {
@@ -691,7 +692,6 @@
 
 .signUpButton:hover {
   background: #6d4cdb;
-  transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(122, 90, 248, 0.3);
 }
 
@@ -731,6 +731,7 @@
   }
   .container {
     padding: 0 mvw(16);
+    gap: mvw(32);
   }
   .rightColumn {
     display: none;
@@ -755,17 +756,20 @@
     gap: mvw(16);
   }
   .leftColumnWrapper {
-    padding: mvw(16);
+    padding: mvw(0);
     border-radius: mvw(16);
     gap: mvw(16);
     max-width: 100%;
     height: auto;
+    background: none;
   }
   .calendarBlock {
     border-radius: mvw(16);
+    background: none;
   }
   .calendar {
     gap: mvw(16);
+    background: none;
   }
   .monthTitle {
     font-size: mvw(20);
@@ -801,6 +805,15 @@
   }
   .calendarDay.selectedEventDay {
     border: 2px solid var(--violet);
+  }
+  .mobileEventsWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: mvw(16);
+    background: var(--white);
+    /* padding: mvw(16); */
+    border-radius: mvw(16);
+    padding: mvw(16);
   }
   .eventsTitle {
     font-size: mvw(16);
@@ -986,7 +999,7 @@
   .resultText {
     font-size: mvw(12);
 
-    font-weight: 700;
+    font-weight: 500;
     font-family: var(--third-family);
 
     line-height: 140%;
@@ -997,9 +1010,15 @@
     height: mvw(50);
     padding: mvw(16) mvw(24);
     border-radius: mvw(16);
-    font-size: mvw(16);
+    font-size: mvw(14);
     align-self: stretch;
     background: var(--violet);
+
+    font-family: var(--third-family);
+    font-weight: 500;
+
+    line-height: 100%;
+    color: #fff;
   }
   .TitleTextBlock {
     display: flex;

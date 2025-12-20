@@ -65,6 +65,7 @@ const OurCoursesInfo = () => {
             src="/images/BFBFitness1.svg"
             alt="BFB Fitness"
             width={120}
+            unoptimized
             height={40}
             className={styles.overlayIcon}
           />
@@ -88,6 +89,7 @@ const OurCoursesInfo = () => {
             src="/images/BFBFitness1.svg"
             alt="BFB Fitness"
             width={120}
+            unoptimized
             height={40}
             className={styles.overlayIcon}
           />

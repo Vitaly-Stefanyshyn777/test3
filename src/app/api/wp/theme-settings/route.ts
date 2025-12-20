@@ -16,7 +16,6 @@ export async function GET(request: NextRequest) {
     const wpPass = process.env.WP_BASIC_PASS || process.env.ADMIN_PASS;
 
     if (!wpUser || !wpPass) {
-      console.error("[Theme Settings API] ❌ WP креденшалі не налаштовані");
       return NextResponse.json(
         { error: "WordPress credentials not configured" },
         { status: 500 }
@@ -27,7 +26,6 @@ export async function GET(request: NextRequest) {
     const url = new URL(`${UPSTREAM_BASE}/wp-json/wp/v2/theme_settings`);
     url.searchParams.set("hl_data_gallery", "1");
     
-    console.log("[Theme Settings API] 📋 URL з параметром hl_data_gallery:", url.toString());
 
     // Визначаємо режим авторизації: Bearer (пріоритет) або Basic
     const bearerToken = jwtFromHeader || jwtFromEnv;
@@ -36,15 +34,12 @@ export async function GET(request: NextRequest) {
     };
     if (bearerToken) {
       headers.Authorization = `Bearer ${bearerToken}`;
-      console.log("[Theme Settings API] 🔐 Auth: Bearer JWT");
     } else if (wpUser && wpPass) {
       headers.Authorization = `Basic ${Buffer.from(
         `${wpUser}:${wpPass}`
       ).toString("base64")}`;
-      console.log("[Theme Settings API] 🔐 Auth: Basic");
     }
 
-    console.log("[Theme Settings API] 🚀 Запит до WordPress:", url.toString());
 
     // Робимо запит з WordPress авторизацією
     const response = await fetch(url.toString(), {
@@ -66,11 +61,9 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
-    console.log("[Theme Settings API] ✅ Отримано theme settings");
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error("[Theme Settings API] ❌ Помилка:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -31,7 +31,6 @@ export async function GET(request: Request) {
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Error in WP product API route:", error);
     return NextResponse.json(
       { error: "Failed to fetch products" },
       { status: 500 }

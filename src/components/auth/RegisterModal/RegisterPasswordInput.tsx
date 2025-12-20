@@ -9,7 +9,7 @@ export interface RegisterFormValues {
   first_name: string;
   last_name: string;
   phone: string;
-  certificate?: string;
+  certificate: string; // Обов'язкове поле
 }
 
 interface RegisterPasswordInputProps {

@@ -5,7 +5,7 @@ import FilterSortPanel, { type SortType } from "@/components/ui/FilterSortPanel/
 import ProductsCatalogContainer from "../../ProductsCatalogContainer/CourseCatalogContainer";
 import { useProducts } from "@/components/hooks/useProducts";
 import OurCoursesFilter from "../filters/OurCoursesFilter/OurCoursesFilter";
-import { useFilteredProducts } from "@/components/hooks/useFilteredProducts";
+import { useCoursesQuery } from "@/lib/coursesQueries";
 import OurCoursesFilterModal from "@/components/ui/OurCoursesFilterModal/OurCoursesFilterModal";
 import { FilterMobileIcon, SortArrowIcon } from "@/components/Icons/Icons";
 import SortDropdown from "@/components/ui/FilterSortPanel/SortDropdown";
@@ -20,23 +20,78 @@ const OurCoursesCatalog = () => {
   const [sortBy, setSortBy] = useState<SortType>("popular");
   const [itemsPerPage, setItemsPerPage] = useState<number>(12);
   
-  // Формуємо фільтри з сортуванням та пагінацією
   const sortParams = useMemo(() => mapSortTypeToWcParams(sortBy), [sortBy]);
-  
+
   const filtersForQuery = useMemo(
     () => ({
       ...(selectedCategoryIds.length > 0 && {
         category: selectedCategoryIds.map((id) => String(id)),
       }),
-      orderby: sortParams.orderby,
-      order: sortParams.order,
+      orderby: sortParams.orderby as "date" | "price" | "popularity" | "rating" | "title" | undefined,
+      order: sortParams.order as "asc" | "desc" | undefined,
       per_page: itemsPerPage,
       ...(sortParams.on_sale !== undefined && { on_sale: sortParams.on_sale }),
+      _t: Date.now(),
     }),
     [selectedCategoryIds, sortParams, itemsPerPage]
   );
-  
-  const { data: coursesToDisplay = [], isLoading, isError } = useFilteredProducts(filtersForQuery);
+
+  const { data: coursesData = [], isLoading, isError } = useCoursesQuery(filtersForQuery);
+  const coursesToDisplay = useMemo(() => {
+    return coursesData.map((course: {
+      id: string;
+      slug?: string;
+      name: string;
+      description?: string;
+      price: string;
+      originalPrice?: string;
+      image?: string;
+      categories?: Array<{ id: number; name: string; slug: string }>;
+      courseData?: {
+        Course_themes?: string[];
+        What_learn?: string[];
+        Course_include?: string[];
+        Course_program?: Array<unknown>;
+        Date_start?: string | null;
+        Duration?: string | null;
+        Course_coach?: { ID: number } | null;
+        Required_equipment?: string | null;
+        Blocks?: unknown;
+        Online_lessons?: unknown;
+      };
+      dateCreated?: string;
+      rating?: number;
+      reviewsCount?: number;
+      requirements?: string;
+      wcProduct?: {
+        prices?: {
+          price: string;
+          regular_price: string;
+          sale_price: string;
+        };
+        on_sale?: boolean;
+        total_sales?: number;
+        average_rating?: string;
+        rating_count?: number;
+        featured?: boolean;
+      };
+    }) => ({
+      id: course.id,
+      slug: course.slug,
+      name: course.name,
+      description: course.description,
+      price: course.price,
+      originalPrice: course.originalPrice,
+      image: course.image,
+      categories: course.categories,
+      courseData: course.courseData,
+      dateCreated: course.dateCreated,
+      rating: course.rating,
+      reviewsCount: course.reviewsCount,
+      requirements: course.requirements,
+      wcProduct: course.wcProduct,
+    }));
+  }, [coursesData]);
 
   const searchTerm = "";
 
@@ -104,14 +159,17 @@ const OurCoursesCatalog = () => {
             />
 
             <ProductsCatalogContainer
-              block={{ subtitle: "Наші товари", title: "Каталог товарів" }}
+              block={{ subtitle: "Наші курси", title: "Каталог курсів" }}
               filteredProducts={coursesToDisplay}
+              isLoading={isLoading}
+              hasFilters={selectedCategoryIds.length > 0}
+              itemsPerPage={itemsPerPage}
+              sortBy={sortBy}
             />
 
             {isError && (
-              <div className={styles.error}>Не вдалося завантажити товари</div>
+              <div className={styles.error}>Не вдалося завантажити курси</div>
             )}
-            {isLoading && <div className={styles.loading}>Завантаження…</div>}
           </div>
         </div>
       </div>

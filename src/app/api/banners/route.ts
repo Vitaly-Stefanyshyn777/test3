@@ -64,7 +64,6 @@ export async function GET() {
 
     return response;
   } catch (error) {
-    console.error("/api/banners error:", error);
     return NextResponse.json(
       {
         error: "Failed to fetch banners",

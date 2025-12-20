@@ -15,7 +15,7 @@ export interface RegisterFormValues {
   first_name: string;
   last_name: string;
   phone: string;
-  certificate?: string;
+  certificate: string; // Обов'язкове поле
   comment?: string;
 }
 
@@ -40,6 +40,12 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
 
   const submit = async (values: RegisterFormValues) => {
     try {
+      // Перевірка наявності сертифікату перед відправкою
+      if (!values.certificate || values.certificate.trim() === "") {
+        setError();
+        return;
+      }
+
       const registerData = {
         username: values.email,
         email: values.email,
@@ -47,7 +53,7 @@ export default function RegisterModal({ isOpen, onClose }: RegisterModalProps) {
         first_name: values.first_name,
         last_name: values.last_name,
         phone: values.phone,
-        certificate: values.certificate,
+        certificate: values.certificate.trim(),
       };
 
       await registerMutation.mutateAsync(registerData);

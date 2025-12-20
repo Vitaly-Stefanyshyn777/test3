@@ -13,6 +13,7 @@ interface PasswordFieldProps
   eyeBtnClassName?: string;
   hasError?: boolean;
   supportingText?: string;
+  inputStyle?: React.CSSProperties;
 }
 
 export const PasswordField: React.FC<PasswordFieldProps> = ({
@@ -25,6 +26,7 @@ export const PasswordField: React.FC<PasswordFieldProps> = ({
   eyeBtnClassName = "",
   hasError = false,
   supportingText = "Supporting text",
+  inputStyle,
   id,
   ...inputProps
 }) => {
@@ -49,6 +51,7 @@ export const PasswordField: React.FC<PasswordFieldProps> = ({
             type={visible ? "text" : "password"}
             placeholder=" "
             className={`${styles.input} ${inputClassName}`}
+            style={inputStyle}
           />
           {label && (
             <label

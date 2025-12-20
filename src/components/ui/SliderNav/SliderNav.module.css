@@ -339,7 +339,7 @@
     gap: mvw(27);
     display: flex;
     justify-content: flex-start;
-    margin-left: mvw(16);
+    /* margin-left: mvw(16); */
   }
 
   /* .sliderNavOutside {

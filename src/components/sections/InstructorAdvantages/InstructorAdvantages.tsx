@@ -308,7 +308,8 @@ export default function InstructorAdvantages() {
                                           Навчання й інвентар
                                         </h3>
                                         <p className={s.cardText}>
-                                          Навчання й інвентар
+                                          Доступ до інвентарю, воркшопів та
+                                          повторних навчань
                                         </p>
                                       </div>
                                     </div>

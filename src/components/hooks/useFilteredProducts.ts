@@ -31,33 +31,7 @@ export function useFilteredProducts(filters: ProductFilters = {}) {
           categories?: Array<{ name: string }>;
         }>;
 
-        // логування вимкнено
-        const newProducts = products.filter((p) => {
-          if (!p.dateCreated) return false;
-          const createdDate = new Date(p.dateCreated);
-          const today = new Date();
-
-          // Нормалізуємо дати до початку дня для правильної різниці
-          const createdDateNormalized = new Date(
-            createdDate.getFullYear(),
-            createdDate.getMonth(),
-            createdDate.getDate()
-          );
-          const todayNormalized = new Date(
-            today.getFullYear(),
-            today.getMonth(),
-            today.getDate()
-          );
-
-          const daysDiff = Math.floor(
-            (todayNormalized.getTime() - createdDateNormalized.getTime()) /
-              (1000 * 60 * 60 * 24)
-          );
-          return daysDiff <= 30;
-        });
-
-        // debug logs removed
-
+        // Спростимо - повертаємо всі продукти без фільтрації за датою
         return products;
       } catch (error) {
         throw error;

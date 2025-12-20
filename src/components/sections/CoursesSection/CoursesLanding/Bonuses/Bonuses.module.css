@@ -153,7 +153,7 @@
 }
 
 .inventoryCard {
-  background-image: url("/images/Frame 1321319181.png");
+  background-image: url(/Frame13213181031.png);
 
   background-repeat: no-repeat;
 
@@ -211,6 +211,7 @@
   position: relative;
   flex: 0 0 360px;
   height: 220px;
+  display: none;
 }
 
 .telegramCard {
@@ -771,7 +772,7 @@
     line-height: 120%;
     text-align: center;
     width: 100%;
-    max-width: mvw(220);
+    max-width: 100%;
     margin: 0 auto;
   }
 
@@ -784,6 +785,10 @@
     height: auto;
     min-height: auto;
     gap: mvw(16);
+  }
+  .cardContent {
+    width: 100%;
+    gap: mvw(8);
   }
 
   .fullBlock {
@@ -937,6 +942,10 @@
 
   .iconsRow {
     gap: mvw(8);
+  }
+
+  .cardText2 {
+    width: 100%;
   }
 
   .iconItem {
@@ -1197,7 +1206,7 @@
   }
 
   .inventoryCard {
-    background-image: url(/Frame1321319018.png);
+    background-image: url(/Frame31321318100.png);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;

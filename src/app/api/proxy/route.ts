@@ -5,7 +5,6 @@ const UPSTREAM_BASE = process.env.UPSTREAM_BASE;
 export async function GET(req: NextRequest) {
   try {
     if (!UPSTREAM_BASE) {
-      console.error("Proxy GET error: UPSTREAM_BASE is not set");
       return NextResponse.json(
         { error: "Server configuration error" },
         { status: 500 }
@@ -66,7 +65,6 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Proxy GET error:", error);
     return NextResponse.json(
       {
         error: "Proxy error",
@@ -135,7 +133,6 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Proxy GET error:", error);
     return NextResponse.json(
       {
         error: "Proxy error",
@@ -200,7 +197,6 @@ export async function PUT(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Proxy GET error:", error);
     return NextResponse.json(
       {
         error: "Proxy error",
@@ -214,10 +210,6 @@ export async function PUT(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const body = await req.json().catch(() => null);
 
-  console.log("----- API DEBUG: PATCH /api/proxy -----");
-  console.log("Client → Next API:");
-  console.log("URL:", req.url);
-  console.log("Body:", body);
 
   try {
     const { searchParams } = new URL(req.url);
@@ -265,9 +257,6 @@ export async function PATCH(req: NextRequest) {
 
     const wpText = await wpResponse.text();
 
-    console.log("Next API → WordPress:");
-    console.log("Status:", wpResponse.status);
-    console.log("Response:", wpText);
 
     return new NextResponse(wpText, {
       status: wpResponse.status,
@@ -277,7 +266,6 @@ export async function PATCH(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Proxy PATCH error:", error);
     return NextResponse.json(
       {
         error: "Proxy error",
@@ -319,7 +307,6 @@ export async function DELETE(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Proxy GET error:", error);
     return NextResponse.json(
       {
         error: "Proxy error",

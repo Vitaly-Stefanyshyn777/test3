@@ -168,7 +168,6 @@ const CoursesFilters = ({
     if (onApplyCategories) {
       onApplyCategories(categoryIds);
     } else {
-      console.warn("[CoursesFilters] ⚠️ onApplyCategories не передано!");
     }
   };
 

@@ -73,13 +73,15 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
         >
           {label}
         </span>
-        <SortArrowIcon
+        <div
           className={`${
             variant === "itemsPerPage"
-              ? styles.itemsPerPageIcon
-              : styles.sortIcon
+              ? styles.itemsPerPageIconWrapper
+              : styles.sortIconWrapper
           } ${isOpen ? styles.iconRotated : ""}`}
-        />
+        >
+          <SortArrowIcon />
+        </div>
       </button>
       {isOpen && (
         <div

@@ -50,7 +50,6 @@ export async function GET(_req: NextRequest) {
     });
     return response;
   } catch (e) {
-    console.error("/api/auth/wp-token error", e);
     return NextResponse.json({ error: "auth error" }, { status: 500 });
   }
 }

@@ -54,6 +54,18 @@
   border-color: rgba(0, 0, 0, 0.3);
 }
 
+.selectButtonDisabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
+  background: #e5e7eb;
+  border-color: #e5e7eb;
+}
+
+.selectButtonDisabled:hover {
+  border-color: #e5e7eb;
+}
+
 .selectText {
   flex: 1;
   text-align: left;
@@ -133,7 +145,6 @@
   height: 16px;
   pointer-events: none;
   overflow: hidden;
-  margin-top: 4px;
 }
 
 .supportingText {

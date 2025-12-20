@@ -6,6 +6,7 @@ import {
   StudentHatIcon,
   User2Icon,
   Weight3Icon,
+  WeightVioletIcon,
   InstagramIcon,
 } from "@/components/Icons/Icons";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -69,9 +70,22 @@ export default function Team() {
   const [active, setActive] = useState(0);
   const [members, setMembers] = useState<TeamMemberUi[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   const [imageLoadedStates, setImageLoadedStates] = useState<
     Record<string | number, boolean>
   >({});
+
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 1000px)");
+    const update = () => setIsMobile(mql.matches);
+    update();
+    if (mql.addEventListener) mql.addEventListener("change", update);
+    else mql.addListener(update);
+    return () => {
+      if (mql.removeEventListener) mql.removeEventListener("change", update);
+      else mql.removeListener(update);
+    };
+  }, []);
 
   const baseMembers: TeamMemberUi[] = useMemo(
     () => [
@@ -283,7 +297,11 @@ export default function Team() {
                       {member.achievements.map((achievement, index) => (
                         <div key={index} className={s.achievementItem}>
                           <div className={s.achievementIcon}>
-                            {achievement.icon}
+                            {isMobile && achievement.text.startsWith("Досвід:") ? (
+                              <WeightVioletIcon className={s.achievementIconSvg} />
+                            ) : (
+                              achievement.icon
+                            )}
                           </div>
                           <span className={s.achievementText}>
                             {achievement.text}

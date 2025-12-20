@@ -165,77 +165,93 @@ const OrdersHistory: React.FC = () => {
       ) : (
         <div className={styles.ordersList}>
           {orders
-            .slice((currentPage - 1) * ordersPerPage, currentPage * ordersPerPage)
+            .slice(
+              (currentPage - 1) * ordersPerPage,
+              currentPage * ordersPerPage
+            )
             .map((order, index) => (
-            <React.Fragment key={order.id}>
-              <div className={styles.orderCard}>
-                <div className={styles.productImageContainer}>
-                  <div className={styles.productImage}>
-                    <Image
-                      src={order.productImage}
-                      alt={order.productName}
-                      width={80}
-                      height={80}
-                    />
-                  </div>
-                  <div className={styles.quantityBadge}>x{order.quantity}</div>
-                </div>
-
-                <div className={styles.orderDetails}>
-                  <div className={styles.productHeader}>
-                    <h3 className={styles.productName}>{order.productName}</h3>
-                    <div className={styles.deliveryIcon}>
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 16 16"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M14 10H12V8H10V10H8L6 12V14H14V10Z"
-                          fill="#ED1C24"
-                        />
-                        <path d="M2 4H10V6H2V4ZM2 8H8V10H2V8Z" fill="#ED1C24" />
-                      </svg>
+              <React.Fragment key={order.id}>
+                <div className={styles.orderCard}>
+                  <div className={styles.productImageContainer}>
+                    <div className={styles.productImage}>
+                      <Image
+                        src={order.productImage}
+                        alt={order.productName}
+                        width={80}
+                        height={80}
+                      />
+                    </div>
+                    <div className={styles.quantityBadge}>
+                      x{order.quantity}
                     </div>
                   </div>
 
-                  <div className={styles.orderMeta}>
-                    <span className={styles.orderDate}>{order.orderDate}</span>
-                    <span className={styles.orderNumber}>
-                      {order.orderNumber}
-                    </span>
-                  </div>
+                  <div className={styles.orderDetails}>
+                    <div className={styles.productHeader}>
+                      <h3 className={styles.productName}>
+                        {order.productName}
+                      </h3>
+                      <div className={styles.deliveryIcon}>
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M14 10H12V8H10V10H8L6 12V14H14V10Z"
+                            fill="#ED1C24"
+                          />
+                          <path
+                            d="M2 4H10V6H2V4ZM2 8H8V10H2V8Z"
+                            fill="#ED1C24"
+                          />
+                        </svg>
+                      </div>
+                    </div>
 
-                  <div className={styles.orderSummary}>
-                    <span className={styles.totalLabel}>Сума замовлення:</span>
-                    <span className={styles.price}>{order.totalPrice} ₴</span>
-                  </div>
+                    <div className={styles.orderMeta}>
+                      <span className={styles.orderDate}>
+                        {order.orderDate}
+                      </span>
+                      <span className={styles.orderNumber}>
+                        {order.orderNumber}
+                      </span>
+                    </div>
 
-                  <div className={styles.orderActions}>
-                    <button
-                      className={styles.repeatBtn}
-                      onClick={() => handleRepeatOrder(order.id)}
-                    >
-                      Замовити
-                    </button>
-                    <button
-                      className={styles.productBtn}
-                      onClick={() => handleViewProduct(order.id)}
-                    >
-                      Сторінка товару
-                    </button>
+                    <div className={styles.orderSummary}>
+                      <span className={styles.totalLabel}>
+                        Сума замовлення:
+                      </span>
+                      <span className={styles.price}>{order.totalPrice} ₴</span>
+                    </div>
+
+                    <div className={styles.orderActions}>
+                      <button
+                        className={styles.repeatBtn}
+                        onClick={() => handleRepeatOrder(order.id)}
+                      >
+                        Замовити
+                      </button>
+                      <button
+                        className={styles.productBtn}
+                        onClick={() => handleViewProduct(order.id)}
+                      >
+                        Сторінка товару
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-              {index < Math.min(ordersPerPage, orders.length) - 1 && (
-                <div className={styles.divider}></div>
-              )}
-            </React.Fragment>
-          ))}
+                {index < Math.min(ordersPerPage, orders.length) - 1 && (
+                  <div className={styles.divider}></div>
+                )}
+              </React.Fragment>
+            ))}
           {isError && (
-            <div className={styles.error}>Не вдалося завантажити замовлення</div>
+            <div className={styles.error}>
+              Не вдалося завантажити замовлення
+            </div>
           )}
         </div>
       )}

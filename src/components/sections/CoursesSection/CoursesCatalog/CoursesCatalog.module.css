@@ -77,7 +77,7 @@
   }
 
   .catalogContentBlock {
-    padding: mvw(24) mvw(16);
+    padding: mvw(135) mvw(16) mvw(24) mvw(16);
     gap: mvw(24);
   }
 
@@ -88,12 +88,12 @@
   .pageTitle {
     font-size: mvw(28);
     line-height: 120%;
-    margin-bottom: mvw(16);
+    margin-bottom: mvw(45);
   }
 
   .filterSortPanel {
     width: 100%;
-    margin-bottom: mvw(16);
+    /* margin-bottom: mvw(16); */
   }
 
   .filterSortBar {

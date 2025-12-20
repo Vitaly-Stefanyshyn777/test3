@@ -43,12 +43,11 @@
 
 .leaveReviewButton:hover {
   background: var(--black);
-  transform: translateY(-2px);
 }
 
 .reviewsCarousel {
   margin-bottom: 40px;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .reviewsCarousel :global(.swiper-slide) {
@@ -164,7 +163,6 @@
 .navButton:hover {
   background: var(--violet);
   color: var(--white);
-  transform: translateY(-2px);
 }
 
 .navButton:last-child {
@@ -197,13 +195,23 @@
 }
 
 @media (max-width: 1000px) {
-  .reviews {
-    padding: mvw(24) 0 0 0;
+  .emptyState {
+    font-size: mvw(14);
+    line-height: 140%;
+    color: var(--black);
+    opacity: 0.8;
+    margin: 0;
+    flex: 1;
+    text-align: center;
+    .reviews {
+      padding: mvw(24) 0 0 0;
+    }
   }
 
   .containerReviews {
     gap: mvw(20);
-    padding: 0 mvw(16);
+    /* padding: 0 mvw(16); */
+    max-width: 100%;
   }
 
   .header {
@@ -229,15 +237,15 @@
   }
 
   .reviewsCarousel :global(.swiper-slide) {
-    width: mvw(292) !important;
+    width: mvw(288) !important;
     height: auto !important;
   }
 
   .reviewCard {
     padding: mvw(20) mvw(16);
     gap: mvw(16);
-    width: mvw(292);
-    flex: 0 0 mvw(292);
+    width: mvw(288);
+    flex: 0 0 mvw(288);
     border-radius: mvw(16);
     min-height: mvw(300);
   }

@@ -108,8 +108,6 @@
 
 .allCoursesBtn:hover {
   background: var(--black);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .loading,
@@ -173,5 +171,6 @@
   .headerLeft {
     align-items: center;
     justify-content: center;
+    gap: mvw(6);
   }
 }

@@ -768,7 +768,7 @@
   }
   .advantagesContainer {
     padding: 0;
-    gap: mvw(16);
+    gap: mvw(32);
   }
   .advantagesHeader {
     padding: 0 mvw(16);

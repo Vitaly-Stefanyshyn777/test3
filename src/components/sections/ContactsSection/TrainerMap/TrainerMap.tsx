@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useThemeSettingsQuery } from "@/components/hooks/useWpQueries";
 import { ThemeSettingsPost } from "@/lib/bfbApi";
-import { getContactData, convertSvgAttributesToCamelCase } from "@/lib/themeSettingsUtils";
+import {
+  getContactData,
+  convertSvgAttributesToCamelCase,
+} from "@/lib/themeSettingsUtils";
 import Image from "next/image";
 import styles from "./TrainerMap.module.css";
 import { TrainerUser } from "@/components/sections/types";
@@ -180,8 +183,11 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
 
   // Load theme_settings when props not provided
   const { data: themeSettingsData } = useThemeSettingsQuery();
-  const contactData = useMemo(() => getContactData(themeSettingsData), [themeSettingsData]);
-  
+  const contactData = useMemo(
+    () => getContactData(themeSettingsData),
+    [themeSettingsData]
+  );
+
   useEffect(() => {
     const shouldLoad = !mapMarkers || mapMarkers.length === 0 || !trainer;
     if (!shouldLoad) {
@@ -201,7 +207,10 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
       hl_data_contact?: unknown[];
       hl_data_gallery?: unknown[];
       acf?: {
-        map_markers?: Array<{ title?: string; coordinates?: [number, number][] }>;
+        map_markers?: Array<{
+          title?: string;
+          coordinates?: [number, number][];
+        }>;
         input_text_phone?: string;
         input_text_email?: string;
         input_text_address?: string;
@@ -234,7 +243,8 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
     const trainerLike: ThemeTrainerLike = {
       input_text_phone: first?.input_text_phone || first?.acf?.input_text_phone,
       input_text_email: first?.input_text_email || first?.acf?.input_text_email,
-      input_text_address: first?.input_text_address || first?.acf?.input_text_address,
+      input_text_address:
+        first?.input_text_address || first?.acf?.input_text_address,
       hl_data_contact: Array.isArray(first?.hl_data_contact)
         ? (first.hl_data_contact as ContactItem[])
         : Array.isArray(first?.acf?.hl_data_contact)
@@ -392,7 +402,7 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
       <div className={styles.mapContainer}>
         <div ref={mapRef} className={styles.map} />
 
-        {effectiveTrainer && (
+        {(effectiveTrainer || contactData.phone || contactData.email) && (
           <div className={styles.locationCard}>
             <div className={styles.locationImages}>
               {(() => {
@@ -453,17 +463,17 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
                 ));
               })()}
             </div>
-            <h3>Головний зал BFB</h3>
+            <h3>FitDance Studio</h3>
             <div className={styles.locationInfoCont}>
               <div className={styles.locationInfo}>
                 <div className={styles.infoRow}>
                   <div className={styles.infoItem}>
                     <span className={styles.label}>Телефон:</span>
                     <span className={styles.value}>
-                      {effectiveTrainer.input_text_phone ||
-                        effectiveTrainer.my_wlocation?.[0]
+                      {effectiveTrainer?.input_text_phone ||
+                        effectiveTrainer?.my_wlocation?.[0]
                           ?.hl_input_text_phone ||
-                        effectiveTrainer.social_phone ||
+                        effectiveTrainer?.social_phone ||
                         contactData.phone ||
                         "Номер телефону поки що не доступний"}
                     </span>
@@ -471,8 +481,8 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
                   <div className={styles.infoItem}>
                     <span className={styles.label}>Email:</span>
                     <span className={styles.value}>
-                      {effectiveTrainer.input_text_email ||
-                        effectiveTrainer.my_wlocation?.[0]
+                      {effectiveTrainer?.input_text_email ||
+                        effectiveTrainer?.my_wlocation?.[0]
                           ?.hl_input_text_email ||
                         contactData.email ||
                         "Email поки що не додано"}
@@ -483,7 +493,7 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
                   <div className={styles.infoItem}>
                     <span className={styles.label}>Час роботи у вихідні:</span>
                     <span className={styles.value}>
-                      {effectiveTrainer.my_wlocation?.[0]
+                      {effectiveTrainer?.my_wlocation?.[0]
                         ?.hl_input_text_schedule_two ||
                         contactData.weekends ||
                         "Графік у вихідні не додано"}
@@ -492,7 +502,7 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
                   <div className={styles.infoItem}>
                     <span className={styles.label}>Час роботи у будні:</span>
                     <span className={styles.value}>
-                      {effectiveTrainer.my_wlocation?.[0]
+                      {effectiveTrainer?.my_wlocation?.[0]
                         ?.hl_input_text_schedule_five ||
                         contactData.weekdays ||
                         "Графік у будні не додано"}
@@ -504,8 +514,9 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
               <div className={styles.infoItemCenter}>
                 <span className={styles.label}>Адреса:</span>
                 <span className={styles.value}>
-                  {effectiveTrainer.input_text_address ||
-                    effectiveTrainer.my_wlocation?.[0]?.hl_input_text_address ||
+                  {effectiveTrainer?.input_text_address ||
+                    effectiveTrainer?.my_wlocation?.[0]
+                      ?.hl_input_text_address ||
                     contactData.address ||
                     "Адресу поки що не додано"}
                 </span>
@@ -513,43 +524,52 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
             </div>
 
             <div className={styles.locationSocial}>
-              {effectiveTrainer.hl_data_contact &&
-              effectiveTrainer.hl_data_contact.length > 0 ? (
-                effectiveTrainer.hl_data_contact.map(
-                  (contact: ContactItem, index: number) => (
+              {contactData.socialLinks && contactData.socialLinks.length > 0 ? (
+                contactData.socialLinks.map((social, index) => {
+                  const iconMap: Record<
+                    string,
+                    React.ComponentType<{ className?: string }>
+                  > = {
+                    Instagram: InstagramIcon,
+                    Facebook: FacebookIcon,
+                    Telegram: TelegramIcon,
+                    WhatsApp: WhatsappIcon,
+                  };
+                  const Icon = iconMap[social.name] || null;
+                  if (!Icon) return null;
+                  return social.link ? (
                     <a
                       key={index}
-                      href={contact.hl_input_text_link || "#"}
+                      href={social.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className={styles.socialIcon}
-                      dangerouslySetInnerHTML={{
-                        __html: convertSvgAttributesToCamelCase(contact.hl_img_svg_icon),
-                      }}
-                    />
-                  )
-                )
-              ) : contactData.socialLinks.length > 0 ? (
-                contactData.socialLinks.map((social, index) => (
-                  <a
-                    key={index}
-                    href={social.link || "#"}
-                    className={styles.socialIcon}
-                    dangerouslySetInnerHTML={{
-                      __html: social.icon || "",
-                    }}
-                  />
-                ))
+                    >
+                      <Icon />
+                    </a>
+                  ) : (
+                    <div key={index} className={styles.socialIcon}>
+                      <Icon />
+                    </div>
+                  );
+                })
               ) : (
                 <>
-                  <div className={styles.IconsBlock}>
+                  <a
+                    href="https://www.instagram.com/bfb.official_ukraine?igsh=enFybWFmZGE3NG8z"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.socialIcon}
+                  >
                     <InstagramIcon />
-                  </div>
-                  <div className={styles.IconsBlock}>
+                  </a>
+                  <div className={styles.socialIcon}>
                     <FacebookIcon />
                   </div>
-                  <div className={styles.IconsBlock}>
+                  <div className={styles.socialIcon}>
                     <TelegramIcon />
                   </div>
-                  <div className={styles.IconsBlock}>
+                  <div className={styles.socialIcon}>
                     <WhatsappIcon />
                   </div>
                 </>

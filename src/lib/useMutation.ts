@@ -9,6 +9,27 @@ import {
   type RegisterCredentials,
   type TrainerApplicationCredentials,
 } from "./auth";
+
+// Тип відповіді від кастомного ендпоінту реєстрації
+type CustomRegisterResponse = {
+  success: boolean;
+  message: string;
+  data: {
+    user: {
+      id: number;
+      name: string;
+      email?: string;
+      first_name?: string;
+      last_name?: string;
+      roles?: string[];
+      meta?: Record<string, unknown>;
+    };
+    certificate?: {
+      [key: string]: unknown;
+    };
+    token?: string;
+  };
+};
 import {
   submitContactQuestion,
   updateTrainerProfile,
@@ -46,12 +67,12 @@ export const useLogin = () => {
       }
 
       setAuth(data.token, user);
-      
+
       // Інвалідуємо queries для оновлення даних
       queryClient.invalidateQueries({ queryKey: ["coaches"] });
       queryClient.invalidateQueries({ queryKey: ["coach"] });
       queryClient.invalidateQueries({ queryKey: ["trainer-profile-full"] });
-      
+
       // Після авторизації явно завантажуємо профіль через GET запит,
       // щоб дані (email, first_name, last_name, phone) автоматично заповнили форму PersonalData
       // Виконуємо після setAuth, щоб токен встиг оновитися в store
@@ -59,22 +80,24 @@ export const useLogin = () => {
         try {
           // Чекаємо трохи, щоб сервер встиг обробити авторизацію та токен оновився в store
           await new Promise((resolve) => setTimeout(resolve, 500));
-          
+
           // Завантажуємо профіль через GET запит
           const profile = await getMyProfile(data.token);
-          
+
           if (profile) {
             // Зберігаємо профіль в кеш React Query для всіх можливих queryKey
             // щоб PersonalData автоматично отримав дані
-            queryClient.setQueryData(["user-profile", "me", data.token], profile);
+            queryClient.setQueryData(
+              ["user-profile", "me", data.token],
+              profile
+            );
             queryClient.setQueryData(["user-profile", "me", null], profile);
             queryClient.setQueryData(["user-profile", "me"], profile);
           }
-          
+
           // Викликаємо refetch для оновлення компонентів (після setQueryData)
           queryClient.refetchQueries({ queryKey: ["user-profile", "me"] });
         } catch (error) {
-          console.error("[useLogin] Помилка завантаження профілю після авторизації:", error);
           // Якщо не вдалося завантажити, все одно викликаємо refetch для автоматичного завантаження
           queryClient.refetchQueries({ queryKey: ["user-profile", "me"] });
         }
@@ -96,15 +119,59 @@ export const useRegister = () => {
   const { setAuth, user: currentUser } = useAuthStore();
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (credentials: RegisterCredentials) => {
-      return register(credentials);
+  return useMutation<CustomRegisterResponse, unknown, RegisterCredentials>({
+    mutationFn: async (
+      credentials: RegisterCredentials
+    ): Promise<CustomRegisterResponse> => {
+      // Викликаємо register і явно кастуємо результат до CustomRegisterResponse
+      // TypeScript може не бачити оновлену сигнатуру, тому використовуємо unknown як проміжний тип
+      const result = (await register(
+        credentials
+      )) as unknown as CustomRegisterResponse;
+      return result;
     },
-    onSuccess: async (data) => {
+    onSuccess: async (data, variables) => {
+      // Кастомний ендпоінт повертає структуру { success, message, data: { user, certificate } }
+      const userData = data.data.user;
+
+      // Перевіряємо, чи є токен у відповіді від кастомного ендпоінту
+      let authToken: string | null = data.data.token || null;
+
+      // Якщо токену немає в відповіді, робимо автоматичний login
+      if (!authToken) {
+        try {
+          const loginResponse = await login({
+            username: variables.email, // Використовуємо email як username
+            password: variables.password,
+          });
+          authToken = loginResponse.token;
+        } catch (loginError) {
+          // Якщо авторизація не вдалася, встановлюємо користувача без токену
+          const user = {
+            id: userData.id.toString(),
+            email: userData.email || variables.email,
+            displayName:
+              userData.name ||
+              `${variables.first_name} ${variables.last_name}`.trim(),
+          };
+          setAuth("", user);
+          throw loginError;
+        }
+      }
+
+      // Отримуємо числовий id через /users/me
+      let numericId: string | undefined;
+      try {
+        const me = await getMyProfile(authToken);
+        if (me?.id) numericId = String(me.id);
+      } catch {}
+
       const user = {
-        id: data.id.toString(),
-        email: data.email || "",
-        displayName: data.name,
+        id: numericId || userData.id.toString(),
+        email: userData.email || variables.email,
+        displayName:
+          userData.name ||
+          `${variables.first_name} ${variables.last_name}`.trim(),
       };
 
       // При реєстрації нового користувача завжди очищаємо кеш
@@ -113,64 +180,32 @@ export const useRegister = () => {
       if (oldUserId && newUserId && oldUserId !== newUserId) {
         queryClient.clear();
       } else if (!oldUserId) {
-        // Якщо раніше не було користувача, також очищаємо кеш
         queryClient.clear();
       }
 
-      setAuth("", user);
-      
+      // Встановлюємо авторизацію з токеном
+      setAuth(authToken, user);
+
       // Інвалідуємо queries для оновлення даних
       queryClient.invalidateQueries({ queryKey: ["coaches"] });
       queryClient.invalidateQueries({ queryKey: ["coach"] });
       queryClient.invalidateQueries({ queryKey: ["trainer-profile-full"] });
-      
-      // Після реєстрації явно завантажуємо профіль через GET запит,
-      // щоб дані (email, first_name, last_name, phone) автоматично заповнили форму PersonalData
-      // Виконуємо після setAuth, щоб isLoggedIn встиг оновитися в store
-      // Використовуємо два підходи: одразу refetch та через setTimeout для гарантії
-      
-      // Підхід 1: Негайний refetch (якщо isLoggedIn вже true)
-      queryClient.refetchQueries({ queryKey: ["user-profile", "me"] });
-      
-      // Підхід 2: Завантаження профілю через setTimeout для гарантії
+
+      // Завантажуємо профіль після авторизації (як у useLogin)
       setTimeout(async () => {
         try {
-          // Чекаємо трохи, щоб сервер встиг обробити реєстрацію та isLoggedIn оновився в store
-          await new Promise((resolve) => setTimeout(resolve, 800));
-          
-          // Завантажуємо профіль через GET запит (null для використання httpOnly cookie)
-          const profile = await getMyProfile(null);
-          
+          await new Promise((resolve) => setTimeout(resolve, 500));
+          const profile = await getMyProfile(authToken);
           if (profile) {
-            // Оновлюємо user.id з числовим ID з профілю (якщо вони відрізняються)
-            const profileId = String((profile as unknown as { id?: number | string })?.id || "");
-            const updatedUser = profileId && profileId !== user.id 
-              ? { ...user, id: profileId }
-              : user;
-            
-            if (profileId && profileId !== user.id) {
-              const { setUser } = useAuthStore.getState();
-              setUser(updatedUser);
-            }
-            
-            // Зберігаємо профіль в кеш React Query для всіх можливих queryKey
-            // щоб PersonalData автоматично отримав дані
-            const { isLoggedIn: currentIsLoggedIn, token: currentToken } = useAuthStore.getState();
-            
-            // Зберігаємо для різних комбінацій queryKey (без userId, щоб уникнути безкінечних циклів)
-            queryClient.setQueryData(["user-profile", "me", null, currentIsLoggedIn], profile);
-            queryClient.setQueryData(["user-profile", "me", "", currentIsLoggedIn], profile);
-            queryClient.setQueryData(["user-profile", "me", currentToken, currentIsLoggedIn], profile);
+            queryClient.setQueryData(
+              ["user-profile", "me", authToken],
+              profile
+            );
             queryClient.setQueryData(["user-profile", "me", null], profile);
-            queryClient.setQueryData(["user-profile", "me", ""], profile);
             queryClient.setQueryData(["user-profile", "me"], profile);
-            
-            // Викликаємо refetch для оновлення компонентів (після setQueryData)
             queryClient.refetchQueries({ queryKey: ["user-profile", "me"] });
           }
         } catch (error) {
-          console.error("[useRegister] Помилка завантаження профілю після реєстрації:", error);
-          // Якщо не вдалося завантажити, все одно викликаємо refetch для автоматичного завантаження
           queryClient.refetchQueries({ queryKey: ["user-profile", "me"] });
         }
       }, 0);
@@ -294,10 +329,8 @@ export const useCreateWcOrder = () => {
       customer_note?: string;
     }) => createWcOrder(orderData),
     onSuccess: (data) => {
-      console.log("[useCreateWcOrder] ✅ Замовлення створено:", data);
     },
     onError: (error) => {
-      console.error("[useCreateWcOrder] ❌ Помилка:", error);
     },
   });
 };

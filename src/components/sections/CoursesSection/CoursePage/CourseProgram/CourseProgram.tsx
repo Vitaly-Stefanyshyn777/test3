@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import {
   PlusIcon,
   MinuswIcon,
@@ -8,8 +9,6 @@ import {
   Check3Icon,
 } from "@/components/Icons/Icons";
 import styles from "./CourseProgram.module.css";
-import { useCourseQuery } from "@/components/hooks/useWpQueries";
-import { CourseData } from "@/lib/bfbApi";
 import CourseProgramSkeleton from "./CourseProgramSkeleton";
 
 interface CourseModule {
@@ -20,32 +19,65 @@ interface CourseModule {
   isExpanded: boolean;
 }
 
+interface CourseProgramItem {
+  hl_input_text_title?: string;
+  hl_input_text_lesson_count?: string;
+  hl_textarea_description?: string;
+  hl_textarea_themes?: string;
+}
+
 interface CourseProgramProps {
   courseId?: string | number;
 }
 
 const CourseProgram: React.FC<CourseProgramProps> = ({ courseId = 169 }) => {
-  const { data: course, isLoading, error } = useCourseQuery(courseId);
-
-  // Динамічні модулі курсу з API
-  const [modules, setModules] = useState<CourseModule[]>([]);
+  const [course, setCourse] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<any>(null);
   const [showAll, setShowAll] = useState(false);
 
-  // Завантажуємо модулі з API
-  React.useEffect(() => {
-    if (course && course.course_data.Course_program) {
+  // Завантажуємо дані курсу напряму без React Query
+  useEffect(() => {
+    const loadCourse = async () => {
+      try {
+        setIsLoading(true);
+        const { fetchCourse } = await import("@/lib/coursesQueries");
+        const courseData = await fetchCourse(courseId);
+        setCourse(courseData);
+        setError(null);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCourse();
+  }, [courseId]);
+
+  // Створюємо модулі з даних
+  const [modules, setModules] = useState<CourseModule[]>([]);
+
+  useEffect(() => {
+    if (
+      course?.course_data?.Course_program &&
+      Array.isArray(course.course_data.Course_program)
+    ) {
       const apiModules = course.course_data.Course_program.map(
-        (program, index) => ({
+        (program: CourseProgramItem, index: number) => ({
           id: index + 1,
-          title: program.hl_input_text_title,
+          title: program.hl_input_text_title || `Модуль ${index + 1}`,
           description: program.hl_textarea_description || "Опис модуля",
           lessonsCount:
-            parseInt(program.hl_input_text_lesson_count.replace(/\D/g, "")) ||
-            1,
+            parseInt(
+              program.hl_input_text_lesson_count?.replace(/\D/g, "") || "1"
+            ) || 1,
           isExpanded: false,
         })
       );
       setModules(apiModules);
+    } else {
+      setModules([]);
     }
   }, [course]);
 
@@ -59,9 +91,12 @@ const CourseProgram: React.FC<CourseProgramProps> = ({ courseId = 169 }) => {
     );
   };
 
-  // Визначаємо які модулі показувати
-  const displayedModules = showAll ? modules : modules.slice(0, 4);
-  const hasMoreModules = modules.length > 4;
+  // Логіка для показу модулів
+  const initialModulesCount = 4;
+  const displayedModules = showAll
+    ? modules
+    : modules.slice(0, initialModulesCount);
+  const hasMoreModules = modules.length > initialModulesCount;
 
   const handleShowMore = () => {
     setShowAll(true);
@@ -81,11 +116,6 @@ const CourseProgram: React.FC<CourseProgramProps> = ({ courseId = 169 }) => {
         </div>
       </section>
     );
-  }
-
-  // Якщо немає модулів, не показуємо секцію
-  if (!course.course_data.Course_program || modules.length === 0) {
-    return null;
   }
 
   return (
@@ -141,7 +171,7 @@ const CourseProgram: React.FC<CourseProgramProps> = ({ courseId = 169 }) => {
                               module.id - 1
                             ].hl_textarea_themes
                               .split("|||")
-                              .map((theme, index) => (
+                              .map((theme: string, index: number) => (
                                 <span key={index} className={styles.topicTag}>
                                   <p className={styles.topicText}>
                                     {theme.trim()}
@@ -201,14 +231,16 @@ const CourseProgram: React.FC<CourseProgramProps> = ({ courseId = 169 }) => {
           <div className={styles.learningOutcomes}>
             <h3>ЧОГО ВИ НАВЧИТЕСЬ</h3>
             <ul className={styles.learningList}>
-              {course.course_data.What_learn.map((item, index) => (
-                <li key={index} className={styles.learningItem}>
-                  <div className={styles.learningIcon}>
-                    <Check3Icon />
-                  </div>
-                  <span className={styles.learningText}>{item}</span>
-                </li>
-              ))}
+              {course.course_data.What_learn.map(
+                (item: string, index: number) => (
+                  <li key={index} className={styles.learningItem}>
+                    <div className={styles.learningIcon}>
+                      <Check3Icon />
+                    </div>
+                    <span className={styles.learningText}>{item}</span>
+                  </li>
+                )
+              )}
             </ul>
           </div>
         </div>

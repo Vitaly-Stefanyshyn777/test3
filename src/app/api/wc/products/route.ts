@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 
 const UPSTREAM_BASE = process.env.UPSTREAM_BASE as string;
 
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  });
+}
+
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(`${UPSTREAM_BASE}/wp-json/wc/v3/products`);
@@ -33,20 +44,12 @@ export async function GET(req: NextRequest) {
     if (basicUser && basicPass) {
       authHeader =
         "Basic " + Buffer.from(`${basicUser}:${basicPass}`).toString("base64");
-      console.log("[Products API] 🔐 Використовується Basic Auth");
     } else {
       return NextResponse.json(
         { error: "Missing WC Basic Auth credentials" },
         { status: 500 }
       );
     }
-
-    // Лог параметрів та URL
-    console.log(
-      "[WC products proxy] 🔎 Параметри:",
-      Object.fromEntries(incoming.searchParams.entries())
-    );
-    console.log("[WC products proxy] 🔍 URL:", url.toString());
 
     const upstreamRes = await fetch(url.toString(), {
       cache: "no-store",
@@ -69,16 +72,9 @@ export async function GET(req: NextRequest) {
               .filter(Boolean)
           )
         );
-        console.log("[WC products proxy] ✅ Відповідь (summary):", {
-          count: data.length,
-          sampleNames: names,
-          uniqueCategorySlugs: categorySlugs,
-        });
       }
     } catch (e) {
-      console.log(
-        "[WC products proxy] ⚠️ Не вдалося розпарсити JSON для логування"
-      );
+      // Пропускаємо помилку парсингу JSON
     }
 
     return new NextResponse(text, {
@@ -86,10 +82,12 @@ export async function GET(req: NextRequest) {
       headers: {
         "content-type":
           upstreamRes.headers.get("content-type") || "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
       },
     });
   } catch (error) {
-    console.error("/api/wc/products error", error);
     return NextResponse.json({ error: "wc products error" }, { status: 500 });
   }
 }

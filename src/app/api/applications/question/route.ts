@@ -43,7 +43,6 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("/api/applications/question POST error", error);
     return NextResponse.json(
       { error: "applications question error" },
       { status: 500 }

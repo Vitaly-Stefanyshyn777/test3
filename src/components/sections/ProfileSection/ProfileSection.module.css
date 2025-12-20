@@ -50,7 +50,7 @@
 
 @media (max-width: 1000px) {
   .portfolioSection {
-    padding: mvw(70) mvw(0) mvw(70) mvw(0);
+    padding: mvw(60) mvw(0) mvw(70) mvw(0);
     overflow-x: visible;
   }
 
@@ -91,7 +91,7 @@
     display: inline-flex;
     align-items: center;
     gap: mvw(7);
-    background: var(--white);
+    background: var(--bg-color);
 
     border-radius: mvw(17);
 

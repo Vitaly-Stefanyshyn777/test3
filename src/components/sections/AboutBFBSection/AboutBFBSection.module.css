@@ -7,6 +7,6 @@
 
 @media (max-width: 1024px) {
   .aboutBFB {
-    gap: mvw(100);
+    gap: mvw(60);
   }
 }

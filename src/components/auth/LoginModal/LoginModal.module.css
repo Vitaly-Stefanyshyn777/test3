@@ -255,6 +255,38 @@
   color: #667eea;
 }
 
+/* LoginModal.module.css */
+
+.registerSwitchBlock {
+  color: var(--black);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.registerText {
+  color: var(--grey-text);
+  font-size: 14px;
+}
+
+.registerButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+  color: var(--violet);
+}
+
+.registerButton:hover {
+  color: var(--primary-color-darker);
+}
+
 @keyframes slideUp {
   from {
     transform: translateY(100%);
@@ -432,5 +464,11 @@
   .privacyLink {
     font-size: mvw(12);
     line-height: 140%;
+  }
+  .registerText {
+    font-size: mvw(12);
+  }
+  .registerButton {
+    font-size: mvw(12);
   }
 }

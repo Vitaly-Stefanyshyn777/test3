@@ -15,15 +15,12 @@ export async function GET(request: NextRequest) {
       authToken = `Basic ${Buffer.from(`${basicUser}:${basicPass}`).toString(
         "base64"
       )}`;
-      console.log("[Payment Gateways API] 🔐 Використовується Basic Auth");
     } else {
       return NextResponse.json(
         { error: "Missing WC Basic Auth credentials" },
         { status: 500 }
       );
     }
-
-    console.log("[WC Payment Gateways API] 🚀 Отримую платіжні методи");
 
     const upstreamBase = process.env.UPSTREAM_BASE as string;
     const response = await fetch(
@@ -57,7 +54,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error("[WC Payment Gateways API] ❌ Помилка:", error);
+    console.error("[WC Payment Gateways API] ❌ Внутрішня помилка сервера:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

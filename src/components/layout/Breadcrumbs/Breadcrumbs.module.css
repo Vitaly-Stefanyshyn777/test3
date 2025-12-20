@@ -4,14 +4,14 @@
   display: flex;
   justify-content: flex-start;
   position: absolute;
-  top: 110px;
+  top: 115px;
   z-index: 10;
 }
 
 .breadcrumbsContainer {
   max-width: 1200px;
   margin: 0;
-  padding-left: 70px;
+  padding-left: 50px;
   display: flex;
   justify-content: flex-start;
 }
@@ -56,7 +56,7 @@
 
 .breadcrumbText.active {
   font-weight: 600;
-  padding: 4px 8px;
+  /* padding: 4px 8px; */
   border-radius: 6px;
 
   color: rgb(14 14 14 / 30%);
@@ -173,7 +173,7 @@
   .breadcrumbs {
     position: absolute;
     top: 0;
-    padding: mvw(85) mvw(16) mvw(15);
+    padding: mvw(95) mvw(16) mvw(15);
     z-index: 10;
     display: flex;
   }
@@ -184,6 +184,14 @@
     padding: mvw(110) mvw(27) mvw(15);
     left: 0;
     right: 0;
+  }
+
+  .breadcrumbs.onOurCourses {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: mvw(76) mvw(13) mvw(15);
   }
 
   /* Приховуємо breadcrumbs коли модалка InstructingSlider відкрита */
@@ -211,7 +219,7 @@
   }
 
   .breadcrumbLink {
-    font-size: mvw(12);
+    font-size: mvw(10);
     line-height: 140%;
     font-family: var(--font-family);
     font-weight: 500;
@@ -257,7 +265,7 @@
     .breadcrumbText.active {
     color: rgba(14, 14, 14, 0.3) !important;
     font-weight: 600;
-    padding: mvw(4) mvw(8);
+    /* padding: mvw(4) mvw(8); */
     border-radius: mvw(6);
   }
 
@@ -268,13 +276,36 @@
     color: var(--white) !important;
     font-size: mvw(12);
     line-height: 140%;
+    opacity: 0.4;
+    font-weight: 600;
   }
 
   .breadcrumbs.onAboutBfb .breadcrumbText.active {
-    opacity: 0.4 !important;
+    opacity: 1 !important;
   }
 
   .breadcrumbs.onAboutBfb .separator {
+    color: var(--white) !important;
+  }
+
+  /* Стилі для breadcrumbs на сторінці contacts на мобілці */
+  .breadcrumbs.onContacts .breadcrumbLink,
+  .breadcrumbs.onContacts .breadcrumbText,
+  .breadcrumbs.onContacts .separator {
+    color: var(--white) !important;
+    font-size: mvw(12);
+    line-height: 140%;
+  }
+
+  .breadcrumbs.onContacts .breadcrumbText.active {
+    opacity: 0.4 !important;
+  }
+
+  .breadcrumbs.onContacts .breadcrumbLink:hover {
+    color: var(--white) !important;
+  }
+
+  .breadcrumbs.onContacts .separator {
     color: var(--white) !important;
   }
 }

@@ -36,10 +36,13 @@ export type EventPost = {
     location?: string;
     description?: string;
     // image може бути рядком, масивом або об'єктом з desctop/mobile
-    image?: string | string[] | {
-      desctop?: string;
-      mobile?: string;
-    };
+    image?:
+      | string
+      | string[]
+      | {
+          desctop?: string;
+          mobile?: string;
+        };
     photo?: string | string[];
     banner?: string | string[];
     img_link_data_banner?: string | string[]; // Поле для зображення (може бути JSON рядок або масив)
@@ -48,19 +51,23 @@ export type EventPost = {
     input_text_location?: string;
     textarea_description?: string;
     // hl_data_result - може бути масив або JSON-рядок (нова структура)
-    hl_data_result?: Array<{
-      title?: string;
-      svg_code?: string;
-      hl_input_text_text?: string;
-      hl_img_svg_icon?: string;
-    }> | string;
+    hl_data_result?:
+      | Array<{
+          title?: string;
+          svg_code?: string;
+          hl_input_text_text?: string;
+          hl_img_svg_icon?: string;
+        }>
+      | string;
     // hl_data_schedule - може бути масив або JSON-рядок (нова структура)
-    hl_data_schedule?: Array<{
-      date?: string;
-      time?: string;
-      hl_input_date_date?: string;
-      hl_input_time_time?: string;
-    }> | string;
+    hl_data_schedule?:
+      | Array<{
+          date?: string;
+          time?: string;
+          hl_input_date_date?: string;
+          hl_input_time_time?: string;
+        }>
+      | string;
   };
 };
 
@@ -150,11 +157,31 @@ async function safeFetch<T>(url: string): Promise<T> {
       ? url
       : `${BASE_URL}${url}`;
 
-  const res = await fetch(fullUrl, { next: { revalidate: 60 } });
-  if (!res.ok) {
-    throw new Error(`Request failed ${res.status}: ${await res.text()}`);
+  try {
+    const res = await fetch(fullUrl, { next: { revalidate: 60 } });
+    if (!res.ok) {
+      throw new Error(`Request failed ${res.status}: ${await res.text()}`);
+    }
+    return (await res.json()) as T;
+  } catch (error: any) {
+    // Обробка мережевих помилок, які не потребують повторних спроб
+    if (
+      error?.message?.includes("ERR_NETWORK_IO_SUSPENDED") ||
+      error?.message?.includes("ERR_NETWORK_CHANGED") ||
+      error?.name === "NetworkError" ||
+      (error instanceof TypeError && error.message.includes("Failed to fetch"))
+    ) {
+      // Створюємо помилку з інформацією про тип помилки для React Query
+      const networkError = new Error(
+        "Network request suspended or network changed"
+      );
+      (networkError as any).name = "NetworkError";
+      (networkError as any).isNetworkError = true;
+      throw networkError;
+    }
+    // Для інших помилок - пробрасуємо далі
+    throw error;
   }
-  return (await res.json()) as T;
 }
 
 export async function fetchFaqCategories(): Promise<FaqCategory[]> {
@@ -179,14 +206,19 @@ function parseMetaJson<T>(jsonString: string | undefined, fallback: T): T {
   }
 }
 
-export async function fetchCourse(courseIdOrSlug?: number | string): Promise<CourseData> {
+export async function fetchCourse(
+  courseIdOrSlug?: number | string
+): Promise<CourseData> {
   if (!courseIdOrSlug) {
     throw new Error("Course ID or slug is required");
   }
 
   // Якщо це число або числовий рядок, використовуємо як ID
   let wcCourse;
-  if (typeof courseIdOrSlug === "number" || /^\d+$/.test(String(courseIdOrSlug))) {
+  if (
+    typeof courseIdOrSlug === "number" ||
+    /^\d+$/.test(String(courseIdOrSlug))
+  ) {
     const wcResponse = await fetch(`/api/wc/v3/products/${courseIdOrSlug}`);
     if (!wcResponse.ok) {
       throw new Error(`Failed to fetch course: ${wcResponse.status}`);
@@ -194,15 +226,17 @@ export async function fetchCourse(courseIdOrSlug?: number | string): Promise<Cou
     wcCourse = await wcResponse.json();
   } else {
     // Якщо це slug, спочатку отримуємо всі курси та шукаємо за slug
-    const allCoursesResponse = await fetch(`/api/wc/v3/products?category=72&per_page=100`);
+    const allCoursesResponse = await fetch(
+      `/api/wc/v3/products?category=72&per_page=100`
+    );
     if (!allCoursesResponse.ok) {
       throw new Error(`Failed to fetch courses: ${allCoursesResponse.status}`);
     }
     const allCourses = await allCoursesResponse.json();
-    
+
     // Нормалізуємо slug: декодуємо URL-encoded значення та очищаємо від ____full____
     const normalizeSlug = (slug: string): string => {
-      if (!slug) return '';
+      if (!slug) return "";
       try {
         // Спробуємо декодувати, якщо це encoded
         let decoded = slug;
@@ -212,10 +246,10 @@ export async function fetchCourse(courseIdOrSlug?: number | string): Promise<Cou
           // Якщо не вдалося декодувати, використовуємо оригінал
           decoded = slug;
         }
-        
+
         // Очищаємо від ____full____
-        decoded = decoded.replace(/____full____/g, '');
-        
+        decoded = decoded.replace(/____full____/g, "");
+
         // Нормалізуємо: приводимо до нижнього регістру та прибираємо зайві пробіли
         return decoded.toLowerCase().trim();
       } catch {
@@ -223,34 +257,35 @@ export async function fetchCourse(courseIdOrSlug?: number | string): Promise<Cou
         return slug.toLowerCase().trim();
       }
     };
-    
+
     // Next.js автоматично декодує slug з URL, тому courseIdOrSlug приходить декодованим
     const normalizedSlug = normalizeSlug(String(courseIdOrSlug));
-    
+
     const course = allCourses.find((c: { slug?: string; id: number }) => {
       if (!c.slug) return false;
-      
+
       // Нормалізуємо slug з API
       const normalizedCourseSlug = normalizeSlug(c.slug);
-      
+
       // Порівнюємо нормалізовані значення
-      const slugMatch = 
+      const slugMatch =
         c.slug === String(courseIdOrSlug) || // Exact match
         normalizedCourseSlug === normalizedSlug || // Нормалізовані значення
         c.slug.toLowerCase() === String(courseIdOrSlug).toLowerCase() || // Case-insensitive
         normalizedCourseSlug === String(courseIdOrSlug).toLowerCase(); // Нормалізований API slug === URL slug
-      
+
       return slugMatch;
     });
-    
+
     if (!course) {
       throw new Error(`Course not found: ${courseIdOrSlug}`);
     }
-    
+
     wcCourse = course;
   }
 
-  // Витягуємо дані з meta_data
+  // Витягуємо дані з ACF (з fallback на meta_data)
+  const acf = wcCourse.acf || {};
   const metaData = wcCourse.meta_data || [];
 
   const getMetaValue = (key: string): string | undefined => {
@@ -259,18 +294,30 @@ export async function fetchCourse(courseIdOrSlug?: number | string): Promise<Cou
     )?.value;
   };
 
-  // Парсимо course_data з meta_data
-  const courseThemes = parseMetaJson<string[]>(
-    getMetaValue("point_data_course_themes"),
-    []
+  // Функція для отримання значення з ACF з fallback на meta_data
+  const getAcfValue = (key: string) => {
+    return acf[key] || getMetaValue(key);
+  };
+
+  // Функція для витягування масиву рядків з ACF (з fallback на meta_data)
+  const extractStringArray = (acfData: unknown): string[] => {
+    if (Array.isArray(acfData)) {
+      // Якщо це ACF дані - витягуємо поле point з кожного об'єкта
+      return acfData
+        .map((item: any) => item?.point || item?.theme || item)
+        .filter(Boolean);
+    }
+    // Fallback на meta_data парсинг
+    return parseMetaJson<string[]>(acfData as string, []);
+  };
+
+  // Парсимо course_data з ACF (з fallback на meta_data)
+  const courseThemes = extractStringArray(getAcfValue("cource_themes"));
+  const whatLearn = extractStringArray(
+    getAcfValue("point_data_course_what_learn")
   );
-  const whatLearn = parseMetaJson<string[]>(
-    getMetaValue("point_data_course_what_learn"),
-    []
-  );
-  const courseInclude = parseMetaJson<string[]>(
-    getMetaValue("point_data_course_include"),
-    []
+  const courseInclude = extractStringArray(
+    getAcfValue("point_data_course_include")
   );
   const courseProgram = parseMetaJson<
     Array<{
@@ -279,50 +326,118 @@ export async function fetchCourse(courseIdOrSlug?: number | string): Promise<Cou
       hl_textarea_description?: string;
       hl_textarea_themes?: string;
     }>
-  >(getMetaValue("hl_data_course_program"), []);
+  >(getAcfValue("point_data_course_themes") as string, []);
 
-  const dateStart = getMetaValue("input_date_date_start") || null;
-  const duration = getMetaValue("input_text_duration") || null;
-  const courseCoachId = getMetaValue("course_coach");
+  const dateStart = (getAcfValue("input_date_date_start") as string) || null;
+  const duration = (getAcfValue("input_text_duration") as string) || null;
+  const courseCoachData = getAcfValue("course_coach");
+  const courseCoachId =
+    typeof courseCoachData === "object" && courseCoachData?.ID
+      ? String(courseCoachData.ID)
+      : typeof courseCoachData === "string"
+      ? courseCoachData
+      : null;
   const requiredEquipment =
-    getMetaValue("required_equipment") ||
-    getMetaValue("input_required_equipment") ||
+    (getAcfValue("required_equipment") as string) ||
+    (getAcfValue("input_required_equipment") as string) ||
     null;
 
-  // Отримуємо дані інструктора, якщо є ID
+  // Отримуємо дані інструктора
   let courseCoach = null;
-  if (courseCoachId) {
+  if (typeof courseCoachData === "object" && courseCoachData?.ID) {
+    // Якщо дані інструктора вже є, отримуємо також ACF дані
     try {
-      const coachId = parseInt(courseCoachId);
       const coachResponse = await fetch(
-        `/api/proxy?path=/wp-json/wp/v2/instructors/${coachId}`
+        `/api/proxy?path=/wp-json/wp/v2/instructors/${courseCoachData.ID}`
       );
+      let coachAcf = {};
       if (coachResponse.ok) {
         const coachData = await coachResponse.json();
-        const coachAcf = coachData.acf || {};
-        courseCoach = {
-          ID: coachId,
-          title: coachData.title?.rendered || "",
-          input_text_experience:
-            (coachAcf.input_text_experience as string) || "",
-          input_text_status: (coachAcf.input_text_status as string) || "",
-          input_text_status_1: "",
-          input_text_status_2: "",
-          input_text_count_training:
-            (coachAcf.input_text_count_training as string) || "",
-          input_text_history: (coachAcf.input_text_history as string) || "",
-          input_text_certificates:
-            (coachAcf.input_text_certificates as string) || "",
-          input_text_link_instagram:
-            (coachAcf.instagram as { url?: string })?.url || "",
-          input_text_text_instagram:
-            (coachAcf.instagram as { title?: string })?.title || "",
-          textarea_description: (coachAcf.textarea_description as string) || "",
-          textarea_about_me: (coachAcf.textarea_about_me as string) || "",
-          textarea_my_mission: (coachAcf.textarea_my_mission as string) || "",
-          img_link_avatar: (coachAcf.img_link_data_avatar as string) || "",
-          point_specialization: "",
-        };
+        coachAcf = coachData.acf || {};
+      }
+
+      courseCoach = {
+        ID: courseCoachData.ID,
+        title: courseCoachData.post_title || "",
+        input_text_experience: (coachAcf as any).input_text_experience || "",
+        input_text_status: (coachAcf as any).input_text_status || "",
+        input_text_status_1: "",
+        input_text_status_2: "",
+        input_text_count_training:
+          (coachAcf as any).input_text_count_training || "",
+        input_text_history: (coachAcf as any).input_text_history || "",
+        input_text_certificates:
+          (coachAcf as any).input_text_certificates || "",
+        input_text_link_instagram:
+          ((coachAcf as any).instagram as any)?.url || "",
+        input_text_text_instagram:
+          ((coachAcf as any).instagram as any)?.title || "",
+        textarea_description:
+          (coachAcf as any).textarea_description ||
+          courseCoachData.post_content ||
+          "",
+        textarea_about_me: (coachAcf as any).textarea_about_me || "",
+        textarea_my_mission: (coachAcf as any).textarea_my_mission || "",
+        img_link_avatar: (coachAcf as any).img_link_data_avatar || "",
+        point_specialization: "",
+      };
+    } catch (error) {
+      // Якщо не вдалося отримати ACF дані, використовуємо базові дані
+      courseCoach = {
+        ID: courseCoachData.ID,
+        title: courseCoachData.post_title || "",
+        input_text_experience: "",
+        input_text_status: "",
+        input_text_status_1: "",
+        input_text_status_2: "",
+        input_text_count_training: "",
+        input_text_history: "",
+        input_text_certificates: "",
+        input_text_link_instagram: "",
+        input_text_text_instagram: "",
+        textarea_description: courseCoachData.post_content || "",
+        textarea_about_me: "",
+        textarea_my_mission: "",
+        img_link_avatar: "",
+        point_specialization: "",
+      };
+    }
+  } else if (courseCoachId) {
+    // Якщо є тільки ID, робимо запит для отримання даних
+    try {
+      const coachId = parseInt(courseCoachId);
+      if (!isNaN(coachId)) {
+        const coachResponse = await fetch(
+          `/api/proxy?path=/wp-json/wp/v2/instructors/${coachId}`
+        );
+        if (coachResponse.ok) {
+          const coachData = await coachResponse.json();
+          const coachAcf = coachData.acf || {};
+          courseCoach = {
+            ID: coachId,
+            title: coachData.title?.rendered || "",
+            input_text_experience:
+              (coachAcf.input_text_experience as string) || "",
+            input_text_status: (coachAcf.input_text_status as string) || "",
+            input_text_status_1: "",
+            input_text_status_2: "",
+            input_text_count_training:
+              (coachAcf.input_text_count_training as string) || "",
+            input_text_history: (coachAcf.input_text_history as string) || "",
+            input_text_certificates:
+              (coachAcf.input_text_certificates as string) || "",
+            input_text_link_instagram:
+              (coachAcf.instagram as { url?: string })?.url || "",
+            input_text_text_instagram:
+              (coachAcf.instagram as { title?: string })?.title || "",
+            textarea_description:
+              (coachAcf.textarea_description as string) || "",
+            textarea_about_me: (coachAcf.textarea_about_me as string) || "",
+            textarea_my_mission: (coachAcf.textarea_my_mission as string) || "",
+            img_link_avatar: (coachAcf.img_link_data_avatar as string) || "",
+            point_specialization: "",
+          };
+        }
       }
     } catch (error) {
       if (process.env.NODE_ENV !== "production") {
@@ -487,10 +602,10 @@ export async function fetchThemeSettings(): Promise<ThemeSettingsPost[]> {
   // Використовуємо проксі на клієнті, прямий запит на сервері
   const isClient = typeof window !== "undefined";
   const path = `/wp-json/wp/v2/theme_settings?hl_data_gallery=1`;
-  
+
   let url: string;
   let options: RequestInit = {};
-  
+
   if (isClient) {
     // На клієнті використовуємо проксі
     url = `/api/proxy?path=${encodeURIComponent(path)}`;
@@ -516,17 +631,17 @@ export async function fetchThemeVideoUrl(): Promise<string | null> {
   try {
     const settings = await fetchThemeSettings();
     const firstSetting = settings[0];
-    
+
     // Перевіряємо спочатку в корені об'єкта, потім в acf (для fallback)
-    const videoUrl = (firstSetting?.theme_video_url || firstSetting?.acf?.theme_video_url) as string | undefined;
+    const videoUrl = (firstSetting?.theme_video_url ||
+      firstSetting?.acf?.theme_video_url) as string | undefined;
 
     if (!videoUrl) {
       return null;
     }
 
-    // Повертаємо проксований URL для уникнення CORS проблем
-    const proxiedUrl = `/api/video-proxy?url=${encodeURIComponent(videoUrl)}`;
-    return proxiedUrl;
+    // Повертаємо оригінальний URL (без проксі для кращої стабільності)
+    return videoUrl;
   } catch (error) {
     return null;
   }
@@ -854,24 +969,15 @@ export async function fetchInstructorAdvantages(): Promise<
   try {
     const fullUrl = `${BASE_URL}/wp-json/wp/v2/instructor_advantages`;
     const res = await fetch(fullUrl, { next: { revalidate: 60 } });
-    
-    // Якщо ендпоінт не існує (404), повертаємо порожній масив без помилки
-    if (res.status === 404) {
+
+    // Якщо ендпоінт не існує (404) або інша помилка, повертаємо порожній масив без помилки
+    if (!res.ok) {
       return [];
     }
-    
-    if (!res.ok) {
-      throw new Error(`Request failed ${res.status}: ${await res.text()}`);
-    }
-    
+
     return (await res.json()) as InstructorAdvantagePost[];
   } catch (error) {
-    // Ендпоінт може не існувати, повертаємо порожній масив
-    // Не логуємо помилку для 404, оскільки це очікувана поведінка
-    if (error instanceof Error && error.message.includes('404')) {
-      return [];
-    }
-    // Для інших помилок також повертаємо порожній масив, але можна додати логування
+    // Ендпоінт може не існувати, повертаємо порожній масив без викидання помилки
     return [];
   }
 }
@@ -1413,6 +1519,7 @@ export async function uploadMedia(
 }
 
 // Custom media upload for coach fields (avatar/gallery/certificate)
+// Custom media upload for coach fields (avatar/gallery/certificate)
 export async function uploadCoachMedia(params: {
   token: string;
   fieldType:
@@ -1435,12 +1542,20 @@ export async function uploadCoachMedia(params: {
 
   // На клієнті використовуємо тільки публічний базовий URL
   const browserBaseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE as string;
+  const targetUrl = `${browserBaseUrl}/wp-json/custom/v1/upload-media`;
 
-  const res = await fetch(`${browserBaseUrl}/wp-json/custom/v1/upload-media`, {
+  // ⭐️ ЛОГ 1: Початок запиту та метадані
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`[Media Upload] 🚀 Відправка медіа...`);
+    console.log(`[Media Upload] ➡️ URL: ${targetUrl}`);
+    console.log(`[Media Upload] 📦 Тип поля (Field Type): ${params.fieldType}`);
+  }
+
+  const res = await fetch(targetUrl, {
     method: "POST",
     body: form,
   });
-  
+
   let data: {
     success?: boolean;
     field_type?: string;
@@ -1450,20 +1565,52 @@ export async function uploadCoachMedia(params: {
     message?: string;
     error?: string;
   };
-  
+
   try {
     data = await res.json();
+    // ⭐️ ЛОГ 2: Успішне парсинг JSON
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`[Media Upload] 🟢 Успішний статус відповіді: ${res.status}`);
+      console.log(`[Media Upload] 📨 JSON дані:`, data);
+    }
   } catch {
     // Якщо не вдалося розпарсити JSON, спробуємо отримати текст
     const text = await res.text();
-    throw new Error(text || `uploadCoachMedia failed with status ${res.status}`);
+
+    // ⭐️ ЛОГ 3: Помилка парсингу JSON (якщо WP повернув HTML або невірний формат)
+    if (process.env.NODE_ENV !== "production") {
+      console.error(
+        `[Media Upload] ❌ Помилка парсингу. Статус: ${res.status}. Сирий текст:`,
+        text
+      );
+    }
+
+    throw new Error(
+      text || `uploadCoachMedia failed with status ${res.status}`
+    );
   }
-  
+
   if (!res.ok) {
-    // Пріоритет: error > message > загальне повідомлення
-    const errorMessage = data?.error || data?.message || `uploadCoachMedia failed with status ${res.status}`;
+    // ⭐️ ЛОГ 4: Помилка HTTP (4xx або 5xx)
+    const errorMessage =
+      data?.error ||
+      data?.message ||
+      `uploadCoachMedia failed with status ${res.status}`;
+    if (process.env.NODE_ENV !== "production") {
+      console.error(
+        `[Media Upload] 🛑 HTTP Помилка. Статус: ${res.status}. Повідомлення: ${errorMessage}`
+      );
+    }
     throw new Error(errorMessage);
   }
+
+  // ⭐️ ЛОГ 5: Успішне завершення
+  if (process.env.NODE_ENV !== "production") {
+    console.log(
+      `[Media Upload] ✅ Завантаження успішне. Оброблені файли: ${data.processed_count}`
+    );
+  }
+
   return data as {
     success: boolean;
     field_type?: string;
@@ -1472,7 +1619,6 @@ export async function uploadCoachMedia(params: {
     current_field_value?: string;
   };
 }
-
 export type ProductFilters = {
   category?: string | string[];
   attribute?: string | string[];
@@ -1626,6 +1772,16 @@ export async function updateTrainerProfile(
     "Content-Type": "application/json",
   };
   if (bearerToken) headers.Authorization = `Bearer ${bearerToken}`;
+
+  // Логування перед відправкою запиту (тільки в development)
+  if (process.env.NODE_ENV !== "production") {
+    console.log("[updateTrainerProfile] PATCH /api/profile/trainer");
+    console.log(
+      "[updateTrainerProfile] Payload:",
+      JSON.stringify(cleanedPayload, null, 2)
+    );
+  }
+
   const res = await fetch("/api/profile/trainer", {
     method: "PATCH",
     headers,
@@ -1863,6 +2019,201 @@ export const fetchWcPaymentGateways = async (): Promise<unknown[]> => {
     const response = await api.get("/api/wc/payment-gateways");
     return response.data;
   } catch (error) {
+    throw error;
+  }
+};
+
+// Cart API
+export interface CartItemResponse {
+  cart_item_key: string;
+  product_id: number;
+  variation_id: number;
+  quantity: number;
+  product_name: string;
+  product_price: string;
+  product_image: string;
+  item_total: number;
+  added_at: string;
+}
+
+export interface CartResponse {
+  user_id: number;
+  items: CartItemResponse[];
+  items_count: number;
+  total: number;
+  currency: string;
+}
+
+export const getCart = async (): Promise<CartResponse> => {
+  const response = await api.get("/api/cart");
+  return response.data;
+};
+
+export const addToCart = async (
+  productId: number,
+  quantity: number = 1,
+  variationId: number = 0
+): Promise<{
+  success: boolean;
+  message: string;
+  cart_item_key: string;
+  cart: CartResponse;
+}> => {
+  const response = await api.post("/api/cart", {
+    product_id: productId,
+    quantity,
+    variation_id: variationId,
+  });
+  return response.data;
+};
+
+export const updateCartItem = async (
+  cartItemKey: string,
+  quantity: number
+): Promise<{
+  success: boolean;
+  message: string;
+  cart: CartResponse;
+}> => {
+  const response = await api.put(`/api/cart?cart_item_key=${cartItemKey}`, {
+    quantity,
+  });
+  return response.data;
+};
+
+export const removeCartItem = async (
+  cartItemKey: string
+): Promise<{
+  success: boolean;
+  message: string;
+  cart: CartResponse;
+}> => {
+  const response = await api.delete(`/api/cart?cart_item_key=${cartItemKey}`);
+  return response.data;
+};
+
+export const clearCart = async (): Promise<{
+  success: boolean;
+  message: string;
+}> => {
+  const response = await api.delete("/api/cart?clear=true");
+  return response.data;
+};
+
+// Wishlist API
+export interface WishlistItemResponse {
+  product_id: number;
+  variation_id: number;
+  product_name: string;
+  product_price: string;
+  product_image: string;
+  product_url: string;
+  in_stock: boolean;
+  added_at: string;
+}
+
+export interface WishlistResponse {
+  user_id: number;
+  items: WishlistItemResponse[];
+  items_count: number;
+}
+
+export const getWishlist = async (): Promise<WishlistResponse> => {
+  try {
+    const response = await api.get("/api/wishlist");
+    return response.data;
+  } catch (error: any) {
+    if (error?.response?.status === 401) {
+      return {
+        user_id: 0,
+        items: [],
+        items_count: 0,
+      };
+    }
+    throw error;
+  }
+};
+
+export const addToWishlist = async (
+  productId: number,
+  variationId: number = 0
+): Promise<{
+  success: boolean;
+  message: string;
+  wishlist: WishlistResponse;
+}> => {
+  try {
+    const response = await api.post("/api/wishlist", {
+      product_id: productId,
+      variation_id: variationId,
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error?.response?.status === 401) {
+      throw new Error(
+        "Wishlist API не доступний. Будь ласка, перевірте налаштування на сервері."
+      );
+    }
+    throw error;
+  }
+};
+
+export const removeFromWishlist = async (
+  productId: number
+): Promise<{
+  success: boolean;
+  message: string;
+  wishlist: WishlistResponse;
+}> => {
+  try {
+    const response = await api.delete(`/api/wishlist?product_id=${productId}`);
+    return response.data;
+  } catch (error: any) {
+    if (error?.response?.status === 401) {
+      return {
+        success: true,
+        message: "Item removed",
+        wishlist: {
+          user_id: 0,
+          items: [],
+          items_count: 0,
+        },
+      };
+    }
+    throw error;
+  }
+};
+
+export const checkWishlistItem = async (
+  productId: number
+): Promise<{ in_wishlist: boolean }> => {
+  try {
+    const response = await api.get(
+      `/api/wishlist?check=true&product_id=${productId}`
+    );
+    return response.data;
+  } catch (error: any) {
+    if (error?.response?.status === 401) {
+      return { in_wishlist: false };
+    }
+    throw error;
+  }
+};
+
+export const clearWishlist = async (): Promise<{
+  success: boolean;
+  message: string;
+}> => {
+  try {
+    const response = await api.delete("/api/wishlist?clear=true");
+    return response.data;
+  } catch (error: any) {
+    if (error?.response?.status === 401) {
+      return {
+        success: true,
+        message: "Wishlist cleared",
+      };
+    }
     throw error;
   }
 };

@@ -32,9 +32,10 @@ const ProductsShowcase: React.FC = () => {
       image?: string;
       categories?: Array<{ id: number; name: string; slug: string }>;
       dateCreated?: string;
+      wcProduct?: ShowcaseItem["wcProduct"];
     }>
   >([]);
-  
+
   useEffect(() => {
     (async () => {
       try {
@@ -60,7 +61,7 @@ const ProductsShowcase: React.FC = () => {
       }
     })();
   }, []);
-  
+
   // Отримуємо продукти категорії 30 ("Товари для спорту") напряму через WC v3
   const {
     data: courses = [],
@@ -81,13 +82,14 @@ const ProductsShowcase: React.FC = () => {
       else mql.removeListener(update);
     };
   }, []);
-  
+
   const list = useMemo(
     () => (Array.isArray(courses) ? courses : []),
     [courses]
   );
   // Дані вже відфільтровані на етапі запиту; можна напряму відображати
   const displayedCourses = list.length > 0 ? list : fallbackProducts;
+
   const hasSlider = displayedCourses.length > 5;
 
   const useSlider = hasSlider && !isMobile;
@@ -101,6 +103,20 @@ const ProductsShowcase: React.FC = () => {
     image?: string;
     categories?: Array<{ id: number; name: string; slug: string }>;
     dateCreated?: string;
+    wcProduct?: {
+      prices?: {
+        price: string;
+        regular_price: string;
+        sale_price: string;
+      };
+      on_sale?: boolean;
+      average_rating?: string;
+      rating_count?: number;
+      total_sales?: number;
+      featured?: boolean;
+      images?: Array<{ src: string; alt: string }>;
+      sku?: string;
+    };
   };
 
   const normalizedShowcase: ShowcaseItem[] = useMemo(() => {
@@ -125,8 +141,15 @@ const ProductsShowcase: React.FC = () => {
       dateCreated:
         (p as { dateCreated?: string }).dateCreated ??
         (p as { date_created?: string }).date_created,
+      wcProduct: (p as { wcProduct?: ShowcaseItem["wcProduct"] }).wcProduct,
     }));
   }, [displayedCourses]);
+
+  // Для мобілки показуємо тільки 4 картки
+  const mobileDisplayedProducts = useMemo(
+    () => (isMobile ? normalizedShowcase.slice(0, 4) : normalizedShowcase),
+    [isMobile, normalizedShowcase]
+  );
 
   // Fallback: якщо з якоїсь причини масив порожній, робимо прямий запит до роута WC v3
   useEffect(() => {
@@ -145,6 +168,20 @@ const ProductsShowcase: React.FC = () => {
           image: normalizeImageUrl(p.images?.[0]?.src),
           categories: p.categories || [],
           dateCreated: p.date_created,
+          wcProduct: {
+            prices: {
+              price: p.price || "0",
+              regular_price: p.regular_price || "0",
+              sale_price: p.sale_price || "0",
+            },
+            on_sale: p.on_sale || false,
+            average_rating: p.average_rating || "0",
+            rating_count: p.rating_count || 0,
+            total_sales: p.total_sales || 0,
+            featured: p.featured || false,
+            images: p.images || [],
+            sku: p.sku,
+          },
         }));
         setFallbackProducts(normalized);
       } catch {}
@@ -163,7 +200,7 @@ const ProductsShowcase: React.FC = () => {
   // Перевіряємо всі можливі стани завантаження та наявність даних
   const hasData = Array.isArray(courses) && courses.length > 0;
   const shouldShowSkeleton = isPending || isLoading || (!hasData && isFetching);
-  
+
   if (shouldShowSkeleton) {
     return <ProductsShowcaseSkeleton />;
   }
@@ -302,13 +339,14 @@ const ProductsShowcase: React.FC = () => {
                     image={product.image}
                     categories={product.categories}
                     dateCreated={product.dateCreated}
+                    // wcProduct={product.wcProduct}
                   />
                 </SwiperSlide>
               ))}
             </Swiper>
           ) : (
             <div className={s.grid}>
-              {normalizedShowcase.map((product) => (
+              {mobileDisplayedProducts.map((product) => (
                 <div key={String(product.id)} className={s.slide}>
                   <ProductCard
                     id={String(product.id)}
@@ -327,6 +365,7 @@ const ProductsShowcase: React.FC = () => {
                     image={product.image}
                     categories={product.categories}
                     dateCreated={product.dateCreated}
+                    // wcProduct={product.wcProduct}
                   />
                 </div>
               ))}

@@ -119,8 +119,15 @@
 
 .products {
   display: flex;
-  justify-content: center;
+
   gap: 16px;
+}
+
+.productsScrollable {
+  max-width: 686px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--black) transparent;
 }
 
 .productImage {
@@ -130,12 +137,14 @@
   border-radius: 12px;
   overflow: hidden;
   background: #f6f6f6;
+  flex-shrink: 0;
 }
 
 .productImage img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  border-radius: 12px;
 }
 
 .quantityBadge {
@@ -381,12 +390,13 @@
     padding: mvw(4) 0;
     width: 100%;
     -webkit-overflow-scrolling: touch;
+    max-width: 100%;
   }
 
   .productImage {
     width: mvw(93);
     height: mvw(110);
-    border-radius: mvw(12);
+    border-radius: mvw(0);
     flex-shrink: 0;
     object-fit: contain;
   }

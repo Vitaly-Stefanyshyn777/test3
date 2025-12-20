@@ -62,10 +62,12 @@ export default function CheckoutFooter() {
             <h3 className={s.sectionTitle}>АДРЕСА:</h3>
             <address className={s.address}>
               <p className={s.addressText}>Мукачево, вул. Духновича 40</p>
-              <p className={s.scheduleItem}>
-                понеділок - пятниця: 09:00 - 22:00,
-              </p>
-              <p className={s.scheduleItem}>субота - неділя: 10:00 - 20:00</p>
+              <div className={s.scheduleItemsBlock}>
+                <p className={s.scheduleItem}>
+                  понеділок - пятниця: 09:00 - 22:00,
+                </p>
+                <p className={s.scheduleItem}>субота - неділя: 10:00 - 20:00</p>
+              </div>
             </address>
           </div>
         </div>

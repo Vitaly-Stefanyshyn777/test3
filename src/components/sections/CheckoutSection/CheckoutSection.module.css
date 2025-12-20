@@ -32,7 +32,7 @@
 .grid2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 16px;
 }
 .inputWrap,
 .inputWrapFull {
@@ -482,7 +482,7 @@
 .deliveryGrid {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
 }
 .addressFields {
   display: flex;
@@ -504,7 +504,7 @@
 
 .deliveryRow {
   display: flex;
-  gap: 8px;
+  gap: 16px;
   align-items: flex-start;
   width: 924px;
 }
@@ -634,7 +634,8 @@
   flex-direction: column;
   gap: 12px;
   max-height: 508px;
-  overflow: auto;
+  overflow-y: auto;
+
   padding: 0px 15px 0px 0px;
 }
 .summaryItem {
@@ -722,6 +723,7 @@
   display: flex;
   align-items: baseline;
   gap: 8px;
+  flex-direction: row;
 }
 .currentPrice {
   color: #e3362c;
@@ -730,12 +732,33 @@
   align-items: baseline;
   gap: 4px;
 }
+.currentPriceValue {
+  color: #e3362c;
+  font-weight: 600;
+}
+.priceCurrency {
+  margin-left: 2px;
+  color: #e3362c;
+  font-weight: 600;
+}
 .buck {
   margin-left: 2px;
 }
 .oldPrice {
   color: #bdbdbd;
   text-decoration: line-through;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.originalPriceValue {
+  color: #bdbdbd;
+  font-size: 18px;
+}
+.originalPriceCurrency {
+  color: #bdbdbd;
+  font-size: 18px;
+  margin-left: 2px;
 }
 .totals {
   display: flex;
@@ -761,6 +784,7 @@
   font-size: 16px;
   line-height: 130%;
   color: var(--black);
+  opacity: 0.4;
 }
 .rowAmountCurrency {
   font-family: var(--font-family);
@@ -868,6 +892,25 @@
     width: 12px;
     height: 12px;
   }
+}
+
+.rowAmountNumber {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.rowNumberCurrency {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+  opacity: 0.4;
 }
 .contentCol {
   width: 100%;
@@ -1098,6 +1141,7 @@
     padding: mvw(18) mvw(24);
     border-radius: mvw(18);
     font-size: mvw(14);
+    font-weight: 600;
   }
 
   .radioBlock {
@@ -1166,6 +1210,7 @@
     width: 100%;
     height: mvw(52);
     font-size: mvw(14);
+    font-weight: 600;
   }
   .deliveryRowAddress {
     flex-direction: column;
@@ -1220,7 +1265,7 @@
   .summaryList {
     max-height: none;
     gap: mvw(16);
-    padding: 0;
+    padding: mvw(10) mvw(15) mvw(0) mvw(0);
   }
 
   .item {
@@ -1281,6 +1326,7 @@
   .colorCode {
     font-size: mvw(10);
     opacity: 0.4;
+    display: none;
   }
 
   .controlsBlock {
@@ -1340,10 +1386,12 @@
   .prices {
     gap: mvw(4);
     align-items: baseline;
+    flex-direction: column;
 
     font-family: var(--second-family);
     font-weight: 500;
     font-size: mvw(16);
+    align-items: flex-end;
   }
 
   .currentPrice {
@@ -1389,7 +1437,14 @@
     gap: mvw(4);
   }
 
-  .rowAmountAmount,
+  .rowAmountAmount {
+    font-size: mvw(14);
+    opacity: 0.4;
+  }
+  .rowNumberCurrency {
+    font-size: mvw(14);
+    opacity: 0.4;
+  }
   .rowAmountCurrency {
     font-size: mvw(14);
   }
@@ -1423,6 +1478,22 @@
     font-size: mvw(16);
   }
   .dropdownText {
+    font-size: mvw(14);
+  }
+  .originalPriceValue {
+    color: #bdbdbd;
+    font-size: mvw(16);
+  }
+  .originalPriceCurrency {
+    font-size: mvw(13);
+  }
+  .priceCurrency {
+    font-size: mvw(16);
+  }
+  .currentPriceValue {
+    font-size: mvw(18);
+  }
+  .rowAmountNumber {
     font-size: mvw(14);
   }
 }

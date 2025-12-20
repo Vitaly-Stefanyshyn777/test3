@@ -17,15 +17,6 @@ import { normalizeImageUrl } from "@/lib/imageUtils";
 export default function Overview({ trainer }: { trainer: TrainerUser }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Логування для діагностики
-  if (process.env.NODE_ENV !== "production") {
-    console.log("[Overview] trainer дані:", {
-      gallery: trainer?.gallery,
-      hl_data_gallery: trainer?.hl_data_gallery,
-      certificate: trainer?.certificate,
-    });
-  }
-
   const avatar = getAvatarUrl(trainer?.avatar);
   const specialties = getSpecialties(trainer);
   const favouriteExercises = getFavouriteExercises(trainer);
@@ -105,10 +96,6 @@ export default function Overview({ trainer }: { trainer: TrainerUser }) {
     }
   }
 
-  if (process.env.NODE_ENV !== "production") {
-    console.log("[Overview] galleryImages після обробки:", galleryImages);
-  }
-
   const locationText =
     trainer?.location_city ||
     (Array.isArray(trainer?.locations)
@@ -134,7 +121,7 @@ export default function Overview({ trainer }: { trainer: TrainerUser }) {
     setCurrentImageIndex(index);
   };
 
-  const hasSlider = galleryImages.length > 2;
+  const hasSlider = galleryImages.length > 1;
 
   return (
     <div className={styles.overview}>
@@ -304,18 +291,22 @@ export default function Overview({ trainer }: { trainer: TrainerUser }) {
             {galleryImages.length === 0 ? (
               <div className={styles.galleryContainer}>
                 <div className={styles.galleryImageWrapper}>
-                  <p
-                    style={{
-                      textAlign: "center",
-                      padding: "20px",
-                      color: "#666",
-                    }}
-                  >
-                    Галерея порожня
-                  </p>
+                  <p className={styles.galleryEmpty}>Галерея порожня</p>
                 </div>
               </div>
-            ) : hasSlider ? (
+            ) : galleryImages.length === 1 ? (
+              <div className={styles.galleryContainer}>
+                <div className={styles.galleryImageWrapper}>
+                  <Image
+                    src={galleryImages[0]}
+                    alt={`Фото тренера 1`}
+                    width={600}
+                    height={400}
+                    className={styles.galleryImage}
+                  />
+                </div>
+              </div>
+            ) : (
               <div className={styles.galleryContainer}>
                 <div className={styles.galleryImageWrapper}>
                   <Image
@@ -327,23 +318,8 @@ export default function Overview({ trainer }: { trainer: TrainerUser }) {
                   />
                 </div>
               </div>
-            ) : (
-              <div className={styles.galleryContainer}>
-                <div className={styles.galleryImageGrid}>
-                  {galleryImages.slice(0, 2).map((src, i) => (
-                    <Image
-                      key={i}
-                      src={src}
-                      alt={`Фото тренера ${i + 1}`}
-                      width={600}
-                      height={400}
-                      className={styles.galleryImage}
-                    />
-                  ))}
-                </div>
-              </div>
             )}
-            {hasSlider && (
+            {galleryImages.length > 1 && (
               <SliderNav
                 activeIndex={currentImageIndex}
                 dots={galleryImages.length}

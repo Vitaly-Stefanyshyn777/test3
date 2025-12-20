@@ -368,8 +368,7 @@
     padding: mvw(56) mvw(16);
     width: mvw(375);
     height: mvw(auto);
-    background-color: #9f57ff;
-    background-image: none;
+    background-image: url(/footer.png);
   }
   .logoContainer {
     flex-direction: column;
@@ -424,7 +423,6 @@
     gap: mvw(12);
     height: auto;
     height: mvw(54);
-    display: none;
   }
   .loginButton,
   .registerButton {
@@ -443,7 +441,7 @@
   }
   .registerButton {
     background: var(--white);
-    color: var(--violet);
+    color: var(--black);
     width: mvw(130);
   }
   .footerTop {

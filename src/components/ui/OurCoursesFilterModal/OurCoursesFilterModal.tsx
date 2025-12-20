@@ -54,6 +54,9 @@ const OurCoursesFilterModal: React.FC<OurCoursesFilterModalProps> = ({
   onApply,
   onApplyCategories,
 }) => {
+  // Створюємо ref для доступу до handleApply з OurCoursesFilter
+  const applyRef = useRef<(() => void) | null>(null);
+
   useScrollLock(isOpen);
 
   useEffect(() => {
@@ -68,9 +71,6 @@ const OurCoursesFilterModal: React.FC<OurCoursesFilterModalProps> = ({
   }, [isOpen]);
 
   if (!isOpen) return null;
-
-  // Створюємо ref для доступу до handleApply з OurCoursesFilter
-  const applyRef = useRef<(() => void) | null>(null);
 
   const handleApply = () => {
     // Викликаємо логіку застосування категорій з OurCoursesFilter

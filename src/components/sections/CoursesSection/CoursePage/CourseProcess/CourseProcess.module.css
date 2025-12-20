@@ -134,7 +134,7 @@
   }
 
   .container {
-    gap: mvw(50);
+    gap: mvw(40);
   }
 
   .titleTextBlock {
@@ -204,8 +204,8 @@
   .mobileSliderWrap .number {
     top: mvw(-6);
     right: mvw(17);
-    width: mvw(24);
-    height: mvw(16);
+    width: mvw(28);
+    height: mvw(20);
     padding: 0 mvw(5);
     border-radius: mvw(6);
     font-size: mvw(10);

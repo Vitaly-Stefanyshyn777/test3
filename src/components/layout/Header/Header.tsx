@@ -55,6 +55,8 @@ export default function Header() {
   const cartItemsMap = useCartStore((s) => s.items);
   const favoriteItemsMap = useFavoriteStore((s) => s.items);
 
+  const openRegisterModal = () => setIsRegisterOpen(true);
+
   const cartItems = useMemo(() => Object.values(cartItemsMap), [cartItemsMap]);
   const favoriteItems = useMemo(
     () => Object.values(favoriteItemsMap),
@@ -84,10 +86,10 @@ export default function Header() {
     if (pathname === "/about-bfb") return s.headerTrainerProfile;
     if (pathname === "/course") return s.headerTrainerProfile;
     if (pathname.startsWith("/profile")) return s.headerTrainerProfile;
-    if (pathname === "/shop") return s.headerShop;
-    if (pathname === "/instructing") return s.headerInstructing;
-    // Treat both catalog and product detail routes as product header style
-    if (pathname.startsWith("/products")) return s.headerProduct;
+    if (pathname === "/shop") return s.headerTrainerProfile;
+    if (pathname === "/instructing") return s.headerTrainerProfile;
+    // Treat both catalog and product detail routes as profile header style (фіолетовий)
+    if (pathname.startsWith("/products")) return s.headerTrainerProfile;
     return "";
   }, [pathname]);
 
@@ -115,8 +117,9 @@ export default function Header() {
 
           if (heroSection) {
             const heroBottom = heroSection.getBoundingClientRect().bottom;
-            if (heroBottom < 0) {
-              // Вийшли з хіро секції
+            // Застосовуємо клас коли hero секція ще в viewport, але нижче 300px від верху
+            if (heroBottom < 200) {
+              // Застосовуємо клас раніше, ще до виходу з hero секції
               setHeaderClass(`${baseClass} ${s.headerScrolled}`);
             } else {
               // Ще в хіро секції
@@ -368,7 +371,8 @@ export default function Header() {
                           // Якщо ми вже на головній сторінці, обробляємо прокрутку вручну
                           if (pathname === "/") {
                             e.preventDefault();
-                            const eventsElement = document.getElementById("events");
+                            const eventsElement =
+                              document.getElementById("events");
                             if (eventsElement) {
                               const headerHeight = 120;
                               const targetPosition =
@@ -475,6 +479,7 @@ export default function Header() {
                         src="/images/fi_232123248.svg"
                         alt="User hover icon"
                         width={16}
+                        unoptimized
                         height={16}
                       />
                     ) : (
@@ -507,6 +512,7 @@ export default function Header() {
         isOpen={isLoginModalOpen}
         onClose={closeLoginModal}
         onSubmit={handleLoginSuccess}
+        onOpenRegister={openRegisterModal}
       />
       <CartModal />
       <FavoritesModal />

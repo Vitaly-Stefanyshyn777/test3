@@ -126,6 +126,11 @@
     margin-bottom: 0;
     gap: 0;
   }
+  .filterSection.collapsedSection {
+    gap: 0;
+    padding: mvw(16);
+    border-radius: mvw(8);
+  }
 
   .filterSection:last-of-type {
     border-bottom: none;
@@ -144,8 +149,8 @@
   }
 
   .sectionTitleContainer svg {
-    width: mvw(20);
-    height: mvw(2);
+    width: mvw(16);
+    height: mvw(14);
   }
 
   .radioGroup {

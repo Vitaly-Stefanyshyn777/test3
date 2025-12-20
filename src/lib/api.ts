@@ -29,22 +29,13 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
         "X-Internal-Admin"
       ] === "1");
 
+  const isCartOrWishlist = 
+    config.url?.includes("/api/cart") || 
+    config.url?.includes("/api/wishlist");
+
   if (!isJwtTokenEndpoint && config.headers && !wantsAdmin) {
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      if (process.env.NODE_ENV !== "production") {
-        console.debug("[api.request] add Authorization", {
-          url: config.url,
-          method: config.method,
-          admin: wantsAdmin,
-        });
-      }
-    } else if (process.env.NODE_ENV !== "production") {
-      console.debug("[api.request] no token available", {
-        url: config.url,
-        method: config.method,
-        admin: wantsAdmin,
-      });
     }
   }
 
@@ -66,15 +57,6 @@ api.interceptors.response.use(
         (config.headers["x-internal-admin"] === "1" ||
           config.headers["X-Internal-Admin"] === "1");
 
-      if (process.env.NODE_ENV !== "production") {
-        console.debug("[api.response.error]", {
-          url: config?.url,
-          method: config?.method,
-          status,
-          admin: wantsAdmin,
-          hasAuthHeader: !!config?.headers?.Authorization,
-        });
-      }
 
       if (
         wantsAdmin &&

@@ -23,7 +23,6 @@
 
 .submit:hover:not(:disabled) {
   background: var(--black);
-  /* transform: translateY(-2px); */
 }
 
 .submit:disabled {
@@ -44,8 +43,8 @@
     padding: mvw(16) mvw(24);
     border-radius: mvw(16);
     font-size: mvw(16);
-    background: var(--bg-color);
-    color: var(--black);
+    background: var(--violet);
+    color: var(--white);
     font-weight: 600;
     margin-top: 0;
   }
@@ -66,6 +65,11 @@
   .submitInactive:disabled {
     opacity: 1;
     background: #efefef;
+    color: #c7c7c7;
+    font-family: var(--third-family);
+    font-weight: 600;
+    font-size: mvw(14);
+    line-height: 100%;
     color: #c7c7c7;
   }
 }

@@ -44,6 +44,19 @@
           flex-wrap: wrap;
           gap: 16px;
           margin-bottom: 40px;
+
+          &.columns {
+            flex-direction: row;
+            justify-content: space-between;
+
+            .column {
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              gap: 16px;
+              max-width: calc(50% - 8px);
+            }
+          }
         }
 
         input,
@@ -72,7 +85,7 @@
           color: rgba(14, 14, 14, 0.8);
         }
 
-        button {
+        .submitButton {
           width: 100%;
           height: 64px;
           border-radius: 20px;
@@ -88,11 +101,11 @@
           transition: background-color 0.2s ease, color 0.2s ease;
         }
 
-        button:hover:not(:disabled) {
+        .submitButton:hover:not(:disabled) {
           background-color: var(--black);
         }
 
-        button:disabled {
+        .submitButton:disabled {
           background: var(--violet);
           opacity: 0.6;
           cursor: not-allowed;
@@ -203,7 +216,7 @@
     padding-bottom: mvw(24);
 
     .topBlock {
-      margin-bottom: mvw(16);
+      margin-bottom: mvw(13);
       h2 {
         font-size: mvw(28);
         line-height: 120%;
@@ -251,7 +264,7 @@
             border: none;
           }
 
-          button {
+          .submitButton {
             height: mvw(50);
             border-radius: mvw(16);
             font-size: mvw(14);
@@ -265,11 +278,11 @@
             transition: background-color 0.2s ease, color 0.2s ease;
           }
 
-          button:hover:not(:disabled) {
+          .submitButton:hover:not(:disabled) {
             background-color: var(--black);
           }
 
-          button:disabled {
+          .submitButton:disabled {
             cursor: not-allowed;
             background: var(--violet);
             opacity: 0.6;
@@ -285,12 +298,18 @@
 
       .statistics {
         width: mvw(343);
-        padding: mvw(20) mvw(20) mvw(0) mvw(20);
+        padding: mvw(13) mvw(20) mvw(0) mvw(20);
         border-radius: mvw(16);
+        font-family: var(--font-family);
+        font-weight: 600;
 
         h3 {
-          margin-bottom: mvw(32);
-          font-size: mvw(16);
+          margin-bottom: mvw(16);
+          font-size: mvw(17);
+          font-weight: 600;
+
+          line-height: 140%;
+          font-family: var(--font-family);
         }
 
         ul {

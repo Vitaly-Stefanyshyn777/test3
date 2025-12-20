@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Marker, Popup, useMap } from "react-leaflet";
 import { Icon } from "leaflet";
 import s from "./UserLocationMarker.module.css";
@@ -61,6 +61,19 @@ export default function UserLocationMarker({
   } | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Визначення мобільної версії
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkIsMobile();
+    window.addEventListener("resize", checkIsMobile);
+
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []);
 
   // Використовуємо CircleMarker замість іконки
 
@@ -131,15 +144,18 @@ export default function UserLocationMarker({
 
   // Створюємо кастомну іконку для геолокації користувача
   const userLocationIcon = React.useMemo(() => {
+    const iconSize: [number, number] = isMobile ? [70, 70] : [120, 120]; // Різні розміри для мобільної та десктопної версії
+    const iconAnchor: [number, number] = isMobile ? [16, 32] : [20, 40]; // Відповідно коригуємо якорь
+
     const icon = new Icon({
       iconUrl: "/Frame-1321317309.svg",
-      iconSize: [40, 40], // Розмір іконки
-      iconAnchor: [20, 40], // Точка якоря внизу іконки
+      iconSize: iconSize, // Розмір іконки
+      iconAnchor: iconAnchor, // Точка якоря внизу іконки
       popupAnchor: [0, -40], // Зміщення попапу
     });
 
     return icon;
-  }, []);
+  }, [isMobile]);
 
   // Component state
 

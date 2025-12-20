@@ -38,7 +38,6 @@ async function fetchHomeSeo(): Promise<YoastHeadJson | null> {
     // Викликаємо WordPress API напряму для статичної генерації
     const UPSTREAM_BASE = process.env.UPSTREAM_BASE;
     if (!UPSTREAM_BASE) {
-      console.warn("[generateMetadata] UPSTREAM_BASE not configured");
       return null;
     }
 
@@ -65,7 +64,7 @@ async function fetchHomeSeo(): Promise<YoastHeadJson | null> {
           freshToken = tokenData?.token;
         }
       } catch (tokenError) {
-        console.warn("[generateMetadata] Failed to get auth token:", tokenError);
+        // Token error handling removed
       }
     }
 
@@ -84,7 +83,6 @@ async function fetchHomeSeo(): Promise<YoastHeadJson | null> {
     });
 
     if (!res.ok) {
-      console.error("[generateMetadata] Failed to fetch banners:", res.status);
       return null;
     }
 
@@ -92,12 +90,10 @@ async function fetchHomeSeo(): Promise<YoastHeadJson | null> {
     const first = Array.isArray(data) && data.length > 0 ? data[0] : data;
     const yoast = first?.yoast_head_json as YoastHeadJson | undefined;
     if (!yoast) {
-      console.warn("[generateMetadata] No yoast_head_json found in banner data");
       return null;
     }
     return yoast;
   } catch (error) {
-    console.error("[generateMetadata] Error fetching SEO data:", error);
     return null;
   }
 }
@@ -107,17 +103,11 @@ export async function generateMetadata(): Promise<Metadata> {
     const yoast = await fetchHomeSeo();
 
     if (!yoast) {
-      console.log("[generateMetadata] Using default metadata");
       return {
         title: "B.F.B Fitness",
         description: "Навчання, інвентар та тренування",
       };
     }
-
-    console.log("[generateMetadata] Using Yoast SEO data:", {
-      title: yoast.title,
-      og_title: yoast.og_title,
-    });
 
     const robots = yoast.robots ?? {};
 
@@ -140,7 +130,6 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     };
   } catch (error) {
-    console.error("[generateMetadata] Error:", error);
     return {
       title: "B.F.B Fitness",
       description: "Навчання, інвентар та тренування",
@@ -156,17 +145,17 @@ export default function Home() {
       <AchievmentsSection />
       <TargetAuditorySection />
       <CalculateSection />
-      <div className="py-[100px]">
+      <div className="py-[70px] sm:py-[100px]">
         <LearningFormats />
       </div>
       <BoardSection />
       <CoursesShowcase />
       <EventsSection />
-      <div className="py-[100px]">
+      <div className="py-[70px] sm:py-[100px]">
         <Founder />
       </div>
       <InstructorAdvantages />
-      <div className="py-[100px]">
+      <div className="py-[70px] sm:py-[100px]">
         <ContactsSection />
       </div>
       <ProductsShowcase />

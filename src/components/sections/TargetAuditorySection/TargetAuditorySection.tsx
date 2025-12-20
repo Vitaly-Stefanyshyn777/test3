@@ -13,6 +13,7 @@ export default function TargetAuditorySection() {
               width={251}
               height={29}
               className={s.logoIcon}
+              unoptimized
             />
           </div>
           <div className={s.target}>

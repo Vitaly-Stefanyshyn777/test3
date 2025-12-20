@@ -71,6 +71,7 @@ const VideoInstruction: React.FC<VideoInstructionProps> = ({
         const url = await fetchThemeVideoUrl();
         console.log("[VideoInstruction] Received video URL:", url);
         if (url) {
+          // URL вже проксований в fetchThemeVideoUrl, використовуємо його напряму
           setRealVideoUrl(url);
           console.log("[VideoInstruction] Video URL set successfully");
         } else {

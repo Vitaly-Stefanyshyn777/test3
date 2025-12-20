@@ -313,6 +313,7 @@
 
   .content {
     /* grid-template-columns: 1fr; */
+    flex-direction: column;
     gap: mvw(16);
   }
 
@@ -324,17 +325,19 @@
   .imageContainer {
     width: 100%;
     max-width: 100%;
+    height: mvw(264);
   }
 
   .heroImage {
     width: 100%;
-    height: auto;
+    height: 100%;
     border-radius: mvw(16);
     object-fit: cover;
   }
 
   .rightColumn {
     width: 100%;
+    max-width: 100%;
   }
 
   .faqList {
@@ -347,7 +350,7 @@
 
   .faqButton {
     padding: mvw(16);
-    border-radius: mvw(12);
+    border-radius: mvw(16);
     gap: mvw(12);
   }
 

@@ -175,11 +175,11 @@
 
 @media (max-width: 1000px) {
   .trainersSection {
-    padding: mvw(24) 0;
+    padding: mvw(70) 0;
   }
   .container {
     padding: 0;
-    gap: mvw(16);
+    gap: mvw(32);
   }
   .header {
     padding: 0 mvw(16);

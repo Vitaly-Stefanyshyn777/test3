@@ -6,14 +6,20 @@ import { useScrollLock } from "../../hooks/useScrollLock";
 import LoginModalHeader from "./LoginModalHeader";
 import LoginForm, { type LoginFormValues } from "./LoginForm";
 import s from "./LoginModal.module.css";
+import { useState } from "react";
 
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (data: LoginFormValues) => Promise<void>;
+  onOpenRegister: () => void;
 }
 
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export default function LoginModal({
+  isOpen,
+  onClose,
+  onOpenRegister,
+}: LoginModalProps) {
   const {
     register,
     handleSubmit,
@@ -23,6 +29,11 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
   const loginMutation = useLogin();
   useScrollLock(isOpen);
+
+  const handleSwitchToRegister = () => {
+    onClose(); // 1. Закриваємо модалку логіну через пропс
+    onOpenRegister();
+  };
 
   if (!isOpen) return null;
 
@@ -57,6 +68,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           onSubmit={submit}
           isSubmitting={isSubmitting}
           isPending={loginMutation.isPending}
+          onSwitchToRegister={handleSwitchToRegister}
           isError={loginMutation.isError}
         />
       </div>

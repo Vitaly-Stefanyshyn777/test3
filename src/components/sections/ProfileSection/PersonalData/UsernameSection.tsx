@@ -29,6 +29,7 @@ export default function UsernameSection({
             icon={<UserIcon />}
             label="Ваше ім'я та прізвище"
             id="profile-username-name-field"
+            type="text"
             value={fullName}
             onChange={(e) => {
               // Зберігаємо все значення як є, дозволяємо пробіли

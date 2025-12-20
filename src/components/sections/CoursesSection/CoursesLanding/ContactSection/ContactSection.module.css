@@ -1,12 +1,12 @@
 .contactSection {
   padding: 200px 0px;
   background-color: #9f57ff;
-  background: url(/Frame13213183072.png);
+  background: url(/Frame13213183074.png);
   background-size: cover;
   width: 100%;
 
   max-width: 1900px;
-  border-radius: 56px;
+  border-radius: 28px;
   margin: 0 auto;
   box-sizing: border-box;
   height: auto;
@@ -79,7 +79,7 @@
     width: 100%;
     max-width: 100%;
     padding: mvw(20) mvw(16);
-    border-radius: mvw(16);
+    border-radius: mvw(24);
     box-sizing: border-box;
     height: auto;
     min-height: auto;

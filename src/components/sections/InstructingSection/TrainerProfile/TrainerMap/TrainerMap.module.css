@@ -246,7 +246,7 @@
 .socialIcon {
   border-radius: 12px;
   border: 1px solid rgba(14, 14, 14, 0.1);
-  background: rgba(255, 255, 255, 0.8);
+  /* background: rgba(255, 255, 255, 0.8); */
   width: 58px;
   height: 58px;
   display: flex;

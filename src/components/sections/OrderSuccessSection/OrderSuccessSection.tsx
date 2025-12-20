@@ -12,13 +12,22 @@ import OrderSummary from "./OrderSummary";
 import s from "./OrderSuccessSection.module.css";
 import type { WooCommerceOrder } from "@/lib/bfbApi";
 
-export default function OrderSuccessSection() {
+interface OrderSuccessSectionProps {
+  initialOrderId?: string | null;
+}
+
+export default function OrderSuccessSection({
+  initialOrderId,
+}: OrderSuccessSectionProps) {
   const total = useCartStore(selectCartTotal);
   const itemsMap = useCartStore((st) => st.items);
   const items = Object.values(itemsMap);
   const [order, setOrder] = useState<WooCommerceOrder | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isHeaderSkeleton, setIsHeaderSkeleton] = useState(true);
+  // Якщо initialOrderId передано з сервера, завжди використовуємо тільки його
+  // Це гарантує консистентність між сервером і клієнтом
+  const orderId = initialOrderId;
 
   const safeTotal = total || 0;
 
@@ -37,42 +46,64 @@ export default function OrderSuccessSection() {
 
   useEffect(() => {
     const fetchOrder = async () => {
+      console.log("📦 OrderSuccessSection: Початок завантаження замовлення", {
+        orderId,
+      });
+
       try {
-        // Спочатку перевіряємо URL параметр
-        const urlParams = new URLSearchParams(window.location.search);
-        let orderId = urlParams.get("orderId");
-        
-        // Якщо немає в URL, перевіряємо localStorage
-        if (!orderId) {
-          const savedOrderData = localStorage.getItem("orderData");
-          if (savedOrderData) {
-            const parsed = JSON.parse(savedOrderData);
-            orderId = parsed.orderId;
-          }
-        }
-        
         if (orderId) {
           const response = await fetch(`/api/wc/orders/${orderId}`);
           if (response.ok) {
             const orderData = await response.json();
+            console.log(
+              "✅ OrderSuccessSection: Замовлення завантажено успішно",
+              {
+                orderId: orderData.id,
+                itemsCount: orderData.line_items?.length || 0,
+                items: orderData.line_items?.map((item: any) => ({
+                  id: item.product_id,
+                  name: item.name,
+                  quantity: item.quantity,
+                })),
+              }
+            );
             setOrder(orderData);
+          } else {
+            console.log(
+              "❌ OrderSuccessSection: Помилка завантаження замовлення",
+              {
+                orderId,
+                status: response.status,
+                statusText: response.statusText,
+              }
+            );
           }
+        } else {
+          console.log(
+            "⚠️ OrderSuccessSection: orderId не вказано, пропускаємо завантаження"
+          );
         }
       } catch (error) {
-        console.error("Failed to fetch order:", error);
+        console.log(
+          "❌ OrderSuccessSection: Виняток при завантаженні замовлення",
+          error
+        );
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchOrder();
-  }, []);
+  }, [orderId]);
 
-  const orderNumber = order?.number 
-    ? `№${order.number}` 
-    : order?.id 
-    ? `№${order.id}` 
-    : `№${Math.floor(Math.random() * 900000) + 100000}`;
+  // Відкладаємо рендеринг номера до тих пір, поки orderId не буде відомий
+  const orderNumber = orderId
+    ? order?.number
+      ? `№${order.number}`
+      : order?.id
+      ? `№${order.id}`
+      : `№${orderId}`
+    : null;
 
   const formattedDate = order?.date_created
     ? new Date(order.date_created).toLocaleDateString("uk-UA", {
@@ -91,9 +122,11 @@ export default function OrderSuccessSection() {
     : safeTotal >= 1999
     ? 0
     : 100;
-  
+
   const orderTotal = order?.total ? parseFloat(order.total) : safeTotal;
-  const orderDiscount = order?.discount_total ? parseFloat(order.discount_total) : discount;
+  const orderDiscount = order?.discount_total
+    ? parseFloat(order.discount_total)
+    : discount;
   const finalTotal = orderTotal || safeTotal - discount + deliveryCost;
 
   // Дані з замовлення
@@ -106,7 +139,8 @@ export default function OrderSuccessSection() {
   const address1Raw = shipping?.address_1?.trim() || "";
   const address2Raw = shipping?.address_2?.trim() || "";
 
-  const paymentMethodDisplay = order?.payment_method_title?.trim() || "Не вказано";
+  const paymentMethodDisplay =
+    order?.payment_method_title?.trim() || "Не вказано";
 
   // Одержувач з shipping або billing
   const recipientFirstName = shipping?.first_name?.trim() || firstNameRaw;
@@ -119,7 +153,9 @@ export default function OrderSuccessSection() {
       : "Одержувач не вказаний";
 
   const recipientPhone = shipping?.phone?.trim() || phoneRaw;
-  const phoneDisplay = recipientPhone.length ? recipientPhone : "Телефон не вказано";
+  const phoneDisplay = recipientPhone.length
+    ? recipientPhone
+    : "Телефон не вказано";
 
   // Адреса доставки
   const deliveryAddressParts: string[] = [];
@@ -133,7 +169,7 @@ export default function OrderSuccessSection() {
     }
   }
   if (address2Raw) deliveryAddressParts.push(address2Raw);
-  
+
   const deliveryAddress = deliveryAddressParts.filter(Boolean).length
     ? deliveryAddressParts.join(", ")
     : "Відділення не вказано";
@@ -151,7 +187,26 @@ export default function OrderSuccessSection() {
           <div className={s.card}>
             {isHeaderSkeleton ? <OrderHeaderSkeleton /> : <OrderHeader />}
 
-            <OrderProducts orderNumber={orderNumber} order={order} />
+            {orderId && orderNumber ? (
+              (() => {
+                console.log(
+                  "🎯 OrderSuccessSection: Передаємо дані в OrderProducts",
+                  {
+                    orderNumber,
+                    hasOrder: !!order,
+                    orderId: order?.id,
+                    itemsCount: order?.line_items?.length || 0,
+                  }
+                );
+                return (
+                  <OrderProducts orderNumber={orderNumber} order={order} />
+                );
+              })()
+            ) : (
+              <div className={s.errorBlock}>
+                <p>Не знайдено інформацію про замовлення</p>
+              </div>
+            )}
 
             <div className={s.productsBlock}>
               <OrderDetails

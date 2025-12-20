@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./ChangePassword.module.css";
 import SectionDivider from "../SectionDivider/SectionDivider";
 
@@ -13,6 +13,7 @@ import SubmitButton from "@/components/ui/SubmitButton/SubmitButton";
 const ChangePassword: React.FC = () => {
   const user = useAuthStore((s) => s.user);
   const token = useAuthStore((s) => s.token);
+  const [isMobile, setIsMobile] = useState(false);
 
   type FormValues = {
     currentPassword: string;
@@ -31,6 +32,15 @@ const ChangePassword: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 1000);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const formValues = watch();
   const isFormFilled = !!(
@@ -98,6 +108,8 @@ const ChangePassword: React.FC = () => {
             label="Поточний пароль"
             hasError={!!error}
             supportingText={error || "Введіть поточний пароль"}
+            inputStyle={{ backgroundColor: isMobile ? '#fff' : '#f9f9f9', borderColor: isMobile ? '#fff' : '#f9f9f9' }}
+            eyeBtnClassName={isMobile ? styles.eyeBtnMobile : ""}
             {...register("currentPassword", { required: true })}
             autoComplete="current-password"
           />
@@ -112,6 +124,8 @@ const ChangePassword: React.FC = () => {
               error ||
               "Новий пароль має містити щонайменше 8 символів та відрізнятися від поточного"
             }
+            inputStyle={{ backgroundColor: isMobile ? '#fff' : '#f9f9f9', borderColor: isMobile ? '#fff' : '#f9f9f9' }}
+            eyeBtnClassName={isMobile ? styles.eyeBtnMobile : ""}
             {...register("newPassword", { required: true, minLength: 8 })}
             autoComplete="new-password"
           />
@@ -123,6 +137,8 @@ const ChangePassword: React.FC = () => {
             label="Підтвердіть новий пароль"
             hasError={!!error}
             supportingText={error || "Повторіть новий пароль без помилок"}
+            inputStyle={{ backgroundColor: isMobile ? '#fff' : '#f9f9f9', borderColor: isMobile ? '#fff' : '#f9f9f9' }}
+            eyeBtnClassName={isMobile ? styles.eyeBtnMobile : ""}
             {...register("confirmPassword", { required: true, minLength: 8 })}
             autoComplete="new-password"
           />

@@ -113,7 +113,6 @@
 
 .heroButtonPrimary:hover {
   background: #6a1b9a;
-  transform: translateY(-2px);
 }
 
 .heroButtonSecondary {
@@ -125,7 +124,6 @@
 
 .heroButtonSecondary:hover {
   background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
 }
 
 .heroNavigation {

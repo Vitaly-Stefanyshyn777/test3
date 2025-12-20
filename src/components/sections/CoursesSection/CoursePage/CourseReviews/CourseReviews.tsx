@@ -26,6 +26,7 @@ interface CourseReviewsProps {
 const CourseReviews: React.FC<CourseReviewsProps> = ({ courseId }) => {
   const [reviews, setReviews] = useState<ReviewUi[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const loadReviews = useCallback(async () => {
     try {
@@ -39,7 +40,7 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({ courseId }) => {
         params.product = courseId;
       }
       const data = await fetchWcReviews(params);
-      
+
       const ui: ReviewUi[] = (data as WcReview[]).map((r: WcReview) => ({
         id: r.id,
         name: r.reviewer_name || r.reviewer || "Користувач",
@@ -59,6 +60,15 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({ courseId }) => {
     loadReviews();
   }, [loadReviews]);
 
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 1000);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   const swiperRef = useRef<SwiperType | null>(null);
   const [active, setActive] = useState(0);
 
@@ -67,7 +77,8 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({ courseId }) => {
       throw new Error("ID курсу не вказано");
     }
 
-    const productId = typeof courseId === "string" ? parseInt(courseId, 10) : courseId;
+    const productId =
+      typeof courseId === "string" ? parseInt(courseId, 10) : courseId;
     if (isNaN(productId)) {
       throw new Error("Невірний ID курсу");
     }
@@ -102,7 +113,7 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({ courseId }) => {
       <div className={styles.containerReviews}>
         <div className={styles.header}>
           <h2 className={styles.title}>Відгуки покупців</h2>
-          <button 
+          <button
             className={styles.leaveReviewButton}
             onClick={() => setIsModalOpen(true)}
           >
@@ -127,13 +138,13 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({ courseId }) => {
                   setActive(currentIndex);
                 }
               }}
-              spaceBetween={16}
-              slidesPerView={"auto"}
+              spaceBetween={isMobile ? 8 : 16}
+              slidesPerView={isMobile ? 1.3 : "auto"}
               centeredSlides={false}
               observer
               observeParents
               updateOnWindowResize
-              slidesOffsetAfter={56}
+              slidesOffsetAfter={isMobile ? 0 : 56}
               slidesOffsetBefore={0}
               navigation={{
                 prevEl: `.${styles.reviewsPrev}`,
@@ -151,7 +162,7 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({ courseId }) => {
                 <SwiperSlide
                   key={review.id}
                   className={styles.slide}
-                  style={{ width: "566px" }}
+                  style={{ width: isMobile ? "288px" : "566px" }}
                 >
                   <div className={styles.reviewCard}>
                     <div className={styles.reviewHeader}>

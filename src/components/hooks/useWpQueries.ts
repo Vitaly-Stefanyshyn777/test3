@@ -151,11 +151,19 @@ export const useFaqCategoriesQuery = () =>
     gcTime: 20 * 60 * 1000,
   });
 
-export const useCourseQuery = (courseIdOrSlug?: number | string) =>
-  useQuery({
+export const useCourseQuery = (courseIdOrSlug?: number | string) => {
+  const enabled = !!courseIdOrSlug;
+
+  const queryResult = useQuery({
     queryKey: ["course", courseIdOrSlug],
-    queryFn: () => fetchCourse(courseIdOrSlug),
+    queryFn: async () => {
+      const result = await fetchCourse(courseIdOrSlug);
+      return result;
+    },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
-    enabled: !!courseIdOrSlug, // Не виконуємо запит, якщо немає ID або slug
+    enabled, // Не виконуємо запит, якщо немає ID або slug
   });
+
+  return queryResult;
+};

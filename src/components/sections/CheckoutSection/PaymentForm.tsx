@@ -15,7 +15,7 @@ export default function PaymentForm({
 }: PaymentFormProps) {
   const { data: paymentGateways = [], isLoading } = useWcPaymentGatewaysQuery();
 
-  // Мапінг платіжних методів для відображення
+  // Мапінг платіжних методів для відображення (ID → DisplayName)
   const paymentMethodMap: Record<string, string> = {
     cod: "Накладений платіж",
     wayforpay: "Онлайн-оплата WayForPay",
@@ -46,6 +46,7 @@ export default function PaymentForm({
         <div className={s.radioRow}>
           {activePaymentGateways.map((gateway) => {
             const displayName = paymentMethodMap[gateway.id] || gateway.title;
+            // Зберігаємо ID платіжного методу, а не displayName
             return (
               <div key={gateway.id} className={s.radioBlock}>
                 <label className={s.radio}>
@@ -53,8 +54,8 @@ export default function PaymentForm({
                     className={s.radioInput}
                     type="radio"
                     name="pay"
-                    value={displayName}
-                    checked={formData.paymentMethod === displayName}
+                    value={gateway.id}
+                    checked={formData.paymentMethod === gateway.id}
                     onChange={(e) =>
                       setFormData({
                         ...formData,

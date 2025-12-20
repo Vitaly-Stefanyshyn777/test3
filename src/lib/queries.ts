@@ -17,7 +17,6 @@ export const coachQuery = (id: string) => ({
       const coach = await getCoachById(id);
       return mapCoachToUi(coach);
     } catch (error) {
-      console.error("Error fetching coach:", error);
       const allCoaches = await getAllCoaches();
       const coach = allCoaches.find((c) => String(c.id) === id);
       if (coach) {

@@ -31,7 +31,10 @@ const ContactInfo: React.FC = () => {
                   <div className={s.socialIconBlock}>
                     {contactData.socialLinks.length > 0 ? (
                       contactData.socialLinks.map((social, index) => {
-                        const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+                        const iconMap: Record<
+                          string,
+                          React.ComponentType<{ className?: string }>
+                        > = {
                           Instagram: InstagramIcon,
                           Facebook: FacebookIcon,
                           Telegram: TelegramIcon,
@@ -82,13 +85,17 @@ const ContactInfo: React.FC = () => {
             </div>
             <div className={s.contactEmailNumber}>
               <a
-                href={`tel:${contactData.phone.replace(/\s/g, "") || "+380954372575"}`}
+                href={`tel:${
+                  contactData.phone.replace(/\s/g, "") || "+380954372575"
+                }`}
                 className={s.valueNumber}
               >
                 {contactData.phone || "+380 95 437 25 75"}
               </a>
               <a
-                href={`mailto:${contactData.email || "bfb.board.ukraine@gmail.com"}`}
+                href={`mailto:${
+                  contactData.email || "bfb.board.ukraine@gmail.com"
+                }`}
                 className={s.valueEmail}
               >
                 {contactData.email || "bfb.board.ukraine@gmail.com"}
@@ -98,7 +105,7 @@ const ContactInfo: React.FC = () => {
 
           <div className={s.contactAddressBlock}>
             <p className={s.valueAddress}>
-              {contactData.address || "Мукачево, вул. Духновича 40"}
+              {contactData.address || "м. Мукачево, вул. Духновича 40"}
             </p>
             <div className={s.contactItem}>
               {contactData.weekdays && (

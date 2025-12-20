@@ -2,13 +2,14 @@ import type { SortType } from "@/components/ui/FilterSortPanel/FilterSortPanel";
 
 export interface SortableItem {
   id: string | number;
-  price?: number;
-  regularPrice?: number;
-  salePrice?: number;
+  price?: number | string;
+  regularPrice?: number | string;
+  salePrice?: number | string;
   dateCreated?: string;
   date_created?: string;
   onSale?: boolean;
   featured?: boolean;
+  total_sales?: number;
 }
 
 export function sortItems<T extends SortableItem>(
@@ -17,10 +18,20 @@ export function sortItems<T extends SortableItem>(
 ): T[] {
   const sorted = [...items];
 
+  if (process.env.NODE_ENV !== "production") {
+  }
+
   switch (sortType) {
     case "popular":
-      // Популярні - можна сортувати за featured або залишити як є
+      // Популярні - сортуємо за загальною кількістю продажів (total_sales) або featured
       return sorted.sort((a, b) => {
+        // Спочатку перевіряємо total_sales (для товарів)
+        const salesA = a.total_sales || 0;
+        const salesB = b.total_sales || 0;
+        if (salesA !== salesB) {
+          return salesB - salesA; // Більше продажів = вище в списку
+        }
+        // Якщо total_sales однакові або відсутні, сортуємо за featured
         if (a.featured && !b.featured) return -1;
         if (!a.featured && b.featured) return 1;
         return 0;
@@ -41,16 +52,24 @@ export function sortItems<T extends SortableItem>(
     case "price_desc":
       // Ціна за зменшенням
       return sorted.sort((a, b) => {
-        const priceA = a.salePrice || a.price || 0;
-        const priceB = b.salePrice || b.price || 0;
+        const getPrice = (item: SortableItem) => {
+          const price = item.salePrice || item.price || 0;
+          return typeof price === 'string' ? parseFloat(price) || 0 : price;
+        };
+        const priceA = getPrice(a);
+        const priceB = getPrice(b);
         return priceB - priceA;
       });
 
     case "price_asc":
       // Ціна за зростанням
       return sorted.sort((a, b) => {
-        const priceA = a.salePrice || a.price || 0;
-        const priceB = b.salePrice || b.price || 0;
+        const getPrice = (item: SortableItem) => {
+          const price = item.salePrice || item.price || 0;
+          return typeof price === 'string' ? parseFloat(price) || 0 : price;
+        };
+        const priceA = getPrice(a);
+        const priceB = getPrice(b);
         return priceA - priceB;
       });
 

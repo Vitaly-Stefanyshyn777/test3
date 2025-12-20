@@ -15,20 +15,6 @@ export default function TrainingLocationsSection({
   locations = [],
   loading = false,
 }: Props) {
-  // Логуємо тільки коли змінюються локації, а не при кожному ре-рендері
-  useEffect(() => {
-    if (process.env.NODE_ENV !== "production") {
-      console.log("[TrainingLocationsSection] Локації:", {
-        count: locations.length,
-        locations: locations.map((l) => ({
-          title: l.title,
-          phone: l.phone,
-          email: l.email,
-          coordinates: l.coordinates,
-        })),
-      });
-    }
-  }, [locations]);
 
   if (loading) {
     return <TrainingLocationsSectionSkeleton />;

@@ -136,11 +136,13 @@ const ProductsCatalog = () => {
     };
   }, [appliedWcFilters, sortBy, itemsPerPage]);
 
+
   const {
     data: wcFilteredProducts = [],
     isLoading,
     isError,
   } = useFilteredProducts(wcFiltersWithSort);
+
 
   type FilterProduct = {
     id?: string | number;

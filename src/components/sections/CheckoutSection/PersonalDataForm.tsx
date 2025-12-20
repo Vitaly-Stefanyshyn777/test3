@@ -15,6 +15,7 @@ interface PersonalDataFormProps {
     lastName?: string;
     phone?: string;
     email?: string;
+    billing?: string;
     recipientFirstName?: string;
     recipientLastName?: string;
     recipientPhone?: string;
@@ -33,7 +34,7 @@ export default function PersonalDataForm({
       <h2 className={s.sectionTitle}>Особисті дані</h2>
       <div className={s.grid2}>
         <SecondaryInput
-          label="Ваше ім'я та прізвище"
+          label="Ваше ім'я"
           id="checkout-form-name-field"
           value={formData.firstName}
           onChange={(e) =>
@@ -90,7 +91,7 @@ export default function PersonalDataForm({
           <h2 className={s.sectionTitle}>Дані отримувача</h2>
           <div className={s.grid2}>
             <SecondaryInput
-              label="Ваше ім'я та прізвище"
+              label="Ваше ім’я"
               id="checkout-recipient-form-name-field"
               value={formData.recipientFirstName}
               onChange={(e) =>

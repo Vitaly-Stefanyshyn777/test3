@@ -13,14 +13,14 @@ interface Props {
   };
   // Якщо undefined → показуємо усіх тренерів; якщо масив (навіть порожній) → показуємо саме його
   filteredPosts?: unknown[];
+  itemsPerPage?: number;
 }
 
-const TrainersCatalogContainer = ({ filteredPosts }: Props) => {
+const TrainersCatalogContainer = ({ filteredPosts, itemsPerPage = 16 }: Props) => {
   const { data: coaches = [], isLoading, isError } = useCoachesQuery();
 
   const [sortBy] = useState("name");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(16);
 
   // Джерело даних: або передані відфільтровані, або повний список з бекенду
   type CoachLike = {

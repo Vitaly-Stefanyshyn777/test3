@@ -2,7 +2,12 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import s from "./BoardSection.module.css";
-import { LegconIcon, ShieldIcon } from "@/components/Icons/Icons";
+import {
+  LegconIcon,
+  ShieldIcon,
+  WalkingIcon,
+  CheckBorder2Icon,
+} from "@/components/Icons/Icons";
 
 const BoardSection: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -142,7 +147,7 @@ const BoardSection: React.FC = () => {
               <li className={s.mobileItem}>
                 <div className={s.mobileItemIcon} aria-hidden>
                   <span>
-                    <ShieldIcon />
+                    <WalkingIcon />
                   </span>
                 </div>
                 <p className={s.mobileItemText}>
@@ -152,7 +157,7 @@ const BoardSection: React.FC = () => {
               <li className={s.mobileItem}>
                 <div className={s.mobileItemIcon} aria-hidden>
                   <span>
-                    <ShieldIcon />
+                    <CheckBorder2Icon />
                   </span>
                 </div>
                 <p className={s.mobileItemText}>

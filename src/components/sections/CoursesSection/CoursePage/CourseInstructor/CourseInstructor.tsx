@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import Image from "next/image";
 import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
 import styles from "./CourseInstructor.module.css";
 import {
@@ -26,7 +25,7 @@ const CourseInstructor: React.FC<CourseInstructorProps> = ({
     return <CourseInstructorSkeleton />;
   }
 
-  if (error || !course || !course.course_data.Course_coach) {
+  if (error || !course || !course.course_data?.Course_coach) {
     return (
       <section className={styles.instructor}>
         <div className={styles.container}>
@@ -39,7 +38,7 @@ const CourseInstructor: React.FC<CourseInstructorProps> = ({
   }
 
   // Підтримка як одного об'єкта, так і масиву інструкторів
-  const coachData = course.course_data.Course_coach;
+  const coachData = course.course_data?.Course_coach;
   const coaches = Array.isArray(coachData) ? coachData : [coachData];
 
   // Відображаємо активного інструктора (можна перемикати якщо їх кілька)
@@ -84,13 +83,24 @@ const CourseInstructor: React.FC<CourseInstructorProps> = ({
 
   // Парсимо аватар з JSON string (з безпечною обробкою)
   const getAvatarUrl = () => {
+    // Спочатку перевіряємо поле img_link_data_avatar з ACF інструктора
+    if (
+      coach.img_link_data_avatar &&
+      typeof coach.img_link_data_avatar === "string"
+    ) {
+      if (coach.img_link_data_avatar.startsWith("http")) {
+        return coach.img_link_data_avatar;
+      }
+    }
+
+    // Потім перевіряємо поле img_link_avatar
     if (!coach.img_link_avatar) {
-      return "/images/instructor-lika.jpg";
+      return "/images/instructor-course1.png";
     }
 
     // Якщо це вже масив, беремо перший елемент
     if (Array.isArray(coach.img_link_avatar)) {
-      return coach.img_link_avatar[0] || "/images/instructor-lika.jpg";
+      return coach.img_link_avatar[0] || "/images/instructor-course1.png";
     }
 
     // Якщо це рядок, намагаємося розпарсити JSON
@@ -115,7 +125,7 @@ const CourseInstructor: React.FC<CourseInstructorProps> = ({
       }
     }
 
-    return "/images/instructor-lika.jpg";
+    // return "/images/instructor-course1.png";
   };
 
   const avatarUrl = getAvatarUrl();
@@ -209,11 +219,9 @@ const CourseInstructor: React.FC<CourseInstructorProps> = ({
 
           <div className={styles.rightColumn}>
             <div className={styles.imageContainer}>
-              <Image
+              <img
                 src={avatarUrl}
                 alt={`${coach.title} - інструктор BFB`}
-                width={500}
-                height={600}
                 className={styles.instructorImage}
                 style={{ width: "100%", height: "auto", maxHeight: "none" }}
               />

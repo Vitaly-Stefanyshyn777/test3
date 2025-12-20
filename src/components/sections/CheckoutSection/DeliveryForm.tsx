@@ -209,6 +209,7 @@ export default function DeliveryForm({
                 setOpenDropdown(isOpen ? "branch" : null)
               }
               backgroundColor="white"
+              disabled={!formData.city}
             />
           </div>
           {deliveryType === "courier" && (

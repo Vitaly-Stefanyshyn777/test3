@@ -1,16 +1,15 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { login as loginApi, getMyProfile } from "@/lib/auth";
+import { useCartStore } from "./cart";
+import { useFavoriteStore } from "./favorites";
 
-function readInitialAuth(): {
-  token: string | null;
-  user: AuthUser | null;
-  isLoggedIn: boolean;
-  isHydrated: boolean;
-} {
-  return { token: null, user: null, isLoggedIn: false, isHydrated: false };
-}
-const initial = readInitialAuth();
+const initial = {
+  token: null,
+  user: null,
+  isLoggedIn: false,
+  isHydrated: false,
+};
 
 export interface AuthUser {
   id?: string;
@@ -37,6 +36,34 @@ interface AuthState {
   closeLoginModal: () => void;
 }
 
+function saveTokenToStorage(token: string) {
+  if (typeof window !== "undefined" && token) {
+    localStorage.setItem("bfb_token", token);
+    localStorage.setItem("bfb_token_old", token);
+  }
+}
+
+function loadUserData(userId: string) {
+  const cartStore = useCartStore.getState();
+  const favoriteStore = useFavoriteStore.getState();
+
+  const tokenInStorage =
+    typeof window !== "undefined" &&
+    (localStorage.getItem("bfb_token") || localStorage.getItem("bfb_token_old"));
+
+  if (!tokenInStorage) return;
+
+  setTimeout(async () => {
+    try {
+      await cartStore.loadUserData(userId);
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      await favoriteStore.loadUserData(userId);
+    } catch (err) {
+      // Silently handle errors
+    }
+  }, 200);
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -47,7 +74,12 @@ export const useAuthStore = create<AuthState>()(
       isLoginModalOpen: false,
 
       setAuth: (token: string, user: AuthUser | null = null) => {
+        saveTokenToStorage(token);
         set({ token, user, isLoggedIn: true });
+
+        if (user?.id) {
+          loadUserData(user.id);
+        }
       },
 
       setUser: (user: AuthUser | null) => {
@@ -89,13 +121,10 @@ export const useAuthStore = create<AuthState>()(
             return false;
           }
 
-          // SSOT: first_name + last_name має бути головним джерелом імені
           const fullName = `${profile?.first_name ?? ""} ${profile?.last_name ?? ""}`.trim();
           const resolvedName = fullName || profile?.name || "";
-          const resolvedEmail =
-            profile?.email || profile?.user_email || user?.email;
+          const resolvedEmail = profile?.email || profile?.user_email || user?.email;
 
-          // Зберігаємо попередній avatar навіть якщо стор ще порожній (беремо з localStorage)
           let previousSavedAvatar: string | undefined;
           try {
             const raw = localStorage.getItem("bfb_user");
@@ -109,8 +138,6 @@ export const useAuthStore = create<AuthState>()(
             email: resolvedEmail,
             nicename: profile?.slug || user?.nicename,
             displayName: resolvedName || user?.displayName,
-            // Пріоритет на клієнті: meta.img_link_data_avatar → avatar → avatar_urls["96"] → попередній user.avatar
-            // Додатково: не перезаписуємо клієнтський uploads-URL, якщо сервер повертає порожнє/граватар
             avatar: (() => {
               const metaAvatar = profile?.meta?.img_link_data_avatar;
               const anyAvatar = profile?.avatar;
@@ -121,8 +148,7 @@ export const useAuthStore = create<AuthState>()(
                 typeof serverCandidate === "string" &&
                 serverCandidate.includes("/wp-content/uploads/");
               const clientHasUploads =
-                typeof user?.avatar === "string" &&
-                user.avatar.includes("/wp-content/uploads/");
+                typeof user?.avatar === "string" && user.avatar.includes("/wp-content/uploads/");
 
               if (!serverHasUploads && clientHasUploads) {
                 return user!.avatar;
@@ -133,6 +159,12 @@ export const useAuthStore = create<AuthState>()(
           };
 
           set({ user: nextUser, isLoggedIn: true });
+          saveTokenToStorage(token);
+
+          if (nextUser?.id) {
+            loadUserData(nextUser.id);
+          }
+
           return true;
         } catch {
           return true;
@@ -143,55 +175,77 @@ export const useAuthStore = create<AuthState>()(
         try {
           const data = await loginApi(credentials);
 
-          // Після логіну одразу отримуємо числовий id через /users/me
-          let numericId: string | undefined;
-          try {
-            const me = await getMyProfile();
-            if (me?.id) numericId = String(me.id);
-          } catch {}
+          if (typeof window !== "undefined" && data.token) {
+            saveTokenToStorage(data.token);
+            await fetch("/api/set-user-cookie", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ token: data.token }),
+            }).catch(() => {});
+          }
 
           const user = {
-            id: numericId || data.user_nicename,
+            id: data.user_nicename,
             email: data.user_email,
             displayName: data.user_display_name,
           };
 
           set({ user, token: data.token, isLoggedIn: true });
+
+          let numericId: string | undefined;
+          try {
+            const me = await getMyProfile(data.token);
+            if (me?.id) {
+              numericId = String(me.id);
+              set({ user: { ...user, id: numericId } });
+            }
+          } catch {}
+
+          const finalUserId = numericId || user.id;
+          if (finalUserId) {
+            loadUserData(finalUserId);
+          }
         } catch (error) {
           throw error;
         }
       },
 
       logout: async () => {
-        // Спочатку очищаємо стор
+        const { user } = get();
+        const userId = user?.id;
+
+        const cartStore = useCartStore.getState();
+        const favoriteStore = useFavoriteStore.getState();
+
+        cartStore.close();
+        favoriteStore.close();
+
+        if (userId) {
+          cartStore.setUserId(userId);
+          favoriteStore.setUserId(userId);
+        }
+
+        cartStore.loadUserData(null).catch(() => {});
+        favoriteStore.loadUserData(null).catch(() => {});
+
         set({ user: null, token: null, isLoggedIn: false });
-        
-        // Очищаємо всі дані з localStorage
+
         if (typeof window !== "undefined") {
           try {
-            // Очищаємо токени користувача
             localStorage.removeItem("bfb_token");
             localStorage.removeItem("bfb_token_old");
             localStorage.removeItem("wp_jwt");
             localStorage.removeItem("wp_jwt_override");
-            
-            // Очищаємо zustand persist (bfb-auth)
             localStorage.removeItem("bfb-auth");
-            
-            // Очищаємо інші дані користувача
             localStorage.removeItem("bfb_user");
-            
-            // Очищаємо тимчасові дані форм
             localStorage.removeItem("trainer_certificates_preview");
             localStorage.removeItem("orderData");
             localStorage.removeItem("userLocationConfirmed");
             localStorage.removeItem("userLocation");
           } catch (error) {
-            console.error("[logout] Помилка очищення localStorage:", error);
           }
         }
-        
-        // Очищаємо httpOnly cookie
+
         try {
           await fetch("/api/set-user-cookie", { method: "DELETE" });
         } catch {}
@@ -208,6 +262,9 @@ export const useAuthStore = create<AuthState>()(
         isLoggedIn: state.isLoggedIn,
       }),
       onRehydrateStorage: () => (state) => {
+        if (state?.token && typeof window !== "undefined") {
+          localStorage.setItem("bfb_token", state.token);
+        }
         if (state) {
           state.isHydrated = true;
         }

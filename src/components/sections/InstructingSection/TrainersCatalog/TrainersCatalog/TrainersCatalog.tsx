@@ -19,7 +19,7 @@ const TrainersCatalog = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [sortBy, setSortBy] = useState<SortType>("popular");
-  const [itemsPerPage, setItemsPerPage] = useState<number>(12);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(16);
 
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 1000px)");
@@ -42,12 +42,11 @@ const TrainersCatalog = () => {
     unknown[] | undefined
   >(undefined);
 
-  // Застосовуємо сортування та пагінацію
-  const sortedAndPaginatedTrainers = useMemo(() => {
+  // Застосовуємо тільки сортування, пагінацію обробляє TrainersCatalogContainer
+  const sortedTrainers = useMemo(() => {
     const trainersList = filteredTrainers ?? coaches;
-    const sorted = sortItems(trainersList as any[], sortBy);
-    return sorted.slice(0, itemsPerPage);
-  }, [filteredTrainers, coaches, sortBy, itemsPerPage]);
+    return sortItems(trainersList as any[], sortBy);
+  }, [filteredTrainers, coaches, sortBy]);
 
   const handleApplyFilters = () => {
     // Логіка застосування фільтрів вже в TrainersFilter через onTrainersChange
@@ -109,7 +108,8 @@ const TrainersCatalog = () => {
               subtitle: "Наші тренери",
               title: "Каталог тренерів",
             }}
-            filteredPosts={sortedAndPaginatedTrainers}
+            filteredPosts={sortedTrainers}
+            itemsPerPage={itemsPerPage}
           />
           {isError && (
             <div className={styles.error}>Не вдалося завантажити тренерів</div>

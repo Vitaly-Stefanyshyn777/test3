@@ -164,19 +164,31 @@ export default function FavoritesModal() {
                         <div className={s.mobileSlideGrid}>
                           {group.map((it) => {
                             const isCourse = it.id.startsWith("course-");
-                            const courseId = isCourse ? it.id.replace("course-", "") : undefined;
+                            const courseId = isCourse
+                              ? it.id.replace("course-", "")
+                              : undefined;
                             const normalizedImage = normalizeImageUrl(it.image);
+                            // Перетворюємо wcProduct для ProductCard
                             return (
                               <div
                                 key={it.id}
                                 className={s.mobileCardWrapper}
                                 onClick={() => close()}
                               >
-                                <ProductCard 
-                                  {...it} 
-                                  price={it.price || 0} 
+                                <ProductCard
+                                  id={it.id}
+                                  name={it.name}
+                                  price={it.price || 0}
+                                  originalPrice={it.originalPrice}
                                   image={normalizedImage}
-                                  slug={isCourse && courseId ? `/courses/${courseId}` : it.slug}
+                                  slug={
+                                    isCourse && courseId
+                                      ? `/courses/${courseId}`
+                                      : it.slug
+                                  }
+                                  discount={it.discount}
+                                  isNew={it.isNew}
+                                  isHit={it.isHit}
                                 />
                               </div>
                             );
@@ -196,15 +208,26 @@ export default function FavoritesModal() {
                   <div className={s.desktopGrid}>
                     {desktopVisible.map((it) => {
                       const isCourse = it.id.startsWith("course-");
-                      const courseId = isCourse ? it.id.replace("course-", "") : undefined;
+                      const courseId = isCourse
+                        ? it.id.replace("course-", "")
+                        : undefined;
                       const normalizedImage = normalizeImageUrl(it.image);
                       return (
                         <div key={it.id} onClick={() => close()}>
-                          <ProductCard 
-                            {...it} 
-                            price={it.price || 0} 
+                          <ProductCard
+                            id={it.id}
+                            name={it.name}
+                            price={it.price || 0}
+                            originalPrice={it.originalPrice}
                             image={normalizedImage}
-                            slug={isCourse && courseId ? `/courses/${courseId}` : it.slug}
+                            slug={
+                              isCourse && courseId
+                                ? `/courses/${courseId}`
+                                : it.slug
+                            }
+                            discount={it.discount}
+                            isNew={it.isNew}
+                            isHit={it.isHit}
                           />
                         </div>
                       );
@@ -219,25 +242,26 @@ export default function FavoritesModal() {
             <div className={s.actionsRow}>
               <div className={s.buttonsWrap}>
                 <div className={s.navWrap}>
-                  {isMobile ? (
-                    <SliderNav
-                      activeIndex={activeIndex}
-                      dots={mobilePages.length}
-                      onPrev={() => swiperRef.current?.slidePrev()}
-                      onNext={() => swiperRef.current?.slideNext()}
-                      onDotClick={(idx) => swiperRef.current?.slideTo(idx)}
-                    />
-                  ) : (
-                    items.length > 4 && (
-                      <SliderNav
-                        activeIndex={desktopSlideIdx}
-                        dots={desktopTotalSlides}
-                        onPrev={onDesktopPrev}
-                        onNext={onDesktopNext}
-                        onDotClick={(idx) => setDesktopSlideIdx(idx)}
-                      />
-                    )
-                  )}
+                  {isMobile
+                    ? // SliderNav на мобілці показуємо тільки коли більше 4 карток
+                      items.length > 4 && (
+                        <SliderNav
+                          activeIndex={activeIndex}
+                          dots={mobilePages.length}
+                          onPrev={() => swiperRef.current?.slidePrev()}
+                          onNext={() => swiperRef.current?.slideNext()}
+                          onDotClick={(idx) => swiperRef.current?.slideTo(idx)}
+                        />
+                      )
+                    : items.length > 4 && (
+                        <SliderNav
+                          activeIndex={desktopSlideIdx}
+                          dots={desktopTotalSlides}
+                          onPrev={onDesktopPrev}
+                          onNext={onDesktopNext}
+                          onDotClick={(idx) => setDesktopSlideIdx(idx)}
+                        />
+                      )}
                 </div>
 
                 <button
@@ -265,8 +289,8 @@ export default function FavoritesModal() {
                 <button
                   className={s.remove}
                   onClick={() => {
-                    const itemsToRemove = isMobile ? mobilePageItems : items;
-                    itemsToRemove.forEach((it) => remove(it.id));
+                    // Завжди видаляємо всі товари з обраних
+                    items.forEach((it) => remove(it.id));
                   }}
                 >
                   Видалити все

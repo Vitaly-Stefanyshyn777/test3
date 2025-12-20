@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
 
     // Отримуємо всі FAQ (WordPress не підтримує фільтрацію за faq_category напряму)
     let url = `${UPSTREAM_BASE}/wp-json/wp/v2/faq`;
-    
+
     // Мапінг наших категорій до реальних ID в WordPress
     // Реальні ID в WordPress: 93 (Головна), 94 (Борди), 95 (Курси)
     const categoryMapping: Record<number, number> = {
@@ -29,11 +29,6 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(
-        "[FAQ API] ❌ WordPress API error:",
-        response.status,
-        errorText
-      );
       return NextResponse.json(
         { error: `WordPress API error: ${response.status}` },
         { status: response.status }
@@ -47,7 +42,7 @@ export async function GET(request: NextRequest) {
       const categoryIdNum = parseInt(categoryId);
       // Мапимо нашу категорію до реального ID в WordPress
       const realCategoryId = categoryMapping[categoryIdNum] || categoryIdNum;
-      
+
       // Фільтруємо FAQ, які мають цю категорію в faq_type
       data = data.filter((item: { faq_type?: number[]; faq_category?: number[] }) => {
         const faqTypes = item.faq_type || [];
@@ -64,7 +59,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error("[FAQ API] ❌ Error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

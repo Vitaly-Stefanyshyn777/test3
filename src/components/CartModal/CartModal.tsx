@@ -1,36 +1,48 @@
 "use client";
-import React, { useMemo, useEffect, useState, useRef } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import s from "./CartModal.module.css";
-import { useCartStore, selectCartTotal } from "@/store/cart";
+import { useCartStore } from "@/store/cart";
+import { useAuthStore } from "@/store/auth";
 import { useScrollLock } from "@/components/hooks/useScrollLock";
+import { calculatePrice, AUTH_DISCOUNT } from "@/lib/priceUtils";
 import CartHeader from "./CartHeader";
 import CartItemsList from "./CartItemsList";
 import CartSummary from "./CartSummary";
 import CartRecommendations from "./CartRecommendations";
 import CartModalSkeleton from "./CartModalSkeleton";
-import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
-import type { Swiper as SwiperType } from "swiper";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
 
 export default function CartModal() {
   const isOpen = useCartStore((st) => st.isOpen);
   const close = useCartStore((st) => st.close);
   const itemsMap = useCartStore((st) => st.items);
   const items = useMemo(() => Object.values(itemsMap), [itemsMap]);
-  const total = useCartStore(selectCartTotal);
-  const discount = useMemo(
-    () =>
-      items.reduce((acc, it) => {
-        const diff =
-          it.originalPrice && it.originalPrice > it.price
-            ? it.originalPrice - it.price
-            : 0;
-        return acc + diff * it.quantity;
-      }, 0),
-    [items]
-  );
+  const isLoggedIn = useAuthStore((st) => st.isLoggedIn);
+  
+  // Обчислюємо total з урахуванням знижки для авторизованих
+  const total = useMemo(() => {
+    return items.reduce((acc, it) => {
+      const { finalPrice } = calculatePrice({
+        price: it.price,
+        originalPrice: it.originalPrice,
+        isLoggedIn,
+      });
+      return acc + finalPrice * it.quantity;
+    }, 0);
+  }, [items, isLoggedIn]);
+  
+  // Обчислюємо знижку (різниця між originalPrice та finalPrice)
+  const discount = useMemo(() => {
+    return items.reduce((acc, it) => {
+      const { finalPrice, originalPrice, shouldShowOldPrice } = calculatePrice({
+        price: it.price,
+        originalPrice: it.originalPrice,
+        isLoggedIn,
+      });
+      const diff = shouldShowOldPrice ? (originalPrice - finalPrice) * it.quantity : 0;
+      return acc + diff;
+    }, 0);
+  }, [items, isLoggedIn]);
   const FREE_SHIPPING_LIMIT = 1999;
   const remainingToFree = Math.max(0, FREE_SHIPPING_LIMIT - total);
   const progressPct = Math.min(
@@ -41,8 +53,6 @@ export default function CartModal() {
   const [isMounted, setIsMounted] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(false);
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const swiperRef = useRef<SwiperType | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -83,34 +93,11 @@ export default function CartModal() {
     }
 
     if (isMobile) {
+      // На мобілці використовуємо скрол замість слайдера
       return (
-        <>
-          <Swiper
-            onSwiper={(sw) => (swiperRef.current = sw)}
-            onSlideChange={(sw) => setActiveIndex(sw.activeIndex)}
-            slidesPerView={1}
-            spaceBetween={8}
-            className={s.recoSwiper}
-          >
-            {items.map((it) => (
-              <SwiperSlide key={it.id}>
-                <CartItemsList items={[it]} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-
-          {items.length > 1 && (
-            <div className={s.navWrap}>
-              <SliderNav
-                activeIndex={activeIndex}
-                dots={items.length}
-                onPrev={() => swiperRef.current?.slidePrev()}
-                onNext={() => swiperRef.current?.slideNext()}
-                onDotClick={(idx) => swiperRef.current?.slideTo(idx)}
-              />
+        <div className={s.mobileItemsScroll}>
+          <CartItemsList items={items} />
             </div>
-          )}
-        </>
       );
     }
 

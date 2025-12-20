@@ -197,6 +197,11 @@
   gap: 12px;
   justify-content: space-between;
 }
+.metaInfo {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+}
 
 .productDescription,
 .description {
@@ -465,6 +470,11 @@
     font-size: mvw(14);
     line-height: 100%;
     color: var(--grey-for-cards);
+  }
+  .metaInfo {
+    display: flex;
+    flex-direction: column;
+    gap: mvw(10);
   }
   .productInfo {
     gap: mvw(10);

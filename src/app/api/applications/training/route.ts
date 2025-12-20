@@ -55,7 +55,6 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("/api/applications/training POST error", error);
     return NextResponse.json(
       { error: "applications training error" },
       { status: 500 }

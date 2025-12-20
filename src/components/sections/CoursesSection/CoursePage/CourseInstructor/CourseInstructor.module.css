@@ -320,7 +320,7 @@
   }
 
   .title {
-    font-size: mvw(20);
+    font-size: mvw(24);
     line-height: 140%;
   }
 
@@ -349,7 +349,7 @@
     padding: mvw(10);
     height: mvw(32);
     border-radius: mvw(8);
-    font-size: mvw(12);
+    font-size: mvw(14);
   }
 
   .stats {
@@ -438,5 +438,8 @@
   .sliderSection {
     margin-top: mvw(16);
     gap: mvw(16);
+  }
+  .error {
+    font-size: mvw(14);
   }
 }

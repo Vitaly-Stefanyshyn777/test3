@@ -22,7 +22,7 @@ export interface RegisterFormValues {
   first_name: string;
   last_name: string;
   phone: string;
-  certificate?: string;
+  certificate: string; // Обов'язкове поле
   comment?: string;
 }
 
@@ -102,7 +102,18 @@ export default function RegisterForm({
             icon={<CertificateIcon />}
             label="Номер сертифіката"
             type="text"
-            {...register("certificate")}
+            id="register-form-certificate-field"
+            hasError={!!errors.certificate}
+            supportingText="Будь ласка, вкажіть номер сертифіката"
+            {...register("certificate", { 
+              required: "Номер сертифіката обов'язковий для заповнення",
+              validate: (value) => {
+                if (!value || value.trim() === "") {
+                  return "Номер сертифіката не може бути порожнім";
+                }
+                return true;
+              }
+            })}
           />
         </div>
       </div>

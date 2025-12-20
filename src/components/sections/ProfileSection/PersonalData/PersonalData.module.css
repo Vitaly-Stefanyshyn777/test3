@@ -507,4 +507,8 @@
     font-size: mvw(14);
     height: mvw(48);
   }
+
+  .wrapperBlockSingle {
+    max-width: 100%;
+  }
 }

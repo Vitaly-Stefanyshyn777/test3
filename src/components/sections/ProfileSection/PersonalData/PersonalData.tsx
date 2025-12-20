@@ -31,6 +31,7 @@ const PersonalData: React.FC = () => {
   });
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [isDeletingAvatar, setIsDeletingAvatar] = useState(false);
 
   // TanStack Query: завантаження та оновлення профілю
   const { data: profile, isLoading: isLoadingProfile, error: profileError } = useUserProfileQuery();
@@ -61,17 +62,25 @@ const PersonalData: React.FC = () => {
 
   const handleRemoveImage = () => {
     if (process.env.NODE_ENV !== "production") {
-      console.log(
-        "[PersonalData] remove avatar → backend (DELETE /api/profile/avatar)"
-      );
+      // Видалено залишки логування
     }
+
+    setIsDeletingAvatar(true);
+
     fetch("/api/profile/avatar", { method: "DELETE" })
       .then(async (res) => {
-        if (!res.ok) throw new Error(await res.text());
+        if (!res.ok) {
+          throw new Error("Failed to delete avatar");
+        }
         setProfileImage(null);
       })
       .catch((e) => {
-        console.error("[PersonalData] remove avatar → failed", e);
+        if (process.env.NODE_ENV !== "production") {
+          console.error("Error deleting avatar:", e);
+        }
+      })
+      .finally(() => {
+        setIsDeletingAvatar(false);
       });
   };
 
@@ -101,7 +110,6 @@ const PersonalData: React.FC = () => {
         freshMeta = (freshProfile?.meta as Record<string, unknown>) || {};
       }
     } catch (error) {
-      console.error("[PersonalData] Помилка отримання свіжих даних:", error);
     }
 
     const acfToSave: Record<string, unknown> = {
@@ -122,7 +130,6 @@ const PersonalData: React.FC = () => {
 
     const numericId = targetId ? parseInt(targetId, 10) : null;
     if (!numericId || isNaN(numericId)) {
-      console.error("[PersonalData] Невірний ID користувача:", targetId);
       return;
     }
 
@@ -161,17 +168,18 @@ const PersonalData: React.FC = () => {
 
       if (!res.ok) {
         const errorText = await res.text();
-        console.error("[PersonalData] Помилка збереження:", {
-          status: res.status,
-          statusText: res.statusText,
-          error: errorText,
-        });
+        if (process.env.NODE_ENV !== "production") {
+          console.error({
+            status: res.status,
+            statusText: res.statusText,
+            error: errorText,
+          });
+        }
       } else {
         queryClient.invalidateQueries({ queryKey: ["user-profile", "me"] });
         queryClient.invalidateQueries({ queryKey: ["trainer-profile-full"] });
       }
     } catch (error) {
-      console.error("[PersonalData] Помилка збереження:", error);
     }
   };
 

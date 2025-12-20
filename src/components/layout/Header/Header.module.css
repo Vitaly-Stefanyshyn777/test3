@@ -6,7 +6,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 24px;
+  padding: 25px 24px;
   color: #fff;
   font-family: inherit;
   z-index: 1000;
@@ -129,7 +129,6 @@
 
 /* Додаткові класи для білого фону */
 @media (min-width: 1001px) {
-  .headerTrainers .nav,
   .headerShop .nav,
   .headerInstructing .nav,
   .headerProduct .nav {
@@ -137,7 +136,22 @@
     background: transparent !important;
   }
 
-  .headerTrainers .iconBtn,
+  /* Стилізація nav для trainers як на our-courses */
+  .headerTrainers .nav {
+    z-index: 1001;
+    -webkit-backdrop-filter: blur(1.04167vw);
+    backdrop-filter: blur(1.04167vw);
+    background: rgba(255, 254, 252, 0.15);
+    border-radius: 0.83333vw;
+    align-items: center;
+    gap: 1.82292vw;
+    height: 2.5vw;
+    padding: 1.04167vw 0.83333vw;
+    display: flex;
+    position: sticky;
+    top: 0;
+  }
+
   .headerShop .iconBtn,
   .headerInstructing .iconBtn,
   .headerProduct .iconBtn {
@@ -146,11 +160,17 @@
     color: var(--white);
   }
 
-  .headerTrainers .iconBtn svg,
+  /* Стилізація iconBtn для trainers як на our-courses */
+  .headerTrainers .iconBtn {
+    -webkit-backdrop-filter: blur(1.04167vw);
+    backdrop-filter: blur(1.04167vw);
+    background: rgba(255, 254, 252, 0.15);
+    color: var(--white);
+  }
+
   .headerShop .iconBtn svg,
   .headerInstructing .iconBtn svg,
   .headerProduct .iconBtn svg,
-  .headerTrainers .iconBtn svg *,
   .headerShop .iconBtn svg *,
   .headerInstructing .iconBtn svg *,
   .headerInstructing .burger svg *,
@@ -159,7 +179,12 @@
     color: var(--white) !important;
   }
 
-  .headerTrainers .iconBtn:hover,
+  .headerTrainers .iconBtn svg,
+  .headerTrainers .iconBtn svg * {
+    stroke: var(--white) !important;
+    color: var(--white) !important;
+  }
+
   .headerShop .iconBtn:hover,
   .headerInstructing .iconBtn:hover,
   .headerProduct .iconBtn:hover {
@@ -167,7 +192,12 @@
     background: rgba(0, 0, 0, 0.05) !important;
   }
 
-  .headerTrainers .burger,
+  .headerTrainers .iconBtn:hover {
+    -webkit-backdrop-filter: blur(1.04167vw);
+    backdrop-filter: blur(1.04167vw);
+    background: var(--violet);
+  }
+
   .headerShop .burger,
   .headerInstructing .burger,
   .headerProduct .burger {
@@ -175,14 +205,20 @@
     background: transparent !important;
   }
 
-  .headerTrainers .burger,
+  /* Стилізація burger для trainers як на our-courses */
+  .headerTrainers .burger {
+    -webkit-backdrop-filter: blur(1.04167vw);
+    backdrop-filter: blur(1.04167vw);
+    background: rgba(255, 254, 252, 0.15);
+    color: var(--white);
+  }
+
   .headerShop .burger,
   .headerInstructing .burger,
   .headerProduct .burger {
     color: var(--white);
   }
 
-  .headerTrainers .burger svg,
   .headerShop .burger svg,
   .headerInstructing .burger svg,
   .headerProduct .burger svg {
@@ -190,12 +226,22 @@
     color: currentColor;
   }
 
-  .headerTrainers .burger:hover,
+  .headerTrainers .burger svg {
+    stroke: currentColor;
+    color: currentColor;
+  }
+
   .headerShop .burger:hover,
   .headerInstructing .burger:hover,
   .headerProduct .burger:hover {
     backdrop-filter: none !important;
     background: rgba(0, 0, 0, 0.05) !important;
+  }
+
+  .headerTrainers .burger:hover {
+    -webkit-backdrop-filter: blur(1.04167vw);
+    backdrop-filter: blur(1.04167vw);
+    background: var(--violet);
   }
 }
 
@@ -280,6 +326,10 @@
   font-size: 18px;
   width: auto;
   height: auto;
+  position: absolute;
+  right: 46%;
+  bottom: 0;
+  top: 0;
   svg {
     width: 38px;
     height: 38px;
@@ -551,7 +601,7 @@
 
 .register:hover {
   backdrop-filter: blur(11.699999809265137px);
-  background: #8426d7;
+  background: var(--violet);
   color: var(--white);
   /* transform: translateY(-1px); */
 }
@@ -835,7 +885,6 @@
 .socialIcon:hover {
   background: #7c3aed;
   color: #fff;
-  transform: translateY(-2px);
 }
 
 .socialIcon svg {
@@ -1288,7 +1337,7 @@
   .menuContainer {
     width: 100%;
     max-width: 100%;
-    height: 100vh;
+    height: 100%;
     padding: mvw(20) mvw(16);
     gap: mvw(24);
     justify-content: flex-start;

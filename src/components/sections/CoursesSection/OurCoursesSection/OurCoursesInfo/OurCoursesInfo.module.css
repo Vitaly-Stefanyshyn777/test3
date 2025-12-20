@@ -103,7 +103,6 @@
 
 .detailsBtn:hover {
   background: var(--black);
-  transform: translateY(-2px);
 }
 
 .courseImage {
@@ -216,7 +215,7 @@
   }
 
   .container {
-    padding: mvw(40) mvw(16) mvw(40) mvw(16);
+    padding: mvw(80) mvw(16) mvw(40) mvw(16);
   }
 
   .mobileSliderWrap {

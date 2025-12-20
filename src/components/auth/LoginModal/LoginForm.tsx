@@ -18,6 +18,7 @@ interface LoginFormProps {
   errors: FieldErrors<LoginFormValues>;
   handleSubmit: UseFormHandleSubmit<LoginFormValues>;
   onSubmit: (data: LoginFormValues) => Promise<void>;
+  onSwitchToRegister: () => void;
   isSubmitting: boolean;
   isPending: boolean;
   isError: boolean;
@@ -31,6 +32,7 @@ export default function LoginForm({
   isSubmitting,
   isPending,
   isError,
+  onSwitchToRegister,
 }: LoginFormProps) {
   return (
     <form className={s.form} onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -41,7 +43,8 @@ export default function LoginForm({
           type="text"
           hasError={!!errors.username}
           supportingText={
-            (errors.username?.message as string) || "Заповніть email або username"
+            (errors.username?.message as string) ||
+            "Заповніть email або username"
           }
           labelClassName={s.loginInputLabel}
           inputBlockClassName={s.loginInputBlock}
@@ -70,6 +73,17 @@ export default function LoginForm({
         >
           {isPending ? "Вхід..." : "Увійти"}
         </button>
+
+        <div className={s.registerSwitchBlock}>
+          <span className={s.registerText}>У мене немає акаунту?</span>
+          <button
+            type="button" // Важливо: запобігає відправці форми
+            className={s.registerButton}
+            onClick={onSwitchToRegister} // ✅ Викликаємо функцію перемикання
+          >
+            Зареєструватися
+          </button>
+        </div>
 
         <p className={s.privacyText}>
           Натискаючи на кнопку, ви погоджуєтесь з{" "}

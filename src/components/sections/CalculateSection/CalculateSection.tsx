@@ -3,7 +3,10 @@ import Container from "@/components/ui/Container/Container";
 import UpperDescription from "@/components/ui/UpperDescription/UpperDescription";
 import s from "./CalculateSection.module.css";
 import { useEffect, useState } from "react";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form, Field, FieldProps } from "formik";
+
+import CalculatorInput from "@/components/ui/FormFields/CalculatorInput";
+import CalculatorInputStyles from "@/components/ui/FormFields/CalculatorInput.module.css"; // <-- ДОДАТИ
 
 type CalculatorValues = {
   rentPerHour: string;
@@ -55,7 +58,8 @@ type CalculationResults = {
 
 export default function CalculateSection() {
   const [isMobile, setIsMobile] = useState(false);
-  const [calculationResults, setCalculationResults] = useState<CalculationResults | null>(null);
+  const [calculationResults, setCalculationResults] =
+    useState<CalculationResults | null>(null);
 
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 1000px)");
@@ -94,9 +98,11 @@ export default function CalculateSection() {
             const trainingTypeCost = DEFAULT_TRAINING_TYPE_COST;
 
             const weeklyIncome =
-              averageTrainingCost * trainingsPerWeek * boardsCount - rentPerHour;
+              averageTrainingCost * trainingsPerWeek * boardsCount -
+              rentPerHour;
             const monthlyIncome = weeklyIncome * 4;
-            const weeklyExpenses = rentPerHour * hoursPerDay * workingDaysPerWeek;
+            const weeklyExpenses =
+              rentPerHour * hoursPerDay * workingDaysPerWeek;
             const totalInvestment =
               boardPrice * boardsCount + weeklyExpenses * 4 + trainingTypeCost;
 
@@ -120,36 +126,126 @@ export default function CalculateSection() {
               <div className={s.content}>
                 <div className={s.calculatorContainer}>
                   <h3>
-                    Дізнайтесь, коли повернете вкладення — заповніть кілька полів.
+                    Дізнайтесь, коли повернете вкладення — заповніть кілька
+                    полів.
                   </h3>
                   <Form className={s.form}>
-                    <div className={s.fields}>
-                      <Field
-                        as="input"
-                        type={"number"}
-                        name="rentPerHour"
-                        placeholder="Ціна оренди зали за годину"
-                      />
-                      <Field
-                        as="input"
-                        type={"number"}
-                        name="boardsCount"
-                        placeholder="Бажана кількість бордів"
-                      />
-                      <Field
-                        as="input"
-                        type={"number"}
-                        name="averageTrainingCost"
-                        placeholder="Середня вартість тренування для клієнта"
-                      />
-                      <Field
-                        as="input"
-                        type={"number"}
-                        name="trainingsPerWeek"
-                        placeholder="Кількість тренувань на тиждень"
-                      />
+                    <div className={`${s.fields} ${!isMobile ? s.columns : ''}`}>
+                      {!isMobile ? (
+                        // Десктоп: 2 колонки по 2 поля
+                        <>
+                          <div className={s.column}>
+                            <Field name="rentPerHour">
+                              {({ field, meta }: FieldProps) => (
+                                <CalculatorInput
+                                  label="Ціна оренди зали за годину"
+                                  type="text"
+                                  {...field}
+                                  inputClassName={CalculatorInputStyles.inputWhite}
+                                  hasError={meta.touched && !!meta.error}
+                                  supportingText={meta.touched ? meta.error : ""}
+                                />
+                              )}
+                            </Field>
+                            <Field name="boardsCount">
+                              {({ field, meta }: FieldProps) => (
+                                <CalculatorInput
+                                  label="Бажана кількість бордів"
+                                  type="text"
+                                  {...field}
+                                  inputClassName={CalculatorInputStyles.inputWhite}
+                                  hasError={meta.touched && !!meta.error}
+                                  supportingText={meta.touched ? meta.error : ""}
+                                />
+                              )}
+                            </Field>
+                          </div>
+                          <div className={s.column}>
+                            <Field name="averageTrainingCost">
+                              {({ field, meta }: FieldProps) => (
+                                <CalculatorInput
+                                  label="Середня вартість тренування для клієнта"
+                                  type="text"
+                                  {...field}
+                                  inputClassName={CalculatorInputStyles.inputWhite}
+                                  hasError={meta.touched && !!meta.error}
+                                  supportingText={meta.touched ? meta.error : ""}
+                                />
+                              )}
+                            </Field>
+                            <Field name="trainingsPerWeek">
+                              {({ field, meta }: FieldProps) => (
+                                <CalculatorInput
+                                  label="Кількість тренувань на тиждень"
+                                  type="text"
+                                  {...field}
+                                  inputClassName={CalculatorInputStyles.inputWhite}
+                                  hasError={meta.touched && !!meta.error}
+                                  supportingText={meta.touched ? meta.error : ""}
+                                />
+                              )}
+                            </Field>
+                          </div>
+                        </>
+                      ) : (
+                        // Мобільний: всі поля в одну колонку
+                        <>
+                          <Field name="rentPerHour">
+                            {({ field, meta }: FieldProps) => (
+                              <CalculatorInput
+                                label="Ціна оренди зали за годину"
+                                type="text"
+                                {...field}
+                                inputClassName={CalculatorInputStyles.inputWhite}
+                                hasError={meta.touched && !!meta.error}
+                                supportingText={meta.touched ? meta.error : ""}
+                              />
+                            )}
+                          </Field>
+                          <Field name="boardsCount">
+                            {({ field, meta }: FieldProps) => (
+                              <CalculatorInput
+                                label="Бажана кількість бордів"
+                                type="text"
+                                {...field}
+                                inputClassName={CalculatorInputStyles.inputWhite}
+                                hasError={meta.touched && !!meta.error}
+                                supportingText={meta.touched ? meta.error : ""}
+                              />
+                            )}
+                          </Field>
+                          <Field name="averageTrainingCost">
+                            {({ field, meta }: FieldProps) => (
+                              <CalculatorInput
+                                label="Середня вартість тренування для клієнта"
+                                type="text"
+                                {...field}
+                                inputClassName={CalculatorInputStyles.inputWhite}
+                                hasError={meta.touched && !!meta.error}
+                                supportingText={meta.touched ? meta.error : ""}
+                              />
+                            )}
+                          </Field>
+                          <Field name="trainingsPerWeek">
+                            {({ field, meta }: FieldProps) => (
+                              <CalculatorInput
+                                label="Кількість тренувань на тиждень"
+                                type="text"
+                                {...field}
+                                inputClassName={CalculatorInputStyles.inputWhite}
+                                hasError={meta.touched && !!meta.error}
+                                supportingText={meta.touched ? meta.error : ""}
+                              />
+                            )}
+                          </Field>
+                        </>
+                      )}
                     </div>
-                    <button type="submit" disabled={!isFormFilled}>
+                    <button
+                      type="submit"
+                      disabled={!isFormFilled}
+                      className={s.submitButton}
+                    >
                       Розрахувати окупність
                     </button>
                   </Form>

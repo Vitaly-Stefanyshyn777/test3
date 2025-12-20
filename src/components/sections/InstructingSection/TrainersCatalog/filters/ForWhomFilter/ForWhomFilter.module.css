@@ -142,8 +142,8 @@
   }
 
   .sectionTitleContainer svg {
-    width: mvw(20);
-    height: mvw(2);
+    width: mvw(16);
+    height: mvw(14);
   }
 
   .radioGroup {
@@ -180,5 +180,11 @@
     font-size: mvw(14);
     font-weight: 400;
     line-height: 140%;
+  }
+
+  .filterSection.collapsedSection {
+    gap: 0;
+    padding: mvw(16);
+    border-radius: mvw(8);
   }
 }

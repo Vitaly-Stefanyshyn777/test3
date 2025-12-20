@@ -52,22 +52,26 @@ interface CoursesGridProps {
   hasFilters?: boolean; // Чи є активні фільтри
 }
 
-const CoursesGrid = ({ 
-  courses: coursesFromProps, 
+const CoursesGrid = ({
+  courses: coursesFromProps,
   isLoading: isLoadingFromProps,
-  hasFilters = false 
+  hasFilters = false,
 }: CoursesGridProps = {}) => {
-  const { data: coursesFromQuery = [], isLoading: isLoadingQuery, isError } = useCoursesQuery();
-  
-  const courses = useMemo<CourseItem[]>(
-    () => {
-      if (coursesFromProps !== undefined) return coursesFromProps;
-      return Array.isArray(coursesFromQuery) ? (coursesFromQuery as CourseItem[]) : [];
-    },
-    [coursesFromProps, coursesFromQuery]
-  );
-  
-  const isLoading = isLoadingFromProps !== undefined ? isLoadingFromProps : isLoadingQuery;
+  const {
+    data: coursesFromQuery = [],
+    isLoading: isLoadingQuery,
+    isError,
+  } = useCoursesQuery();
+
+  const courses = useMemo<CourseItem[]>(() => {
+    if (coursesFromProps !== undefined) return coursesFromProps;
+    return Array.isArray(coursesFromQuery)
+      ? (coursesFromQuery as CourseItem[])
+      : [];
+  }, [coursesFromProps, coursesFromQuery]);
+
+  const isLoading =
+    isLoadingFromProps !== undefined ? isLoadingFromProps : isLoadingQuery;
 
   // Отримуємо allProducts для розрахунку хітів (як в CoursesShowcase)
   const allProducts = useMemo(
@@ -101,19 +105,28 @@ const CoursesGrid = ({
       <div className={styles.productsGrid}>
         {courses.map((course) => {
           const courseWcProduct = (course as any).wcProduct;
-          
+
           const normalizedWc = courseWcProduct
             ? {
                 prices: {
-                  price: courseWcProduct.prices?.price && courseWcProduct.prices.price !== "" && courseWcProduct.prices.price !== "0"
-                    ? courseWcProduct.prices.price
-                    : "0",
-                  regular_price: courseWcProduct.prices?.regular_price && courseWcProduct.prices.regular_price !== "" && courseWcProduct.prices.regular_price !== "0"
-                    ? courseWcProduct.prices.regular_price
-                    : "0",
-                  sale_price: courseWcProduct.prices?.sale_price && courseWcProduct.prices.sale_price !== "" && courseWcProduct.prices.sale_price !== "0"
-                    ? courseWcProduct.prices.sale_price
-                    : "0",
+                  price:
+                    courseWcProduct.prices?.price &&
+                    courseWcProduct.prices.price !== "" &&
+                    courseWcProduct.prices.price !== "0"
+                      ? courseWcProduct.prices.price
+                      : "0",
+                  regular_price:
+                    courseWcProduct.prices?.regular_price &&
+                    courseWcProduct.prices.regular_price !== "" &&
+                    courseWcProduct.prices.regular_price !== "0"
+                      ? courseWcProduct.prices.regular_price
+                      : "0",
+                  sale_price:
+                    courseWcProduct.prices?.sale_price &&
+                    courseWcProduct.prices.sale_price !== "" &&
+                    courseWcProduct.prices.sale_price !== "0"
+                      ? courseWcProduct.prices.sale_price
+                      : "0",
                 },
                 on_sale: courseWcProduct.on_sale || false,
                 total_sales: courseWcProduct.total_sales || 0,
@@ -127,21 +140,28 @@ const CoursesGrid = ({
             <CourseCard
               key={course.id}
               id={course.id}
+              slug={course.slug}
               name={course.name}
               description={course.description}
               price={
-                typeof course.price === "string" ? parseInt(course.price) : course.price || 5000
+                typeof course.price === "string"
+                  ? parseInt(course.price)
+                  : course.price || 0
               }
               originalPrice={
                 typeof course.originalPrice === "string"
                   ? parseInt(course.originalPrice)
-                  : course.originalPrice || 7000
+                  : course.originalPrice || 0
               }
               image={course.image}
               rating={
                 typeof course.rating === "number"
                   ? course.rating
-                  : Math.round(parseFloat(course?.wcProduct?.average_rating?.toString() || "0"))
+                  : Math.round(
+                      parseFloat(
+                        course?.wcProduct?.average_rating?.toString() || "0"
+                      )
+                    )
               }
               reviewsCount={
                 typeof course.reviewsCount === "number"
@@ -184,8 +204,12 @@ const CoursesGrid = ({
                               img_link_avatar?: string;
                               point_specialization?: string;
                             }),
-                      Course_program: Array.isArray(course.courseData.Course_program)
-                        ? (course.courseData.Course_program as unknown[]).filter(
+                      Course_program: Array.isArray(
+                        course.courseData.Course_program
+                      )
+                        ? (
+                            course.courseData.Course_program as unknown[]
+                          ).filter(
                             (item): item is string => typeof item === "string"
                           )
                         : undefined,

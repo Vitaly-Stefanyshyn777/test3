@@ -51,7 +51,7 @@
 }
 
 .exitBtn:hover {
-  background-color: #f5f5f5;
+  /* background-color: #f5f5f5; */
 }
 
 .logo {
@@ -188,6 +188,11 @@
 .mobileLogo .LogoIcon img {
   width: mvw(34);
   height: mvw(43);
+
+  position: absolute;
+  top: mvw(2);
+
+  left: mvw(-28);
 }
 
 .mobileRight .contacts {

@@ -28,6 +28,7 @@ export default function TrainingFocusSection() {
               src="/images/BFBFitness1.svg"
               alt="BFB Fitness"
               width={251}
+              unoptimized
               height={29}
               className={s.logoIcon}
             />

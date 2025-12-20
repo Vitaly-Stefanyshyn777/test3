@@ -24,11 +24,14 @@ const Navigation: React.FC<NavigationProps> = ({
   return (
     <nav className={styles.navigation}>
       <a
-        href="#overview"
+        href="#"
         className={`${styles.navItem} ${
           activeSection === "overview" ? styles.active : ""
         }`}
-        onClick={() => handleClick("overview")}
+        onClick={(e) => {
+          e.preventDefault();
+          handleClick("overview");
+        }}
       >
         <span className={styles.navIcon}>
           <ReviewIcon />

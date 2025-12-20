@@ -204,12 +204,12 @@
   position: absolute;
   right: 48px;
   bottom: 120px;
-  width: 520px;
-  aspect-ratio: 16 / 9;
+  width: 516px;
+  height: 290px;
   max-width: 100%;
   border-radius: 32px;
   overflow: hidden;
-  background: #000;
+  /* background: #000; */
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 }
 
@@ -360,7 +360,7 @@
   .hero {
     flex-direction: column;
     background: #f5f5f5;
-    padding: mvw(68) 0 0 0;
+    padding: mvw(60) 0 0 0;
   }
 
   /* Банер стає звичайним блоком зверху, а не absolute */
@@ -422,14 +422,14 @@
   }
 
   .roiBanner svg {
-    width: mvw(26);
-    height: mvw(26);
+    width: mvw(20);
+    height: mvw(20);
   }
 
   .roiText {
     font-family: var(--font-family);
     font-weight: 600;
-    font-size: mvw(13);
+    font-size: mvw(10);
     line-height: 140%;
     text-transform: uppercase;
     color: var(--violet);
@@ -509,7 +509,9 @@
   } */
   .heroVideo {
     width: mvw(343);
-    aspect-ratio: 16 / 9;
+    height: mvw(
+      193
+    ); /* 343 * 300 / 520 ≈ 197.88 ≈ 198 для пропорційного масштабування */
     border-radius: mvw(30);
     overflow: hidden;
     background: #000;

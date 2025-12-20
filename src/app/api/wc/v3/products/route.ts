@@ -7,6 +7,17 @@ const WC_CONSUMER_SECRET =
   process.env.WC_CONSUMER_SECRET ||
   "cs_871e6f287926ed84839018c2d7578ef9a71865c4";
 
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  });
+}
+
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(`${UPSTREAM_BASE}/wp-json/wc/v3/products`);
@@ -40,6 +51,9 @@ export async function GET(req: NextRequest) {
       headers: {
         "content-type":
           upstreamRes.headers.get("content-type") || "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
       },
     });
   } catch (error) {

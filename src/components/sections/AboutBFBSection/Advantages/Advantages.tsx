@@ -159,6 +159,7 @@ export default function Advantages() {
                 src="/images/Frame132131867742.svg"
                 alt="Arc with circle"
                 width={422}
+                unoptimized
                 height={275}
                 className={s.arcSvg}
               />

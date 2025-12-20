@@ -399,7 +399,7 @@
 
   .sectionTitleContainer svg {
     width: mvw(16);
-    height: mvw(2);
+    height: mvw(14);
   }
 
   .minusIcon {
@@ -417,7 +417,7 @@
     height: mvw(48);
     border-radius: mvw(6);
     background: var(--bg-color);
-    padding: 0;
+    padding: mvw(0);
     position: relative;
   }
 

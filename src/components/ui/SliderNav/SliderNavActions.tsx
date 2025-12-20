@@ -80,7 +80,6 @@ export default function SliderNav({
 //       <button
 //         className={s.leftBtn}
 //         onClick={() => {
-//           console.log("SliderNav left button clicked");
 //           onPrev();
 //         }}
 //         aria-label="Previous slide"
@@ -95,7 +94,6 @@ export default function SliderNav({
 //             key={idx}
 //             className={idx === activeIndex ? s.activeDot : s.dot}
 //             onClick={() => {
-//               console.log("SliderNav dot clicked", idx);
 //               onDotClick(idx);
 //             }}
 //           />
@@ -105,7 +103,6 @@ export default function SliderNav({
 //       <button
 //         className={s.rightBtn}
 //         onClick={() => {
-//           console.log("SliderNav right button clicked");
 //           onNext();
 //         }}
 //         aria-label="Next slide"

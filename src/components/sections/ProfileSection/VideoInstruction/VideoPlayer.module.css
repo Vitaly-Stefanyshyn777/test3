@@ -1,10 +1,11 @@
 .container {
   position: relative;
-  background: #f7f6f6;
-  border-radius: 1.04167vw;
-  overflow: hidden;
+  /* background: #f7f6f6; */
+  /* border-radius: inherit; */
+  /* overflow: hidden; */
   width: 100%;
   height: 100%;
+  border-radius: 20px;
 }
 
 /* Ready-to-use fixed box for payload-style embeds */
@@ -65,6 +66,8 @@
   background: transparent;
   border: none;
   cursor: pointer;
+  border-radius: inherit;
+  overflow: hidden;
 }
 
 .previewImage {
@@ -73,6 +76,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: inherit;
 }
 
 .playButton {
@@ -126,7 +130,7 @@
   justify-content: center;
   background: #000;
   z-index: 10;
-  border-radius: 1.04167vw;
+  border-radius: inherit;
 }
 
 .spinner {
@@ -148,8 +152,15 @@
 }
 
 .video {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
+  /* height: 100%; */
+  object-fit: contain;
+
+  display: block;
+  border-radius: 20px;
 }
 
 .overlay {
@@ -161,7 +172,8 @@
   cursor: pointer;
   backdrop-filter: blur(10px);
   background: rgba(14, 14, 14, 0.1);
-  border-radius: 10px;
+  border-radius: 20px;
+  /* border-radius: inherit; */
 }
 
 .overlay.overlayNoBlur {
@@ -197,6 +209,7 @@
 }
 
 .playPauseButton.noBlur .playTriangle {
+  transform: translateX(3px);
   color: #3b2d47;
 }
 
@@ -244,6 +257,7 @@
     width: auto;
     min-width: mvw(109);
     padding: mvw(16);
+    color: var(--black);
   }
 
   .closeIcon {
@@ -267,7 +281,13 @@
     width: mvw(30);
     height: mvw(30);
   }
+
+  .playPauseButton.noBlur .playTriangle {
+    transform: translateX(mvw(3));
+  }
   .closeButtonText {
     font-size: mvw(14);
+    color: var(--black);
+    opacity: 0.4;
   }
 }

@@ -31,6 +31,7 @@ const Footer = () => {
   const isLoginModalOpen = useAuthStore((s) => s.isLoginModalOpen);
   const openLoginModal = useAuthStore((s) => s.openLoginModal);
   const closeLoginModal = useAuthStore((s) => s.closeLoginModal);
+  const openRegisterModal = () => setIsRegisterOpen(true);
 
   // Отримуємо контактні дані з theme_settings
   const { data: themeSettings } = useThemeSettingsQuery();
@@ -58,8 +59,9 @@ const Footer = () => {
                 alt="B.F.B Fitness"
                 width={166}
                 height={25}
-                style={{ width: "100%", height: "auto" }}
+                style={{ width: "100%", height: "auto", objectFit: "contain" }}
                 priority
+                unoptimized
               />
             </div>
           </div>
@@ -340,7 +342,11 @@ const Footer = () => {
         isOpen={isRegisterOpen}
         onClose={() => setIsRegisterOpen(false)}
       />
-      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={closeLoginModal}
+        onOpenRegister={openRegisterModal}
+      />
     </footer>
   );
 };

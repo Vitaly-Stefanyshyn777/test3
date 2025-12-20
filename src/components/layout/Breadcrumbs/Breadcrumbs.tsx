@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import styles from "./Breadcrumbs.module.css";
 import { useProductQuery } from "@/components/hooks/useProductsQuery";
+import { useCourseQuery } from "@/lib/coursesQueries";
 
 interface BreadcrumbItem {
   label: string;
@@ -25,6 +26,12 @@ const Breadcrumbs: React.FC = () => {
   const productSlug = productSlugMatch?.[1] || "";
   // Викликаємо useProductQuery тільки якщо є slug (не порожній)
   const { data: productData } = useProductQuery(productSlug || "skip");
+
+  // Якщо ми на сторінці курсу /courses/[slug] — підтягнемо назву
+  const courseSlugMatch = pathname.match(/^\/courses\/(.+)$/);
+  const courseSlug = courseSlugMatch?.[1] || "";
+  // Викликаємо useCourseQuery тільки якщо є slug (не порожній)
+  const { data: courseData } = useCourseQuery(courseSlug || "skip");
 
   // Обробка кліку на breadcrumb item
   const handleBreadcrumbClick = (item: BreadcrumbItem, e: React.MouseEvent) => {
@@ -56,8 +63,6 @@ const Breadcrumbs: React.FC = () => {
         label = "Інструкторство";
       } else if (segment === "courses") {
         label = "Онлайн тренування";
-      } else if (currentPath.match(/^\/courses\/[\w-]+$/)) {
-        label = "Основи тренерства BFB";
       } else if (segment === "course") {
         label = "Основи тренерства BFB";
       } else if (segment === "our-courses") {
@@ -81,10 +86,27 @@ const Breadcrumbs: React.FC = () => {
         } catch {
           // Якщо не вдалося декодувати, використовуємо як є
         }
-        
+
         // Використовуємо назву продукту, якщо вона доступна
         if (productData?.name) {
           label = productData.name;
+        } else {
+          // Якщо назва недоступна, використовуємо декодований segment
+          label = decodedSegment;
+        }
+      } else if (segments[0] === "courses" && index === 1) {
+        // Сторінка курсу: замінити slug/ID на назву курсу
+        // Декодуємо segment, якщо він encoded
+        let decodedSegment = segment;
+        try {
+          decodedSegment = decodeURIComponent(segment);
+        } catch {
+          // Якщо не вдалося декодувати, використовуємо як є
+        }
+
+        // Використовуємо назву курсу, якщо вона доступна
+        if (courseData?.name) {
+          label = courseData.name;
         } else {
           // Якщо назва недоступна, використовуємо декодований segment
           label = decodedSegment;

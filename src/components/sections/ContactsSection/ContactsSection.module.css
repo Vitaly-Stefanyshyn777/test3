@@ -1,16 +1,19 @@
 .contactSection {
   padding: 160px 0px;
 
-  background: url(/images/Frame-1321318307.png);
+  background: url(/Frame13213183074.png);
   background-size: cover;
   width: 100%;
   max-width: 98.75vw;
-  border-radius: 56px;
+  border-radius: 40px;
   border: none;
   display: flex;
   flex-direction: column;
   gap: 40px;
   margin: 0 auto;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .header {
@@ -69,12 +72,12 @@
 
 @media (max-width: 1000px) {
   .contactSection {
-    padding: mvw(50) 0;
+    padding: mvw(150) mvw(0) mvw(50) mvw(0);
     border-radius: 0;
     max-width: 100%;
     border: none;
     gap: mvw(31);
-    background-image: url(/images/Frame13213196251.png);
+    background-image: url(/Frame1321318307.png);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -89,6 +92,7 @@
     font-size: mvw(15);
     text-align: left;
     border-radius: mvw(8);
+    color: var(--white);
   }
   .title {
     font-size: mvw(28);
@@ -106,7 +110,7 @@
     width: 100%;
     max-width: 100%;
     padding: mvw(16);
-    border-radius: mvw(16);
+    border-radius: mvw(24);
   }
   .innerContainer {
     max-width: 100%;

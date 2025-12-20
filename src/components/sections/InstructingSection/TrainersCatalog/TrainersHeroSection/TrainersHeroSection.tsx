@@ -20,7 +20,7 @@ const TrainersHeroSection = () => {
             <h1 className={styles.heroTitle}>ЗНАЙДИ ТРЕНЕРА</h1>
 
             <p className={styles.heroDescription}>
-              Сертифіковані інструктори BFB ближче, ніж здається! <br />
+              Сертифіковані інструктори BFB ближче, ніж здається
               Обирайте тренера поруч або займайтесь онлайн
             </p>
           </div>

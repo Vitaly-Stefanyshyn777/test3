@@ -98,13 +98,6 @@ const HeroSection = () => {
         });
         const initial =
           bannerWithVideo ?? bannerWithPoster ?? normalized[0] ?? null;
-        console.log("[HeroSection] Setting initial banner:", {
-          bannerWithVideo: bannerWithVideo?.id,
-          bannerWithPoster: bannerWithPoster?.id,
-          firstBanner: normalized[0]?.id,
-          initialBannerId: initial?.id,
-          totalBanners: normalized.length,
-        });
         setActiveBannerId(initial ? initial.id : null);
         if (initial) {
           const idx = normalized.findIndex((b) => b.id === initial.id);
@@ -150,17 +143,9 @@ const HeroSection = () => {
 
   const activeBanner: BannerPost | null = useMemo(() => {
     if (!activeBannerId) {
-      console.log("[HeroSection] No activeBannerId set");
       return null;
     }
     const banner = banners.find((b) => b.id === activeBannerId) ?? null;
-    console.log("[HeroSection] Active banner found:", {
-      activeBannerId,
-      found: !!banner,
-      bannerId: banner?.id,
-      bannerTitle:
-        banner?.acf?.title || banner?.Title || banner?.title?.rendered,
-    });
     return banner;
   }, [banners, activeBannerId]);
 
@@ -202,17 +187,10 @@ const HeroSection = () => {
   );
 
   const getVideoUrlFromBanner = (b?: BannerPost | null): string => {
-    console.log("[HeroSection] getVideoUrlFromBanner called", {
-      hasBanner: !!b,
-      bannerId: b?.id,
-      bannerTitle: b?.acf?.title || b?.Title || b?.title?.rendered,
-    });
-
     let rawVideoUrl = "";
 
     // Не використовуємо фолбек, якщо банера немає - повертаємо порожній рядок
     if (!b) {
-      console.log("[HeroSection] No banner, returning empty video URL");
       return "";
     } else {
       const videoObj =
@@ -221,18 +199,6 @@ const HeroSection = () => {
         !Array.isArray(b.acf.video)
           ? (b.acf.video as { url?: string; preview?: string })
           : null;
-      console.log("[HeroSection] Checking banner video fields:", {
-        "acf.video": b.acf?.video,
-        "acf.video type": typeof b.acf?.video,
-        "acf.video.url": videoObj?.url,
-        Aside_video: b.Aside_video,
-        "acf.Aside_video": b.acf?.Aside_video,
-        video: b.video,
-        "acf.video (string)":
-          typeof b.acf?.video === "string" ? b.acf.video : undefined,
-        video_url: b.video_url,
-        "acf.video_url": b.acf?.video_url,
-      });
 
       // Нова структура: acf.video.url (якщо video є об'єктом)
       if (
@@ -242,10 +208,6 @@ const HeroSection = () => {
       ) {
         if (b.acf.video.url) {
           rawVideoUrl = b.acf.video.url;
-          console.log(
-            "[HeroSection] Found video in acf.video.url:",
-            rawVideoUrl
-          );
         }
       }
 
@@ -264,15 +226,8 @@ const HeroSection = () => {
 
         if (Array.isArray(video) && video.length > 0) {
           rawVideoUrl = video[0];
-          console.log("[HeroSection] Found video in array field:", rawVideoUrl);
         } else if (typeof video === "string" && video.length > 0) {
           rawVideoUrl = video;
-          console.log(
-            "[HeroSection] Found video in string field:",
-            rawVideoUrl
-          );
-        } else {
-          console.log("[HeroSection] No video found in old structure fields");
         }
       }
     }
@@ -283,7 +238,6 @@ const HeroSection = () => {
       rawVideoUrl.trim() === "" ||
       rawVideoUrl === "undefined"
     ) {
-      console.log("[HeroSection] No video in banner, returning empty URL");
       return "";
     }
 
@@ -291,27 +245,18 @@ const HeroSection = () => {
 
     // Якщо URL вже є проксованим (починається з /api/video-proxy), повертаємо як є
     if (rawVideoUrl.startsWith("/api/video-proxy")) {
-      console.log(
-        "[HeroSection] URL already proxied, returning as is:",
-        rawVideoUrl
-      );
       return rawVideoUrl;
     }
 
     // Якщо відносний URL → додаємо домен
     if (rawVideoUrl.startsWith("/")) {
       rawVideoUrl = `${baseUrl}${rawVideoUrl}`;
-      console.log("[HeroSection] Relative URL, added base:", rawVideoUrl);
     }
 
     // Інакше проксуємо через /api/video-proxy для уникнення CORS проблем
     const proxiedUrl = `/api/video-proxy?url=${encodeURIComponent(
       rawVideoUrl
     )}`;
-    console.log("[HeroSection] Proxying video URL:", {
-      original: rawVideoUrl,
-      proxied: proxiedUrl,
-    });
     return proxiedUrl;
   };
 
@@ -468,24 +413,8 @@ const HeroSection = () => {
         {(() => {
           const shouldShowVideo =
             showVideo && videoUrl && videoUrl.trim() !== "";
-          console.log("[HeroSection] Video render decision:", {
-            showVideo,
-            hasVideoUrl: !!videoUrl,
-            videoUrlLength: videoUrl?.length,
-            videoUrl: videoUrl?.substring(0, 100),
-            hasPosterUrl: !!posterUrl,
-            shouldShowVideo,
-            activeBannerId: activeBanner?.id,
-          });
 
           if (!shouldShowVideo) {
-            console.log("[HeroSection] Not rendering video:", {
-              reason: !showVideo
-                ? "showVideo is false"
-                : !videoUrl
-                ? "no videoUrl"
-                : "videoUrl is empty",
-            });
             return null;
           }
 

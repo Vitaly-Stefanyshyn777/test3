@@ -35,13 +35,13 @@
   }
 
   .container {
-    padding: 0 mvw(16);
+    padding: mvw(130) mvw(16);
   }
 
   .content {
     display: flex;
     flex-direction: column;
-    gap: mvw(24);
+    gap: mvw(74);
     padding: mvw(0) 0;
   }
 

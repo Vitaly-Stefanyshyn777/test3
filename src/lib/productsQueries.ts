@@ -77,11 +77,7 @@ export const productQuery = (slugOrId: string) => ({
     if (!product) {
       // Не логуємо помилку, якщо slug порожній (це очікувана поведінка)
       if (slugOrId && slugOrId.trim() !== "" && slugOrId !== "skip") {
-        console.error("[productQuery] Product not found:", {
-          slugOrId,
-          normalizedSlugOrId,
-          availableSlugs: products.slice(0, 5).map(p => ({ id: p.id, slug: p.slug })),
-        });
+        // Product not found logging removed
       }
       throw new Error(`Product not found: ${slugOrId}`);
     }
@@ -112,10 +108,6 @@ export const productsWithFiltersQuery = (filters: Record<string, unknown>) => ({
         }
       } catch (e) {
         // Якщо не вдалось — залишаємо fallback на клієнтську фільтрацію нижче
-        console.warn(
-          "[productsWithFiltersQuery] Не вдалося отримати категорії або товари за категорією, використовую локальну фільтрацію",
-          e
-        );
       }
     }
 

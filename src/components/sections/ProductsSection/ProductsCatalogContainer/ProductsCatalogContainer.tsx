@@ -142,6 +142,7 @@ const ProductsCatalogContainer = ({
 
     return {
       id: Number(product.id),
+      slug: (product as any).slug, // Додаємо slug з продукту
       name: product.name,
       price: String(product.price ?? "0"),
       regular_price: String(p.regular_price ?? product.regularPrice ?? ""),
@@ -157,6 +158,7 @@ const ProductsCatalogContainer = ({
       attributes: [],
       stock_status: String(p.stock_status ?? product.stockStatus ?? ""),
       date_created: dateCreatedValue,
+      wcProduct: (product as any).wcProduct,
     };
   });
 

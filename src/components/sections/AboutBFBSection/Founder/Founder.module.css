@@ -412,7 +412,7 @@
     font-size: mvw(14);
   }
   .founderMission {
-    height: mvw(200);
+    height: mvw(217);
     border-radius: mvw(16);
     padding: mvw(16);
     gap: mvw(8);
@@ -462,7 +462,7 @@
     justify-content: center;
   }
   .missionCardContent {
-    gap: mvw(8);
+    gap: mvw(4);
     align-items: flex-start;
     align-items: center;
   }

@@ -10,7 +10,6 @@ export async function GET(
     const { id } = await params;
     const url = `${UPSTREAM_BASE}/wp-json/wp/v2/product/${id}`;
 
-    console.log("[WP Products API] 🔍 Запит для продукту:", url);
 
     const upstreamRes = await fetch(url.toString(), {
       cache: "no-store",
@@ -20,13 +19,11 @@ export async function GET(
     });
 
     if (!upstreamRes.ok) {
-      console.log("[WP Products API] ❌ Помилка:", upstreamRes.status);
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
     const text = await upstreamRes.text();
 
-    console.log("[WP Products API] ✅ Відповідь:", upstreamRes.status);
 
     return new NextResponse(text, {
       status: upstreamRes.status,
@@ -36,7 +33,6 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("/api/wp/products/[id] error", error);
     return NextResponse.json({ error: "wp product error" }, { status: 500 });
   }
 }

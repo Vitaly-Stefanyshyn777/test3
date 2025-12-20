@@ -54,7 +54,7 @@ export const SORT_OPTIONS: SortOption[] = [
 ];
 
 export const ITEMS_PER_PAGE_OPTIONS: SortOption[] = [
-  { value: "12", label: "12" },
+  { value: "16", label: "16" },
   { value: "24", label: "24" },
   { value: "36", label: "36" },
 ];
@@ -73,7 +73,7 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
   onApply = () => {},
   sortBy = "popular",
   onSortChange = () => {},
-  itemsPerPage = 12,
+  itemsPerPage = 16,
   onItemsPerPageChange = () => {},
   hideSort = false,
 }) => {
@@ -102,7 +102,7 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
                 className={styles.filterMobileButton}
                 onClick={() => setIsFilterModalOpen(true)}
               >
-                <FilterMobileIcon className={styles.filterMobileIcon} />
+                {/* <FilterMobileIcon className={styles.filterMobileIcon} /> */}
                 <span className={styles.filterMobileLabel}>Фільтр</span>
               </button>
               <div className={styles.sortSection}>
@@ -138,6 +138,8 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
                     value={sortBy}
                     options={SORT_OPTIONS}
                     onChange={(value) => {
+                      if (process.env.NODE_ENV !== "production") {
+                      }
                       onSortChange(value as SortType);
                     }}
                     variant="sort"

@@ -71,6 +71,13 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  /* Приховуємо скролбар, але залишаємо можливість прокрутки */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .filterSection {
@@ -101,10 +108,12 @@
   .modal {
     border-radius: 0;
     height: 100vh;
+    padding: mvw(16) mvw(16) mvw(40);
     height: 100dvh;
+    gap: mvw(35);
   }
   .header {
-    padding: mvw(20) mvw(16);
+    padding: mvw(0);
     border-bottom: none;
   }
   .title {
@@ -116,10 +125,16 @@
     width: mvw(46);
     height: mvw(46);
     background: #f2f2f2;
+    transition: background-color 0.3s ease;
     border-radius: mvw(10);
   }
+  .closeButton:hover {
+    background: var(--violet);
+    color: var(--white);
+  }
+
   .content {
-    padding: mvw(24) mvw(16);
+    padding: mvw(0);
     gap: mvw(24);
   }
   .filterSection {
@@ -131,7 +146,7 @@
   }
   .footer {
     gap: mvw(12);
-    padding: mvw(16);
+    padding: mvw(0);
     border-top: none;
   }
 }

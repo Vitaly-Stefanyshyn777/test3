@@ -66,7 +66,6 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("/api/wc/products/attributes/[id]/terms error", error);
     return NextResponse.json(
       { error: "wc product attribute terms error" },
       { status: 500 }

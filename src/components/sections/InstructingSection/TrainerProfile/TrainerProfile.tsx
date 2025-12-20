@@ -41,16 +41,39 @@ const TrainerProfile = ({ trainerId }: TrainerProfileProps) => {
     setIsUserClick(true);
     setActiveSection(section);
 
+    // Для "overview" просто скролимо на самий верх
+    if (section === "overview") {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+      setTimeout(() => {
+        setIsUserClick(false);
+      }, 500);
+      return;
+    }
+
     // Плавний перехід з урахуванням фіксованого хедера
-    const element = document.getElementById(section);
+    let element = document.getElementById(section);
+    
+    // Якщо клікнули на locations, але є контакти, скролимо до контактів
+    if (section === "locations") {
+      const contactsElement = document.getElementById("contacts");
+      if (contactsElement) {
+        element = contactsElement;
+      }
+    }
+    
     if (element) {
       const headerHeight = 120; // Висота фіксованого хедера
       const additionalOffset = section === "gallery" ? 40 : 20; // Зменшую відступ для галереї
-      const targetPosition =
-        element.offsetTop - headerHeight - additionalOffset;
+      // Використовуємо getBoundingClientRect для точнішого позиціонування
+      const rect = element.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const targetPosition = rect.top + scrollTop - headerHeight - additionalOffset;
 
       window.scrollTo({
-        top: targetPosition,
+        top: Math.max(0, targetPosition),
         behavior: "smooth",
       });
     }
@@ -68,14 +91,13 @@ const TrainerProfile = ({ trainerId }: TrainerProfileProps) => {
     const LOCATIONS_EARLY = 250; // Зменшую для локацій
 
     const evaluateActiveSection = () => {
-      const overviewElement = document.getElementById("overview");
       const favoriteExerciseElement =
         document.getElementById("favorite-exercise");
       const galleryElement = document.getElementById("gallery");
       const locationsElement = document.getElementById("locations");
+      const contactsElement = document.getElementById("contacts");
 
       if (
-        !overviewElement ||
         !favoriteExerciseElement ||
         !galleryElement ||
         !locationsElement
@@ -83,6 +105,7 @@ const TrainerProfile = ({ trainerId }: TrainerProfileProps) => {
         return;
 
       const scrollPosition = window.scrollY + HEADER_OFFSET;
+      const currentScrollY = window.scrollY;
 
       const favoriteExerciseTop =
         favoriteExerciseElement.getBoundingClientRect().top + window.scrollY;
@@ -90,8 +113,19 @@ const TrainerProfile = ({ trainerId }: TrainerProfileProps) => {
         galleryElement.getBoundingClientRect().top + window.scrollY;
       const locationsTop =
         locationsElement.getBoundingClientRect().top + window.scrollY;
+      // Якщо є контакти, використовуємо їх позицію замість locations
+      const contactsTop = contactsElement
+        ? contactsElement.getBoundingClientRect().top + window.scrollY
+        : locationsTop;
 
       if (isUserClick) return;
+
+      // Перевіряємо секції від низу до верху для правильного визначення активної
+      // Перевіряємо контакти перед locations, якщо вони є
+      if (contactsElement && scrollPosition >= contactsTop - LOCATIONS_EARLY) {
+        if (activeSection !== "locations") setActiveSection("locations");
+        return;
+      }
 
       if (scrollPosition >= locationsTop - LOCATIONS_EARLY) {
         if (activeSection !== "locations") setActiveSection("locations");
@@ -109,6 +143,13 @@ const TrainerProfile = ({ trainerId }: TrainerProfileProps) => {
         return;
       }
 
+      // Якщо скрол на самому верху (менше 200px) або до favorite-exercise, активуємо overview
+      if (currentScrollY < 200 || scrollPosition < favoriteExerciseTop - 150) {
+        if (activeSection !== "overview") setActiveSection("overview");
+        return;
+      }
+
+      // За замовчуванням overview
       if (activeSection !== "overview") setActiveSection("overview");
     };
 
@@ -167,9 +208,7 @@ const TrainerProfile = ({ trainerId }: TrainerProfileProps) => {
         </div>
 
         <div className={styles.mainContent}>
-          <div id="overview">
-            <Overview trainer={trainer} />
-          </div>
+          <Overview trainer={trainer} />
         </div>
       </div>
 

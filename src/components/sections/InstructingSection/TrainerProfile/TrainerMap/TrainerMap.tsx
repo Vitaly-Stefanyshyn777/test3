@@ -391,7 +391,6 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
           if (process.env.NODE_ENV !== "production") {
             // Ігноруємо помилку, яка виникає, якщо Leaflet вже відʼєднав контейнер
             // або контейнер перевикористовується React-ом
-            // console.warn("[TrainerMap] Помилка при remove() карти:", err);
           }
         } finally {
           mapInstanceRef.current = null;
@@ -568,7 +567,7 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
   return (
     <div id="locations" className={styles.container}>
       {trainer?.hl_data_contact && trainer.hl_data_contact.length > 0 && (
-        <div className={styles.contactsSection}>
+        <div id="contacts" className={styles.contactsSection}>
           <h4 className={styles.contactsTitle}>Контакти</h4>
           <div className={styles.socialIconsMobile}>
             {trainer.hl_data_contact.map(

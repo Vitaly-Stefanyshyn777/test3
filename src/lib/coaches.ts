@@ -79,7 +79,6 @@ export const getCoachesFirstPage = async (): Promise<{
   totalPages: number;
 }> => {
   try {
-    console.log("[getCoachesFirstPage] 🚀 Запитую тренерів з API...");
     const response = await api.get("/api/trainers", {
       params: {
         roles: "bfb_coach",
@@ -90,10 +89,6 @@ export const getCoachesFirstPage = async (): Promise<{
     });
 
     const totalPages = Number(response.headers["x-wp-totalpages"]) || 1;
-    console.log(
-      "[getCoachesFirstPage] ✅ Отримано тренерів:",
-      response.data?.length || 0
-    );
 
     return {
       data: response.data,
@@ -110,9 +105,6 @@ export const getCoachesFirstPage = async (): Promise<{
 
     if (isAxios401) {
       try {
-        console.warn(
-          "[getCoachesFirstPage] 401 → виконую /api/admin-login і повторюю запит…"
-        );
         await fetch("/api/admin-login", {
           method: "POST",
           credentials: "include",
@@ -126,22 +118,12 @@ export const getCoachesFirstPage = async (): Promise<{
         });
 
         const totalPages = Number(retry.headers["x-wp-totalpages"]) || 1;
-        console.log(
-          "[getCoachesFirstPage] ✅ Після логіну отримано тренерів:",
-          retry.data?.length || 0
-        );
         return { data: retry.data, totalPages };
       } catch (e) {
-        console.error(
-          "[getCoachesFirstPage] Повтор після логіну не вдався:",
-          e
-        );
+        // Retry failed
       }
     }
 
-    console.error("Failed to fetch coaches:", error);
-
-    console.warn("Using mock coaches data");
     const mockCoaches: CoachApi[] = [
       {
         id: 1,
@@ -287,14 +269,6 @@ export const getCoachesFiltered = async (
 };
 
 export const mapCoachToUi = (item: CoachApi): CoachUiItem => {
-  console.log("[mapCoachToUi] 🔄 Маплю тренера:", {
-    id: item.id,
-    name: item.name,
-    location_city: item.location_city,
-    location_country: item.location_country,
-    avatar: item.avatar,
-  });
-
   const topLevelAvatar = ensureString(
     (item as unknown as { img_link_data_avatar?: string })?.img_link_data_avatar
   ).trim();
@@ -348,10 +322,8 @@ export const mapCoachToUi = (item: CoachApi): CoachUiItem => {
 
   const fullName = `${item.first_name ?? ""} ${item.last_name ?? ""}`.trim();
 
-  const mapped = {
+  return {
     id: String(item.id),
-    // SSOT: завжди віддаємо пріоритет first_name + last_name з user,
-    // а title/name з CPT використовуємо лише як fallback
     name: fullName || item.name || "",
     location: locationsValue,
     specialization: specializationValue,
@@ -361,13 +333,4 @@ export const mapCoachToUi = (item: CoachApi): CoachUiItem => {
     favouriteExercise: joinToString(item.favourite_exercise),
     workExperience,
   };
-
-  console.log("[mapCoachToUi] ✅ Результат мапінгу:", {
-    id: mapped.id,
-    name: mapped.name,
-    location: mapped.location,
-    image: mapped.image,
-  });
-
-  return mapped;
 };

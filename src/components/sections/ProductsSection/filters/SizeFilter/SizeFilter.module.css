@@ -98,7 +98,7 @@
 @media (max-width: 1000px) {
   .filterSection {
     gap: mvw(20);
-    padding: mvw(20) mvw(16) mvw(24);
+    padding: mvw(0);
     border-bottom: none;
   }
 
@@ -112,7 +112,7 @@
   }
 
   .sizeButtons {
-    gap: mvw(12);
+    gap: mvw(4);
   }
 
   .sizeButton {

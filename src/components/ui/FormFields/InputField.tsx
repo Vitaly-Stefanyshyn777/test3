@@ -53,6 +53,7 @@ export const InputField: React.FC<InputFieldProps> = ({
           <input
             id={inputId}
             {...restProps}
+            type={restProps.type || "text"}
             inputMode={onlyDigits ? "numeric" : inputMode}
             pattern={onlyDigits ? "\\d*" : pattern}
             onChange={handleChange}

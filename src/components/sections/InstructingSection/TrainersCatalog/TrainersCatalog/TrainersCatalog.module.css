@@ -50,10 +50,11 @@
   .trainersCatalog {
     width: 100%;
     border-radius: 0;
+    padding: mvw(110) 0;
   }
 
   .catalogContentBlock {
-    padding: mvw(77) mvw(16);
+    padding: mvw(60) mvw(16);
   }
 
   .catalogContent {

@@ -148,7 +148,7 @@
     width: 100%;
     overflow: hidden;
     margin: 0;
-    padding: 0 mvw(16);
+    padding: 0;
     box-sizing: border-box;
   }
 
@@ -204,7 +204,7 @@
 
   .number {
     border-radius: mvw(8);
-    font-size: mvw(14);
+    font-size: mvw(12);
     bottom: mvw(48);
     right: mvw(19);
 

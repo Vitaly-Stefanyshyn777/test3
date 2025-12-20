@@ -165,6 +165,38 @@ export interface Product {
     Blocks?: unknown;
     Online_lessons?: unknown;
   };
+  wcProduct?: {
+    prices?: {
+      price: string;
+      regular_price: string;
+      sale_price: string;
+    };
+    on_sale?: boolean;
+    average_rating?: string;
+    rating_count?: number;
+    total_sales?: number;
+    featured?: boolean;
+    images?: Array<{ src: string; alt: string }>;
+    sku?: string;
+    type?: string;
+    variations?: number[];
+    variationsData?: Record<
+      number,
+      {
+        id: number;
+        price: string;
+        regular_price: string;
+        sale_price: string;
+        sku: string;
+        attributes: Array<{
+          id: number;
+          name: string;
+          slug: string;
+          option: string;
+        }>;
+      }
+    >;
+  };
 }
 
 // Отримати всі товари
@@ -174,7 +206,6 @@ export const getAllProducts = async (): Promise<WooCommerceProduct[]> => {
     const response = await api.get("/api/wc/v3/products");
     return response.data;
   } catch (error) {
-    console.error("Error fetching products:", error);
     // Fallback to mock data if API fails
     return [
       {
@@ -195,9 +226,9 @@ export const getAllProducts = async (): Promise<WooCommerceProduct[]> => {
         short_description:
           "Інноваційний тренажер для функціонального тренування",
         sku: "BFB-001",
-        price: "5000",
-        regular_price: "7000",
-        sale_price: "5000",
+        price: "0",
+        regular_price: "0",
+        sale_price: "0",
         date_on_sale_from: null,
         date_on_sale_from_gmt: null,
         date_on_sale_to: null,
@@ -288,16 +319,140 @@ export const getProductById = async (
     const response = await api.get(`/api/wc/products/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching product:", error);
     throw new Error("Product not found");
   }
 };
 
+// Функція для отримання даних варіації товару
+export const fetchProductVariation = async (
+  variationId: number,
+  parentId: number
+) => {
+  const response = await fetch(
+    `/api/wc/v3/products/${parentId}/variations/${variationId}`
+  );
+  if (!response.ok) {
+    throw new Error(`Failed to fetch variation: ${response.status}`);
+  }
+  return response.json();
+};
+
+// Функція для отримання цін товару (з урахуванням варіацій)
+export const getProductPrices = async (
+  productId: string,
+  wcProduct?: {
+    id: number;
+    type: string;
+    variations: number[];
+    price: string;
+    regular_price: string;
+    sale_price: string;
+  }
+): Promise<{
+  currentPrice: number;
+  originalPrice?: number;
+  isLoading?: boolean;
+}> => {
+  try {
+    // Якщо це не варіативний товар, повертаємо звичайні ціни
+    if (wcProduct?.type !== "variable") {
+      const currentPrice = parseFloat(wcProduct?.price || "0");
+      const originalPrice = wcProduct?.regular_price
+        ? parseFloat(wcProduct.regular_price)
+        : undefined;
+
+      return {
+        currentPrice,
+        originalPrice:
+          originalPrice && originalPrice > currentPrice
+            ? originalPrice
+            : undefined,
+      };
+    }
+
+    // Для варіативних товарів отримуємо дані першої варіації
+    if (wcProduct?.variations?.[0]) {
+      const firstVariationId = wcProduct.variations[0];
+      const variation = await fetchProductVariation(
+        firstVariationId,
+        wcProduct.id
+      );
+
+      const currentPrice = parseFloat(
+        variation.price ||
+          variation.sale_price ||
+          variation.regular_price ||
+          "0"
+      );
+      const regularPrice = variation.regular_price
+        ? parseFloat(variation.regular_price)
+        : undefined;
+
+      return {
+        currentPrice,
+        originalPrice:
+          regularPrice && regularPrice > currentPrice
+            ? regularPrice
+            : undefined,
+      };
+    }
+
+    // Fallback для варіативних товарів без варіацій
+    return {
+      currentPrice: parseFloat(wcProduct?.price || "0"),
+      originalPrice: undefined,
+    };
+  } catch (error) {
+    console.error("Error fetching product prices:", error);
+    return {
+      currentPrice: 0,
+      originalPrice: undefined,
+    };
+  }
+};
+
 export const mapProductToUi = (wcProduct: WooCommerceProduct): Product => {
+  // Забезпечуємо що slug завжди існує, генеруємо з назви якщо потрібно
+  const ensureSlug = (
+    slug: string | undefined,
+    name: string,
+    id: number
+  ): string => {
+    let processedSlug = slug;
+
+    // Декодуємо slug тільки якщо він містить URL-encoded символи
+    if (processedSlug && processedSlug.includes("%")) {
+      try {
+        processedSlug = decodeURIComponent(processedSlug);
+      } catch {
+        // Якщо декодування не вдалося, використовуємо оригінал
+        processedSlug = slug;
+      }
+    }
+
+    if (
+      processedSlug &&
+      processedSlug.trim() !== "" &&
+      !/^\d+$/.test(processedSlug)
+    ) {
+      return processedSlug;
+    }
+
+    // Генеруємо slug з назви: lowercase, заміняємо пробіли на дефіси, видаляємо спецсимволи
+    const generatedSlug = name
+      .toLowerCase()
+      .replace(/[^a-zа-яіїєґ0-9\s-]/g, "") // видаляємо спецсимволи окрім пробілів та дефісів
+      .replace(/\s+/g, "-") // заміняємо пробіли на дефіси
+      .replace(/-+/g, "-") // заміняємо множинні дефіси на один
+      .replace(/^-|-$/g, ""); // видаляємо дефіси на початку та кінці
+
+    return generatedSlug || `product-${id}`;
+  };
+
   const mapped = {
     id: wcProduct.id.toString(),
     name: wcProduct.name,
-    slug: wcProduct.slug,
+    slug: ensureSlug(wcProduct.slug, wcProduct.name, wcProduct.id),
     price: wcProduct.price,
     regularPrice: wcProduct.regular_price,
     salePrice: wcProduct.sale_price,
@@ -344,9 +499,27 @@ export const mapProductToUi = (wcProduct: WooCommerceProduct): Product => {
     averageRating: wcProduct.average_rating,
     ratingCount: wcProduct.rating_count,
     dateCreated: wcProduct.date_created, // Додаємо дату створення
+    wcProduct: {
+      id: wcProduct.id,
+      name: wcProduct.name,
+      prices: {
+        price: wcProduct.price,
+        regular_price: wcProduct.regular_price,
+        sale_price: wcProduct.sale_price,
+      },
+      on_sale: wcProduct.on_sale,
+      total_sales: wcProduct.total_sales,
+      average_rating: wcProduct.average_rating,
+      rating_count: wcProduct.rating_count,
+      featured: wcProduct.featured,
+      images: wcProduct.images,
+      sku: wcProduct.sku,
+      type: wcProduct.type,
+      variations: wcProduct.variations,
+    },
   };
 
-  return mapped;
+  return mapped as Product;
 };
 
 // Отримати товари за категорією
@@ -359,7 +532,6 @@ export const getProductsByCategory = async (
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching products by category:", error);
     // Fallback to mock data if API fails
     const allProducts = await getAllProducts();
     return allProducts.filter((product) =>

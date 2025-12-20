@@ -110,18 +110,17 @@ export default function ProductsGrid({
     return 0;
   });
 
-
   return (
     <div className={styles.productsGrid}>
       {allProducts.map((p, index) => {
         const id = String(p.id);
         const priceNum = Number(p.price) || 0;
         const original = p.regular_price ? Number(p.regular_price) : undefined;
-        
+
         // Нормалізуємо image: обробляємо випадок, коли src може бути рядком-масивом
         const image = normalizeImageUrl(p.images?.[0]?.src);
-        
-        const storeProduct = undefined; // Спрощено
+
+        const storeProduct = undefined; // Дані WooCommerce продукту відсутні в цьому інтерфейсі
 
         // тихий режим — без логів
 
@@ -148,7 +147,13 @@ export default function ProductsGrid({
             categories={productCategories[p.id] || p.categories}
             dateCreated={p.date_created}
             wcProduct={storeProduct}
-            allProducts={products.map(() => ({ total_sales: 0 }))}
+            allProducts={products.map((p) => ({
+              total_sales: 0,
+              average_rating: p.average_rating || "0",
+              rating_count: p.review_count || 0,
+              featured: p.featured || false,
+              on_sale: p.on_sale || false,
+            }))}
             isNoCertificationFilter={isNoCertificationFilter}
           />
         );

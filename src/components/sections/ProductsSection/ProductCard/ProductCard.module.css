@@ -37,6 +37,7 @@
 
 .badges {
   display: flex;
+
   /* flex-direction: column; */
   gap: 6px;
   z-index: 2;
@@ -84,31 +85,6 @@
   background: #8b5cf6;
 }
 
-.favoriteBtn {
-  position: absolute;
-  top: 25px;
-  right: 25px;
-  width: 48px;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  z-index: 2;
-  backdrop-filter: blur(4px);
-  color: var(--violet);
-  svg {
-    width: 20px;
-    height: 20px;
-    display: block;
-    transform: translateX(0.5px);
-  }
-}
-
 /* .favoriteBtn:hover {
   background: rgba(255, 255, 255, 1);
   transform: scale(1.1);
@@ -126,6 +102,7 @@
   padding: 18px 24px 24px;
   width: 100%;
   flex: 1 1 auto;
+  height: 163px;
 }
 
 .category {
@@ -168,16 +145,21 @@
   display: flex;
   align-items: baseline;
   gap: 8px;
+  font-size: mvw(20);
+  flex-direction: column;
 }
 
 .subNewPrice {
   color: var(--black);
   font-weight: 700;
+  font-size: 28px;
 }
 
 .subOldPrice {
   color: #999;
   text-decoration: line-through;
+  font-weight: 500;
+  font-size: 24px;
 }
 
 .pricing {
@@ -201,6 +183,33 @@
   text-decoration: line-through;
   line-height: 1;
   font-family: var(--font-family);
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeletonPrice {
+  width: 80px;
+  height: 24px;
+  margin-bottom: 4px;
+}
+
+.skeletonOriginalPrice {
+  width: 60px;
+  height: 18px;
 }
 
 .cartBtn {
@@ -413,6 +422,10 @@
     display: flex;
     flex-direction: column;
   }
+  .subNewPrice {
+    font-size: mvw(20);
+    font-weight: 500;
+  }
   .currentPrice {
     font-size: mvw(18);
     font-family: var(--second-family);
@@ -433,5 +446,11 @@
     padding: mvw(8) mvw(12);
 
     font-size: mvw(12);
+  }
+  .subOldPrice {
+    color: #999;
+    text-decoration: line-through;
+    font-weight: 500;
+    font-size: mvw(24);
   }
 }

@@ -22,6 +22,7 @@ const CoursesShowcase: React.FC = () => {
 
   type CourseItem = {
     id: string;
+    slug?: string;
     name: string;
     description?: string;
     price?: number | string;
@@ -56,6 +57,12 @@ const CoursesShowcase: React.FC = () => {
 
   const displayedCourses = list;
   const hasSlider = displayedCourses.length > 5;
+
+  // Для мобілки показуємо тільки 4 картки
+  const mobileDisplayedCourses = useMemo(
+    () => (isMobile ? displayedCourses.slice(0, 4) : displayedCourses),
+    [isMobile, displayedCourses]
+  );
 
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 1000px)");
@@ -230,17 +237,18 @@ const CoursesShowcase: React.FC = () => {
                   <SwiperSlide key={course.id} className={s.slide}>
                     <CourseCard
                       id={course.id}
+                      slug={course.slug}
                       name={course.name}
                       description={course.description}
                       price={
                         typeof course.price === "string"
                           ? parseInt(course.price)
-                          : course.price || 5000
+                          : course.price || 0
                       }
                       originalPrice={
                         typeof course.originalPrice === "string"
                           ? parseInt(course.originalPrice)
-                          : course.originalPrice || 7000
+                          : course.originalPrice || 0
                       }
                       isFavorite={false}
                       image={course.image}
@@ -276,7 +284,7 @@ const CoursesShowcase: React.FC = () => {
             </Swiper>
           ) : (
             <div className={s.grid}>
-              {displayedCourses.map((course) => {
+              {mobileDisplayedCourses.map((course) => {
                 // Нормалізуємо wcProduct - використовуємо реальні дані з API
                 // Якщо course.wcProduct не існує, використовуємо fallback на course.price/originalPrice
                 // Для курсу 248: regular_price має бути "90" з course.wcProduct.prices.regular_price
@@ -302,17 +310,18 @@ const CoursesShowcase: React.FC = () => {
                   <div key={course.id} className={s.slide}>
                     <CourseCard
                       id={course.id}
+                      slug={course.slug}
                       name={course.name}
                       description={course.description}
                       price={
                         typeof course.price === "string"
                           ? parseInt(course.price)
-                          : course.price || 5000
+                          : course.price || 0
                       }
                       originalPrice={
                         typeof course.originalPrice === "string"
                           ? parseInt(course.originalPrice)
-                          : course.originalPrice || 7000
+                          : course.originalPrice || 0
                       }
                       isFavorite={false}
                       image={course.image}

@@ -37,7 +37,15 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "api.bfb.projection-learn.website",
+      },
+      {
+        protocol: "https",
         hostname: "www.api.bfb.in.ua",
+      },
+      {
+        protocol: "https",
+        hostname: "api.bfb.in.ua",
       },
       {
         protocol: "https",

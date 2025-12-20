@@ -23,7 +23,6 @@ export async function GET(
     const authHeader =
       "Basic " + Buffer.from(`${basicUser}:${basicPass}`).toString("base64");
 
-    console.log("[Product ID API] 🔐 Використовується Basic Auth");
 
     const upstreamRes = await fetch(url.toString(), {
       cache: "no-store",
@@ -39,7 +38,6 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("/api/wc/products/[id] error", error);
     return NextResponse.json({ error: "wc product error" }, { status: 500 });
   }
 }

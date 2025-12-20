@@ -21,12 +21,6 @@ export async function POST(_req: NextRequest) {
       );
     }
 
-    console.log("/api/admin-login → using creds:", {
-      hasUser: !!username,
-      passLen: password.length,
-      hasBase: !!upstreamBase,
-    });
-
     const res = await fetch(`${upstreamBase}/wp-json/jwt-auth/v1/token`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -35,12 +29,6 @@ export async function POST(_req: NextRequest) {
     });
 
     const data = await res.json();
-
-    console.log("/api/admin-login → WP response:", {
-      status: res.status,
-      hasToken: !!data?.token,
-      error: data?.message || data?.code,
-    });
 
     if (!res.ok || !data?.token) {
       return NextResponse.json(
@@ -62,7 +50,6 @@ export async function POST(_req: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error("/api/admin-login → error:", error);
     return NextResponse.json({ error: "admin-login error" }, { status: 500 });
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Marker, Popup } from "react-leaflet";
 import { Icon } from "leaflet";
 
@@ -51,18 +51,35 @@ function getWarehouseInfo(warehouse: Warehouse) {
 }
 
 // Створюємо іконку з публічного SVG без додаткових стилів
-function createCustomIcon(_warehouse: Warehouse) {
+function createCustomIcon(_warehouse: Warehouse, isMobile: boolean) {
+  const iconSize: [number, number] = isMobile ? [70, 70] : [120, 120]; // Різні розміри для мобільної та десктопної версії
+  const iconAnchor: [number, number] = isMobile ? [16, 32] : [20, 40]; // Відповідно коригуємо якорь
+
   return new Icon({
     iconUrl: "/Frame-1321317314.svg",
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
+    iconSize: iconSize,
+    iconAnchor: iconAnchor,
     popupAnchor: [0, -40],
   });
 }
 
 export default function CustomMarker({ warehouse, onSelect }: Props) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Визначення мобільної версії
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkIsMobile();
+    window.addEventListener("resize", checkIsMobile);
+
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []);
+
   const info = getWarehouseInfo(warehouse);
-  const icon = createCustomIcon(warehouse);
+  const icon = createCustomIcon(warehouse, isMobile);
 
   return (
     <Marker

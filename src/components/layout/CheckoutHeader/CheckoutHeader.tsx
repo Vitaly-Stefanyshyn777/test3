@@ -94,14 +94,14 @@ export default function CheckoutHeader() {
           </div>
         ) : (
           <>
-        <div className={s.left}>
-          <button className={s.exitBtn} onClick={handleExit}>
-            <EntranceIcon />
+            <div className={s.left}>
+              <button className={s.exitBtn} onClick={handleExit}>
+                <EntranceIcon />
                 <span className={s.exitBtnText}>Вийти</span>
-          </button>
-        </div>
+              </button>
+            </div>
 
-        <div className={s.logo}>
+            <div className={s.logo}>
               <Link
                 href="/"
                 className={s.logoLink}
@@ -109,25 +109,25 @@ export default function CheckoutHeader() {
               >
                 <div className={s.LogoIcon}>{desktopLogoGraphic}</div>
                 <div className={s.logoTextGroup}>
-            <span className={s.logoTextOne}>B.F.B</span>
-            <span className={s.logoText}>Fitness</span>
+                  <span className={s.logoTextOne}>B.F.B</span>
+                  <span className={s.logoText}>Fitness</span>
                 </div>
-          </Link>
-        </div>
+              </Link>
+            </div>
 
-        <div className={s.right}>
-          <div className={s.phone}>
-            <NumberHeader />
-            <div className={s.contacts}>
-              <p className={s.contactText}>Ми на зв&apos;язку:</p>
-              <div className={s.phoneWrapper}>
+            <div className={s.right}>
+              <div className={s.phone}>
+                <NumberHeader />
+                <div className={s.contacts}>
+                  <p className={s.contactText}>Ми на зв&apos;язку:</p>
+                  <div className={s.phoneWrapper}>
                     <a href="tel:+380954372575" className={s.phoneLink}>
                       +380 95 437 25 75
-                </a>
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
           </>
         )}
       </div>

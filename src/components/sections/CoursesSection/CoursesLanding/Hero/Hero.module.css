@@ -149,7 +149,6 @@
   background: var(--black);
   color: var(--white);
   border-color: var(--black);
-  /* transform: translateY(-2px); */
 }
 
 .imageOverlay {
@@ -317,7 +316,7 @@
   .detailsBtLowern {
     width: auto;
 
-    border: mvw(3) solid #8426d7;
+    border: mvw(2) solid #8426d7;
     border-radius: mvw(14);
     font-size: mvw(14);
     text-align: center;

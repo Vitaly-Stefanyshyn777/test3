@@ -79,7 +79,6 @@
 .socialIcons {
   display: flex;
   gap: 12px;
-  margin-top: 8px;
 }
 
 .iconButton {
@@ -110,7 +109,7 @@
 .addressSection {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .address {
@@ -243,10 +242,10 @@
 
 @media (max-width: 1000px) {
   .footer {
-    border-radius: mvw(20);
-    padding: mvw(24) mvw(16);
-    background-color: #9f57ff;
-    background-image: none;
+    border-radius: mvw(16) mvw(16) 0 0;
+    padding: mvw(50) mvw(16);
+    background-image: url(/footer21.png);
+
     max-width: 100%;
   }
 
@@ -257,7 +256,7 @@
   }
 
   .contactsSection {
-    gap: mvw(16);
+    gap: mvw(26);
   }
 
   .sectionTitle {
@@ -266,7 +265,7 @@
   }
 
   .contactInfo {
-    gap: mvw(12);
+    gap: mvw(15);
   }
 
   .phoneLink {
@@ -281,39 +280,39 @@
 
   .socialIcons {
     gap: mvw(12);
-    margin-top: mvw(8);
   }
 
   .iconButton {
-    width: mvw(40);
-    height: mvw(40);
-    border-radius: mvw(12);
-    border: 2px solid rgba(255, 254, 252, 0.3);
+    width: mvw(58);
+    height: mvw(58);
+    border-radius: mvw(16);
+    border: mvw(2) solid rgba(255, 254, 252, 0.3);
   }
 
   .iconButton svg {
-    width: mvw(20);
-    height: mvw(20);
+    width: mvw(24);
+    height: mvw(24);
   }
 
   .addressSection {
-    gap: mvw(16);
+    gap: mvw(20);
   }
 
   .address {
-    gap: mvw(8);
+    gap: mvw(20);
   }
 
   .addressText {
     font-size: mvw(14);
     line-height: 140%;
-    margin-bottom: mvw(4);
+    margin-bottom: mvw(0);
   }
 
   .scheduleItem {
     font-size: mvw(14);
     line-height: 140%;
-    margin-bottom: mvw(4);
+    margin-bottom: mvw(0);
+    opacity: 0.6;
   }
 
   .documentationSection {
@@ -321,7 +320,7 @@
   }
 
   .list {
-    gap: mvw(12);
+    gap: mvw(16);
   }
 
   .listLink {
@@ -338,14 +337,14 @@
   .footerBottom {
     flex-direction: column;
     align-items: flex-start;
-    gap: mvw(16);
-    padding: mvw(24) 0 0;
+    gap: mvw(25);
+    padding: mvw(0);
   }
 
   .copyright {
-    font-size: mvw(12);
+    font-size: mvw(14);
     color: var(--white);
-    opacity: 1;
+    opacity: 0.4;
   }
 
   .paymentMethods {
@@ -358,15 +357,27 @@
     height: mvw(20);
     color: var(--white);
     opacity: 0.8;
+    width: mvw(57);
   }
 
   .credits {
     font-size: mvw(12);
-    color: var(--white);
+
+    color: rgba(255, 254, 252, 0.4);
     opacity: 1;
   }
 
   .creditsLink {
-    color: var(--white);
+    color: rgba(255, 254, 252, 0.8);
+  }
+  .contactsBlock {
+    display: flex;
+    flex-direction: column;
+    gap: mvw(20);
+  }
+  .scheduleItemsBlock {
+    display: flex;
+    flex-direction: column;
+    gap: mvw(10);
   }
 }

@@ -31,8 +31,29 @@ const CoursesCatalog = () => {
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const [isMobile, setIsMobile] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [sortBy, setSortBy] = useState<SortType>("popular");
-  const [itemsPerPage, setItemsPerPage] = useState<number>(12);
+
+  // Завантажуємо стан сортування з localStorage
+  const [sortBy, setSortBy] = useState<SortType>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("courses_sort");
+      return (saved as SortType) || "popular";
+    }
+    return "popular";
+  });
+
+  const [itemsPerPage, setItemsPerPage] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("courses_items_per_page");
+      return saved ? parseInt(saved) : 12;
+    }
+    return 12;
+  });
+
+  // Для мобілки встановлюємо 8 карток, для десктопу - 12
+  const effectiveItemsPerPage = useMemo(
+    () => (isMobile ? 8 : itemsPerPage),
+    [isMobile, itemsPerPage]
+  );
 
   // Формуємо фільтри з сортуванням та пагінацією
   const sortParams = useMemo(() => mapSortTypeToWcParams(sortBy), [sortBy]);
@@ -44,12 +65,12 @@ const CoursesCatalog = () => {
       }),
       orderby: sortParams.orderby,
       order: sortParams.order,
-      per_page: itemsPerPage,
+      per_page: effectiveItemsPerPage,
       ...(sortParams.on_sale !== undefined && { on_sale: sortParams.on_sale }),
     };
 
     return filters;
-  }, [selectedCategoryIds, sortParams, itemsPerPage]);
+  }, [selectedCategoryIds, sortParams, effectiveItemsPerPage]);
 
   const {
     data: coursesToDisplay = [],
@@ -75,6 +96,21 @@ const CoursesCatalog = () => {
     setIsFilterModalOpen(false);
   };
 
+  // Зберігаємо стан сортування в localStorage
+  const handleSortChange = (newSort: SortType) => {
+    setSortBy(newSort);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("courses_sort", newSort);
+    }
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("courses_items_per_page", newItemsPerPage.toString());
+    }
+  };
+
   return (
     <div className={styles.productsCatalog}>
       <div className={styles.catalogContentBlock}>
@@ -95,7 +131,7 @@ const CoursesCatalog = () => {
                     label="Сортування"
                     value={sortBy}
                     options={SORT_OPTIONS}
-                    onChange={(value) => setSortBy(value as SortType)}
+                    onChange={(value) => handleSortChange(value as SortType)}
                   />
                 </div>
               </div>
@@ -103,9 +139,9 @@ const CoursesCatalog = () => {
           ) : (
             <FilterSortPanel
               sortBy={sortBy}
-              onSortChange={setSortBy}
+              onSortChange={handleSortChange}
               itemsPerPage={itemsPerPage}
-              onItemsPerPageChange={setItemsPerPage}
+              onItemsPerPageChange={handleItemsPerPageChange}
             />
           )}
           <div className={styles.catalogContent}>
@@ -170,6 +206,7 @@ const CoursesCatalog = () => {
               filteredProducts={coursesToDisplay}
               isLoading={isLoading}
               hasFilters={selectedCategoryIds.length > 0}
+              itemsPerPage={effectiveItemsPerPage}
             />
           </div>
         </div>

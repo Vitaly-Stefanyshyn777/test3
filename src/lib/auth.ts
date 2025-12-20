@@ -27,7 +27,7 @@ export interface RegisterCredentials {
   first_name: string;
   last_name: string;
   phone: string;
-  certificate?: string;
+  certificate: string; // Обов'язкове поле - реєстрація без сертифікату заборонена
   roles?: string[];
   meta?: Record<string, unknown>;
 }
@@ -40,6 +40,20 @@ export interface UserResponse {
   last_name?: string;
   roles?: string[];
   meta?: Record<string, unknown>;
+}
+
+// Відповідь від кастомного ендпоінту реєстрації
+export interface CustomRegisterResponse {
+  success: boolean;
+  message: string;
+  data: {
+    user: UserResponse;
+    certificate?: {
+      // Структура сертифікату з бекенду
+      [key: string]: unknown;
+    };
+    token?: string; // Можливо, токен також повертається
+  };
 }
 
 export interface TrainerApplicationCredentials {
@@ -82,48 +96,34 @@ export const login = async (
 
 export const register = async (
   credentials: RegisterCredentials
-): Promise<UserResponse> => {
+): Promise<CustomRegisterResponse> => {
+  // Використовуємо кастомний ендпоінт для реєстрації
   const registerData = {
     username: credentials.username,
     email: credentials.email,
     password: credentials.password,
+    certificate_code: credentials.certificate, // Використовуємо certificate_code замість certificate
     first_name: credentials.first_name,
     last_name: credentials.last_name,
     roles: credentials.roles || ["bfb_coach"],
-    // Додаємо acf для збереження phone (для консистентності з PersonalData)
-    acf: {
-      phone: credentials.phone,
-      telegram: "",
-      instagram: "",
-    },
-    meta: {
-      phone: credentials.phone,
-      input_text_position: "Фітнес тренер",
-      input_text_experience: "0",
-      input_text_locations_city: "Київ",
-      input_text_locations_country: "Україна",
-      input_text_social_telegram: "",
-      input_text_social_phone: credentials.phone,
-      input_text_social_instagram: "",
-      input_text_boards: "0",
-      textarea_super_power: "",
-      point_data_favourite_exercise: [],
-      point_data_my_specialty: [],
-      hl_data_my_experience: [],
-      hl_data_my_wlocation: [],
-      certificate: credentials.certificate,
-      ...credentials.meta,
-    },
   };
 
   try {
     // Через адмінський канал: проксі підтягне Authorization з httpOnly кукі (bfb_admin_jwt)
     const response = await adminRequest({
       method: "POST",
-      url: "/api/proxy?path=" + encodeURIComponent("/wp-json/wp/v2/users"),
+      url: "/api/proxy?path=" + encodeURIComponent("/wp-json/custom/v2/users"),
       data: registerData,
     });
-    return response.data as UserResponse;
+    
+    const customResponse = response.data as CustomRegisterResponse;
+    
+    // Перевіряємо, чи реєстрація була успішною
+    if (!customResponse.success) {
+      throw new Error(customResponse.message || "Помилка реєстрації");
+    }
+    
+    return customResponse;
   } catch (error) {
     throw error;
   }
@@ -165,23 +165,8 @@ export const getMyProfile = async (token?: string | null): Promise<WPUserMe | nu
           }
         : undefined,
     });
-    if (process.env.NODE_ENV !== "production") {
-      console.debug("[auth.getMyProfile] OK", {
-        hasToken: !!authToken,
-        status: response.status,
-      });
-    }
     return response.data;
   } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
-      const status = (error as unknown as { response?: { status?: number } })
-        ?.response?.status;
-      console.debug("[auth.getMyProfile] FAIL", {
-        hasToken:
-          typeof window !== "undefined" && !!localStorage.getItem("bfb_token"),
-        status,
-      });
-    }
 
     return null;
   }

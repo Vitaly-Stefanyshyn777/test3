@@ -455,15 +455,6 @@ const TrainerProfile: React.FC = () => {
         (rawData as Record<string, unknown>).personal_gallery ||
         meta?.personal_gallery;
 
-      if (process.env.NODE_ENV !== "production") {
-        console.log("[TrainerProfile] Завантаження галереї:", {
-          rawGallery,
-          gallery: (rawData as Record<string, unknown>).gallery,
-          metaGallery: meta?.gallery,
-          metaImgLink: meta?.img_link_data_gallery_,
-        });
-      }
-
       if (Array.isArray(rawGallery) && rawGallery.length > 0) {
         const galleryUrls = rawGallery
           .map((item) => {
@@ -494,13 +485,6 @@ const TrainerProfile: React.FC = () => {
           .filter(
             (url): url is string => typeof url === "string" && url.length > 0
           );
-
-        if (process.env.NODE_ENV !== "production") {
-          console.log(
-            "[TrainerProfile] Встановлення personalGalleryUrls:",
-            galleryUrls
-          );
-        }
 
         setPersonalGalleryUrls(galleryUrls);
       } else if (typeof rawGallery === "string" && rawGallery.length > 0) {

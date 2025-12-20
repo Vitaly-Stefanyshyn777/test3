@@ -139,6 +139,10 @@
   color: var(--violet);
 }
 
+.iconRotated {
+  transition: transform 0.3s ease-in-out; /* 0.3 секунди, цей блок може бути продубльований */
+  transform: rotate(180deg);
+}
 /* Загальний клас для обертання іконки */
 .iconRotated {
   transform: rotate(180deg);
@@ -163,14 +167,19 @@
 
   .itemsPerPageDropdown,
   .sortDropdown {
+    position: absolute;
     min-width: mvw(180);
-    padding: mvw(8) 0;
+    padding: mvw(12);
+    gap: mvw(15);
     border-radius: mvw(12);
+    left: mvw(-80);
+    top: mvw(30);
+    border: mvw(2) solid var(--grey);
   }
 
   .itemsPerPageDropdownItem,
   .sortDropdownItem {
-    padding: mvw(12) mvw(20);
+    padding: mvw(0);
     font-size: mvw(14);
   }
 }

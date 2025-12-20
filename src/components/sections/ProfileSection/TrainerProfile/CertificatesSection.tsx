@@ -22,22 +22,23 @@ export default function CertificatesSection({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
-  const [serverCertificates, setServerCertificates] = useState<string[]>(
-    initialCertificates
-  );
+  const [serverCertificates, setServerCertificates] =
+    useState<string[]>(initialCertificates);
   const [isMobile, setIsMobile] = useState(false);
   const uploadInputId = "trainer-cert-upload";
-  
+
   // Комбінуємо прев'ю з локальних файлів та URL з сервера
   const previews = useMemo(() => {
     const filePreviews = files.map((f) => URL.createObjectURL(f));
     return [...serverCertificates, ...filePreviews];
   }, [files, serverCertificates]);
-  
+
   const token = useAuthStore((s) => s.token);
 
   // Використовуємо ref для зберігання функцій, щоб уникнути нескінченного циклу
-  const getCertificatesUrlsRef = useRef<() => string[]>(() => serverCertificates);
+  const getCertificatesUrlsRef = useRef<() => string[]>(
+    () => serverCertificates
+  );
   const getCertificatesFilesRef = useRef<() => File[]>(() => files);
 
   // Оновлюємо ref при зміні стану
@@ -63,18 +64,13 @@ export default function CertificatesSection({
       // Якщо initialCertificates undefined, нічого не робимо
       return;
     }
-    
+
     if (Array.isArray(initialCertificates)) {
       if (initialCertificates.length > 0) {
         setServerCertificates(initialCertificates);
       } else {
         // Якщо initialCertificates порожній масив, не очищаємо serverCertificates
         // щоб не втратити дані після завантаження
-        if (process.env.NODE_ENV !== "production") {
-          console.log(
-            "[CertificatesSection] initialCertificates порожній масив, зберігаємо поточні serverCertificates"
-          );
-        }
       }
     }
   }, [initialCertificates]);
@@ -151,57 +147,29 @@ export default function CertificatesSection({
       setFiles(next);
       onChange?.(next);
 
-      if (process.env.NODE_ENV !== "production") {
-        console.log("[CertificatesSection] Файли додано локально:", {
-          filesCount: filesArray.length,
-          totalFiles: next.length,
-          fileNames: filesArray.map((f) => f.name),
-        });
-      }
-
       if (inputEl) inputEl.value = "";
     } catch (error) {
       setError("Не вдалося додати файл");
-      if (process.env.NODE_ENV !== "production") {
-        console.error(error);
-      }
     }
   };
 
   const handleDelete = (index: number) => {
     if (process.env.NODE_ENV !== "production") {
-      console.log("[CertificatesSection] Видалення за індексом:", {
-        index,
-        serverCertificatesLength: serverCertificates.length,
-        filesLength: files.length,
-        previewsLength: previews.length,
-      });
     }
-    
+
     // Просто видаляємо за індексом з previews
     // Якщо індекс в межах serverCertificates - видаляємо з serverCertificates
     // Інакше - з files
     if (index < serverCertificates.length) {
       // Видаляємо з серверних сертифікатів
-      const newServerCertificates = serverCertificates.filter((_, i) => i !== index);
-      if (process.env.NODE_ENV !== "production") {
-        console.log("[CertificatesSection] Видалення з serverCertificates:", {
-          before: serverCertificates.length,
-          after: newServerCertificates.length,
-        });
-      }
+      const newServerCertificates = serverCertificates.filter(
+        (_, i) => i !== index
+      );
       setServerCertificates(newServerCertificates);
     } else {
       // Видаляємо з локальних файлів
       const fileIndex = index - serverCertificates.length;
       const newFiles = files.filter((_, i) => i !== fileIndex);
-      if (process.env.NODE_ENV !== "production") {
-        console.log("[CertificatesSection] Видалення з files:", {
-          fileIndex,
-          before: files.length,
-          after: newFiles.length,
-        });
-      }
       setFiles(newFiles);
       onChange?.(newFiles);
     }
@@ -253,10 +221,7 @@ export default function CertificatesSection({
 
         {isMobile ? (
           <div className={styles.uploadAreaOutside}>
-            <label
-              htmlFor={uploadInputId}
-              className={styles.uploadArea}
-            >
+            <label htmlFor={uploadInputId} className={styles.uploadArea}>
               <div className={styles.uploadIcon}>
                 <CloudUploadIcon />
               </div>
@@ -272,10 +237,7 @@ export default function CertificatesSection({
             </p>
           </div>
         ) : (
-          <label
-            htmlFor={uploadInputId}
-            className={styles.uploadArea}
-          >
+          <label htmlFor={uploadInputId} className={styles.uploadArea}>
             <div className={styles.uploadIcon}>
               <CloudUploadIcon />
             </div>

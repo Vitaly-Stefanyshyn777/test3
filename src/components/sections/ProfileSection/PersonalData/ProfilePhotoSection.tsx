@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import styles from "./PersonalData.module.css";
 import { UserIcon, PlusIcon } from "@/components/Icons/Icons";
 import ProfilePhotoSectionSkeleton from "./ProfilePhotoSectionSkeleton";
@@ -34,7 +33,7 @@ export default function ProfilePhotoSection({
       setError(null);
 
       if (process.env.NODE_ENV !== "production") {
-        console.log("[AvatarUpload] start", {
+        console.log({
           name: file.name,
           size: file.size,
           type: file.type,
@@ -53,8 +52,7 @@ export default function ProfilePhotoSection({
         result?.files?.[0]?.url || result?.current_field_value || null;
 
       if (process.env.NODE_ENV !== "production") {
-        console.log("[AvatarUpload] response", result);
-        console.log("[AvatarUpload] resolvedUrl", uploadedUrl);
+        console.log("Uploaded URL:", uploadedUrl);
       }
 
       if (uploadedUrl) {
@@ -67,7 +65,7 @@ export default function ProfilePhotoSection({
       }
     } catch (e) {
       if (process.env.NODE_ENV !== "production") {
-        console.error("[AvatarUpload] error", e);
+        console.error("Error uploading image:", e);
       }
       setError("Не вдалося завантажити фото");
     } finally {
@@ -85,8 +83,6 @@ export default function ProfilePhotoSection({
         <div className={styles.profilePhotoBlock}>
           <div className={styles.profilePhoto}>
             {profileImage ? (
-              // Використовуємо нативний <img> замість Next/Image, щоб уникнути блокувань
-              // доменів/CSP у локальному середовищі
               <img
                 key={profileImage}
                 src={profileImage}

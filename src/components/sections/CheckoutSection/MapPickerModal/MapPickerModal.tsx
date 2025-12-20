@@ -157,6 +157,9 @@ export default function MapPickerModal({
   const [shouldCenterOnUserLocation, setShouldCenterOnUserLocation] =
     React.useState(false);
 
+  // Стан для тригера оновлення геолокації
+  const [locationRefreshTrigger, setLocationRefreshTrigger] = React.useState(0);
+
   // Динамічне підключення карти Leaflet без SSR
   const LeafletMap = React.useMemo(
     () => dynamic(() => import("./LeafletMap"), { ssr: false }),
@@ -260,6 +263,15 @@ export default function MapPickerModal({
       }
     }
   }, [isOpen, selectedCity, cities.length]);
+
+  // Окремий useEffect для ініціалізації геолокації
+  React.useEffect(() => {
+    if (isOpen && !userLocation && !hasUserConfirmedLocation) {
+      // Ініціалізуємо геолокацію при відкритті модалки
+      // Якщо немає збереженої геолокації, тригеримо отримання нової
+      setLocationRefreshTrigger((prev) => prev + 1);
+    }
+  }, [isOpen, userLocation, hasUserConfirmedLocation]);
 
   const loadCitiesData = async () => {
     setLoading(true);
@@ -631,6 +643,7 @@ export default function MapPickerModal({
               }
               userLocation={userLocation}
               shouldCenterOnUserLocation={shouldCenterOnUserLocation}
+              locationRefreshTrigger={locationRefreshTrigger}
               onUserLocationFound={(lat: number, lng: number) => {
                 setUserLocation({ lat, lng });
                 // Автоматично центруємо карту на новій геолокації

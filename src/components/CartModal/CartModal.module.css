@@ -218,7 +218,6 @@
   gap: 24px;
   width: 100%;
   height: auto;
-  /* background: #e5e5e5; */
   border-radius: 4px;
   overflow: hidden;
 }
@@ -275,6 +274,7 @@
 }
 .recoSwiper {
   width: 100%;
+  height: 100%;
 }
 .recoSlide {
   width: 458px !important;
@@ -369,7 +369,21 @@
   color: var(--black);
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
+}
+.recoCurrentPriceValue {
+  font-family: var(--second-family);
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 120%;
+  color: var(--black);
+}
+.recoPriceCurrency {
+  font-family: var(--second-family);
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 120%;
+  color: var(--black);
 }
 .recoCurrency {
   font-family: var(--second-family);
@@ -385,6 +399,23 @@
   line-height: 120%;
   color: #bdbdbd;
   text-decoration: line-through;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.recoOriginalPriceValue {
+  font-family: var(--second-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 120%;
+  color: #bdbdbd;
+}
+.recoOriginalPriceCurrency {
+  font-family: var(--second-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 120%;
+  color: #bdbdbd;
 }
 .smallPrimary {
   background: var(--violet, #6c3bd7);
@@ -555,6 +586,9 @@
   color: var(--style);
 }
 .currentPrice {
+  display: flex;
+  align-items: center;
+  gap: 2px;
   font-family: var(--second-family);
   font-weight: 500;
   font-size: 22px;
@@ -562,10 +596,37 @@
   text-align: right;
   color: var(--style);
 }
+.currentPriceValue {
+  font-family: var(--second-family);
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 120%;
+  color: var(--style);
+}
+.priceCurrency {
+  font-family: var(--second-family);
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 120%;
+  color: var(--style);
+}
 .oldPrice {
+  display: flex;
+  align-items: center;
+  gap: 2px;
   color: #bdbdbd;
   text-decoration: line-through;
   margin-left: 8px;
+}
+.originalPriceValue {
+  color: #bdbdbd;
+  font-size: 18px;
+  line-height: 120%;
+}
+.originalPriceCurrency {
+  color: #bdbdbd;
+  font-size: 18px;
+  line-height: 120%;
 }
 .removeBtn {
   border-radius: 8px;
@@ -633,10 +694,9 @@
   .modal {
     width: 100%;
     max-width: 100%;
-    /* border-radius: mvw(20) mvw(20) 0 0; */
     padding: mvw(20) mvw(16);
     gap: mvw(24);
-    max-height: 90vh;
+    max-height: 100%;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -653,6 +713,7 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
+    padding: mvw(50) mvw(0) mvw(0) mvw(0);
   }
 
   .topbarListBlock::-webkit-scrollbar {
@@ -690,11 +751,34 @@
     flex-direction: column;
   }
 
+  /* Скрол-контейнер для товарів на мобілці */
+  .mobileItemsScroll {
+    max-height: mvw(351);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  }
+
+  .mobileItemsScroll::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .mobileItemsScroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .mobileItemsScroll::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+
   .item {
     gap: mvw(12);
     padding: mvw(12);
     border-radius: mvw(12);
-    background: var(--white);
+    background: none;
   }
 
   .itemMain {
@@ -808,7 +892,7 @@
     max-width: 100%;
     padding: mvw(16);
     border-radius: mvw(16);
-    gap: mvw(20);
+    gap: mvw(30);
     flex-shrink: 0;
   }
 
@@ -861,7 +945,7 @@
   }
 
   .summaryBlock {
-    gap: mvw(8);
+    gap: mvw(12);
   }
 
   .summaryRows {
@@ -931,6 +1015,7 @@
     border-radius: mvw(16);
     font-size: mvw(14);
     text-align: center;
+    border: mvw(2) solid #8426d7;
   }
 
   .recommendations {
@@ -956,10 +1041,12 @@
 
   .recoRow {
     gap: mvw(12);
+    height: mvw(272);
   }
 
   .recoSwiper {
     width: 100%;
+    height: 100%;
   }
 
   .recoSlide {
@@ -970,6 +1057,7 @@
     border-radius: mvw(12);
     gap: mvw(0);
     flex-direction: column;
+    height: 100%;
   }
 
   .recoThumb {
@@ -982,6 +1070,8 @@
     gap: mvw(6);
     flex: 1;
     padding: mvw(16);
+    height: 100%;
+    justify-content: space-between;
   }
 
   .recoTextBlock {
@@ -1020,6 +1110,16 @@
     gap: mvw(2);
   }
 
+  .recoCurrentPriceValue {
+    font-size: mvw(16);
+    line-height: 120%;
+  }
+
+  .recoPriceCurrency {
+    font-size: mvw(16);
+    line-height: 120%;
+  }
+
   .recoPriceBucks {
     font-size: mvw(14);
     line-height: 120%;
@@ -1031,6 +1131,17 @@
   }
 
   .recoOldPrice {
+    font-size: mvw(14);
+    line-height: 120%;
+    gap: mvw(2);
+  }
+
+  .recoOriginalPriceValue {
+    font-size: mvw(14);
+    line-height: 120%;
+  }
+
+  .recoOriginalPriceCurrency {
     font-size: mvw(14);
     line-height: 120%;
   }
@@ -1061,5 +1172,18 @@
     padding: mvw(40) mvw(20);
     font-size: mvw(16);
     text-align: center;
+  }
+  .currentPriceValue {
+    font-weight: 500;
+    font-size: mvw(18);
+  }
+  .priceCurrency {
+    font-size: mvw(15);
+  }
+  .originalPriceValue {
+    font-size: mvw(18);
+  }
+  .originalPriceCurrency {
+    font-size: mvw(15);
   }
 }

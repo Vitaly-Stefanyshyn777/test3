@@ -76,6 +76,16 @@ const formatDateUkrainian = (dateString: string): string => {
   return `${date.getDate()} ${months[date.getMonth()]}`;
 };
 
+const formatTime = (timeString: string): string => {
+  if (!timeString) return "12:00";
+  // Якщо час у форматі HH:MM:SS, обрізаємо секунди
+  if (timeString.includes(":") && timeString.split(":").length === 3) {
+    const parts = timeString.split(":");
+    return `${parts[0]}:${parts[1]}`;
+  }
+  return timeString;
+};
+
 const formatDateRange = (
   schedule: Array<{
     date?: string;
@@ -167,8 +177,8 @@ const getScheduleFromEventPost = (
 
   if (scheduleData && Array.isArray(scheduleData)) {
     return scheduleData.map((item: any) => ({
-      date: item.hl_input_date_date || "",
-      time: item.hl_input_time_time || "",
+      date: item.date || item.hl_input_date_date || "",
+      time: item.time || item.hl_input_time_time || "",
     }));
   }
 
@@ -183,7 +193,7 @@ const mapEventPostToEvent = (
   const schedule = getScheduleFromEventPost(eventPost);
   const firstSchedule = schedule[0];
   const eventDate = firstSchedule?.date || "";
-  const eventTime = firstSchedule?.time || "12:00";
+  const eventTime = formatTime(firstSchedule?.time || "12:00");
   const formattedDate = eventDate ? formatDateUkrainian(eventDate) : "";
   const dateRange = formatDateRange(schedule);
 
@@ -200,8 +210,8 @@ const mapEventPostToEvent = (
 
   if (resultData && Array.isArray(resultData)) {
     results = resultData.map((result: any) => ({
-      icon: result.hl_img_svg_icon || "",
-      text: result.hl_input_text_text || "",
+      icon: result.hl_img_svg_icon || result.svg_code || "",
+      text: result.hl_input_text_text || result.title || "",
     }));
   }
 
@@ -592,82 +602,91 @@ const EventsSection: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <h3 className={s.eventsTitle}>Календар подій</h3>
-              <div className={s.eventsListBlock}>
-                <div className={s.eventsList}>
-                  {events.length === 0 ? (
-                    <div style={{ padding: "20px", textAlign: "center" }}>
-                      Подій поки що немає
-                    </div>
-                  ) : (
-                    events.map((event, index) => {
-                      const eventPost = eventsData.find(
-                        (e) => String(e.id) === event.id
-                      );
-                      const schedule = eventPost
-                        ? getScheduleFromEventPost(eventPost)
-                        : [];
-                      const firstScheduleDate = schedule[0]?.date;
-                      const eventDay = firstScheduleDate
-                        ? (() => {
-                            // Нормалізуємо дату (може бути DD/MM/YYYY або YYYY-MM-DD)
-                            const normalizedDate = firstScheduleDate.includes(
-                              "/"
-                            )
-                              ? firstScheduleDate.split("/").reverse().join("-") // DD/MM/YYYY -> YYYY-MM-DD
-                              : firstScheduleDate;
-                            return new Date(normalizedDate).getDate();
-                          })()
-                        : null;
+              <div className={isMobile ? s.mobileEventsWrapper : ""}>
+                <h3 className={s.eventsTitle}>Календар подій</h3>
+                <div className={s.eventsListBlock}>
+                  <div className={s.eventsList}>
+                    {events.length === 0 ? (
+                      <div style={{ padding: "20px", textAlign: "center" }}>
+                        Подій поки що немає
+                      </div>
+                    ) : (
+                      events.map((event, index) => {
+                        const eventPost = eventsData.find(
+                          (e) => String(e.id) === event.id
+                        );
+                        const schedule = eventPost
+                          ? getScheduleFromEventPost(eventPost)
+                          : [];
+                        const firstScheduleDate = schedule[0]?.date;
+                        const eventDay = firstScheduleDate
+                          ? (() => {
+                              // Нормалізуємо дату (може бути DD/MM/YYYY або YYYY-MM-DD)
+                              const normalizedDate = firstScheduleDate.includes(
+                                "/"
+                              )
+                                ? firstScheduleDate
+                                    .split("/")
+                                    .reverse()
+                                    .join("-") // DD/MM/YYYY -> YYYY-MM-DD
+                                : firstScheduleDate;
+                              return new Date(normalizedDate).getDate();
+                            })()
+                          : null;
 
-                      return (
-                        <div
-                          key={event.id}
-                          className={`${s.eventItem} ${
-                            selectedEvent?.id === event.id ? s.activeEvent : ""
-                          }`}
-                          onClick={() => {
-                            if (!isMobile) {
-                              setSelectedEvent(event);
-                              if (eventDay) setSelectedDay(eventDay);
-                            }
-                          }}
-                        >
-                          <div className={s.eventDate}>
-                            <span className={s.eventDay}>{event.date}</span>
-                            <span className={s.eventTime}>{event.time}</span>
-                          </div>
-                          <div className={s.eventDivider}></div>
-                          {isMobile ? (
-                            <div className={s.eventInfoWrapper}>
+                        return (
+                          <div
+                            key={event.id}
+                            className={`${s.eventItem} ${
+                              selectedEvent?.id === event.id
+                                ? s.activeEvent
+                                : ""
+                            }`}
+                            onClick={() => {
+                              if (!isMobile) {
+                                setSelectedEvent(event);
+                                if (eventDay) setSelectedDay(eventDay);
+                              }
+                            }}
+                          >
+                            <div className={s.eventDate}>
+                              <span className={s.eventDay}>{event.date}</span>
+                              <span className={s.eventTime}>{event.time}</span>
+                            </div>
+                            <div className={s.eventDivider}></div>
+                            {isMobile ? (
+                              <div className={s.eventInfoWrapper}>
+                                <div className={s.eventInfo}>
+                                  <h4 className={s.eventTitle}>
+                                    {event.title}
+                                  </h4>
+                                </div>
+                                <button
+                                  className={s.eventDetailsButton}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedEvent(event);
+                                    if (eventDay) setSelectedDay(eventDay);
+                                  }}
+                                >
+                                  Детальніше
+                                </button>
+                              </div>
+                            ) : (
                               <div className={s.eventInfo}>
                                 <h4 className={s.eventTitle}>{event.title}</h4>
+                                {event.description && (
+                                  <p className={s.eventDescription}>
+                                    {event.description}
+                                  </p>
+                                )}
                               </div>
-                              <button
-                                className={s.eventDetailsButton}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedEvent(event);
-                                  if (eventDay) setSelectedDay(eventDay);
-                                }}
-                              >
-                                Детальніше
-                              </button>
-                            </div>
-                          ) : (
-                            <div className={s.eventInfo}>
-                              <h4 className={s.eventTitle}>{event.title}</h4>
-                              {event.description && (
-                                <p className={s.eventDescription}>
-                                  {event.description}
-                                </p>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })
-                  )}
+                            )}
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

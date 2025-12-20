@@ -1,7 +1,10 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
 import { useCartStore } from "@/store/cart";
+import { useAuthStore } from "@/store/auth";
 import { useProductsQuery } from "@/components/hooks/useProductsQuery";
+import { calculatePrice, calculateCartPrice } from "@/lib/priceUtils";
+import { getProductPriceAsync } from "@/lib/useProductPrices";
 import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
 import { PlusIcon, CloseButtonIcon } from "@/components/Icons/Icons";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -13,6 +16,7 @@ export default function CartRecommendations() {
   const items = useCartStore((st) => st.items);
   const addItem = useCartStore((st) => st.addItem);
   const removeItem = useCartStore((st) => st.removeItem);
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const swiperRef = useRef<{
     slidePrev: () => void;
     slideNext: () => void;
@@ -20,6 +24,7 @@ export default function CartRecommendations() {
   } | null>(null);
   const [recoPage, setRecoPage] = useState(0);
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
+  const [productPrices, setProductPrices] = useState<Record<string, { currentPrice: number; originalPrice?: number }>>({});
 
   useEffect(() => {
     const checkMobile = () => {
@@ -34,6 +39,31 @@ export default function CartRecommendations() {
   }, []);
 
   const productsList = products || [];
+
+  // Завантажуємо правильні ціни для всіх продуктів
+  useEffect(() => {
+    const loadProductPrices = async () => {
+      const pricesMap: Record<string, { currentPrice: number; originalPrice?: number }> = {};
+
+      await Promise.all(
+        productsList.map(async (product) => {
+          try {
+            const freshPrices = await getProductPriceAsync(String(product.id));
+            pricesMap[String(product.id)] = freshPrices;
+          } catch (error) {
+            console.error(`Error loading price for product ${product.id}:`, error);
+            // Пропускаємо продукт при помилці завантаження цін
+          }
+        })
+      );
+
+      setProductPrices(pricesMap);
+    };
+
+    if (productsList.length > 0) {
+      loadProductPrices();
+    }
+  }, [productsList]);
 
   return (
     <div className={s.recommendations}>
@@ -52,9 +82,10 @@ export default function CartRecommendations() {
       <div className={s.recoRow}>
         <Swiper
           onSwiper={(inst) => (swiperRef.current = inst)}
-          onSlideChange={(sw) => setRecoPage(sw.activeIndex)}
+          onSlideChange={(sw) => setRecoPage(sw.realIndex)}
           slidesPerView={3.1}
           spaceBetween={8}
+          loop={productsList.length > 3}
           className={s.recoSwiper}
         >
           {productsList.map((p) => (
@@ -67,7 +98,6 @@ export default function CartRecommendations() {
                   className={s.recoThumb}
                 />
                 <div className={s.recoContent}>
-                  {/* Блок 1: Текст (бренд, назва, колір) */}
                   <div className={s.recoTextBlock}>
                     <div className={s.recoBrand}>DOMYOS</div>
                     <div className={s.recoName}>{p.name}</div>
@@ -78,18 +108,54 @@ export default function CartRecommendations() {
 
                   <div className={s.recoPriceButtonBlock}>
                     <div className={s.recoPriceBlock}>
-                      <div className={s.recoPrice}>
-                        {Number(p.price || 0).toLocaleString()}
-                        <span className={s.recoCurrency}>
-                          <p className={s.recoPriceBucks}>₴</p>
-                        </span>
-                      </div>
-                      {p.originalPrice &&
-                        Number(p.originalPrice) > Number(p.price || 0) && (
-                          <div className={s.recoOldPrice}>
-                            {Number(p.originalPrice).toLocaleString()}
-                          </div>
-                        )}
+                      {(() => {
+                        // Використовуємо завантажені ціни або fallback до існуючих
+                        const productPrice = productPrices[String(p.id)];
+                        const priceToUse = productPrice?.currentPrice ?? p.price ?? 0;
+                        const originalPriceToUse = productPrice?.originalPrice ?? p.regularPrice;
+
+                        console.log('💰 CartRecommendations price calculation:', {
+                          productId: p.id,
+                          productName: p.name,
+                          loadedPrice: productPrice,
+                          fallbackPrice: p.price,
+                          fallbackRegularPrice: p.regularPrice,
+                          priceToUse,
+                          originalPriceToUse,
+                          isLoggedIn
+                        });
+
+                        const {
+                          finalPrice,
+                          originalPrice,
+                          shouldShowOldPrice,
+                        } = calculatePrice({
+                          price: priceToUse,
+                          originalPrice: originalPriceToUse,
+                          isLoggedIn,
+                        });
+
+                        return (
+                          <>
+                              <div className={s.recoPrice}>
+                                <span className={s.recoCurrentPriceValue}>
+                                  {finalPrice.toLocaleString()}
+                                </span>
+                                <span className={s.recoPriceCurrency}>₴</span>
+                              </div>
+                            {shouldShowOldPrice && (
+                              <div className={s.recoOldPrice}>
+                                <span className={s.recoOriginalPriceValue}>
+                                  {originalPrice.toLocaleString()}
+                                </span>
+                                <span className={s.recoOriginalPriceCurrency}>
+                                  ₴
+                                </span>
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                     {items[String(p.id)] ? (
                       <button
@@ -103,16 +169,28 @@ export default function CartRecommendations() {
                     ) : (
                       <button
                         className={s.smallPrimary}
-                        onClick={() =>
+                        onClick={() => {
+                          // Використовуємо завантажені ціни або fallback
+                          const productPrice = productPrices[String(p.id)];
+                          const priceToUse = productPrice?.currentPrice ?? p.price ?? 0;
+                          const originalPriceToUse = productPrice?.originalPrice ?? p.regularPrice;
+
+                          const { priceToAdd, originalPriceToAdd } =
+                            calculateCartPrice({
+                              price: priceToUse,
+                              originalPrice: originalPriceToUse,
+                              isLoggedIn,
+                            });
+
                           addItem({
                             id: String(p.id),
                             name: p.name,
-                            price: Number(p.price) || 0,
+                            price: priceToAdd,
                             image: p.image,
                             color: p.color,
-                            originalPrice: Number(p.originalPrice) || 0,
-                          })
-                        }
+                            originalPrice: originalPriceToAdd,
+                          });
+                        }}
                         aria-label="Додати товар у кошик"
                       >
                         <span className={s.smallPrimaryLabel}>Додати</span>
@@ -125,8 +203,6 @@ export default function CartRecommendations() {
             </SwiperSlide>
           ))}
         </Swiper>
-
-        {/* SliderNav тільки на десктопі: на мобільному свайп руками */}
       </div>
     </div>
   );

@@ -5,10 +5,6 @@ const UPSTREAM_BASE = process.env.UPSTREAM_BASE;
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    console.log(
-      "[Trainers API] ▶ incoming query:",
-      Object.fromEntries(searchParams.entries())
-    );
 
     const incomingAuthHeader = request.headers.get("authorization") || "";
     const jwtFromHeader = incomingAuthHeader.startsWith("Bearer ")
@@ -17,13 +13,6 @@ export async function GET(request: NextRequest) {
     const jwtFromCookie = request.cookies.get("bfb_user_jwt")?.value || "";
     const adminCookie = request.cookies.get("bfb_admin_jwt")?.value || "";
     const jwtFromEnv = process.env.WP_JWT_TOKEN || "";
-    console.log("[Trainers API] ▶ tokens: ", {
-      hasAuthHeader: !!incomingAuthHeader,
-      jwtFromHeader: !!jwtFromHeader,
-      jwtFromCookie: !!jwtFromCookie,
-      adminCookie: !!adminCookie,
-      jwtFromEnv: !!jwtFromEnv,
-    });
 
     const normalize = (v?: string) => (v || "").replace(/^['"]|['"]$/g, "");
     const wpUser =
@@ -32,7 +21,6 @@ export async function GET(request: NextRequest) {
       process.env.WP_BASIC_PASS || normalize(process.env.ADMIN_PASS);
 
     if (!wpUser || !wpPass) {
-      console.error("[Trainers API] ❌ WP креденшалі не налаштовані");
       return NextResponse.json(
         { error: "WordPress credentials not configured" },
         { status: 500 }
@@ -59,17 +47,6 @@ export async function GET(request: NextRequest) {
 
     let bearerToken =
       adminCookie || jwtFromHeader || jwtFromCookie || jwtFromEnv;
-    console.log("[Trainers API] ▶ chosen bearer token source:", {
-      from: adminCookie
-        ? "adminCookie"
-        : jwtFromHeader
-        ? "header"
-        : jwtFromCookie
-        ? "userCookie"
-        : jwtFromEnv
-        ? "env"
-        : "none",
-    });
 
     let shouldSetAdminCookie = false;
 
@@ -77,10 +54,7 @@ export async function GET(request: NextRequest) {
       const upstreamBase = UPSTREAM_BASE;
       const username = process.env.ADMIN_USER;
       const password = process.env.ADMIN_PASS;
-      console.log("[Trainers API] ▶ trying bootstrap login (no token)", {
-        hasUser: !!username,
-        passLen: (password || "").length,
-      });
+
       if (username && password && upstreamBase) {
         try {
           const wpRes = await fetch(
@@ -102,23 +76,17 @@ export async function GET(request: NextRequest) {
         } catch {}
       }
     }
+
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
     if (bearerToken) {
       headers.Authorization = `Bearer ${bearerToken}`;
-      console.log(
-        "[Trainers API] 🔐 Auth: Bearer JWT",
-        wantsAdmin ? "(admin)" : "(user)"
-      );
     } else if (wpUser && wpPass) {
       headers.Authorization = `Basic ${Buffer.from(
         `${wpUser}:${wpPass}`
       ).toString("base64")}`;
-      console.log("[Trainers API] 🔐 Auth: Basic");
     }
-
-    console.log("[Trainers API] 🚀 Запит до WordPress:", url.toString());
 
     let response = await fetch(url.toString(), {
       method: "GET",
@@ -127,11 +95,6 @@ export async function GET(request: NextRequest) {
 
     // Auto-relogin and retry once on 401/403
     if (!response.ok && (response.status === 401 || response.status === 403)) {
-      console.log(
-        "[Trainers API] ↻ 1st request failed:",
-        response.status,
-        "→ trying admin JWT refresh and retry"
-      );
       try {
         const upstreamBase = process.env.UPSTREAM_BASE;
         const username = normalize(process.env.ADMIN_USER);
@@ -155,7 +118,6 @@ export async function GET(request: NextRequest) {
                 method: "GET",
                 headers,
               });
-              console.log("[Trainers API] ↻ retry with JWT →", response.status);
             }
           }
           // If still forbidden, force Basic with ADMIN creds
@@ -174,7 +136,6 @@ export async function GET(request: NextRequest) {
               method: "GET",
               headers: basicHeaders,
             });
-            console.log("[Trainers API] ↻ retry with Basic →", response.status);
           }
         }
       } catch {}
@@ -182,11 +143,6 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(
-        "[Trainers API] ❌ Помилка WordPress API:",
-        response.status,
-        errorText
-      );
       return NextResponse.json(
         { error: `WordPress API error: ${response.status}` },
         { status: response.status }
@@ -194,19 +150,17 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
-    console.log("[Trainers API] ✅ Отримано тренерів:", data.length);
 
     // Детальна перевірка координат у всіх тренерів
     if (Array.isArray(data) && data.length > 0) {
-      console.log("[Trainers API] 🔍 Перевірка координат:");
       let trainersWithCoords = 0;
       let trainersWithoutCoords = 0;
 
-      data.forEach((trainer, idx) => {
+      data.forEach((trainer) => {
         const wloc = trainer.my_wlocation || [];
         if (wloc.length > 0) {
           let hasCoords = false;
-          wloc.forEach((loc: unknown, locIdx: number) => {
+          wloc.forEach((loc: unknown) => {
             const location = loc as Record<string, unknown>;
             const lat =
               location?.hl_input_text_coord_lat ||
@@ -221,11 +175,6 @@ export async function GET(request: NextRequest) {
 
             if (lat && lng) {
               hasCoords = true;
-              console.log(
-                `[Trainers API] 📍 Тренер ${trainer.id} (${
-                  trainer.name
-                }): місце ${locIdx + 1} має координати lat=${lat}, lng=${lng}`
-              );
             }
           });
 
@@ -233,27 +182,11 @@ export async function GET(request: NextRequest) {
             trainersWithCoords++;
           } else {
             trainersWithoutCoords++;
-            console.log(
-              `[Trainers API] ⚠️ Тренер ${trainer.id} (${trainer.name}): my_wlocation є (${wloc.length} місць), але координат немає`
-            );
-            if (wloc[0]) {
-              console.log(
-                `[Trainers API]    Поля в першому місці:`,
-                Object.keys(wloc[0] as Record<string, unknown>)
-              );
-            }
           }
         } else {
           trainersWithoutCoords++;
-          console.log(
-            `[Trainers API] ⚠️ Тренер ${trainer.id} (${trainer.name}): my_wlocation відсутнє або порожнє`
-          );
         }
       });
-
-      console.log(
-        `[Trainers API] 📊 Підсумок: ${trainersWithCoords} з координатами, ${trainersWithoutCoords} без координат`
-      );
     }
 
     const res = NextResponse.json(data);
@@ -269,7 +202,6 @@ export async function GET(request: NextRequest) {
     }
     return res;
   } catch (error) {
-    console.error("[Trainers API] ❌ Помилка:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

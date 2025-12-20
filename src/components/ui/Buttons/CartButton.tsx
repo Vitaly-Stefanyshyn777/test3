@@ -6,9 +6,10 @@ import { BasketIcon, SmitnikIcon } from "@/components/Icons/Icons";
 import s from "./CartButton.module.css";
 
 type Props = {
-  id: string; // unique key in cart
+  id: string;
   name: string;
   price?: number;
+  originalPrice?: number;
   image?: string;
   className?: string;
   activeClassName?: string;
@@ -18,6 +19,7 @@ export default function CartButton({
   id,
   name,
   price = 0,
+  originalPrice,
   image,
   className = "",
   activeClassName = "",
@@ -33,14 +35,13 @@ export default function CartButton({
     e.preventDefault();
     e.stopPropagation();
     
-    // Якщо користувач не залогінений і намагається додати до корзини
     if (!isLoggedIn && !inCart) {
       openLoginModal();
       return;
     }
     
     if (inCart) removeItem(id);
-    else addItem({ id, name, price, image }, 1);
+    else addItem({ id, name, price, originalPrice, image }, 1);
   };
 
   return (

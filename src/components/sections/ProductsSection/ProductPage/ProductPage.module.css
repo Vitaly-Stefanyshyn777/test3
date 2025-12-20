@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   gap: 136px;
+  overflow: visible;
 }
 
 .loading,
@@ -39,6 +40,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 40px;
+  align-items: start;
 }
 
 .imageSection {
@@ -59,6 +61,10 @@
   position: relative;
   max-height: 620px;
   overflow: auto;
+}
+
+.thumbnail.active {
+  border-color: var(--violet);
 }
 
 .thumbnailsNoNav {
@@ -231,6 +237,10 @@
   flex-wrap: wrap;
   gap: 10px;
 }
+.mobileActionsWrapper {
+  display: contents;
+}
+
 .currenInfoBlock {
   width: 100%;
   height: auto;
@@ -299,6 +309,72 @@
 
 .sizeButton.selected {
   border: 2px solid var(--violet);
+}
+
+.colorButton {
+  border: 2px solid #fff;
+  border-radius: 8px;
+  padding: 14px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  background: var(--white);
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 140%;
+  color: var(--black);
+  min-width: 80px;
+}
+
+.colorButton.selected {
+  border: 2px solid var(--violet);
+}
+
+.loadingColors {
+  padding: 10px;
+  color: #666;
+  font-size: 14px;
+  text-align: center;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeletonColorOption {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+}
+
+.skeletonSizeOption {
+  width: 60px;
+  height: 40px;
+  border-radius: 6px;
+}
+
+.skeletonPrice {
+  width: 120px;
+  height: 32px;
+  margin-bottom: 8px;
+}
+
+.skeletonOriginalPrice {
+  width: 80px;
+  height: 24px;
 }
 
 .priceSection {
@@ -430,7 +506,6 @@
 
 .addToCartBtn:hover {
   background: var(--black);
-  transform: translateY(-2px);
 }
 
 .favoriteBtn {
@@ -452,10 +527,6 @@
   }
 }
 
-.favoriteBtn:hover {
-  transform: translateY(-2px);
-}
-
 .favoriteActive {
   background: rgba(255, 255, 255, 0.95);
   color: var(--violet);
@@ -472,6 +543,15 @@
 .addToCartBtn.addToCartBtnDisabled:hover {
   background: #e6e6e6;
   transform: none;
+}
+
+.addToCartBtn.addToCartBtnInCart {
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--black);
+}
+
+.addToCartBtn.addToCartBtnInCart:hover {
+  background: rgba(0, 0, 0, 0.18);
 }
 
 .favoriteBtn.favoriteBtnDisabled {
@@ -959,7 +1039,7 @@
 
 @media (max-width: 1000px) {
   .productPage {
-    padding: mvw(24) mvw(16);
+    padding: mvw(124) mvw(16);
     gap: mvw(24);
   }
 
@@ -1054,11 +1134,13 @@
     flex-shrink: 0;
     border-radius: mvw(8);
     margin: 0 mvw(4);
+    border: mvw(2) solid #ffffff;
   }
 
   .mainImage {
     width: 100%;
     border-radius: mvw(12);
+    background: var(--white);
   }
 
   .productImage {
@@ -1088,6 +1170,7 @@
 
   .categoryTag {
     font-size: mvw(12);
+    display: none;
   }
 
   .titleWithBadges {
@@ -1106,10 +1189,12 @@
   .productText {
     font-size: mvw(14);
     line-height: 140%;
+    display: none;
   }
 
   .productDescriptionBlock {
     gap: mvw(16);
+    flex-direction: column-reverse;
   }
 
   .colorSection,
@@ -1130,10 +1215,11 @@
     width: mvw(60);
     height: mvw(60);
     border-radius: mvw(6);
+    border: mvw(2) solid #ffffff;
   }
 
   .sizeOptions {
-    gap: mvw(8);
+    gap: mvw(6);
     flex-wrap: wrap;
   }
 
@@ -1142,10 +1228,27 @@
     border-radius: mvw(8);
     font-size: mvw(14);
     min-width: mvw(80);
+    border: mvw(2) solid #fff;
+  }
+
+  .sizeButton.selected {
+    border: mvw(2) solid var(--violet);
+  }
+
+  .colorButton {
+    padding: mvw(12) mvw(16);
+    border-radius: mvw(8);
+    font-size: mvw(14);
+    min-width: mvw(80);
+    border: mvw(2) solid #fff;
+  }
+
+  .colorButton.selected {
+    border: mvw(2) solid var(--violet);
   }
 
   .currenInfoBlock {
-    gap: mvw(16);
+    gap: mvw(6);
   }
 
   .priceSection {
@@ -1161,7 +1264,14 @@
     font-size: mvw(16);
   }
 
+  .mobileActionsWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: mvw(6);
+  }
+
   .subscriptionOffer {
+    flex-direction: row;
     padding: mvw(16);
     gap: mvw(8);
     border-radius: mvw(12);
@@ -1180,6 +1290,9 @@
   .registerBlock {
     padding: mvw(16);
     border-radius: mvw(12);
+    text-align: center;
+    align-items: center;
+    justify-content: center;
   }
 
   .registerText {
@@ -1195,7 +1308,7 @@
 
   .actionButtons {
     flex-direction: row;
-    gap: mvw(12);
+    gap: mvw(6);
     width: 100%;
     align-items: stretch;
     flex-direction: column;
@@ -1239,7 +1352,8 @@
     width: 100%;
     padding: mvw(16) mvw(24);
     border-radius: mvw(16);
-    font-size: mvw(16);
+    font-size: mvw(14);
+    font-weight: 600;
     gap: mvw(8);
   }
 
@@ -1272,6 +1386,14 @@
   .productCode {
     font-size: mvw(12);
     gap: mvw(4);
+    display: flex;
+    align-items: center;
+  }
+
+  .productCode span {
+    display: inline;
+    font-size: mvw(12);
+    color: rgba(14, 14, 14, 0.4);
   }
 
   .expandableSections {
@@ -1317,8 +1439,8 @@
   }
 
   .chevron svg {
-    width: mvw(18);
-    height: mvw(18);
+    width: mvw(24);
+    height: mvw(24);
   }
 
   .sectionContent {

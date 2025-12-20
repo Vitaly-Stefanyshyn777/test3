@@ -4,6 +4,7 @@ import styles from "./CourseCatalogContainer.module.css";
 import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
 import type SwiperType from "swiper";
 import ProductsGrid from "../CoursesGrid/CoursesGrid";
+import { SortType } from "@/components/ui/FilterSortPanel/FilterSortPanel";
 
 interface Props {
   block: {
@@ -13,11 +14,13 @@ interface Props {
   filteredProducts: unknown[];
   isLoading?: boolean;
   hasFilters?: boolean; // Чи є активні фільтри
+  itemsPerPage?: number; // Кількість елементів на сторінці
+  sortBy?: SortType;
 }
 
-// Тип для курсу з useFilteredCourses
 type Course = {
   id: string | number;
+  slug?: string; // Додаємо slug
   name: string;
   description?: string;
   price: string | number;
@@ -40,31 +43,93 @@ const CourseCatalogContainer = ({
   filteredProducts,
   isLoading,
   hasFilters,
+  itemsPerPage = 12,
+  sortBy,
 }: Props) => {
-  // Component state
-  const [sortBy] = useState("name");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(12);
+  const effectiveSortBy = sortBy || "popular";
 
-  // Використовуємо ТІЛЬКИ відфільтровані курси - якщо порожній, показуємо порожній список
+  const [currentPage, setCurrentPage] = useState(1);
   const sourceProducts: Course[] = (filteredProducts as Course[]) || [];
 
+  // Спрощена функція розрахунку ціни з урахуванням знижки для авторизованих користувачів
+  const getCoursePrice = (course: Course): number => {
+    // Пріоритет цін: sale_price -> regular_price -> price
+    let price: string | number | undefined =
+      (course as any).wcProduct?.prices?.sale_price ||
+      (course as any).wcProduct?.prices?.regular_price ||
+      course.price;
+
+    // Парсимо ціну, якщо вона рядок
+    if (typeof price === "string") {
+      const cleaned = price
+        .replace(/\s/g, "")
+        .replace(/[₴$€£]/g, "")
+        .replace(",", ".");
+      price = parseFloat(cleaned) || 0;
+    } else if (typeof price !== "number") {
+      price = 0;
+    }
+
+    // Застосовуємо знижку 20% для авторизованих користувачів
+    return price * 0.8; // 20% знижка = множимо на 0.8
+  };
+
+  // Спрощена логіка сортування
   const sortedProducts = useMemo(() => {
     const copy = [...sourceProducts];
-    if (sortBy === "name") {
-      copy.sort((a, b) => a.name.localeCompare(b.name));
+
+    switch (effectiveSortBy) {
+      case "price_asc":
+        return copy.sort((a, b) => getCoursePrice(b) - getCoursePrice(a)); // Спочатку великі ціни
+
+      case "price_desc":
+        return copy.sort((a, b) => getCoursePrice(a) - getCoursePrice(b)); // Спочатку маленькі ціни
+
+      case "popular":
+        return copy.sort((a, b) => {
+          // Спочатку featured продукти
+          const aFeatured = (a as any).featured === true ? 1 : 0;
+          const bFeatured = (b as any).featured === true ? 1 : 0;
+          if (aFeatured !== bFeatured) return bFeatured - aFeatured;
+
+          // Потім за продажами
+          const aSales = (a as any).total_sales || 0;
+          const bSales = (b as any).total_sales || 0;
+          return bSales - aSales;
+        });
+
+      case "new":
+        return copy.sort((a, b) => {
+          const aDate = new Date(
+            (a as any).dateCreated || (a as any).date_created || 0
+          );
+          const bDate = new Date(
+            (b as any).dateCreated || (b as any).date_created || 0
+          );
+          return bDate.getTime() - aDate.getTime();
+        });
+
+      case "sale":
+        return copy.sort((a, b) => {
+          // Спочатку акційні товари
+          const aOnSale = (a as any).on_sale === true ? 1 : 0;
+          const bOnSale = (b as any).on_sale === true ? 1 : 0;
+          if (aOnSale !== bOnSale) return bOnSale - aOnSale;
+
+          // Потім за датою
+          const aDate = new Date(
+            (a as any).dateCreated || (a as any).date_created || 0
+          );
+          const bDate = new Date(
+            (b as any).dateCreated || (b as any).date_created || 0
+          );
+          return bDate.getTime() - aDate.getTime();
+        });
+
+      default:
+        return copy;
     }
-    if (sortBy === "price") {
-      copy.sort((a, b) => {
-        const priceA =
-          typeof a.price === "string" ? parseFloat(a.price) || 0 : a.price || 0;
-        const priceB =
-          typeof b.price === "string" ? parseFloat(b.price) || 0 : b.price || 0;
-        return priceA - priceB;
-      });
-    }
-    return copy;
-  }, [sourceProducts, sortBy]);
+  }, [sourceProducts, effectiveSortBy]);
 
   const totalPages = Math.max(
     1,
@@ -94,6 +159,7 @@ const CourseCatalogContainer = ({
         <ProductsGrid
           courses={pageData.map((course: Course) => ({
             id: String(course.id),
+            slug: course.slug,
             name: course.name,
             description: course.description || undefined,
             image: course.image || "",
@@ -109,13 +175,15 @@ const CourseCatalogContainer = ({
             reviewsCount: course.reviewsCount || 0,
             requirements: course.requirements,
             dateCreated: course.dateCreated,
-            wcProduct: (course as any).wcProduct, // ВАЖЛИВО: Передаємо wcProduct як є
-            courseData: course.courseData as { excerpt?: { rendered: string } } | undefined,
+            wcProduct: (course as any).wcProduct,
+            courseData: course.courseData as
+              | { excerpt?: { rendered: string } }
+              | undefined,
           }))}
           isLoading={isLoading}
           hasFilters={hasFilters}
         />
-        {sortedProducts.length > 12 && (
+        {sortedProducts.length > itemsPerPage && (
           <SliderNav
             activeIndex={activeIndex}
             dots={Math.ceil(sortedProducts.length / itemsPerPage)}

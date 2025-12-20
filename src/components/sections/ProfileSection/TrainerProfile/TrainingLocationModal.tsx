@@ -90,13 +90,20 @@ export default function TrainingLocationModal({
     queryFn: async () => {
       if (!baseProfile?.id) return null;
       const id = String(baseProfile.id);
-      const response = await api.get("/api/proxy", {
-        params: {
-          path: `/wp-json/wp/v2/users/${id}?context=edit`,
-        },
-        headers: { "x-internal-admin": "1" },
-      });
-      return response.data;
+      try {
+        const response = await api.get("/api/proxy", {
+          params: {
+            path: `/wp-json/wp/v2/users/${id}?context=edit`,
+          },
+          headers: { "x-internal-admin": "1" },
+        });
+        return response.data;
+      } catch (error) {
+        if (process.env.NODE_ENV !== "production") {
+          console.error("Failed to fetch trainer profile:", error);
+        }
+        return null;
+      }
     },
     enabled: !!baseProfile?.id && isOpen,
     staleTime: 60_000,
@@ -244,6 +251,19 @@ export default function TrainingLocationModal({
                   />
                 </div>
 
+                <div className={styles.workingHoursSection}>
+                  {/* <h4 className={styles.sectionLabel}></h4> */}
+                  <div className={styles.inputGroup}>
+                    <InputField
+                      wrapperClassName={styles.fullWidthInput}
+                      icon={<LocationIcon className={styles.inputIcon} />}
+                      label="Введіть адресу залу"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                    />
+                  </div>
+                </div>
+
                 <div className={styles.inputGroup}>
                   <InputField
                     wrapperClassName={styles.fullWidthInput}
@@ -296,19 +316,6 @@ export default function TrainingLocationModal({
                   label="50.438611, 30.518611"
                   value={coordinates}
                   onChange={(e) => setCoordinates(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className={styles.workingHoursSection}>
-              <h4 className={styles.sectionLabel}>Адреса:</h4>
-              <div className={styles.inputGroup}>
-                <InputField
-                  wrapperClassName={styles.fullWidthInput}
-                  icon={<LocationIcon className={styles.inputIcon} />}
-                  label="Введіть адресу залу"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
                 />
               </div>
             </div>
@@ -438,29 +445,12 @@ export default function TrainingLocationModal({
                 onChange={async (e) => {
                   const files = e.target.files;
                   if (!files || files.length === 0 || !token) {
-                    if (process.env.NODE_ENV !== "production") {
-                      console.log(
-                        "[TrainingLocationModal] Немає файлів або токена:",
-                        {
-                          hasFiles: !!files && files.length > 0,
-                          hasToken: !!token,
-                        }
-                      );
-                    }
                     return;
                   }
                   try {
                     setUploadingGym(true);
-                    if (process.env.NODE_ENV !== "production") {
-                      console.log(
-                        "[TrainingLocationModal] Завантаження фото залу:",
-                        {
-                          filesCount: files.length,
-                        }
-                      );
-                    }
-                    // Використовуємо стандартний WordPress media endpoint для завантаження файлів
-                    // без збереження в gallery (тільки отримуємо URL)
+
+                    // Завантаження файлів
                     const uploadPromises = Array.from(files).map(
                       async (file) => {
                         try {
@@ -470,14 +460,7 @@ export default function TrainingLocationModal({
                             fieldType: "img_link_data_gallery_", // fieldType не використовується в стандартному endpoint, але потрібен для типу
                           });
                           return result.url || null;
-                        } catch (error) {
-                          if (process.env.NODE_ENV !== "production") {
-                            console.error(
-                              "[TrainingLocationModal] Помилка завантаження файлу:",
-                              file.name,
-                              error
-                            );
-                          }
+                        } catch {
                           return null;
                         }
                       }
@@ -493,37 +476,7 @@ export default function TrainingLocationModal({
                     );
 
                     if (uploadedUrls.length > 0) {
-                      if (process.env.NODE_ENV !== "production") {
-                        console.log(
-                          "[TrainingLocationModal] Фото завантажено, URL:",
-                          uploadedUrls
-                        );
-                        console.log(
-                          "[TrainingLocationModal] Поточні фото до додавання:",
-                          gymPhotos
-                        );
-                      }
-                      // Додаємо до існуючих фото (не замінюємо)
-                      setGymPhotos((prev) => {
-                        const combined = [...prev, ...uploadedUrls];
-                        if (process.env.NODE_ENV !== "production") {
-                          console.log(
-                            "[TrainingLocationModal] Комбіновані фото:",
-                            combined
-                          );
-                        }
-                        return combined;
-                      });
-                    } else {
-                      if (process.env.NODE_ENV !== "production") {
-                        console.warn(
-                          "[TrainingLocationModal] Не вдалося завантажити фото"
-                        );
-                      }
-                    }
-                    // allow re-select same files later
-                    if (e.currentTarget) {
-                      e.currentTarget.value = "";
+                      setGymPhotos((prev) => [...prev, ...uploadedUrls]);
                     }
                   } finally {
                     setUploadingGym(false);
@@ -595,7 +548,6 @@ export default function TrainingLocationModal({
                 weekdayStart && weekdayEnd
                   ? `${weekdayStart}–${weekdayEnd}`
                   : "";
-              // Використовуємо title, якщо він є, інакше address
               const finalTitle = title.trim() || address.trim() || "";
 
               onSave({
@@ -608,22 +560,9 @@ export default function TrainingLocationModal({
                 schedule_five,
                 schedule_two,
                 address,
-                coordinates: coordinates.trim(), // Додаємо координати
-                photos: gymPhotos, // Додаємо фото залу
+                coordinates: coordinates.trim(),
+                photos: gymPhotos,
               });
-
-              if (process.env.NODE_ENV !== "production") {
-                console.log(
-                  "[TrainingLocationModal] Збереження локації з фото:",
-                  {
-                    title: finalTitle,
-                    titleFromState: title,
-                    addressFromState: address,
-                    photosCount: gymPhotos.length,
-                    photos: gymPhotos,
-                  }
-                );
-              }
             }}
           >
             Зберегти дані

@@ -46,7 +46,6 @@ export async function PUT(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("/api/profile/trainer PUT error", error);
     return NextResponse.json(
       { error: "trainer profile update error" },
       { status: 500 }
@@ -55,7 +54,6 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  console.log("[PATCH /api/profile/trainer] Request received");
   try {
     // Отримуємо raw текст для обробки некоректних символів
     const rawText = await req.text();
@@ -92,7 +90,6 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    console.log("[PATCH /api/profile/trainer] Body:", body);
 
     // Отримуємо токен з заголовка або cookies
     let authHeader = req.headers.get("authorization") || "";
@@ -153,7 +150,7 @@ export async function PATCH(req: NextRequest) {
           `[PATCH /api/profile/trainer] Адмін редагує користувача з ID: ${targetId}`
         );
       } else {
-        console.error(
+        console.log(
           `[PATCH /api/profile/trainer] Отримано slug замість числового ID: "${idStr}"`
         );
         return NextResponse.json(
@@ -174,9 +171,6 @@ export async function PATCH(req: NextRequest) {
     }
 
     const url = `${UPSTREAM_BASE}/wp-json/wp/v2/users/${targetId}`;
-    console.log(`[PATCH /api/profile/trainer] Target URL: ${url}`);
-    console.log(`[PATCH /api/profile/trainer] UPSTREAM_BASE: ${UPSTREAM_BASE}`);
-    console.log(`[PATCH /api/profile/trainer] targetId: ${targetId}`);
 
     const upstreamRes = await fetch(url, {
       method: "PATCH",
@@ -207,7 +201,6 @@ export async function PATCH(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("/api/profile/trainer PATCH error", error);
     return NextResponse.json(
       { error: "trainer profile update error" },
       { status: 500 }

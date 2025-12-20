@@ -59,7 +59,6 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("/api/wc/products/attributes error", error);
     return NextResponse.json(
       { error: "wc product attributes error" },
       { status: 500 }

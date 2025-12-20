@@ -59,15 +59,6 @@ export function useUserProfile() {
         if (!token) return;
         const data = await getMyProfile();
         if (!mounted || !data) return;
-        if (process.env.NODE_ENV !== "production") {
-          console.log("[useUserProfile] fetched", {
-            meta: data?.meta,
-            avatar: data?.avatar,
-            avatar96: data?.avatar_urls?.["96"],
-            topLevelAvatar: (data as unknown as { img_link_data_avatar?: string })
-              ?.img_link_data_avatar,
-          });
-        }
         // SSOT: first_name + last_name має бути головним джерелом імені
         const fullName = `${data?.first_name ?? ""} ${data?.last_name ?? ""}`.trim();
         const resolvedName = fullName || data?.name || "";
@@ -133,9 +124,6 @@ export function useUserProfile() {
               }
             }
           } catch {}
-          if (process.env.NODE_ENV !== "production") {
-            console.log("[useUserProfile] skip override (no server avatar url)");
-          }
           // все одно оновлюємо імʼя/емейл із бекенду
           setRemoteName(resolvedName || authUser?.displayName || "");
           setRemoteEmail(resolvedEmail || authUser?.email || "");
@@ -144,18 +132,6 @@ export function useUserProfile() {
 
         // Пріоритет: img_link_data_avatar (top-level/meta) або інший валідний URL з бекенду
         const finalAvatar: string | undefined = serverAvatarCandidate as string;
-        if (process.env.NODE_ENV !== "production") {
-          console.log("[useUserProfile] resolved avatar", {
-            topLevelAvatar,
-            metaAvatar: meta?.["img_link_data_avatar"],
-            firstUploadUrl,
-            avatar: data?.avatar,
-            avatar96: data?.avatar_urls?.["96"],
-            serverAvatarCandidate,
-            hasServerAvatarUrl,
-            finalAvatar,
-          });
-        }
         setRemoteName(resolvedName || authUser?.displayName || "");
         setRemoteEmail(resolvedEmail || authUser?.email || "");
         setRemoteAvatar(finalAvatar || "");

@@ -191,7 +191,6 @@
 
   .courseContentBlock {
     gap: mvw(20);
-    display: none;
   }
 
   .tagsCodeBlock {
@@ -255,7 +254,7 @@
 
   .topicsSection {
     gap: mvw(12);
-    display: none;
+    /* display: none; */
   }
 
   .topicsSection h3 {

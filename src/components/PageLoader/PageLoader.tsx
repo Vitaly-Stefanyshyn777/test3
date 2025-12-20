@@ -8,85 +8,45 @@ const PageLoader = () => {
   const [isVisible, setIsVisible] = useState(true);
   const pathname = usePathname();
 
-  const checkReady = () => {
-    const hero = document.querySelector("[data-hero-section]");
-    if (!hero) return false;
-
-    const banner =
-      hero.querySelector('[class*="heroBanner"]') ||
-      hero.querySelector('[class*="swiper"]');
-
-    if (!banner) return false;
-
-    const styles = getComputedStyle(banner);
-    const height = parseInt(styles.height);
-
-    return height > 0;
-  };
-
-  const hideLoader = () => {
-    setProgress(100);
-    setTimeout(() => setIsVisible(false), 300);
-  };
-
+  // Початкове завантаження (гідрація завершилась)
   useEffect(() => {
-    // при зміні маршруту знову показуємо
+    const timer = setTimeout(() => {
+      setProgress(100);
+      setTimeout(() => {
+        setIsVisible(false);
+      }, 300);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Перехід між сторінками (відстеження зміни pathname)
+  useEffect(() => {
+    // Показуємо лоадер при зміні маршруту
     setIsVisible(true);
     setProgress(0);
 
-    if (checkReady()) {
-      hideLoader();
-      return;
-    }
-
-    let done = false;
-
-    const finish = () => {
-      if (done) return;
-      done = true;
-
-      clearInterval(progressInterval);
-      clearInterval(checkInterval);
-      observer.disconnect();
-      clearTimeout(fallback);
-
-      hideLoader();
-    };
-
-    // плавний прогрес
-    const progressInterval = setInterval(() => {
-      setProgress((p) => {
-        if (p >= 90) return p;
-        const step = p < 50 ? 10 : p < 80 ? 5 : 2;
-        return Math.min(p + step, 90);
+    // Симуляція прогресу під час переходу
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        const maxBeforeLoad = 90;
+        if (prev >= maxBeforeLoad) return prev;
+        const increment = prev < 50 ? 10 : prev < 80 ? 5 : 2;
+        return Math.min(prev + increment, maxBeforeLoad);
       });
-    }, 60);
+    }, 50);
 
-    // слідкуємо за DOM
-    const observer = new MutationObserver(() => {
-      if (checkReady()) finish();
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-    });
-
-    // періодична перевірка
-    const checkInterval = setInterval(() => {
-      if (checkReady()) finish();
-    }, 80);
-
-    // запасний таймер
-    const fallback = setTimeout(finish, 8000);
+    // Завершуємо завантаження після невеликої затримки (час на гідрацію нової сторінки)
+    const timer = setTimeout(() => {
+      setProgress(100);
+      setTimeout(() => {
+        setIsVisible(false);
+      }, 300);
+    }, 400);
 
     return () => {
-      done = true;
-      clearInterval(progressInterval);
-      clearInterval(checkInterval);
-      clearTimeout(fallback);
-      observer.disconnect();
+      clearInterval(interval);
+      clearTimeout(timer);
     };
   }, [pathname]);
 
@@ -95,10 +55,14 @@ const PageLoader = () => {
   return (
     <div className={s.loader}>
       <div className={s.progressBar}>
-        <div className={s.progressFill} style={{ width: `${progress}%` }} />
+        <div
+          className={s.progressFill}
+          style={{ width: `${progress}%` }}
+        />
       </div>
     </div>
   );
 };
 
 export default PageLoader;
+

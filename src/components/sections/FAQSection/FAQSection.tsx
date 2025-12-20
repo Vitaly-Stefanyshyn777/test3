@@ -17,6 +17,7 @@ const FAQSection: React.FC<FAQSectionProps> = ({ categoryId: propCategoryId }) =
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<number[]>([]);
   const [faqData, setFaqData] = useState<FaqItem[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Визначаємо категорію FAQ на основі поточної сторінки або переданого пропса
   const getFaqCategoryId = (): number => {
@@ -42,6 +43,18 @@ const FAQSection: React.FC<FAQSectionProps> = ({ categoryId: propCategoryId }) =
   };
 
   const categoryId = getFaqCategoryId();
+
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 1000px)");
+    const update = () => setIsMobile(mql.matches);
+    update();
+    if (mql.addEventListener) mql.addEventListener("change", update);
+    else mql.addListener(update);
+    return () => {
+      if (mql.removeEventListener) mql.removeEventListener("change", update);
+      else mql.removeListener(update);
+    };
+  }, []);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["faq", categoryId],
@@ -108,7 +121,11 @@ const FAQSection: React.FC<FAQSectionProps> = ({ categoryId: propCategoryId }) =
               <div className={styles.titleContainer}></div>
               <div className={styles.imageContainer}>
                 <Image
-                  src="/images/Frame132131848543.png"
+                  src={
+                    isMobile
+                      ? "/IMG_20250601_233327_7061.png"
+                      : "/images/Frame132131848543.png"
+                  }
                   alt="Дівчина на балансборді"
                   width={562}
                   height={465}

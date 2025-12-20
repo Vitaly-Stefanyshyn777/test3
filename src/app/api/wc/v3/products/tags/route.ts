@@ -27,7 +27,6 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Error fetching product tags:", error);
     return NextResponse.json(
       { error: "Failed to fetch product tags" },
       { status: 500 }

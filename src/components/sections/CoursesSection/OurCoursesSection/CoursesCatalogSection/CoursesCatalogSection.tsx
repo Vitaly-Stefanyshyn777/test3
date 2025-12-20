@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import styles from "./CoursesCatalogSection.module.css";
-import ProductCard from "../../ CourseCard/CourseCard";
+import ProductCard from "@/components/sections/CoursesSection/CourseCard/CourseCard";
 
 const CoursesCatalogSection = () => {
   const courses = [
@@ -10,8 +10,8 @@ const CoursesCatalogSection = () => {
       name: "Тренер BFB: Базовий рівень",
       description:
         "Курс BFB — це сертифікаційна навчальна програма, яка дає не просто знання, а право стати частиною авторської системи тренувань.",
-      price: 5000,
-      originalPrice: 7000,
+      price: 0,
+      originalPrice: 0,
       discount: 5,
       isNew: true,
       isHit: false,
@@ -25,8 +25,8 @@ const CoursesCatalogSection = () => {
       name: "Тренер BFB: Базовий рівень",
       description:
         "Курс BFB — це сертифікаційна навчальна програма, яка дає не просто знання, а право стати частиною авторської системи тренувань.",
-      price: 5000,
-      originalPrice: 7000,
+      price: 0,
+      originalPrice: 0,
       discount: 5,
       isNew: false,
       isHit: true,
@@ -40,8 +40,8 @@ const CoursesCatalogSection = () => {
       name: "Тренер BFB: Базовий рівень",
       description:
         "Курс BFB — це сертифікаційна навчальна програма, яка дає не просто знання, а право стати частиною авторської системи тренувань.",
-      price: 5000,
-      originalPrice: 7000,
+      price: 0,
+      originalPrice: 0,
       discount: 0,
       isNew: true,
       isHit: false,
@@ -55,8 +55,8 @@ const CoursesCatalogSection = () => {
       name: "Тренер BFB: Базовий рівень",
       description:
         "Курс BFB — це сертифікаційна навчальна програма, яка дає не просто знання, а право стати частиною авторської системи тренувань.",
-      price: 5000,
-      originalPrice: 7000,
+      price: 0,
+      originalPrice: 0,
       discount: 20,
       isNew: false,
       isHit: false,
@@ -70,8 +70,8 @@ const CoursesCatalogSection = () => {
       name: "Тренер BFB: Базовий рівень",
       description:
         "Курс BFB — це сертифікаційна навчальна програма, яка дає не просто знання, а право стати частиною авторської системи тренувань.",
-      price: 5000,
-      originalPrice: 7000,
+      price: 0,
+      originalPrice: 0,
       discount: 5,
       isNew: false,
       isHit: true,
@@ -85,8 +85,8 @@ const CoursesCatalogSection = () => {
       name: "Тренер BFB: Базовий рівень",
       description:
         "Курс BFB — це сертифікаційна навчальна програма, яка дає не просто знання, а право стати частиною авторської системи тренувань.",
-      price: 5000,
-      originalPrice: 7000,
+      price: 0,
+      originalPrice: 0,
       discount: 5,
       isNew: true,
       isHit: false,
@@ -100,8 +100,8 @@ const CoursesCatalogSection = () => {
       name: "Тренер BFB: Базовий рівень",
       description:
         "Курс BFB — це сертифікаційна навчальна програма, яка дає не просто знання, а право стати частиною авторської системи тренувань.",
-      price: 5000,
-      originalPrice: 7000,
+      price: 0,
+      originalPrice: 0,
       discount: 5,
       isNew: false,
       isHit: false,
@@ -115,8 +115,8 @@ const CoursesCatalogSection = () => {
       name: "Тренер BFB: Базовий рівень",
       description:
         "Курс BFB — це сертифікаційна навчальна програма, яка дає не просто знання, а право стати частиною авторської системи тренувань.",
-      price: 5000,
-      originalPrice: 7000,
+      price: 0,
+      originalPrice: 0,
       discount: 5,
       isNew: false,
       isHit: false,
@@ -190,11 +190,11 @@ const CoursesCatalogSection = () => {
               <ProductCard
                 key={course.id}
                 id={course.id}
+                slug={`course-${course.id}`}
                 name={course.name}
                 description={course.description}
                 price={course.price}
                 originalPrice={course.originalPrice}
-                discount={course.discount}
                 isNew={course.isNew}
                 isHit={course.isHit}
                 image={course.image}

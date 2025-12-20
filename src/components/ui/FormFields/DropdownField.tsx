@@ -21,6 +21,7 @@ interface DropdownFieldProps {
   isOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
   backgroundColor?: "bg-color" | "white";
+  disabled?: boolean;
 }
 
 const DropdownField: React.FC<DropdownFieldProps> = ({
@@ -36,6 +37,7 @@ const DropdownField: React.FC<DropdownFieldProps> = ({
   isOpen: controlledIsOpen,
   onOpenChange,
   backgroundColor = "bg-color",
+  disabled = false,
 }) => {
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const isOpen =
@@ -44,6 +46,7 @@ const DropdownField: React.FC<DropdownFieldProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleToggle = () => {
+    if (disabled) return;
     const newIsOpen = !isOpen;
     if (onOpenChange) {
       onOpenChange(newIsOpen);
@@ -92,8 +95,11 @@ const DropdownField: React.FC<DropdownFieldProps> = ({
             value ? styles.selectButtonFilled : ""
           } ${isOpen ? styles.selectButtonActive : ""} ${
             hasError ? styles.selectButtonError : ""
-          } ${backgroundColor === "white" ? styles.selectButtonWhite : ""}`}
+          } ${backgroundColor === "white" ? styles.selectButtonWhite : ""} ${
+            disabled ? styles.selectButtonDisabled : ""
+          }`}
           onClick={handleToggle}
+          disabled={disabled}
         >
           <span className={styles.selectText}>
             {icon && !value && icon}

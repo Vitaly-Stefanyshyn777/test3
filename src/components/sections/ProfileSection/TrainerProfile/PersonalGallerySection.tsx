@@ -67,12 +67,6 @@ export default function PersonalGallerySection({
       Array.isArray(initialImages) &&
       initialImages.length > 0
     ) {
-      if (process.env.NODE_ENV !== "production") {
-        console.log(
-          "[PersonalGallerySection] Оновлення initialImages:",
-          initialImages
-        );
-      }
       setServerImages(initialImages);
     } else if (
       initialImages &&
@@ -81,11 +75,6 @@ export default function PersonalGallerySection({
     ) {
       // Якщо initialImages порожній масив, не очищаємо serverImages
       // щоб не втратити дані після завантаження
-      if (process.env.NODE_ENV !== "production") {
-        console.log(
-          "[PersonalGallerySection] initialImages порожній масив, зберігаємо поточні serverImages"
-        );
-      }
     }
     // Якщо initialImages undefined, не робимо нічого - зберігаємо поточні serverImages
   }, [initialImages]);
@@ -129,8 +118,7 @@ export default function PersonalGallerySection({
     const selected = inputEl.files;
     if (!selected || selected.length === 0) return;
 
-    // Перевірка розміру файлів (ліміт 10 МБ)
-    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 МБ в байтах
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 МБ
     const oversizedFiles: string[] = [];
 
     for (const file of Array.from(selected)) {
@@ -151,63 +139,29 @@ export default function PersonalGallerySection({
 
     try {
       setError(null);
-      // Додаємо файли тільки локально, завантаження на сервер відбудеться при збереженні
       const filesArray = Array.from(selected);
       const next = [...files, ...filesArray];
       setFiles(next);
       onChange?.(next);
 
-      if (process.env.NODE_ENV !== "production") {
-        console.log("[PersonalGallerySection] Файли додано локально:", {
-          filesCount: filesArray.length,
-          totalFiles: next.length,
-          fileNames: filesArray.map((f) => f.name),
-        });
-      }
-
       if (inputEl) inputEl.value = "";
     } catch (error) {
       setError("Не вдалося додати файл");
-      if (process.env.NODE_ENV !== "production") {
-        console.error(error);
-      }
     }
   };
 
   const handleDelete = (index: number) => {
-    if (process.env.NODE_ENV !== "production") {
-      console.log("[PersonalGallerySection] Видалення за індексом:", {
-        index,
-        serverImagesLength: serverImages.length,
-        filesLength: files.length,
-        previewsLength: previews.length,
-      });
-    }
-
     // Просто видаляємо за індексом з previews
     // Якщо індекс в межах serverImages - видаляємо з serverImages
     // Інакше - з files
     if (index < serverImages.length) {
       // Видаляємо з серверних зображень
       const newServerImages = serverImages.filter((_, i) => i !== index);
-      if (process.env.NODE_ENV !== "production") {
-        console.log("[PersonalGallerySection] Видалення з serverImages:", {
-          before: serverImages.length,
-          after: newServerImages.length,
-        });
-      }
       setServerImages(newServerImages);
     } else {
       // Видаляємо з локальних файлів
       const fileIndex = index - serverImages.length;
       const newFiles = files.filter((_, i) => i !== fileIndex);
-      if (process.env.NODE_ENV !== "production") {
-        console.log("[PersonalGallerySection] Видалення з files:", {
-          fileIndex,
-          before: files.length,
-          after: newFiles.length,
-        });
-      }
       setFiles(newFiles);
       onChange?.(newFiles);
     }

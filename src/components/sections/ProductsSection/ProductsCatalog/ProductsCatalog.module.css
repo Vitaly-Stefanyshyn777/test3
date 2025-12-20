@@ -56,7 +56,7 @@
 
 @media (max-width: 1000px) {
   .catalogContentBlock {
-    padding: mvw(24) mvw(16) mvw(80) mvw(16);
+    padding: mvw(130) mvw(16) mvw(80) mvw(16);
   }
   .catalogContentContainer {
     padding: 0;

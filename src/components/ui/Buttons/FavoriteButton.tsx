@@ -12,9 +12,18 @@ type Props = {
   slug?: string;
   name: string;
   price?: number;
+  originalPrice?: number;
   image?: string;
   className?: string;
   activeClassName?: string;
+  wcProduct?: {
+    prices?: {
+      price: string;
+      regular_price: string;
+      sale_price: string;
+    };
+    on_sale?: boolean;
+  };
 };
 
 export default function FavoriteButton({
@@ -22,9 +31,11 @@ export default function FavoriteButton({
   slug,
   name,
   price = 0,
+  originalPrice,
   image,
   className = "",
   activeClassName = "",
+  wcProduct,
 }: Props) {
   const isFav = useFavoriteStore(selectIsFavorite(id));
   const toggleFav = useFavoriteStore((s) => s.toggleFavorite);
@@ -32,7 +43,7 @@ export default function FavoriteButton({
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleFav({ id, slug, name, price, image });
+    toggleFav({ id, slug, name, price, originalPrice, image, wcProduct });
   };
 
   return (

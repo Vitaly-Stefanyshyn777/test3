@@ -150,11 +150,10 @@
 
 @media (max-width: 1000px) {
   .wrapper {
-    gap: mvw(24);
+    gap: mvw(16);
   }
 
   .header {
-    margin-bottom: mvw(16);
   }
 
   .title {
@@ -164,7 +163,7 @@
 
   .scroller {
     gap: mvw(8);
-    padding-bottom: mvw(6);
+    padding-bottom: mvw(20);
   }
 
   .card {

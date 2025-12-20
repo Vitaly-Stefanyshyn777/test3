@@ -45,7 +45,6 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("/api/wc/orders/[id] error", error);
     return NextResponse.json(
       { error: "Failed to fetch order" },
       { status: 500 }

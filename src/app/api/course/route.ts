@@ -21,11 +21,7 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(
-        "[Course API] ❌ WordPress API error:",
-        response.status,
-        errorText
-      );
+      console.error("[Course API] ❌ WordPress API error:", response.status, errorText);
       return NextResponse.json(
         { error: `WordPress API error: ${response.status}` },
         { status: response.status }
@@ -35,7 +31,7 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error("[Course API] ❌ Error:", error);
+    console.error("[Course API] ❌ Internal error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -3,6 +3,7 @@ import React from "react";
 import { useAuthStore } from "@/store/auth";
 import Image from "next/image";
 import Link from "next/link";
+import { normalizeImageUrl } from "@/lib/imageUtils";
 import styles from "./CourseCard.module.css";
 import FavoriteButton from "@/components/ui/Buttons/FavoriteButton";
 import CartButton from "@/components/ui/Buttons/CartButton";
@@ -12,6 +13,7 @@ import SubscriptionBadge from "@/components/ui/SubscriptionBadge/SubscriptionBad
 
 interface CourseCardProps {
   id: string;
+  slug?: string;
   name: string;
   description?: string;
   price?: number;
@@ -70,15 +72,35 @@ interface CourseCardProps {
     featured?: boolean;
     is_purchasable?: boolean;
   };
-  allProducts?: Array<{ total_sales?: number }>; // Для розрахунку топ продажів
+  allProducts?: Array<{ total_sales?: number }>;
 }
+
+const getHref = (id: string, slug?: string) => {
+  if (slug && slug.trim() !== "" && !/^\d+$/.test(slug)) {
+    let processedSlug = slug;
+    if (slug.includes("%")) {
+      try {
+        processedSlug = decodeURIComponent(slug);
+      } catch {
+        processedSlug = slug;
+      }
+    }
+
+    if (processedSlug.trim() !== "" && !/^\d+$/.test(processedSlug)) {
+      return `/courses/${processedSlug}`;
+    }
+  }
+
+  return `/courses/${id}`;
+};
 
 const CourseCard = ({
   id,
+  slug,
   name,
   description,
-  price = 5000,
-  originalPrice = 7000,
+  price = 0,
+  originalPrice = 0,
   isNew = false,
   isHit = false,
   isFavorite = false,
@@ -94,7 +116,7 @@ const CourseCard = ({
 }: CourseCardProps) => {
   const favoriteKey = `course-${id}`;
   const cartKey = `course-${id}`;
-  const imageUrl = image || "/placeholder.svg";
+  const imageUrl = normalizeImageUrl(image);
 
   const isNewProduct = (dateCreated?: string) => {
     if (!dateCreated) return false;
@@ -138,16 +160,22 @@ const CourseCard = ({
   const currentPrice =
     wcProduct?.prices?.price &&
     wcProduct.prices.price !== "0" &&
-    wcProduct.prices.price !== ""
+    wcProduct.prices.price !== "" &&
+    wcProduct.prices.price.trim() !== ""
       ? wcProduct.prices.price
-      : price.toString();
+      : (price !== undefined && price !== null && price.toString() !== "0" && price.toString() !== "" && price.toString().trim() !== "")
+        ? price.toString()
+        : "0";
 
   const regularPrice =
     wcProduct?.prices?.regular_price &&
     wcProduct.prices.regular_price !== "0" &&
-    wcProduct.prices.regular_price !== ""
+    wcProduct.prices.regular_price !== "" &&
+    wcProduct.prices.regular_price.trim() !== ""
       ? wcProduct.prices.regular_price
-      : originalPrice?.toString() || "0";
+      : (originalPrice !== undefined && originalPrice !== null && originalPrice.toString() !== "0" && originalPrice.toString() !== "" && originalPrice.toString().trim() !== "")
+        ? originalPrice.toString()
+        : "0";
 
   const salePrice =
     wcProduct?.prices?.sale_price &&
@@ -227,7 +255,7 @@ const CourseCard = ({
   };
 
   return (
-    <Link href={`/courses/${id}`} className={styles.productCard}>
+    <Link href={getHref(id, slug)} className={styles.productCard}>
       <div className={styles.cardImage}>
         <Image
           src={imageUrl}
@@ -259,9 +287,26 @@ const CourseCard = ({
           id={favoriteKey}
           name={name}
           price={price || 0}
+          originalPrice={
+            regularPrice ? parseFloat(regularPrice) : originalPrice
+          }
           image={image}
           className={styles.favoriteBtn}
           activeClassName={styles.favoriteActive}
+          wcProduct={
+            wcProduct
+              ? {
+                  prices: {
+                    price: wcProduct.prices?.price || currentPrice || "0",
+                    regular_price:
+                      wcProduct.prices?.regular_price || regularPrice || "0",
+                    sale_price:
+                      wcProduct.prices?.sale_price || salePrice || "0",
+                  },
+                  on_sale: wcProduct.on_sale || isOnSale,
+                }
+              : undefined
+          }
         />
       </div>
 
@@ -274,25 +319,35 @@ const CourseCard = ({
 
             <p className={styles.description}>
               {truncateDescription(
-                stripTags(courseData?.excerpt?.rendered) ||
+                (courseData?.excerpt?.rendered
+                  ? stripTags(courseData.excerpt.rendered)
+                  : null) ||
                   stripTags(description) ||
                   "Курс BFB — це сертифікаційна навчальна програма, яка дає не просто знання, а право стати частиною авторської системи"
               )}
             </p>
           </div>
-
-          <div className={styles.rating}>
+          {/* <div className={styles.rating}>
             {renderStars(rating || 0)}
             <span className={styles.reviewsCount}>({reviewsCount || 0})</span>
-          </div>
+          </div> */}
+          <div className={styles.metaInfo}>
+            {/* 1. requirementsBadge (order: 1 на мобільному) */}
+            {(courseData?.Required_equipment || requirements) && (
+              <div className={styles.requirements}>
+                <span className={styles.requirementsBadge}>
+                  {courseData?.Required_equipment || requirements}
+                </span>
+              </div>
+            )}
 
-          {(courseData?.Required_equipment || requirements) && (
-            <div className={styles.requirements}>
-              <span className={styles.requirementsBadge}>
-                {courseData?.Required_equipment || requirements}
-              </span>
+            {/* 2. rating (order: 2 на мобільному) */}
+            <div className={styles.rating}>
+              {renderStars(rating || 0)}
+              <span className={styles.reviewsCount}>({reviewsCount || 0})</span>
             </div>
-          )}
+          </div>{" "}
+          {/* Кінець styles.metaInfo */}
         </div>
         <div className={styles.subscriptionPriceBlock}>
           <div className={styles.subscriptionBlock}>
@@ -305,14 +360,12 @@ const CourseCard = ({
             <div className={styles.pricing}>
               {isLoggedIn ? (
                 <>
-                  {finalPrice > 0 && (
-                    <span className={styles.currentPrice}>
-                      <span className={styles.currentPriceValue}>
-                        {formatPrice(finalPrice.toString())}
-                      </span>
-                      <span className={styles.priceCurrency}>₴</span>
+                  <span className={styles.currentPrice}>
+                    <span className={styles.currentPriceValue}>
+                      {formatPrice(finalPrice.toString())}
                     </span>
-                  )}
+                    <span className={styles.priceCurrency}>₴</span>
+                  </span>
                   {regularPrice &&
                     parseFloat(regularPrice) > 0 &&
                     totalDiscount > 0 && (
@@ -326,15 +379,12 @@ const CourseCard = ({
                 </>
               ) : (
                 <>
-                  {(formattedSalePrice || formattedCurrentPrice) &&
-                    parseFloat(salePrice || currentPrice || "0") > 0 && (
-                      <span className={styles.currentPrice}>
-                        <span className={styles.currentPriceValue}>
-                          {formattedSalePrice || formattedCurrentPrice}
-                        </span>
-                        <span className={styles.priceCurrency}>₴</span>
-                      </span>
-                    )}
+                  <span className={styles.currentPrice}>
+                    <span className={styles.currentPriceValue}>
+                      {formattedSalePrice || formattedCurrentPrice || "0"}
+                    </span>
+                    <span className={styles.priceCurrency}>₴</span>
+                  </span>
                   {salePrice &&
                     regularPrice &&
                     parseFloat(regularPrice) > 0 && (
@@ -353,8 +403,16 @@ const CourseCard = ({
           <CartButton
             id={cartKey}
             name={name}
-            price={price || 0}
-            image={image}
+            price={
+              // Зберігаємо базову ціну (без знижки авторизації), знижка застосовується при відображенні
+              parseFloat(salePrice || currentPrice || basePrice || "0")
+            }
+            originalPrice={
+              regularPrice && parseFloat(regularPrice) > 0
+                ? parseFloat(regularPrice)
+                : undefined
+            }
+            image={imageUrl}
             className={styles.cartBtn}
             activeClassName={styles.cartBtnActive}
           />

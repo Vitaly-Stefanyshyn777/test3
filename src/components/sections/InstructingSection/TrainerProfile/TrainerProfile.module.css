@@ -32,9 +32,9 @@
   scroll-padding-top: 120px;
 }
 
-#overview,
 #gallery,
-#locations {
+#locations,
+#contacts {
   scroll-margin-top: 140px;
 }
 
@@ -45,12 +45,18 @@
   z-index: 1;
 }
 
-#overview {
+#contacts {
   scroll-margin-top: 140px;
+  padding-top: 20px;
+  position: relative;
+  z-index: 1;
 }
 
 #gallery {
-  scroll-margin-top: 160px;
+  scroll-margin-top: 140px;
+  padding-top: 20px;
+  position: relative;
+  z-index: 1;
 }
 
 #favorite-exercise {
@@ -357,11 +363,8 @@
 }
 
 .exerciseItem {
-  border-radius: 0.625vw;
   align-items: center;
 
-  /* padding: 0.83333vw; */
-  font-size: 1.1rem;
   display: flex;
   width: fit-content;
 }
@@ -701,7 +704,6 @@
   font-size: 1.2rem;
   color: #6f42c1;
   text-decoration: none;
-
 }
 
 .loading,
@@ -861,23 +863,43 @@
   cursor: pointer;
 }
 
+.galleryEmpty {
+  text-align: center;
+  padding: mvw(20);
+  color: #666;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 140%;
+  color: var(--black);
+}
 @media (max-width: 1000px) {
   .trainerProfileWrapper {
     width: 100%;
     position: relative;
     z-index: 1;
     padding-bottom: mvw(240);
-    margin-bottom: mvw(120);
+    margin-bottom: mvw(0);
     overflow: visible;
     min-height: auto;
   }
 
   .trainerProfile {
     flex-direction: column;
-    padding: mvw(24) mvw(16);
+    padding: mvw(124) mvw(16);
     gap: mvw(24);
     background-color: var(--white);
     margin-bottom: 0;
+  }
+  .galleryEmpty {
+    text-align: center;
+    padding: mvw(20);
+    color: #666;
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: mvw(14);
+    line-height: 140%;
+    color: var(--black);
   }
 
   .sidebar {
@@ -1023,12 +1045,6 @@
   .favoriteExercise h3 {
     font-size: mvw(18);
     line-height: 120%;
-  }
-
-  .exerciseItem {
-    padding: mvw(12);
-    gap: mvw(8);
-    border-radius: mvw(8);
   }
 
   .exerciseIcon {
@@ -1179,6 +1195,16 @@
     margin-left: 0;
     margin-right: 0;
     margin: 0;
+  }
+
+  .exerciseTag {
+    font-weight: 400;
+    font-size: mvw(14);
+
+    border-radius: mvw(12);
+    padding: mvw(12);
+    /* width: mvw(149);
+height: mvw(44); */
   }
 
   .galleryContainer :global(.navContainer) {

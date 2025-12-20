@@ -1,8 +1,11 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { useCartStore, selectCartTotal } from "@/store/cart";
+import React, { useState, useEffect, useMemo } from "react";
+import { useCartStore, type CartItem } from "@/store/cart";
+import { useAuthStore } from "@/store/auth";
 import { useCreateWcOrder } from "@/lib/useMutation";
 import { useWcPaymentGatewaysQuery } from "@/components/hooks/useWpQueries";
+import { calculatePrice } from "@/lib/priceUtils";
+import { getProductPriceAsync } from "@/lib/useProductPrices";
 import MapPickerModal from "@/components/sections/CheckoutSection/MapPickerModal/MapPickerModal";
 import CheckoutHeader from "@/components/layout/CheckoutHeader/CheckoutHeader";
 import CheckoutFooter from "@/components/layout/CheckoutFooter/CheckoutFooter";
@@ -15,10 +18,25 @@ import OrderSummarySkeleton from "./OrderSummarySkeleton";
 import s from "./CheckoutSection.module.css";
 
 export default function CheckoutSection() {
-  const total = useCartStore(selectCartTotal);
-  const safeTotal = total || 0;
   const itemsMap = useCartStore((st) => st.items);
   const items = Object.values(itemsMap);
+  const user = useAuthStore((st) => st.user);
+  const isLoggedIn = useAuthStore((st) => st.isLoggedIn);
+  const cartStore = useCartStore();
+
+  // Обчислюємо total з урахуванням знижки для авторизованих
+  const total = useMemo(() => {
+    return items.reduce((acc, it) => {
+      const { finalPrice } = calculatePrice({
+        price: it.price,
+        originalPrice: it.originalPrice,
+        isLoggedIn,
+      });
+      return acc + finalPrice * it.quantity;
+    }, 0);
+  }, [items, isLoggedIn]);
+
+  const safeTotal = total || 0;
 
   const [isMobile, setIsMobile] = useState(false);
   const [isSummarySkeleton, setIsSummarySkeleton] = useState(true);
@@ -33,27 +51,10 @@ export default function CheckoutSection() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Короткий скелетон для summaryCard, щоб уникнути ривка при першому рендері
   useEffect(() => {
     const timer = setTimeout(() => setIsSummarySkeleton(false), 300);
     return () => clearTimeout(timer);
   }, []);
-
-  // Логування стану кошика (тільки для дебагу)
-  // React.useEffect(() => {
-  //   console.log("[CheckoutSection] 🛒 Стан кошика:", {
-  //     total,
-  //     safeTotal,
-  //     itemsCount: items.length,
-  //     itemsMap,
-  //     items: items.map((item) => ({
-  //       id: item.id,
-  //       name: item.name,
-  //       quantity: item.quantity,
-  //       price: item.price,
-  //     })),
-  //   });
-  // }, [total, items, itemsMap]);
 
   const createOrderMutation = useCreateWcOrder();
   const { data: paymentGateways = [] } = useWcPaymentGatewaysQuery();
@@ -82,6 +83,7 @@ export default function CheckoutSection() {
     lastName?: string;
     phone?: string;
     email?: string;
+    billing?: string;
     recipientFirstName?: string;
     recipientLastName?: string;
     recipientPhone?: string;
@@ -93,10 +95,86 @@ export default function CheckoutSection() {
     apartment?: string;
   }>({});
 
+  // Функція для парсингу помилок WooCommerce API
+  const parseWcValidationErrors = (errorData: any): typeof errors => {
+    const wcErrors: typeof errors = {};
+
+    // Перевіряємо структуру відповіді WooCommerce
+    if (errorData?.data?.params) {
+      const params = errorData.data.params;
+
+      // Маппінг помилок WooCommerce на поля форми
+      if (params.billing) {
+        // Парсимо помилки billing - вони можуть бути рядком або об'єктом
+        if (typeof params.billing === "string") {
+          wcErrors.email = params.billing;
+        } else if (typeof params.billing === "object") {
+          // Якщо це об'єкт з детальними помилками
+          if (params.billing.email) {
+            wcErrors.email = params.billing.email;
+          }
+          if (params.billing.phone) {
+            wcErrors.phone = params.billing.phone;
+          }
+          if (params.billing.first_name) {
+            wcErrors.firstName = params.billing.first_name;
+          }
+          if (params.billing.last_name) {
+            wcErrors.lastName = params.billing.last_name;
+          }
+        }
+      }
+
+      // Інші можливі помилки
+      if (params.shipping) {
+        // Помилки доставки
+        if (typeof params.shipping === "object") {
+          if (params.shipping.city) {
+            wcErrors.city = params.shipping.city;
+          }
+          if (params.shipping.address_1) {
+            wcErrors.branch = params.shipping.address_1;
+            wcErrors.house = params.shipping.address_1;
+          }
+        }
+      }
+    }
+
+    // Перевіряємо також data.details якщо params немає
+    if (errorData?.data?.details && !errorData?.data?.params) {
+      const details = errorData.data.details;
+
+      if (details.billing) {
+        if (typeof details.billing === "object") {
+          if (details.billing.email) {
+            wcErrors.email = Array.isArray(details.billing.email)
+              ? details.billing.email.join(", ")
+              : details.billing.email;
+          }
+          if (details.billing.phone) {
+            wcErrors.phone = Array.isArray(details.billing.phone)
+              ? details.billing.phone.join(", ")
+              : details.billing.phone;
+          }
+        }
+      }
+    }
+
+    return wcErrors;
+  };
+
+  // Функція для очищення помилки конкретного поля
+  const clearFieldError = (fieldName: keyof typeof errors) => {
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[fieldName];
+      return newErrors;
+    });
+  };
+
   const handleSubmit = async () => {
     const newErrors: typeof errors = {};
 
-    // Валідація особистих даних
     if (!formData.firstName.trim()) {
       newErrors.firstName = "Обов'язкове поле";
     }
@@ -113,7 +191,6 @@ export default function CheckoutSection() {
       newErrors.email = "Невірний email";
     }
 
-    // Валідація даних отримувача
     if (hasDifferentRecipient) {
       if (!formData.recipientFirstName.trim()) {
         newErrors.recipientFirstName = "Обов'язкове поле";
@@ -126,7 +203,6 @@ export default function CheckoutSection() {
       }
     }
 
-    // Валідація доставки
     if (!deliveryType) {
       newErrors.deliveryType = "Обов'язкове поле";
     }
@@ -149,25 +225,71 @@ export default function CheckoutSection() {
       return;
     }
 
-    try {
-      // console.log("[CheckoutSection] 🚀 Відправляю замовлення:", {
-      //   formData,
-      //   hasDifferentRecipient,
-      //   deliveryType,
-      //   itemsCount: items.length,
-      // });
+    // Перевірка на порожній кошик
+    if (items.length === 0) {
+      alert("Ваш кошик порожній. Додайте товари перед оформленням замовлення.");
+      return;
+    }
 
-      // Мапінг платіжного методу
-      const paymentMethodMap: Record<string, string> = {
-        "Накладений платіж": "cod",
-        "Онлайн-оплата WayForPay": "wayforpay",
-        "Оплата при отриманні": "cod",
+    // Перевірка на нульову суму
+    if (safeTotal <= 0) {
+      alert("Сума замовлення не може бути нульовою. Перевірте кошик.");
+      return;
+    }
+
+    try {
+      const paymentMethodTitleMap: Record<string, string> = {
+        cod: "Накладений платіж",
+        wayforpay: "Онлайн-оплата WayForPay",
+        bacs: "Оплата при отриманні",
       };
 
-      const paymentMethod = paymentMethodMap[formData.paymentMethod] || "cod";
-      const paymentMethodTitle = formData.paymentMethod;
+      const paymentMethod = formData.paymentMethod || "cod";
+      const paymentMethodTitle =
+        paymentMethodTitleMap[paymentMethod] || paymentMethod;
 
-      // Підготовка даних для WooCommerce
+      const extractProductId = (id: string): number | null => {
+        if (/^\d+$/.test(id)) {
+          return parseInt(id, 10);
+        }
+
+        const match = id.match(/(?:course|product)-(\d+)/i);
+        if (match && match[1]) {
+          return parseInt(match[1], 10);
+        }
+
+        const numberMatch = id.match(/\d+/);
+        if (numberMatch) {
+          return parseInt(numberMatch[0], 10);
+        }
+
+        return null;
+      };
+
+      const lineItems = items
+        .map((item) => {
+          const productId = extractProductId(item.id);
+          if (productId === null || productId <= 0) {
+            return null;
+          }
+          if (!item.quantity || item.quantity <= 0) {
+            return null;
+          }
+          return {
+            product_id: productId,
+            quantity: item.quantity,
+          };
+        })
+        .filter((item) => item !== null) as Array<{
+        product_id: number;
+        quantity: number;
+      }>;
+
+      if (lineItems.length === 0) {
+        alert("Не вдалося підготувати товари для замовлення. Перевірте кошик.");
+        return;
+      }
+
       const orderData = {
         payment_method: paymentMethod,
         payment_method_title: paymentMethodTitle,
@@ -192,77 +314,108 @@ export default function CheckoutSection() {
           city: formData.city,
           country: "UA",
         },
-        line_items: items.map((item) => ({
-          product_id: parseInt(item.id),
-          quantity: item.quantity,
-        })),
-        shipping_lines:
-          deliveryType === "nova_poshta"
-            ? [
-                {
-                  method_id: "nova_poshta",
-                  method_title: "Нова Пошта",
-                  total: "0.00",
-                },
-              ]
-            : undefined,
-        customer_note: formData.comment,
+        line_items: lineItems,
+        ...(deliveryType === "nova_poshta" && {
+          shipping_lines: [
+            {
+              method_id: "nova_poshta",
+              method_title: "Нова Пошта",
+              total: "0.00",
+            },
+          ],
+        }),
+        ...(formData.comment && { customer_note: formData.comment }),
       };
 
-      // console.log("[CheckoutSection] 📦 Дані замовлення:", orderData);
-      // console.log("[CheckoutSection] 📦 Line items детально:", {
-      //   lineItems: orderData.line_items,
-      //   itemsFromCart: items.map((item) => ({
-      //     id: item.id,
-      //     name: item.name,
-      //     quantity: item.quantity,
-      //     price: item.price,
-      //   })),
-      // });
-
-      // Відправка замовлення
       const result = (await createOrderMutation.mutateAsync(orderData)) as {
         id: number | string;
         status?: string;
       };
 
-      // console.log("[CheckoutSection] ✅ Замовлення створено:", result);
-
-      // WayForPay redirect if selected
       if (paymentMethod === "wayforpay" && result?.id) {
+        if (safeTotal <= 0) {
+          alert(
+            "Неможливо здійснити онлайн-оплату для замовлення з нульовою сумою. Оберіть інший спосіб оплати."
+          );
+          window.location.href = `/order-success?orderId=${result.id}`;
+          return;
+        }
+
         try {
           const baseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE;
+          if (!baseUrl) {
+            throw new Error("NEXT_PUBLIC_UPSTREAM_BASE не налаштовано");
+          }
+
           const res = await fetch(
             `${baseUrl}/wp-json/myplugin/v1/wayforpay?order_id=${result.id}`,
             { cache: "no-store" }
           );
-          if (!res.ok) throw new Error(`WayForPay payload ${res.status}`);
+
+          if (!res.ok) {
+            const errorText = await res.text();
+            let errorData;
+            try {
+              errorData = JSON.parse(errorText);
+            } catch {
+              errorData = { message: errorText };
+            }
+
+            throw new Error(
+              `WayForPay API помилка: ${res.status} - ${
+                errorData.message ||
+                errorData.error ||
+                res.statusText ||
+                "Невідома помилка"
+              }`
+            );
+          }
+
           const payload = (await res.json()) as {
             action: string;
             fields: Record<string, string | number | string[]>;
           };
+
+          if (!payload.action || !payload.fields) {
+            throw new Error(
+              "Невірний формат відповіді від WayForPay API: відсутні action або fields"
+            );
+          }
+
           const form = document.createElement("form");
           form.method = "POST";
           form.action = payload.action;
+
           Object.entries(payload.fields || {}).forEach(([key, val]) => {
-            const values = Array.isArray(val) ? (val as string[]) : [val];
-            values.forEach((v) => {
+            if (Array.isArray(val)) {
+              val.forEach((v) => {
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = `${key}[]`;
+                input.value = String(v);
+                form.appendChild(input);
+              });
+            } else {
               const input = document.createElement("input");
               input.type = "hidden";
               input.name = key;
-              input.value = String(v);
+              input.value = String(val);
               form.appendChild(input);
-            });
+            }
           });
+
           document.body.appendChild(form);
           form.submit();
           return;
         } catch (e) {
-          console.error("[CheckoutSection] WayForPay redirect failed", e);
+          const errorMessage =
+            e instanceof Error ? e.message : "Невідома помилка";
+          alert(`Не вдалося здійснити оплату. ${errorMessage}`);
+          window.location.href = `/order-success?orderId=${result.id}`;
+          return;
         }
       }
 
-      // Збереження даних для сторінки успіху
       localStorage.setItem(
         "orderData",
         JSON.stringify({
@@ -274,11 +427,56 @@ export default function CheckoutSection() {
         })
       );
 
-      // Перенаправлення на сторінку успіху з orderId в URL
       window.location.href = `/order-success?orderId=${result.id}`;
     } catch (error) {
-      // Silent error handling
-      alert("Помилка створення замовлення. Спробуйте ще раз.");
+      let errorMessage = "Помилка створення замовлення. Спробуйте ще раз.";
+      let showAlert = true;
+
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response?: {
+            data?: {
+              code?: string;
+              message?: string;
+              data?: { params?: any; details?: any };
+            };
+            status?: number;
+          };
+        };
+
+        const responseData = axiosError.response?.data;
+
+        // Перевіряємо чи це помилка валідації WooCommerce
+        if (responseData?.code === "rest_invalid_param" && responseData?.data) {
+          const wcErrors = parseWcValidationErrors(responseData);
+
+          // Якщо знайшли помилки валідації, відображаємо їх під полями форми
+          if (Object.keys(wcErrors).length > 0) {
+            setErrors((prevErrors) => ({ ...prevErrors, ...wcErrors }));
+            showAlert = false; // Не показуємо alert, бо помилки відображені під полями
+          }
+        }
+
+        if (responseData?.message) {
+          errorMessage = responseData.message;
+        }
+
+        if (
+          axiosError.response?.data &&
+          "details" in axiosError.response.data
+        ) {
+          console.error(
+            "[CheckoutSection] Деталі помилки:",
+            axiosError.response.data.details
+          );
+        }
+      } else if (error instanceof Error) {
+        errorMessage = `Помилка: ${error.message}`;
+      }
+
+      if (showAlert) {
+        alert(errorMessage);
+      }
     }
   };
 
@@ -309,12 +507,26 @@ export default function CheckoutSection() {
         <div className={s.container}>
           {isMobile ? (
             <>
-              {/* Мобільний порядок: titleFormBlock -> deliveryBlock -> paymentBlock -> commentBlock -> summaryCard */}
               <div className={s.left}>
                 <PersonalDataForm
                   formData={formData}
                   hasDifferentRecipient={hasDifferentRecipient}
-                  setFormData={setFormData}
+                  setFormData={(data) => {
+                    setFormData(data);
+                    // Очищаємо помилки при зміні полів
+                    if (data.firstName !== formData.firstName)
+                      clearFieldError("firstName");
+                    if (data.lastName !== formData.lastName)
+                      clearFieldError("lastName");
+                    if (data.phone !== formData.phone) clearFieldError("phone");
+                    if (data.email !== formData.email) clearFieldError("email");
+                    if (data.recipientFirstName !== formData.recipientFirstName)
+                      clearFieldError("recipientFirstName");
+                    if (data.recipientLastName !== formData.recipientLastName)
+                      clearFieldError("recipientLastName");
+                    if (data.recipientPhone !== formData.recipientPhone)
+                      clearFieldError("recipientPhone");
+                  }}
                   setHasDifferentRecipient={setHasDifferentRecipient}
                   errors={errors}
                 />
@@ -322,8 +534,22 @@ export default function CheckoutSection() {
                 <DeliveryForm
                   deliveryType={deliveryType}
                   formData={formData}
-                  setDeliveryType={setDeliveryType}
-                  setFormData={setFormData}
+                  setDeliveryType={(value) => {
+                    setDeliveryType(value);
+                    clearFieldError("deliveryType");
+                  }}
+                  setFormData={(data) => {
+                    setFormData(data);
+                    // Очищаємо помилки при зміні полів доставки
+                    if (data.city !== formData.city) clearFieldError("city");
+                    if (data.branch !== formData.branch)
+                      clearFieldError("branch");
+                    if (data.house !== formData.house) clearFieldError("house");
+                    if (data.building !== formData.building)
+                      clearFieldError("building");
+                    if (data.apartment !== formData.apartment)
+                      clearFieldError("apartment");
+                  }}
                   setIsMapOpen={setIsMapOpen}
                   errors={errors}
                 />
@@ -355,12 +581,26 @@ export default function CheckoutSection() {
             </>
           ) : (
             <>
-              {/* Десктопний порядок: left -> right */}
               <div className={s.left}>
                 <PersonalDataForm
                   formData={formData}
                   hasDifferentRecipient={hasDifferentRecipient}
-                  setFormData={setFormData}
+                  setFormData={(data) => {
+                    setFormData(data);
+                    // Очищаємо помилки при зміні полів
+                    if (data.firstName !== formData.firstName)
+                      clearFieldError("firstName");
+                    if (data.lastName !== formData.lastName)
+                      clearFieldError("lastName");
+                    if (data.phone !== formData.phone) clearFieldError("phone");
+                    if (data.email !== formData.email) clearFieldError("email");
+                    if (data.recipientFirstName !== formData.recipientFirstName)
+                      clearFieldError("recipientFirstName");
+                    if (data.recipientLastName !== formData.recipientLastName)
+                      clearFieldError("recipientLastName");
+                    if (data.recipientPhone !== formData.recipientPhone)
+                      clearFieldError("recipientPhone");
+                  }}
                   setHasDifferentRecipient={setHasDifferentRecipient}
                   errors={errors}
                 />
@@ -368,8 +608,22 @@ export default function CheckoutSection() {
                 <DeliveryForm
                   deliveryType={deliveryType}
                   formData={formData}
-                  setDeliveryType={setDeliveryType}
-                  setFormData={setFormData}
+                  setDeliveryType={(value) => {
+                    setDeliveryType(value);
+                    clearFieldError("deliveryType");
+                  }}
+                  setFormData={(data) => {
+                    setFormData(data);
+                    // Очищаємо помилки при зміні полів доставки
+                    if (data.city !== formData.city) clearFieldError("city");
+                    if (data.branch !== formData.branch)
+                      clearFieldError("branch");
+                    if (data.house !== formData.house) clearFieldError("house");
+                    if (data.building !== formData.building)
+                      clearFieldError("building");
+                    if (data.apartment !== formData.apartment)
+                      clearFieldError("apartment");
+                  }}
                   setIsMapOpen={setIsMapOpen}
                   errors={errors}
                 />

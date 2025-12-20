@@ -1,7 +1,10 @@
 "use client";
-import React from "react";
+import React, { useMemo, useEffect } from "react";
 import Image from "next/image";
-import { useCartStore } from "@/store/cart";
+import { useCartStore, CartItem } from "@/store/cart";
+import { useAuthStore } from "@/store/auth";
+import { calculatePrice } from "@/lib/priceUtils";
+import { getProductPriceAsync } from "@/lib/useProductPrices";
 import {
   MinuswIcon,
   PlusIcon,
@@ -11,16 +14,74 @@ import s from "./CheckoutSection.module.css";
 
 interface OrderSummaryProps {
   total: number;
+  updateItem?: (id: string, updates: Partial<{ price: number; originalPrice?: number }>) => void;
 }
 
-export default function OrderSummary({ total }: OrderSummaryProps) {
+export default function OrderSummary({ total, updateItem }: OrderSummaryProps) {
   const itemsMap = useCartStore((st) => st.items);
   const items = Object.values(itemsMap);
   const increment = useCartStore((st) => st.increment);
   const decrement = useCartStore((st) => st.decrement);
   const removeItem = useCartStore((st) => st.removeItem);
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+
+  // Перевіряємо та оновлюємо ціни для всіх товарів при завантаженні
+  useEffect(() => {
+    const checkAndUpdateAllPrices = async () => {
+      if (!updateItem) return;
+
+      for (const item of items) {
+        try {
+          // Отримуємо свіжі ціни з API
+          const freshPrices = await getProductPriceAsync(item.id);
+
+          // Якщо ціни відрізняються від тих, що в кошику, оновлюємо
+          if (freshPrices.currentPrice !== item.price ||
+              freshPrices.originalPrice !== item.originalPrice) {
+
+            console.log('🛒 OrderSummary: Оновлюємо ціни для товару', {
+              itemId: item.id,
+              oldPrice: item.price,
+              newPrice: freshPrices.currentPrice,
+              oldOriginalPrice: item.originalPrice,
+              newOriginalPrice: freshPrices.originalPrice
+            });
+
+            // Оновлюємо товар в кошику
+            updateItem(item.id, {
+              price: freshPrices.currentPrice,
+              originalPrice: freshPrices.originalPrice,
+            });
+          }
+        } catch (error) {
+          console.error('Error updating cart item prices in OrderSummary:', error);
+        }
+      }
+    };
+
+    // Перевіряємо тільки товари, які можуть бути варіативними
+    const itemsToCheck = items.filter(item => /\d/.test(item.id));
+    if (itemsToCheck.length > 0) {
+      checkAndUpdateAllPrices();
+    }
+  }, [items, updateItem]);
 
   const safeTotal = total || 0;
+
+  // Обчислюємо загальну знижку
+  const totalDiscount = useMemo(() => {
+    return items.reduce((acc, it) => {
+      const { finalPrice, originalPrice, shouldShowOldPrice } = calculatePrice({
+        price: it.price,
+        originalPrice: it.originalPrice,
+        isLoggedIn,
+      });
+      const diff = shouldShowOldPrice
+        ? (originalPrice - finalPrice) * it.quantity
+        : 0;
+      return acc + diff;
+    }, 0);
+  }, [items, isLoggedIn]);
 
   return (
     <div className={s.summaryCard}>
@@ -59,7 +120,10 @@ export default function OrderSummary({ total }: OrderSummaryProps) {
                   <div className={s.color}>
                     {it.color || "Колір не вказано"}
                     {(it.sku || it.id) && (
-                      <span className={s.colorCode}> | Код товару: {it.sku || it.id}</span>
+                      <span className={s.colorCode}>
+                        {" "}
+                        | Код товару: {it.sku || it.id}
+                      </span>
                     )}
                   </div>
                 </div>
@@ -78,15 +142,38 @@ export default function OrderSummary({ total }: OrderSummaryProps) {
                   </div>
                   <div className={s.priceWrap}>
                     <div className={s.prices}>
-                      <span className={s.currentPrice}>
-                        {it.price.toLocaleString()}
-                        <span className={s.buck}>₴</span>
-                      </span>
-                      {it.originalPrice && it.originalPrice > it.price && (
-                        <span className={s.oldPrice}>
-                          {it.originalPrice.toLocaleString()} ₴
-                        </span>
-                      )}
+                      {(() => {
+                        const {
+                          finalPrice,
+                          originalPrice,
+                          shouldShowOldPrice,
+                        } = calculatePrice({
+                            price: it.price,
+                            originalPrice: it.originalPrice,
+                            isLoggedIn,
+                          });
+
+                        return (
+                          <>
+                              <span className={s.currentPrice}>
+                                <span className={s.currentPriceValue}>
+                                  {finalPrice.toLocaleString()}
+                                </span>
+                                <span className={s.priceCurrency}>₴</span>
+                              </span>
+                            {shouldShowOldPrice && (
+                              <span className={s.oldPrice}>
+                                <span className={s.originalPriceValue}>
+                                  {originalPrice.toLocaleString()}
+                                </span>
+                                <span className={s.originalPriceCurrency}>
+                                  ₴
+                                </span>
+                              </span>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>
@@ -100,15 +187,17 @@ export default function OrderSummary({ total }: OrderSummaryProps) {
         <div className={s.row}>
           <span className={s.rowLabel}>Сума замовлення</span>
           <span className={s.rowAmount}>
-            <p className={s.rowAmountAmount}>{safeTotal.toLocaleString()}</p>
+            <p className={s.rowAmountNumber}>{safeTotal.toLocaleString()}</p>
             <p className={s.rowAmountCurrency}>₴</p>
           </span>
         </div>
         <div className={s.row}>
           <span className={s.rowLabel}>Сума знижки</span>
           <span className={s.rowAmount}>
-            <p className={s.rowAmountAmount}>0</p>
-            <p className={s.rowAmountCurrency}>₴</p>
+            <p className={s.rowAmountAmount}>
+              {Math.round(totalDiscount).toLocaleString()}
+            </p>
+            <p className={s.rowNumberCurrency}>₴</p>
           </span>
         </div>
         <div className={s.row}>
@@ -129,4 +218,3 @@ export default function OrderSummary({ total }: OrderSummaryProps) {
     </div>
   );
 }
-

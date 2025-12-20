@@ -304,7 +304,7 @@
 @media (max-width: 1000px) {
   .container {
     padding: 0 mvw(16);
-    gap: mvw(16);
+    gap: mvw(35);
   }
 
   .header {
@@ -378,7 +378,7 @@
   .listItemIcon {
     width: mvw(28);
     height: mvw(28);
-    border-radius: mvw(12);
+    border-radius: mvw(15);
   }
   .listItemIcon svg {
     width: mvw(12);
@@ -386,7 +386,7 @@
   }
 
   .pills {
-    gap: mvw(8);
+    gap: mvw(4);
   }
   .pill {
     gap: mvw(8);
@@ -412,7 +412,7 @@
   .cardFooter {
     flex-direction: column;
     align-items: stretch;
-    gap: mvw(32);
+    gap: mvw(16);
   }
   .priceWrap {
     justify-content: flex-start;

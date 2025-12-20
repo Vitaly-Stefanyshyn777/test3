@@ -66,17 +66,22 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
       id: "course-bfb",
       name: "Основи тренерства BFB",
       price: 0,
-      image: "/images/course-hero.jpg",
+      image: "/images/bfb-fitness-img.jpg",
     });
   };
 
   const handleAddToCart = () => {
     if (course && courseId) {
-      const courseName = course.title.rendered.replace(/____FULL____/g, "");
+      const courseName = course.title?.rendered?.replace(/____FULL____/g, "") || "Основи тренерства BFB";
+      // Зберігаємо базову ціну (без знижки авторизації), знижка застосовується при відображенні
       const coursePrice =
         parseFloat(hasDiscount ? salePrice : currentPrice) / 100;
+      const courseOriginalPrice =
+        regularPrice && regularPrice !== "0"
+          ? parseFloat(regularPrice) / 100
+          : undefined;
       const courseImageUrl = normalizeImageUrl(
-        courseImage || product?.images?.[0]?.src || "/images/course-hero.jpg"
+        courseImage || product?.images?.[0]?.src || "/images/bfb-fitness-img.jpg"
       );
 
       addItem(
@@ -84,6 +89,10 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
           id: courseId.toString(),
           name: courseName,
           price: coursePrice,
+          originalPrice:
+            courseOriginalPrice && courseOriginalPrice > coursePrice
+              ? courseOriginalPrice
+              : undefined,
           image: courseImageUrl,
         },
         1
@@ -267,22 +276,34 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
   };
 
   // Визначаємо ціни для поточного курсу (як в CourseCard - якщо немає або "0" - fallback)
-  const currentPrice = (courseData?.wcProduct?.prices?.price && courseData.wcProduct.prices.price !== "0")
-    ? courseData.wcProduct.prices.price
-    : courseData?.price || storeProduct?.prices?.price || product?.sale_price || product?.price || "5000";
-  const regularPrice = (courseData?.wcProduct?.prices?.regular_price && courseData.wcProduct.prices.regular_price !== "0")
-    ? courseData.wcProduct.prices.regular_price
-    : courseData?.originalPrice || storeProduct?.prices?.regular_price || product?.regular_price;
-  const salePrice = (courseData?.wcProduct?.prices?.sale_price && courseData.wcProduct.prices.sale_price !== "0")
-    ? courseData.wcProduct.prices.sale_price
-    : storeProduct?.prices?.sale_price || null;
+  const currentPrice =
+    courseData?.wcProduct?.prices?.price &&
+    courseData.wcProduct.prices.price !== "0"
+      ? courseData.wcProduct.prices.price
+      : courseData?.price ||
+        storeProduct?.prices?.price ||
+        product?.sale_price ||
+        product?.price ||
+        "0";
+  const regularPrice =
+    courseData?.wcProduct?.prices?.regular_price &&
+    courseData.wcProduct.prices.regular_price !== "0"
+      ? courseData.wcProduct.prices.regular_price
+      : courseData?.originalPrice ||
+        storeProduct?.prices?.regular_price ||
+        product?.regular_price;
+  const salePrice =
+    courseData?.wcProduct?.prices?.sale_price &&
+    courseData.wcProduct.prices.sale_price !== "0"
+      ? courseData.wcProduct.prices.sale_price
+      : storeProduct?.prices?.sale_price || null;
   const isOnSale = courseData?.wcProduct?.on_sale || false;
 
   // Додаткові дані для fallback логіки (як в CourseCard)
-  const fallbackPrice = courseData?.price ? parseFloat(courseData.price) : 5000;
+  const fallbackPrice = courseData?.price ? parseFloat(courseData.price) : 0;
   const fallbackOriginalPrice = courseData?.originalPrice
     ? parseFloat(courseData.originalPrice)
-    : 7000;
+    : 0;
 
   // Логіка цін з урахуванням авторизації (як в CourseCard)
   // isLoggedIn вже визначено вище на рядку 57
@@ -434,7 +455,7 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
             src={normalizeImageUrl(
               courseImage ||
                 product?.images?.[0]?.src ||
-                "/images/course-hero.jpg"
+                "/images/bfb-fitness-img.jpg"
             )}
             alt={(
               product?.name ||
@@ -455,11 +476,17 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
             {isLoggedIn
               ? // Авторизований: показуємо загальну знижку
                 totalDiscount > 0 && (
-                  <Badge variant="discount" text={`-${Math.round(totalDiscount)}%`} />
+                  <Badge
+                    variant="discount"
+                    text={`-${Math.round(totalDiscount)}%`}
+                  />
                 )
               : // Неавторизований: показуємо акційну знижку
                 baseDiscount > 0 && (
-                  <Badge variant="discount" text={`-${Math.round(baseDiscount)}%`} />
+                  <Badge
+                    variant="discount"
+                    text={`-${Math.round(baseDiscount)}%`}
+                  />
                 )}
 
             {/* Хіт - якщо курс популярний на основі рейтингу та відгуків */}
@@ -470,26 +497,84 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
         </div>
       )}
 
+      {/* courseContentBlock для мобілки - після imageContainer */}
+      {isMobile && course && (
+        <div className={styles.mobileCourseContentBlock}>
+          <div className={styles.mobileTagsCodeBlock}>
+            <div className={styles.mobileTags}>
+              {course.course_data?.Date_start && (
+                <div className={styles.mobileTag}>
+                  <div className={styles.mobileTagIcon}>
+                    <СalendarIcon />
+                  </div>
+                  <p className={styles.mobileTagText}>
+                    {course.course_data?.Date_start}
+                  </p>
+                </div>
+              )}
+              {course.course_data?.Duration && (
+                <div className={styles.mobileTag}>
+                  <div className={styles.mobileTagIcon}>
+                    <СlockIcon />
+                  </div>
+                  <p className={styles.mobileTagText}>
+                    {course.course_data?.Duration}
+                  </p>
+                </div>
+              )}
+              {hasOnlineFormat && (
+                <div className={styles.mobileTag}>
+                  <div className={styles.mobileTagIcon}>
+                    <GlobeIcon />
+                  </div>
+                  <p className={styles.mobileTagText}>Online</p>
+                </div>
+              )}
+              {hasOfflineFormat && (
+                <div className={styles.mobileTag}>
+                  <div className={styles.mobileTagIcon}>
+                    <NotGlobeIcon />
+                  </div>
+                  <p className={styles.mobileTagText}>Offline</p>
+                </div>
+              )}
+            </div>
+            <div className={styles.mobileCourseCode}>
+              <p className={styles.mobileCourseCodeText}>Код курсу:</p>
+              <p className={styles.mobileCourseCodeNumber}>{course.id}</p>
+            </div>
+          </div>
+          <h1 className={styles.mobileTitle}>
+            {course.title?.rendered?.replace(/____FULL____/g, "") || "Основи тренерства BFB"}
+          </h1>
+          <div className={styles.mobileDescription}>
+            <div
+              dangerouslySetInnerHTML={{ __html: course.content?.rendered || "Опис курсу тимчасово недоступний" }}
+            />
+          </div>
+        </div>
+      )}
+
       <div className={styles.courseInfoBlock}>
         <div className={styles.tagsCodeBlock}>
           <div className={styles.tags}>
             {/* ///// */}
-            {course?.course_data.Date_start && (
+            {course?.course_data?.Date_start && (
               <div className={styles.tag}>
                 <div className={styles.tagIcon}>
                   <СalendarIcon />
                 </div>
                 <p className={styles.tagText}>
-                  {course.course_data.Date_start}
+                  {course.course_data?.Date_start}
                 </p>
               </div>
             )}
-            {course?.course_data.Duration && (
+            {course?.course_data?.Duration && (
               <div className={styles.tag}>
                 <div className={styles.tagIcon}>
                   <СlockIcon />
                 </div>
-                <p className={styles.tagText}>{course.course_data.Duration}</p>
+                <p className={styles.tagText}>{course.course_data?.Duration}</p>
               </div>
             )}
             {hasOnlineFormat && (
@@ -548,7 +633,7 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
                       {renderStars(ratingValue)}
                     </div>
                     <span className={styles.reviewsCount}>
-                      (
+                      (Відгуки{" "}
                       {storeProduct?.rating_count || product?.rating_count || 0}
                       )
                     </span>
@@ -559,14 +644,15 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
           </div>
 
           <p className={styles.courseDescription}>
-            {course?.excerpt?.rendered?.replace(/<[^>]*>/g, "") ||
-              "Професійний курс для тренерів з функціонального тренування на BFB"}
+            {course?.excerpt?.rendered && typeof course.excerpt.rendered === 'string'
+              ? course.excerpt.rendered.replace(/<[^>]*>/g, "")
+              : "Професійний курс для тренерів з функціонального тренування на BFB"}
           </p>
 
           <div className={styles.courseIncludes}>
             <h3 className={styles.courseIncludesTitle}>ЦЕЙ КУРС ВКЛЮЧАЄ:</h3>
             <ul className={styles.courseIncludesList}>
-              {course?.course_data.Course_include?.map((item, index) => (
+              {course?.course_data?.Course_include?.map((item, index) => (
                 <li key={index} className={styles.courseIncludesItem}>
                   <div className={styles.courseIncludesIcon}>
                     <Check3Icon />
@@ -623,7 +709,7 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
               ЯКІ ТЕМИ ПОКРИВАЄ КУРС:
             </h3>
             <div className={styles.topicsGrid}>
-              {course?.course_data.Course_themes?.map((theme, index) => (
+              {course?.course_data?.Course_themes?.map((theme, index) => (
                 <div key={index} className={styles.topicTag}>
                   <p className={styles.topicText}>{theme}</p>
                 </div>
@@ -645,13 +731,18 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
                   {isLoggedIn ? formattedFinalPrice : formattedCurrentPrice}
                   <span className={styles.currentPriceCurrency}>₴</span>
                 </span>
-                {((hasDiscount || hasFallbackDiscount) && formattedRegularPrice && regularPrice !== "0") ||
-                (isLoggedIn && finalPrice > 0 && formattedRegularPrice && regularPrice !== "0") ? (
-                    <div className={styles.oldPrice}>
-                      <span>{formattedRegularPrice}</span>
-                      <span className={styles.oldPriceCurrency}>₴</span>
-                    </div>
-                  ) : null}
+                {((hasDiscount || hasFallbackDiscount) &&
+                  formattedRegularPrice &&
+                  regularPrice !== "0") ||
+                (isLoggedIn &&
+                  finalPrice > 0 &&
+                  formattedRegularPrice &&
+                  regularPrice !== "0") ? (
+                  <div className={styles.oldPrice}>
+                    <span>{formattedRegularPrice}</span>
+                    <span className={styles.oldPriceCurrency}>₴</span>
+                  </div>
+                ) : null}
               </div>
             )}
 
@@ -694,13 +785,18 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
                   {isLoggedIn ? formattedFinalPrice : formattedCurrentPrice}
                   <span className={styles.currentPriceCurrency}>₴</span>
                 </span>
-                {((hasDiscount || hasFallbackDiscount) && formattedRegularPrice && regularPrice !== "0") ||
-                (isLoggedIn && finalPrice > 0 && formattedRegularPrice && regularPrice !== "0") ? (
-                    <div className={styles.oldPrice}>
-                      <span>{formattedRegularPrice}</span>
-                      <span className={styles.oldPriceCurrency}>₴</span>
-                    </div>
-                  ) : null}
+                {((hasDiscount || hasFallbackDiscount) &&
+                  formattedRegularPrice &&
+                  regularPrice !== "0") ||
+                (isLoggedIn &&
+                  finalPrice > 0 &&
+                  formattedRegularPrice &&
+                  regularPrice !== "0") ? (
+                  <div className={styles.oldPrice}>
+                    <span>{formattedRegularPrice}</span>
+                    <span className={styles.oldPriceCurrency}>₴</span>
+                  </div>
+                ) : null}
               </div>
             )}
 

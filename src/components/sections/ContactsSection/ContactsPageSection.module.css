@@ -7,3 +7,11 @@
   gap: 150px;
 }
 
+@media (max-width: 1000px) {
+  .section {
+    padding: 0px 0px mvw(80) mvw(0);
+  }
+  .inner {
+    gap: mvw(100);
+  }
+}

@@ -23,13 +23,14 @@
   height: 14px;
 }
 
-
-
-
-
-
-
-
-
-
-
+@media (max-width: 1000px) {
+  .close {
+    width: mvw(46);
+    height: mvw(46);
+    border-radius: mvw(10);
+  }
+  .close svg {
+    width: mvw(14);
+    height: mvw(14);
+  }
+}

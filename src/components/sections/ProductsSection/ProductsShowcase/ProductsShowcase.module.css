@@ -110,8 +110,6 @@
 
 .allCoursesBtn:hover {
   background: var(--black);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .loading,
@@ -171,5 +169,8 @@
 
   .header {
     justify-content: center;
+  }
+  .section {
+    padding: mvw(70) 0;
   }
 }

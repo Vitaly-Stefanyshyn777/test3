@@ -30,7 +30,6 @@ export async function GET(req: NextRequest) {
     if (basicUser && basicPass) {
       authHeader =
         "Basic " + Buffer.from(`${basicUser}:${basicPass}`).toString("base64");
-      console.log("[Categories API] 🔐 Використовується Basic Auth");
     } else {
       return NextResponse.json(
         { error: "Missing WC Basic Auth credentials" },
@@ -38,35 +37,17 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.log("[API] Запит до WooCommerce API:", url.toString());
-    console.log(
-      "[API] Використовується авторизація:",
-      authHeader ? "✅" : "❌"
-    );
-    console.log(
-      "[API] Auth header:",
-      authHeader ? `${authHeader.substring(0, 20)}...` : "None"
-    );
-
     const upstreamRes = await fetch(url.toString(), {
       cache: "no-store",
       headers: { Authorization: authHeader },
     });
 
-    console.log("[API] Статус відповіді:", upstreamRes.status);
 
     if (!upstreamRes.ok) {
-      console.error(
-        "[API] Помилка API:",
-        upstreamRes.status,
-        upstreamRes.statusText
-      );
       const errorText = await upstreamRes.text();
-      console.error("[API] Деталі помилки:", errorText);
 
       // Для 403 помилок повертаємо порожній масив замість помилки
       if (upstreamRes.status === 403) {
-        console.log("[API] Повертаємо порожній масив для 403 помилки");
         return NextResponse.json([]);
       }
 
@@ -90,7 +71,6 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("/api/wc/products/categories error", error);
     return NextResponse.json(
       { error: "wc product categories error" },
       { status: 500 }
