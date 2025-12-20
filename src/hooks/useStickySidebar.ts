@@ -13,6 +13,7 @@ export const useStickySidebar = () => {
         window.requestAnimationFrame(() => {
           const headerHeight = 120;
           const offsetMargin = 20;
+          //
 
           const sidebar = document.querySelector(
             "[data-sidebar]"
