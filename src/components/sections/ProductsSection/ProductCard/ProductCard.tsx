@@ -101,7 +101,11 @@ const ProductCard = ({
   }, [imageUrl]);
 
   // Отримуємо ціни товару (з урахуванням варіацій)
-  const { currentPrice: priceFromApi, originalPrice: originalPriceFromApi, isLoading: isPriceLoading } = useProductPrices(id, wcProduct);
+  const {
+    currentPrice: priceFromApi,
+    originalPrice: originalPriceFromApi,
+    isLoading: isPriceLoading,
+  } = useProductPrices(id, wcProduct);
 
   const handleCartClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -161,7 +165,10 @@ const ProductCard = ({
   if (!isPriceLoading && priceFromApi > 0) {
     currentPrice = priceFromApi.toString();
     regularPrice = (originalPriceFromApi || priceFromApi).toString();
-    salePrice = originalPriceFromApi && originalPriceFromApi > priceFromApi ? null : currentPrice;
+    salePrice =
+      originalPriceFromApi && originalPriceFromApi > priceFromApi
+        ? null
+        : currentPrice;
   } else {
     // Fallback на стару логіку
     currentPrice =
@@ -525,10 +532,20 @@ const ProductCard = ({
                 <>
                   <span className={styles.currentPrice}>
                     <span className={styles.currentPriceValue}>
-                      {formattedCurrentPrice || "0"}
+                      {formattedCurrentPrice || formattedFinalPrice}
                     </span>
                     <span className={styles.priceCurrency}>₴</span>
                   </span>
+                  {formattedRegularPrice &&
+                    totalDiscount > 0 &&
+                    formattedCurrentPrice !== formattedRegularPrice && (
+                      <span className={styles.originalPrice}>
+                        <span className={styles.originalPriceValue}>
+                          {formattedRegularPrice}
+                        </span>
+                        <span className={styles.originalPriceCurrency}>₴</span>
+                      </span>
+                    )}
                 </>
               )}
             </div>
