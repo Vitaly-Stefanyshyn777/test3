@@ -5,12 +5,6 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     let videoUrl = searchParams.get("url");
 
-    console.log("[video-proxy] Request received:", {
-      hasUrl: !!videoUrl,
-      urlLength: videoUrl?.length,
-      urlPreview: videoUrl ? videoUrl.substring(0, 100) : null,
-    });
-
     if (!videoUrl) {
       console.error("[video-proxy] URL parameter missing");
       return NextResponse.json(
@@ -33,10 +27,6 @@ export async function GET(request: NextRequest) {
         }
         decodedUrl = testDecode;
         decodeAttempts++;
-        console.log(`[video-proxy] URL decoded (attempt ${decodeAttempts}):`, {
-          before: videoUrl.substring(0, 100),
-          after: decodedUrl.substring(0, 100),
-        });
       } catch (error) {
         console.warn(
           `[video-proxy] Failed to decode URL (attempt ${decodeAttempts}):`,
@@ -47,21 +37,11 @@ export async function GET(request: NextRequest) {
     }
 
     videoUrl = decodedUrl;
-    console.log("[video-proxy] Final decoded URL:", {
-      url: videoUrl.substring(0, 150),
-      decodeAttempts,
-      hasCyrillic: /[а-яА-ЯіІїЇєЄ]/.test(videoUrl),
-    });
 
     // Базова валідація URL (перевіряємо тільки формат, без перевірки доменів)
     let validatedUrl: URL;
     try {
       validatedUrl = new URL(videoUrl);
-      console.log("[video-proxy] URL validated:", {
-        hostname: validatedUrl.hostname,
-        pathname: validatedUrl.pathname.substring(0, 100),
-        protocol: validatedUrl.protocol,
-      });
     } catch (error) {
       console.error("[video-proxy] Invalid URL format:", {
         videoUrl: videoUrl.substring(0, 100),
@@ -77,7 +57,6 @@ export async function GET(request: NextRequest) {
     // Прибираємо строгу валідацію, щоб не блокувати валідні URL, які можуть не мати розширення в кінці
 
     // Завантажуємо відео з оригінального сервера
-    console.log("[video-proxy] Fetching video from:", videoUrl);
     let response: Response;
     try {
       // Збільшуємо таймаут для великих відео файлів (230MB+)
@@ -92,13 +71,6 @@ export async function GET(request: NextRequest) {
       });
 
       clearTimeout(timeoutId);
-      console.log("[video-proxy] Fetch response:", {
-        status: response.status,
-        statusText: response.statusText,
-        contentType: response.headers.get("content-type"),
-        contentLength: response.headers.get("content-length"),
-        ok: response.ok,
-      });
     } catch (fetchError) {
       console.error("[video-proxy] Fetch error:", {
         error: fetchError,

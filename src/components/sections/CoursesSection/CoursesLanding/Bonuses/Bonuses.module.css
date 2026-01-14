@@ -1221,6 +1221,12 @@
     height: auto;
     flex: 0 0 auto;
   }
+  .mobileSliderContainer {
+    display: flex;
+    flex-direction: column;
+    gap: mvw(16);
+    padding: mvw(16);
+  }
 }
 
 /* Frame1321318677.png */

@@ -36,6 +36,7 @@ export type TrainerUser = {
   }>;
   gallery?: string | string[];
   certificate?: string | string[];
+  certificateContent?: string | string[];
   map_markers?: Array<{
     title: string;
     coordinates: [number, number][];

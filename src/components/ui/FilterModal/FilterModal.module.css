@@ -14,8 +14,7 @@
   border-radius: 0;
   width: 100%;
   max-width: 100vw;
-  height: 100vh;
-  height: 100dvh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -107,9 +106,9 @@
 @media (max-width: 1000px) {
   .modal {
     border-radius: 0;
-    height: 100vh;
+
     padding: mvw(16) mvw(16) mvw(40);
-    height: 100dvh;
+    height: 100%;
     gap: mvw(35);
   }
   .header {

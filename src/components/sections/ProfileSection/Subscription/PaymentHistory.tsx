@@ -2,7 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import styles from "./Subscription.module.css";
-import { ChevronDownIcon } from "@/components/Icons/Icons";
+import { ChevronDownloadIcon } from "@/components/Icons/Icons";
+import { formatPrice } from "@/lib/priceUtils";
+
+import PaginationNavSubscriptionCurrent from "@/components/ui/PaginationNavSubscriptionCurrent/PaginationNavSubscriptionCurrent";
+import { fetchUserOrders } from "@/lib/bfbApi";
+import { useAuthStore } from "@/store/auth";
 
 interface PaymentRecord {
   id: number;
@@ -18,46 +23,60 @@ export default function PaymentHistory() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [isMobile, setIsMobile] = useState(false);
+  const user = useAuthStore((s) => s.user);
 
   useEffect(() => {
-    // Тут можна додати API запит для отримання історії платежів
-    // Поки що використовуємо мокові дані
-    const mockPayments: PaymentRecord[] = [
-      {
-        id: 1,
-        date: "19/03/2025",
-        description: "Підписка BFB Професійний",
-        amount: "1500$",
-        status: "completed",
-      },
-      {
-        id: 2,
-        date: "19/02/2025",
-        description: "Підписка BFB Професійний",
-        amount: "1500$",
-        status: "completed",
-      },
-      {
-        id: 3,
-        date: "19/01/2025",
-        description: "Підписка BFB Професійний",
-        amount: "1500$",
-        status: "completed",
-      },
-      {
-        id: 4,
-        date: "19/12/2024",
-        description: "Підписка BFB Професійний",
-        amount: "1500$",
-        status: "completed",
-      },
-    ];
+    const loadPaymentHistory = async () => {
+      if (!user?.id) {
+        setIsLoading(false);
+        return;
+      }
 
-    setTimeout(() => {
-      setPayments(mockPayments);
-      setTotalPages(5);
-      setIsLoading(false);
-    }, 1000);
+      try {
+        setIsLoading(true);
+        // Отримуємо JWT токен для авторизації
+        const token =
+          typeof window !== "undefined"
+            ? localStorage.getItem("wp_jwt") ||
+              localStorage.getItem("wp_jwt_override") ||
+              undefined
+            : undefined;
+
+        const orders = await fetchUserOrders(Number(user.id), token);
+
+        // Перетворюємо замовлення в формат PaymentRecord
+        const paymentRecords: PaymentRecord[] = orders.map((order) => ({
+          id: order.id,
+          date: new Date(order.date_created).toLocaleDateString("uk-UA"),
+          description: order.line_items.map((item) => item.name).join(", "),
+          amount: order.total,
+          status: order.status as "completed" | "pending" | "failed",
+        }));
+
+        setPayments(paymentRecords);
+        // Розраховуємо загальну кількість сторінок (показуємо по 5 платежів на сторінку)
+        setTotalPages(Math.ceil(paymentRecords.length / 5));
+      } catch (err) {
+        setError("Не вдалося завантажити історію платежів");
+        console.error("Error loading payment history:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPaymentHistory();
+  }, [user?.id]);
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth <= 1000);
+    };
+
+    checkIsMobile();
+    window.addEventListener("resize", checkIsMobile);
+
+    return () => window.removeEventListener("resize", checkIsMobile);
   }, []);
 
   const handleDownload = (paymentId: number) => {
@@ -66,7 +85,25 @@ export default function PaymentHistory() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    // Тут можна додати API запит для завантаження нової сторінки
+  };
+
+  // Отримуємо платежі для поточної сторінки
+  const getCurrentPagePayments = () => {
+    const startIndex = (currentPage - 1) * 5;
+    const endIndex = startIndex + 5;
+    return payments.slice(startIndex, endIndex);
+  };
+
+  const handlePrev = () => {
+    if (currentPage > 1) {
+      handlePageChange(currentPage - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      handlePageChange(currentPage + 1);
+    }
   };
 
   if (isLoading) {
@@ -92,18 +129,49 @@ export default function PaymentHistory() {
       <h2 className={styles.sectionTitle}>Історія платежів</h2>
 
       <div className={styles.paymentList}>
-        {payments.map((payment) => (
+        {getCurrentPagePayments().map((payment) => (
           <div key={payment.id} className={styles.paymentItem}>
-            <div className={styles.paymentDate}>{payment.date}</div>
-            <div className={styles.paymentDescription}>
-              {payment.description}
-            </div>
-            <div className={styles.paymentAmount}>{payment.amount}</div>
+            {isMobile ? (
+              /* Mobile: Date and Description in container */
+              <div className={styles.paymentInfoWrapper}>
+                <div className={styles.paymentInfoContainer}>
+                  <div className={styles.paymentDate}>{payment.date}</div>
+                  {/* <div className={styles.paymentDescription}>
+                    {payment.description}
+                  </div> */}
+                  <div className={styles.paymentAmount}>
+                    <span className={styles.paymentAmountValue}>
+                      {payment.amount}
+                    </span>
+                    <span className={styles.paymentAmountCurrency}>$</span>
+                  </div>
+                </div>
+                <div className={styles.paymentDescription}>
+                  {payment.description}
+                </div>
+              </div>
+            ) : (
+              /* Desktop: Date and Description separate */
+              <>
+                <div className={styles.paymentDate}>{payment.date}</div>
+                <div className={styles.paymentDescription}>
+                  {payment.description}
+                </div>
+                {/* <div className={styles.paymentAmount}>
+                  {formatPrice(payment.amount)}
+                </div> */}
+              </>
+            )}
+
+            {/* <div className={styles.paymentAmount}>
+              {formatPrice(payment.amount)}
+            </div> */}
+
             <button
               className={styles.downloadButton}
               onClick={() => handleDownload(payment.id)}
             >
-              <ChevronDownIcon />
+              {!isMobile && <ChevronDownloadIcon />}
               Скачати
             </button>
           </div>
@@ -111,51 +179,13 @@ export default function PaymentHistory() {
       </div>
 
       {totalPages > 1 && (
-        <div className={styles.pagination}>
-          <button
-            className={styles.paginationButton}
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            ←
-          </button>
-
-          <div className={styles.paginationNumbers}>
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              const page = i + 1;
-              return (
-                <button
-                  key={page}
-                  className={`${styles.paginationNumber} ${
-                    currentPage === page ? styles.paginationNumberActive : ""
-                  }`}
-                  onClick={() => handlePageChange(page)}
-                >
-                  {page}
-                </button>
-              );
-            })}
-            {totalPages > 5 && (
-              <>
-                <span className={styles.paginationDots}>...</span>
-                <button
-                  className={styles.paginationNumber}
-                  onClick={() => handlePageChange(totalPages)}
-                >
-                  {totalPages}
-                </button>
-              </>
-            )}
-          </div>
-
-          <button
-            className={styles.paginationButton}
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            →
-          </button>
-        </div>
+        <PaginationNavSubscriptionCurrent
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          onPrev={handlePrev}
+          onNext={handleNext}
+        />
       )}
     </div>
   );

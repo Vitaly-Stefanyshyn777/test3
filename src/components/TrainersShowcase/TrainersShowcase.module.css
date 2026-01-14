@@ -175,11 +175,12 @@
 
 @media (max-width: 1000px) {
   .trainersSection {
-    padding: mvw(70) 0;
+    padding: mvw(0) 0;
   }
   .container {
     padding: 0;
     gap: mvw(32);
+    padding: mvw(0) mvw(16);
   }
   .header {
     padding: 0 mvw(16);
@@ -199,7 +200,7 @@
     width: 100%;
     overflow: hidden;
     margin: 0;
-    padding: 0 mvw(16);
+    padding: mvw(0);
   }
   .mobileSlider {
     width: 100%;

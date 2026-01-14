@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   UseFormRegister,
   FieldErrors,
@@ -45,22 +45,9 @@ export default function ContactForm({
   isError,
   isFormFilled,
 }: TrainerFormProps) {
-  const [submitStatus, setSubmitStatus] = useState<{
-    type: "success" | "error" | null;
-    message: string;
-  }>({ type: null, message: "" });
 
   const handleFormSubmit = async (data: ContactFormValues) => {
-    try {
-      setSubmitStatus({ type: null, message: "" });
-      await onSubmit(data);
-      // setSubmitStatus({ type: "success", message: "Заявку надіслано" });
-    } catch (error) {
-      setSubmitStatus({
-        type: "error",
-        message: error instanceof Error ? error.message : "Помилка відправки",
-      });
-    }
+    await onSubmit(data);
   };
 
   return (
@@ -74,25 +61,25 @@ export default function ContactForm({
           <InputField
             icon={<UserIcon />}
             label="Ваше ім'я та прізвище"
-                type="text"
+            type="text"
             id="contact-form-name-field"
             hasError={!!errors.name}
             supportingText="Будь ласка, вкажіть імʼя"
-                {...register("name", { required: true })}
-              />
+            {...register("name", { required: true })}
+          />
         </div>
 
         <div className={s.inputGroup}>
           <InputField
             icon={<NumberIcon />}
             label="Ваш номер телефону"
-                type="tel"
+            type="tel"
             id="contact-form-phone-field"
             onlyDigits
             hasError={!!errors.phone}
             supportingText="Невірний номер"
-                {...register("phone")}
-              />
+            {...register("phone")}
+          />
         </div>
       </div>
 
@@ -101,27 +88,27 @@ export default function ContactForm({
           <InputField
             icon={<EmailDoggieIcon />}
             label="Нікнейм Telegram/Instagram"
-                type="text"
+            type="text"
             id="contact-form-nickname-field"
             hasError={!!errors.nickname}
             supportingText={
               (errors.nickname?.message as string) || "Некоректний нікнейм"
             }
-                {...register("nickname", {
-                  // allow optional @, letters, numbers, underscore and dot
-                  pattern: {
-                    value: /^@?[A-Za-z0-9._]+$/, // optional @ at start
-                    message: "Некоректний нікнейм",
-                  },
-                })}
-              />
+            {...register("nickname", {
+              // allow optional @, letters, numbers, underscore and dot
+              pattern: {
+                value: /^@?[A-Za-z0-9._]+$/, // optional @ at start
+                message: "Некоректний нікнейм",
+              },
+            })}
+          />
         </div>
 
         <div className={s.inputGroup}>
           <InputField
             icon={<EmailIcon />}
             label="Ваша пошта"
-                type="email"
+            type="email"
             id="contact-form-email-field"
             hasError={!!errors.email}
             supportingText={
@@ -135,7 +122,7 @@ export default function ContactForm({
                   'Електронна адреса має містити знак "@" та коректний домен',
               },
             })}
-              />
+          />
         </div>
       </div>
 
@@ -143,22 +130,12 @@ export default function ContactForm({
         <TextareaField
           icon={<QuestionIcon />}
           label="Ваше питання"
-            rows={4}
-            {...register("question")}
-          />
-        </div>
+          rows={4}
+          {...register("question")}
+        />
+      </div>
       {isError && (
         <p className={s.error}>Помилка відправки заявки. Спробуйте ще раз.</p>
-      )}
-
-      {submitStatus.type && (
-        <div
-          className={`${s.statusMessage} ${
-            submitStatus.type === "success" ? s.success : s.error
-          }`}
-        >
-          {submitStatus.message}
-        </div>
       )}
 
       <div className={s.privacyLinkBlock}>
@@ -170,7 +147,7 @@ export default function ContactForm({
 
         <p className={s.privacyText}>
           Натискаючи на кнопку, ви погоджуєтесь з{" "}
-          <a href="/privacy" className={s.privacyLink}>
+          <a href="/privacy-policy" className={s.privacyLink}>
             Політикою конфіденційності
           </a>
         </p>

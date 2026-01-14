@@ -314,7 +314,7 @@
   }
 
   .titleTextBlock {
-    padding: mvw(8);
+    padding: mvw(18) mvw(20) mvw(18) mvw(20);
     border-radius: mvw(16);
     gap: mvw(16);
   }
@@ -364,6 +364,7 @@
     border-radius: mvw(16);
     gap: mvw(16);
     flex-direction: row;
+    justify-content: space-around;
     align-items: center;
   }
 

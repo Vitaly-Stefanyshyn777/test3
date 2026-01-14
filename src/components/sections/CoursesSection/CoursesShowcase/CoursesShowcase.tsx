@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import type { SwiperRef } from "swiper/react";
+import type { Swiper as SwiperType } from "swiper";
 import { useCoursesQuery } from "@/lib/coursesQueries";
 import CourseCard from "../CourseCard/CourseCard";
 import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
@@ -165,7 +166,9 @@ const CoursesShowcase: React.FC = () => {
         <div className={s.header}>
           <div className={s.headerLeft}>
             <p className={s.eyebrow}>Початок навчання</p>
-            <h2 className={s.title}>Почни свій шлях з BFB тут</h2>
+            <h2 className={s.title}>
+              Надихайся разом з командою Lika Fitdance
+            </h2>
           </div>
           <div className={s.headerRight}>
             {useSlider && (
@@ -191,11 +194,11 @@ const CoursesShowcase: React.FC = () => {
               loop={true}
               allowSlideNext={true}
               allowSlidePrev={true}
-              onSlideChange={(sw) => {
+              onSlideChange={(sw: SwiperType) => {
                 const realIndex = sw.realIndex;
                 setActiveIndex(realIndex);
               }}
-              onSwiper={(swiper) => {
+              onSwiper={(swiper: SwiperType) => {
                 // Swiper initialized
               }}
               breakpoints={{
@@ -222,7 +225,8 @@ const CoursesShowcase: React.FC = () => {
                       prices: {
                         // Використовуємо реальні дані з API
                         price: courseWcProduct.prices?.price || "0",
-                        regular_price: courseWcProduct.prices?.regular_price || "0",
+                        regular_price:
+                          courseWcProduct.prices?.regular_price || "0",
                         sale_price: courseWcProduct.prices?.sale_price || "0",
                       },
                       on_sale: courseWcProduct.on_sale || false,
@@ -232,7 +236,7 @@ const CoursesShowcase: React.FC = () => {
                       featured: courseWcProduct.featured || false,
                     } as const)
                   : null;
-                
+
                 return (
                   <SwiperSlide key={course.id} className={s.slide}>
                     <CourseCard
@@ -296,7 +300,8 @@ const CoursesShowcase: React.FC = () => {
                       prices: {
                         // Використовуємо реальні дані з API
                         price: courseWcProduct.prices?.price || "0",
-                        regular_price: courseWcProduct.prices?.regular_price || "0",
+                        regular_price:
+                          courseWcProduct.prices?.regular_price || "0",
                         sale_price: courseWcProduct.prices?.sale_price || "0",
                       },
                       on_sale: courseWcProduct.on_sale || false,

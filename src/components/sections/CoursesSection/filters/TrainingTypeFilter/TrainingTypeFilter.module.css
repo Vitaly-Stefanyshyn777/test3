@@ -312,7 +312,7 @@
   .sectionTitleContainer {
     width: 100%;
     padding: 0;
-    margin-bottom: mvw(16);
+    margin-bottom: mvw(0);
   }
 
   .sectionTitleContainer svg {

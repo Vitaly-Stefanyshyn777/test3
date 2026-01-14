@@ -33,12 +33,18 @@ export default function CartSummary({
             />
           </span>
           <span className={s.freeShippingText}>
+            {remainingToFree <= 0 ? (
+              "Доставка безкоштовна"
+            ) : (
+              <>
             До безкоштовної доставки залишилось
             <span className={s.amount}>
               {" "}
               {remainingToFree.toLocaleString()}
             </span>
             <span className={s.currency}> грн.</span>
+              </>
+            )}
           </span>
         </div>
         <div className={s.progressWrap}>

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import styles from "./TrainersFilter.module.css";
 import { CountryFilter } from "../filters/CountryFilter/CountryFilter";
 import { CityFilter } from "../filters/CityFilter/CityFilter";
-import { TrainingDirectionFilter } from "../filters/TrainingDirectionFilter/TrainingDirectionFilter";
+// import { TrainingDirectionFilter } from "../filters/TrainingDirectionFilter/TrainingDirectionFilter";
 import { ForWhomFilter } from "../filters/ForWhomFilter/ForWhomFilter";
 import { WorkFormatFilter } from "../filters/WorkFormatFilter/WorkFormatFilter";
 import ButtonFilter from "@/components/ui/ButtonFilter/ButtonFilter";
@@ -127,9 +127,9 @@ const TrainersFilter = ({
   };
 
   return (
-    <div 
-      className={`${styles.filterContainer} ${isInModal ? styles.inModal : ''}`}
-      data-in-modal={isInModal ? 'true' : undefined}
+    <div
+      className={`${styles.filterContainer} ${isInModal ? styles.inModal : ""}`}
+      data-in-modal={isInModal ? "true" : undefined}
     >
       <div className={styles.filterSidebar}>
         <CountryFilter
@@ -146,10 +146,10 @@ const TrainersFilter = ({
           searchTerm={searchTerm}
         />
 
-        <TrainingDirectionFilter
+        {/* <TrainingDirectionFilter
           value={filters.trainingDirection}
           onChange={(value) => handleFilterChange("trainingDirection", value)}
-        />
+        /> */}
 
         <ForWhomFilter
           value={filters.forWhom}

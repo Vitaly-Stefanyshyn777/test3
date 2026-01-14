@@ -66,16 +66,12 @@ const VideoInstruction: React.FC<VideoInstructionProps> = ({
   useEffect(() => {
     const loadVideoUrl = async () => {
       try {
-        console.log("[VideoInstruction] Loading video URL...");
         setIsLoading(true);
         const url = await fetchThemeVideoUrl();
-        console.log("[VideoInstruction] Received video URL:", url);
         if (url) {
           // URL вже проксований в fetchThemeVideoUrl, використовуємо його напряму
           setRealVideoUrl(url);
-          console.log("[VideoInstruction] Video URL set successfully");
         } else {
-          console.log("[VideoInstruction] No video URL received");
           setRealVideoUrl(null);
         }
       } catch (error) {
@@ -93,10 +89,6 @@ const VideoInstruction: React.FC<VideoInstructionProps> = ({
   }, []);
 
   const handleWatchVideo = () => {
-    console.log(
-      "[VideoInstruction] handleWatchVideo called, currentVideoUrl:",
-      currentVideoUrl
-    );
     // Якщо URL вже готовий, просто переконуємось що плеєр увімкнено
     if (currentVideoUrl) {
       setWatched(true);

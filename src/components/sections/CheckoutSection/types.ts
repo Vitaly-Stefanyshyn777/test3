@@ -15,3 +15,19 @@ export interface FormData {
   comment: string;
 }
 
+export interface CheckoutErrors {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  email?: string;
+  billing?: string;
+  recipientFirstName?: string;
+  recipientLastName?: string;
+  recipientPhone?: string;
+  deliveryType?: string;
+  city?: string;
+  branch?: string;
+  house?: string;
+  building?: string;
+  apartment?: string;
+}

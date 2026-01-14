@@ -369,6 +369,7 @@
     width: mvw(375);
     height: mvw(auto);
     background-image: url(/footer.png);
+    max-width: 100%;
   }
   .logoContainer {
     flex-direction: column;
@@ -465,7 +466,7 @@
   }
   .sectionTitle {
     font-size: mvw(14);
-    margin-bottom: mvw(26);
+    margin-bottom: mvw(20);
     color: rgba(255, 254, 252, 0.56);
   }
   .contactInfo {

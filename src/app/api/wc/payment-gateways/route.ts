@@ -47,11 +47,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log(
-      "[WC Payment Gateways API] ✅ Отримано платіжних методів:",
-      data.length
-    );
-
     return NextResponse.json(data);
   } catch (error) {
     console.error("[WC Payment Gateways API] ❌ Внутрішня помилка сервера:", error);

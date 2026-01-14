@@ -8,10 +8,28 @@
   z-index: 10;
 }
 
+.breadcrumbs.on404 .breadcrumbLink {
+  --breadcrumbs-link-color: var(--white);
+}
+
+.breadcrumbs.on404 .breadcrumbText {
+  color: var(--white);
+  opacity: 0.4;
+}
+
+.breadcrumbs.on404 .separator {
+  color: var(--white);
+}
+
+.breadcrumbs.on404 {
+  --breadcrumbs-link-color: var(--white);
+  top: 150px;
+}
+
 .breadcrumbsContainer {
   max-width: 1200px;
   margin: 0;
-  padding-left: 50px;
+  padding-left: 70px;
   display: flex;
   justify-content: flex-start;
 }
@@ -173,7 +191,7 @@
   .breadcrumbs {
     position: absolute;
     top: 0;
-    padding: mvw(95) mvw(16) mvw(15);
+    padding: mvw(95) mvw(26) mvw(15);
     z-index: 10;
     display: flex;
   }
@@ -181,7 +199,15 @@
   .breadcrumbs.onCoursesLanding {
     position: absolute;
     top: 0;
-    padding: mvw(110) mvw(27) mvw(15);
+    padding: mvw(110) mvw(35) mvw(15);
+    left: 0;
+    right: 0;
+  }
+
+  .breadcrumbs.on404 {
+    position: absolute;
+    top: 0;
+    padding: mvw(110) mvw(35) mvw(15);
     left: 0;
     right: 0;
   }
@@ -239,29 +265,29 @@
   /* Стилі для breadcrumbs на сторінці профілю тренера (чорний текст на білому фоні) */
   .breadcrumbs:not(.onTrainers):not(.onOurCourses):not(.onCoursesLanding):not(
       .onContacts
-    ):not(.onAboutBfb)
+    ):not(.onAboutBfb):not(.on404)
     .breadcrumbLink,
   .breadcrumbs:not(.onTrainers):not(.onOurCourses):not(.onCoursesLanding):not(
       .onContacts
-    ):not(.onAboutBfb)
+    ):not(.onAboutBfb):not(.on404)
     .breadcrumbText,
   .breadcrumbs:not(.onTrainers):not(.onOurCourses):not(.onCoursesLanding):not(
       .onContacts
-    ):not(.onAboutBfb)
+    ):not(.onAboutBfb):not(.on404)
     .separator {
     color: var(--black) !important;
   }
 
   .breadcrumbs:not(.onTrainers):not(.onOurCourses):not(.onCoursesLanding):not(
       .onContacts
-    ):not(.onAboutBfb)
+    ):not(.onAboutBfb):not(.on404)
     .separator {
     color: rgb(14 14 14 / 30%) !important;
   }
 
   .breadcrumbs:not(.onTrainers):not(.onOurCourses):not(.onCoursesLanding):not(
       .onContacts
-    ):not(.onAboutBfb)
+    ):not(.onAboutBfb):not(.on404)
     .breadcrumbText.active {
     color: rgba(14, 14, 14, 0.3) !important;
     font-weight: 600;
@@ -278,6 +304,20 @@
     line-height: 140%;
     opacity: 0.4;
     font-weight: 600;
+  }
+
+  /* Стилі для breadcrumbs на сторінці 404 на мобілці */
+  .breadcrumbs.on404 .breadcrumbLink {
+    --breadcrumbs-link-color: var(--white) !important;
+  }
+
+  .breadcrumbs.on404 .breadcrumbText {
+    color: var(--white) !important;
+    opacity: 0.4;
+  }
+
+  .breadcrumbs.on404 .separator {
+    color: var(--white) !important;
   }
 
   .breadcrumbs.onAboutBfb .breadcrumbText.active {

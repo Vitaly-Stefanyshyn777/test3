@@ -170,9 +170,10 @@
 .orderDetails {
   text-align: left;
   display: flex;
-  flex-direction: column;
+  /* flex-direction: row; */
   gap: 24px;
   border-radius: 12px;
+  flex-direction: column;
 }
 
 .detailRow {

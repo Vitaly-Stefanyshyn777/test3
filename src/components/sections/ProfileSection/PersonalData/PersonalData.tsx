@@ -9,6 +9,7 @@ import { adminRequest } from "@/lib/api";
 import { useUserProfileQuery } from "@/components/hooks/useUserProfileQuery";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/auth";
+import { toast } from "react-toastify";
 
 interface PersonalDataForm {
   firstName: string;
@@ -34,9 +35,12 @@ const PersonalData: React.FC = () => {
   const [isDeletingAvatar, setIsDeletingAvatar] = useState(false);
 
   // TanStack Query: завантаження та оновлення профілю
-  const { data: profile, isLoading: isLoadingProfile, error: profileError } = useUserProfileQuery();
+  const {
+    data: profile,
+    isLoading: isLoadingProfile,
+    error: profileError,
+  } = useUserProfileQuery();
   const queryClient = useQueryClient();
-
 
   const handleInputChange = (field: keyof PersonalDataForm, value: string) => {
     setFormData((prev) => ({
@@ -73,11 +77,13 @@ const PersonalData: React.FC = () => {
           throw new Error("Failed to delete avatar");
         }
         setProfileImage(null);
+        toast.success("Аватар успішно видалено!");
       })
       .catch((e) => {
         if (process.env.NODE_ENV !== "production") {
           console.error("Error deleting avatar:", e);
         }
+        toast.error("Не вдалося видалити аватар. Спробуйте ще раз.");
       })
       .finally(() => {
         setIsDeletingAvatar(false);
@@ -109,8 +115,7 @@ const PersonalData: React.FC = () => {
         freshAcf = (freshProfile?.acf as Record<string, unknown>) || {};
         freshMeta = (freshProfile?.meta as Record<string, unknown>) || {};
       }
-    } catch (error) {
-    }
+    } catch (error) {}
 
     const acfToSave: Record<string, unknown> = {
       ...freshAcf,
@@ -147,7 +152,7 @@ const PersonalData: React.FC = () => {
       email: formData.email,
       acf: acfToSave,
     };
-    
+
     if (Object.keys(metaToSave).length > 0) {
       payload.meta = metaToSave;
     }
@@ -175,18 +180,25 @@ const PersonalData: React.FC = () => {
             error: errorText,
           });
         }
+        toast.error("Не вдалося зберегти дані. Спробуйте ще раз.");
       } else {
         queryClient.invalidateQueries({ queryKey: ["user-profile", "me"] });
         queryClient.invalidateQueries({ queryKey: ["trainer-profile-full"] });
+        toast.success("Дані успішно збережено!");
       }
     } catch (error) {
+      toast.error("Не вдалося зберегти дані. Спробуйте ще раз.");
     }
   };
 
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const token = useAuthStore((s) => s.token);
+  const isHydrated = useAuthStore((s) => s.isHydrated);
 
   useEffect(() => {
+    // Чекаємо на гідратацію перед перевіркою
+    if (!isHydrated) return;
+
     if (!isLoggedIn && !token) {
       setFormData({
         firstName: "",
@@ -222,7 +234,7 @@ const PersonalData: React.FC = () => {
         };
         const normalize = (s: string) =>
           String(s || "")
-            .replace(/!+$/g, "")
+            .replace(/[.!]+$/g, "") // Видаляємо крапки та знаки оклику в кінці
             .trim();
         const firstName = normalize(data?.first_name || "");
         let lastName = normalize(data?.last_name || "");
@@ -233,18 +245,21 @@ const PersonalData: React.FC = () => {
         const email = data?.email || data?.user_email || "";
         const acf = (data as { acf?: Record<string, unknown> })?.acf || {};
         const meta = (data?.meta || {}) as Record<string, string>;
-        
-        const newPhone = (acf.phone as string) ||
+
+        const newPhone =
+          (acf.phone as string) ||
           meta.input_text_social_phone ||
           meta.phone ||
           data?.social_phone ||
           "";
-        const newTelegram = (acf.telegram as string) ||
+        const newTelegram =
+          (acf.telegram as string) ||
           meta.input_text_social_telegram ||
           meta.social_telegram ||
           data?.social_telegram ||
           "";
-        const newInstagram = (acf.instagram as string) ||
+        const newInstagram =
+          (acf.instagram as string) ||
           meta.input_text_social_instagram ||
           meta.social_instagram ||
           data?.social_instagram ||
@@ -260,7 +275,7 @@ const PersonalData: React.FC = () => {
           ) {
             return prev;
           }
-          
+
           return {
             firstName,
             lastName,

@@ -9,10 +9,12 @@ import { useAuthStore } from "@/store/auth";
 import PasswordField from "@/components/ui/FormFields/PasswordField";
 import { PasswordsIcon } from "@/components/Icons/Icons";
 import SubmitButton from "@/components/ui/SubmitButton/SubmitButton";
+import { toast } from "react-toastify";
 
 const ChangePassword: React.FC = () => {
   const user = useAuthStore((s) => s.user);
   const token = useAuthStore((s) => s.token);
+  const isHydrated = useAuthStore((s) => s.isHydrated);
   const [isMobile, setIsMobile] = useState(false);
 
   type FormValues = {
@@ -29,8 +31,6 @@ const ChangePassword: React.FC = () => {
     mode: "onSubmit",
   });
 
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -50,10 +50,11 @@ const ChangePassword: React.FC = () => {
   );
 
   const onSubmit = handleSubmit(async (values) => {
-    setError(null);
-    setSuccess(null);
+    // Чекаємо на гідратацію перед перевіркою
+    if (!isHydrated) return;
+
     if (!token || !user?.id) {
-      setError("Потрібна авторизація для зміни пароля");
+      toast.error("Потрібна авторизація для зміни пароля");
       return;
     }
 
@@ -62,15 +63,15 @@ const ChangePassword: React.FC = () => {
       !values.newPassword ||
       !values.confirmPassword
     ) {
-      setError("Заповніть усі поля");
+      toast.error("Заповніть усі поля форми");
       return;
     }
     if (values.newPassword !== values.confirmPassword) {
-      setError("Паролі не співпадають");
+      toast.error("Нові паролі не співпадають");
       return;
     }
     if (values.newPassword.length < 8) {
-      setError("Новий пароль має містити щонайменше 8 символів");
+      toast.error("Новий пароль має містити щонайменше 8 символів");
       return;
     }
 
@@ -84,10 +85,10 @@ const ChangePassword: React.FC = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      setSuccess("Пароль успішно змінено");
+      toast.success("Пароль успішно змінено");
       reset();
     } catch {
-      setError("Не вдалося змінити пароль. Спробуйте ще раз.");
+      toast.error("Не вдалося змінити пароль. Спробуйте ще раз.");
     } finally {
       setSubmitting(false);
     }
@@ -106,8 +107,8 @@ const ChangePassword: React.FC = () => {
           <PasswordField
             icon={<PasswordsIcon />}
             label="Поточний пароль"
-            hasError={!!error}
-            supportingText={error || "Введіть поточний пароль"}
+            hasError={false}
+            supportingText="Введіть поточний пароль"
             inputStyle={{ backgroundColor: isMobile ? '#fff' : '#f9f9f9', borderColor: isMobile ? '#fff' : '#f9f9f9' }}
             eyeBtnClassName={isMobile ? styles.eyeBtnMobile : ""}
             {...register("currentPassword", { required: true })}
@@ -119,11 +120,8 @@ const ChangePassword: React.FC = () => {
           <PasswordField
             icon={<PasswordsIcon />}
             label="Введіть новий пароль"
-            hasError={!!error}
-            supportingText={
-              error ||
-              "Новий пароль має містити щонайменше 8 символів та відрізнятися від поточного"
-            }
+            hasError={false}
+            supportingText="Новий пароль має містити щонайменше 8 символів та відрізнятися від поточного"
             inputStyle={{ backgroundColor: isMobile ? '#fff' : '#f9f9f9', borderColor: isMobile ? '#fff' : '#f9f9f9' }}
             eyeBtnClassName={isMobile ? styles.eyeBtnMobile : ""}
             {...register("newPassword", { required: true, minLength: 8 })}
@@ -135,17 +133,14 @@ const ChangePassword: React.FC = () => {
           <PasswordField
             icon={<PasswordsIcon />}
             label="Підтвердіть новий пароль"
-            hasError={!!error}
-            supportingText={error || "Повторіть новий пароль без помилок"}
+            hasError={false}
+            supportingText="Повторіть новий пароль без помилок"
             inputStyle={{ backgroundColor: isMobile ? '#fff' : '#f9f9f9', borderColor: isMobile ? '#fff' : '#f9f9f9' }}
             eyeBtnClassName={isMobile ? styles.eyeBtnMobile : ""}
             {...register("confirmPassword", { required: true, minLength: 8 })}
             autoComplete="new-password"
           />
         </div>
-
-        {error && <div className={styles.error}>{error}</div>}
-        {success && <div className={styles.success}>{success}</div>}
 
         <SubmitButton
           className={styles.submitBtn}

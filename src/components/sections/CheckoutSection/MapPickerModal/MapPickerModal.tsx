@@ -64,7 +64,7 @@ declare const google: {
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  onSelectLocation: (location: string) => void;
+  onSelectLocation: (location: string, city?: string) => void;
   selectedCity?: string; // Обране місто з CheckoutSection
 };
 
@@ -84,7 +84,6 @@ interface City {
   ref: string;
   streets: string[];
   branches?: Warehouse[];
-  postomats?: Warehouse[];
   warehouses?: Warehouse[];
 }
 
@@ -305,7 +304,6 @@ export default function MapPickerModal({
       // Завантажуємо відділення
       const allWarehouses = [
         ...(city.branches || []),
-        ...(city.postomats || []),
         ...(city.warehouses || []),
       ];
       setWarehouses(allWarehouses);
@@ -338,7 +336,6 @@ export default function MapPickerModal({
     if (selectedCityState) {
       const allWarehouses = [
         ...(selectedCityState.branches || []),
-        ...(selectedCityState.postomats || []),
         ...(selectedCityState.warehouses || []),
       ];
       setWarehouses(allWarehouses);
@@ -354,10 +351,12 @@ export default function MapPickerModal({
         .replace(/Пункт приймання-видачі \(до \d+ кг\): /, "")
         .replace(/Поштомат "Нова Пошта" №\d+: /, "Поштомат: ");
 
-      onSelectLocation(formattedName);
+      // Передаємо також місто відділення
+      const cityName = selectedCityState?.name || selectedCity;
+      onSelectLocation(formattedName, cityName);
       onClose();
     },
-    [onSelectLocation, onClose]
+    [onSelectLocation, onClose, selectedCityState, selectedCity]
   );
 
   // Створення статичних маркерів з даних файлу
@@ -625,7 +624,8 @@ export default function MapPickerModal({
             <LeafletMap
               warehouses={filteredWarehousesForMap}
               onSelect={(text: string) => {
-                onSelectLocation(text);
+                const cityName = selectedCityState?.name || selectedCity;
+                onSelectLocation(text, cityName);
                 onClose();
               }}
               center={

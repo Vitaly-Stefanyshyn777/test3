@@ -34,25 +34,22 @@ export function ProductsShowcase({
   };
 
   const [categories, setCategories] = useState<InventoryCategory[]>([]);
-  const [isLoading, setIsLoading] = useState(true); // Вже встановлено в true
+  const [isLoading, setIsLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
   const [hasNewInCategory, setHasNewInCategory] = useState<
     Record<number, boolean>
   >({});
-  // Лише список категорій для навігації; вибір і фільтрація відбудуться на сторінці каталогу
 
   useEffect(() => {
     (async () => {
       try {
-        // isLoading вже true з початкового стану, не потрібно встановлювати знову
         const cats = (await fetchWcCategories({
-          parent: 85, // Інвентар
+          parent: 85,
           per_page: 50,
         })) as InventoryCategory[];
-        // Фільтруємо та сортуємо: найновіші категорії першими
+
         const filtered = (cats || []).filter(Boolean);
         const sorted = filtered.sort((a, b) => {
-          // Використовуємо date_modified або date_created, якщо доступні
           const dateA =
             a.date_modified ||
             a.date_modified_gmt ||
@@ -67,10 +64,9 @@ export function ProductsShowcase({
             "";
 
           if (!dateA && !dateB) return 0;
-          if (!dateA) return 1; // Категорії без дати в кінець
+          if (!dateA) return 1;
           if (!dateB) return -1;
 
-          // Сортуємо від новіших до старіших
           return new Date(dateB).getTime() - new Date(dateA).getTime();
         });
         setCategories(sorted);
@@ -136,21 +132,22 @@ export function ProductsShowcase({
   })();
 
   const visibleCategories = (() => {
-    if (!categories || categories.length === 0) return [] as InventoryCategory[];
-    
+    if (!categories || categories.length === 0)
+      return [] as InventoryCategory[];
+
     // Сортуємо: категорії з новинками першими
     const sorted = [...categories].sort((a, b) => {
       const aHasNew = hasNewInCategory[a.id] || false;
       const bHasNew = hasNewInCategory[b.id] || false;
-      
+
       // Якщо одна категорія має новинку, а інша ні - та з новинкою першою
       if (aHasNew && !bHasNew) return -1;
       if (!aHasNew && bHasNew) return 1;
-      
+
       // Якщо обидві мають або не мають новинку - зберігаємо поточний порядок (за датою)
       return 0;
     });
-    
+
     if (!showAll && sorted.length > 6) return sorted.slice(0, 6);
     return sorted;
   })();

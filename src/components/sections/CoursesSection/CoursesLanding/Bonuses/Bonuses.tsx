@@ -317,7 +317,7 @@ const Bonuses: React.FC = () => {
         </div>
 
         {isMobile ? (
-          <>
+          <div className={s.mobileSliderContainer}>
             <div className={s.mobileSliderWrap}>
               <Swiper
                 modules={[A11y]}
@@ -335,10 +335,10 @@ const Bonuses: React.FC = () => {
                 speed={350}
                 grabCursor={true}
                 className={s.mobileSlider}
-                onSwiper={(swiper) => {
+                onSwiper={(swiper: SwiperType) => {
                   mobileSwiperRef.current = swiper;
                 }}
-                onSlideChange={(swiper) => {
+                onSlideChange={(swiper: SwiperType) => {
                   setActiveMobile(swiper.activeIndex || 0);
                 }}
               >
@@ -350,15 +350,17 @@ const Bonuses: React.FC = () => {
               </Swiper>
             </div>
             <div className={s.sliderNavOutside}>
-              <SliderNav
-                activeIndex={activeMobile}
-                dots={mobileSlides.length}
-                onPrev={() => mobileSwiperRef.current?.slidePrev()}
-                onNext={() => mobileSwiperRef.current?.slideNext()}
-                onDotClick={(idx) => mobileSwiperRef.current?.slideTo(idx)}
-              />
+              <div>
+                <SliderNav
+                  activeIndex={activeMobile}
+                  dots={mobileSlides.length}
+                  onPrev={() => mobileSwiperRef.current?.slidePrev()}
+                  onNext={() => mobileSwiperRef.current?.slideNext()}
+                  onDotClick={(idx) => mobileSwiperRef.current?.slideTo(idx)}
+                />
+              </div>
             </div>
-          </>
+          </div>
         ) : (
           <div className={s.flexContainer}>
             <div className={s.cardContentBlock}>

@@ -40,6 +40,11 @@ export const CertificationFilter = ({
 
   const options = fetchedOptions.length > 0 ? fetchedOptions : fallbackOptions;
 
+  // Якщо немає опцій і не завантажується, не відображаємо фільтр
+  if (!showSkeleton && options.length === 0) {
+    return null;
+  }
+
   const toggleSection = () => {
     setIsExpanded(!isExpanded);
   };

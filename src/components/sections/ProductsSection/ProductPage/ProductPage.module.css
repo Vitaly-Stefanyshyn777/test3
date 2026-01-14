@@ -118,7 +118,7 @@
 .thumbnailImage {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .mainImage {
@@ -133,10 +133,11 @@
 .productImage {
   width: 100%;
   height: 800px;
-  object-fit: contain;
+  object-fit: cover;
   border-radius: 24px;
   position: sticky;
   top: 0;
+  height: 800px;
 }
 .productDescriptionBlock {
   width: 100%;
@@ -546,12 +547,12 @@
 }
 
 .addToCartBtn.addToCartBtnInCart {
-  background: rgba(0, 0, 0, 0.12);
-  color: var(--black);
+  background: var(--black);
+  color: var(--white);
 }
 
 .addToCartBtn.addToCartBtnInCart:hover {
-  background: rgba(0, 0, 0, 0.18);
+  background: var(--violet);
 }
 
 .favoriteBtn.favoriteBtnDisabled {
@@ -1002,15 +1003,15 @@
 }
 
 /* Маркери на зображенні товару */
-.imageBadges {
+/* .imageBadges {
   position: absolute;
   top: 20px;
   left: 20px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 8px;
   z-index: 10;
-}
+} */
 
 /* .imageBadge {
   padding: 6px 12px;
@@ -1040,7 +1041,7 @@
 @media (max-width: 1000px) {
   .productPage {
     padding: mvw(124) mvw(16);
-    gap: mvw(24);
+    gap: mvw(70);
   }
 
   .breadcrumb {
@@ -1145,7 +1146,7 @@
 
   .productImage {
     height: auto;
-    min-height: mvw(300);
+    height: mvw(300);
     border-radius: mvw(12);
   }
 
@@ -1479,7 +1480,7 @@
   }
 
   .relatedProducts {
-    margin-top: mvw(40);
+    margin-top: mvw(0);
     padding: 0;
     gap: mvw(24);
   }
@@ -1556,6 +1557,39 @@
   }
   .detailText {
     font-family: var(--font-family);
+
+    /* Стилі для товарів, яких немає в наявності */
+    .productPageOutOfStock {
+      position: relative;
+    }
+
+    .productPageOutOfStock .productContainer,
+    .productPageOutOfStock .productContainer * {
+      opacity: 0.6;
+    }
+
+    .outOfStockOverlay {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 68, 68, 0.9);
+      z-index: 1000;
+      pointer-events: none;
+      border-radius: 12px;
+      padding: 24px 48px;
+      width: auto;
+      max-width: none;
+      height: auto;
+      white-space: nowrap;
+      text-align: center;
+      display: block;
+      font-family: var(--font-family);
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 140%;
+      color: var(--white);
+    }
     font-weight: 400;
     font-size: mvw(14);
     line-height: 140%;

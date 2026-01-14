@@ -378,7 +378,7 @@
     padding: mvw(16);
     border-bottom: mvw(1) solid rgba(14, 14, 14, 0.1);
     margin-bottom: 0;
-    gap: 0;
+    gap: mvw(16);
   }
 
   .filterSection:last-of-type {
@@ -393,7 +393,7 @@
   }
 
   .sectionTitleContainer {
-    margin-bottom: mvw(16);
+    margin-bottom: mvw(0);
     padding: 0;
   }
 

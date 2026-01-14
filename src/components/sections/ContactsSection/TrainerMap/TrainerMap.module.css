@@ -475,7 +475,7 @@
   }
 
   .infoItem {
-    gap: mvw(4);
+    gap: mvw(16);
   }
 
   .infoItemCenter {

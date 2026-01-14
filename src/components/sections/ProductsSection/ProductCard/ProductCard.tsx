@@ -15,8 +15,13 @@ import { useFavoriteStore } from "@/store/favorites";
 import { selectIsFavorite } from "@/store/favorites";
 import { FavoriteIcon } from "../../../Icons/Icons";
 import { normalizeImageUrl } from "@/lib/imageUtils";
+import {
+  calculatePrice,
+  formatPrice as formatPriceUtil,
+  AUTH_DISCOUNT,
+} from "@/lib/priceUtils";
 
-import { useProductPrices } from "@/lib/useProductPrices";
+// import { useProductPrices } from "@/lib/useProductPrices"; // Тимчасово закоментовано для спрощення
 
 interface ProductCardProps {
   id: string;
@@ -32,6 +37,7 @@ interface ProductCardProps {
   category?: string;
   categories?: Array<{ id: number; name: string; slug: string }>; // Категорії продукту
   stockStatus?: string;
+  stockQuantity?: number | null; // Кількість товару в наявності
   dateCreated?: string; // Дата створення продукту
   sku?: string; // Код товару (SKU)
   // WooCommerce v3 API data
@@ -55,6 +61,8 @@ interface ProductCardProps {
   allProducts?: Array<{ total_sales?: number }>;
   isNoCertificationFilter?: boolean; // Чи застосований фільтр "Немає сертифікації"
   isFluid?: boolean;
+  useRedGreenIconOnMobile?: boolean; // для використання червоно-зеленої іконки на мобільній версії в FavoritesModal
+  removeFromFavoritesOnAddToCart?: boolean; // чи видаляти товар з favorites при додаванні в кошик
 }
 
 const ProductCard = ({
@@ -69,12 +77,16 @@ const ProductCard = ({
   // remove isFavorite prop, derive below
   image,
   categories,
+  stockStatus,
+  stockQuantity,
   dateCreated,
   sku,
   wcProduct,
   allProducts,
   isNoCertificationFilter = false,
   isFluid = false,
+  useRedGreenIconOnMobile = false,
+  removeFromFavoritesOnAddToCart = false,
 }: ProductCardProps) => {
   // const isLoggedIn = useAuthStore((s) => s.isLoggedIn); // moved below
   const addItem = useCartStore((s) => s.addItem);
@@ -100,42 +112,43 @@ const ProductCard = ({
     setImageError(false);
   }, [imageUrl]);
 
-  // Отримуємо ціни товару (з урахуванням варіацій)
-  const {
-    currentPrice: priceFromApi,
-    originalPrice: originalPriceFromApi,
-    isLoading: isPriceLoading,
-  } = useProductPrices(id, wcProduct);
+  // Спрощена логіка цін - використовуємо тільки передані пропси без API запитів
+  const priceFromApi = price || 0;
+  const originalPriceFromApi = originalPrice;
+  const isPriceLoading = false;
 
-  const handleCartClick = (e: React.MouseEvent) => {
+  const handleCartClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (isInCart) {
       removeItem(id);
     } else {
-      // Зберігаємо базову ціну (без знижки авторизації), знижка застосовується при відображенні
-      const priceToAdd = parseFloat(
-        salePrice || currentPrice || regularPrice || price?.toString() || "0"
-      );
-      const finalOriginalPrice =
-        regularPrice && parseFloat(regularPrice) > 0
-          ? parseFloat(regularPrice)
-          : originalPrice;
+      // Спрощена логіка цін для додавання в кошик
+      const priceToAdd = parseFloat(currentPrice);
+      const finalOriginalPrice = hasRealDiscount
+        ? parseFloat(regularPrice!)
+        : undefined;
 
-      addItem(
-        {
-          id,
-          name,
-          price: priceToAdd,
-          originalPrice:
-            finalOriginalPrice && finalOriginalPrice > priceToAdd
-              ? finalOriginalPrice
-              : undefined,
-          image: imageUrl,
-          sku: sku || wcProduct?.sku,
-        },
-        1
-      );
+      try {
+        await addItem(
+          {
+            id,
+            name,
+            price: priceToAdd,
+            originalPrice:
+              finalOriginalPrice && finalOriginalPrice > priceToAdd
+                ? finalOriginalPrice
+                : undefined,
+            image: imageUrl,
+            sku: sku || wcProduct?.sku,
+            stockQuantity,
+          },
+          1
+        );
+      } catch (error) {
+        alert((error as Error).message);
+        return;
+      }
     }
   };
 
@@ -156,122 +169,54 @@ const ProductCard = ({
     );
   };
 
-  // Визначаємо ціни залежно від типу товару
-  let currentPrice = "0";
-  let regularPrice = "0";
-  let salePrice: string | null = null;
+  // Для основних товарів - тільки основна ціна, без знижок
+  // Якщо є originalPrice > price, то це знижка, інакше - просто ціна
+  const hasRealDiscount =
+    originalPriceFromApi && originalPriceFromApi > priceFromApi;
 
-  // Якщо ціни завантажені з API, використовуємо їх
-  if (!isPriceLoading && priceFromApi > 0) {
-    currentPrice = priceFromApi.toString();
-    regularPrice = (originalPriceFromApi || priceFromApi).toString();
-    salePrice =
-      originalPriceFromApi && originalPriceFromApi > priceFromApi
-        ? null
-        : currentPrice;
-  } else {
-    // Fallback на стару логіку
-    currentPrice =
-      wcProduct?.price &&
-      wcProduct.price !== "0" &&
-      wcProduct.price !== "" &&
-      wcProduct.price.trim() !== ""
-        ? wcProduct.price
-        : price !== undefined &&
-          price !== null &&
-          price.toString() !== "0" &&
-          price.toString() !== "" &&
-          price.toString().trim() !== ""
-        ? price.toString()
-        : "0";
+  const currentPrice =
+    priceFromApi > 0 ? priceFromApi.toString() : price?.toString() || "0";
+  const regularPrice = hasRealDiscount ? originalPriceFromApi.toString() : null;
+  const salePrice = hasRealDiscount ? currentPrice : null;
 
-    regularPrice =
-      wcProduct?.regular_price &&
-      wcProduct.regular_price !== "0" &&
-      wcProduct.regular_price !== "" &&
-      wcProduct.regular_price.trim() !== ""
-        ? wcProduct.regular_price
-        : originalPrice !== undefined &&
-          originalPrice !== null &&
-          originalPrice.toString() !== "0" &&
-          originalPrice.toString() !== "" &&
-          originalPrice.toString().trim() !== ""
-        ? originalPrice.toString()
-        : currentPrice;
-
-    salePrice =
-      wcProduct?.sale_price &&
-      wcProduct.sale_price !== "0" &&
-      wcProduct.sale_price !== ""
-        ? wcProduct.sale_price
-        : null;
-  }
-
-  const isOnSale = wcProduct?.on_sale || false;
-
-  // Перевіряємо чи є знижка
-  const hasDiscount =
-    isOnSale && salePrice && regularPrice && salePrice !== regularPrice;
+  // Спрощена логіка знижок
+  const hasDiscount = salePrice && regularPrice && salePrice !== regularPrice;
   const finalDiscount =
-    hasDiscount && salePrice
+    hasDiscount && salePrice && regularPrice
       ? calculateDiscount(salePrice, regularPrice)
-      : discount ||
-        (isOnSale && originalPrice && price
-          ? Math.round(((originalPrice - price) / originalPrice) * 100)
-          : 0);
+      : discount || 0;
 
-  // Логіка цін з урахуванням авторизації (відповідно до детального алгоритму)
+  // Логіка цін з урахуванням авторизації через priceUtils
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-  const authDiscount = 0.2; // 20% знижка для авторизованих
 
-  // 1. Обираємо базову ціну (пріоритет: salePrice -> currentPrice -> regularPrice)
-  const basePrice = salePrice || currentPrice || regularPrice;
+  // Визначаємо базову ціну (пріоритет: salePrice -> currentPrice)
+  const basePrice = salePrice || currentPrice || "0";
+  const basePriceNum = parseFloat(basePrice) || 0;
 
-  // 2. Розраховуємо відсоток акційної знижки
-  const baseDiscount = (() => {
-    if (salePrice && regularPrice) {
-      return (
-        ((parseFloat(regularPrice) - parseFloat(salePrice)) /
-          parseFloat(regularPrice)) *
-        100
-      );
-    }
-    if (currentPrice && regularPrice && currentPrice < regularPrice) {
-      return (
-        ((parseFloat(regularPrice) - parseFloat(currentPrice)) /
-          parseFloat(regularPrice)) *
-        100
-      );
-    }
-    return 0;
-  })();
+  // Використовуємо calculatePrice з priceUtils
+  const priceCalculation = calculatePrice({
+    price: basePriceNum,
+    regularPrice: regularPrice ? parseFloat(regularPrice) : undefined,
+    isLoggedIn,
+  });
 
-  // 3. Якщо користувач авторизований - від базової ціни віднімаємо ще 20%
-  const finalPrice = (() => {
-    if (!basePrice) return 0;
-
-    const basePriceNum = parseFloat(basePrice);
-    if (isLoggedIn) {
-      // Для авторизованих: від basePrice віднімаємо 20%
-      return basePriceNum * (1 - authDiscount);
-    } else {
-      // Для неавторизованих: показуємо basePrice
-      return basePriceNum;
-    }
-  })();
-
-  // 4. Загальна знижка для бейджа (від regular_price до finalPrice)
-  const totalDiscount =
-    regularPrice && finalPrice
-      ? ((parseFloat(regularPrice) - finalPrice) / parseFloat(regularPrice)) *
-        100
-      : 0;
+  const {
+    finalPrice,
+    originalPrice: calculatedOriginalPrice,
+    totalDiscount,
+    shouldShowOldPrice,
+  } = priceCalculation;
 
   // Форматуємо ціни для відображення
   const formattedFinalPrice = Number.isFinite(finalPrice)
-    ? formatPrice(finalPrice.toString())
+    ? formatPriceUtil(finalPrice)
     : "0";
-  const formattedRegularPrice = regularPrice ? formatPrice(regularPrice) : null;
+  const formattedRegularPrice =
+    calculatedOriginalPrice > 0
+      ? formatPriceUtil(calculatedOriginalPrice)
+      : regularPrice
+      ? formatPrice(regularPrice)
+      : null;
   const formattedSalePrice = salePrice ? formatPrice(salePrice) : null;
   const formattedCurrentPrice = currentPrice ? formatPrice(currentPrice) : null;
 
@@ -279,16 +224,7 @@ const ProductCard = ({
   const showDiscount = totalDiscount > 0;
 
   // Логіка для підписки (якщо потрібно)
-  const subscriptionPrice =
-    isLoggedIn && basePrice ? Math.round(parseFloat(basePrice) * 0.8) : null;
-  const baseNumeric = salePrice || regularPrice;
-  const authFinalDiscount =
-    salePrice && regularPrice
-      ? Math.round((1 - parseFloat(salePrice) / parseFloat(regularPrice)) * 100)
-      : 0;
-  const combinedDiscountPercent = isLoggedIn
-    ? authFinalDiscount + 20
-    : authFinalDiscount;
+  const subscriptionPrice = isLoggedIn ? finalPrice : null;
 
   // Безпечне форматування ціни (fallback)
   const formatPriceFallback = (priceValue: number) => {
@@ -412,13 +348,17 @@ const ProductCard = ({
     return `/products/${id}`;
   };
 
+  // Перевіряємо чи товар відсутній в наявності
+  const isOutOfStock = stockStatus === "outofstock";
+
   return (
     <Link
       href={getHref()}
       className={`${styles.productCard} ${
         isFluid ? styles.productCardFluid : ""
-      }`}
+      } ${isOutOfStock ? styles.productCardOutOfStock : ""}`}
       data-category={hasNoCertification ? "78" : undefined}
+      data-outofstock={isOutOfStock ? "true" : undefined}
     >
       <div className={styles.cardImage}>
         <Image
@@ -431,26 +371,10 @@ const ProductCard = ({
         />
 
         <BadgeContainer>
-          {isLoggedIn ? (
-            // Авторизований: показуємо загальну знижку
-            totalDiscount > 0 && (
-              <Badge
-                variant="discount"
-                text={`-${Math.round(totalDiscount)}%`}
-              />
-            )
-          ) : (
-            // Неавторизований: показуємо лише акційну знижку (бейдж підписки перенесено до блоку ціни)
-            <>
-              {baseDiscount > 0 && (
-                <Badge
-                  variant="discount"
-                  text={`-${Math.round(baseDiscount)}%`}
-                />
-              )}
-            </>
-          )}
           {isActuallyNew && <Badge variant="new" />}
+          {totalDiscount > 0 && (
+            <Badge variant="discount" text={`-${Math.round(totalDiscount)}%`} />
+          )}
           {isActuallyHit && <Badge variant="hit" />}
         </BadgeContainer>
 
@@ -470,6 +394,7 @@ const ProductCard = ({
           image={imageUrl}
           className={styles.favoriteBtn}
           activeClassName={styles.favoriteActive}
+          useRedGreenIconOnMobile={useRedGreenIconOnMobile}
           wcProduct={
             wcProduct
               ? {
@@ -479,7 +404,7 @@ const ProductCard = ({
                       wcProduct.regular_price || regularPrice || "0",
                     sale_price: wcProduct.sale_price || salePrice || "0",
                   },
-                  on_sale: wcProduct.on_sale || isOnSale,
+                  on_sale: wcProduct.on_sale,
                 }
               : undefined
           }
@@ -493,7 +418,7 @@ const ProductCard = ({
             {!isLoggedIn && (
               <div className={styles.subscriptionDiscount}>
                 <SubscriptionBadge>
-                  -{Math.round(authDiscount * 100)}% з підпискою
+                  -{Math.round(AUTH_DISCOUNT * 100)}% з підпискою
                 </SubscriptionBadge>
               </div>
             )}
@@ -514,7 +439,7 @@ const ProductCard = ({
                     <span className={styles.currentPriceValue}>
                       {formattedFinalPrice}
                     </span>
-                    <span className={styles.priceCurrency}>₴</span>
+                    {/* <span className={styles.priceCurrency}>₴</span> */}
                   </span>
                   {regularPrice &&
                     parseFloat(regularPrice) > 0 &&
@@ -534,7 +459,7 @@ const ProductCard = ({
                     <span className={styles.currentPriceValue}>
                       {formattedCurrentPrice || formattedFinalPrice}
                     </span>
-                    <span className={styles.priceCurrency}>₴</span>
+                    {/* <span className={styles.priceCurrency}>₴</span> */}
                   </span>
                   {formattedRegularPrice &&
                     totalDiscount > 0 &&
@@ -543,7 +468,7 @@ const ProductCard = ({
                         <span className={styles.originalPriceValue}>
                           {formattedRegularPrice}
                         </span>
-                        <span className={styles.originalPriceCurrency}>₴</span>
+                        {/* <span className={styles.originalPriceCurrency}>₴</span> */}
                       </span>
                     )}
                 </>
@@ -568,13 +493,30 @@ const ProductCard = ({
                 ? parseFloat(regularPrice)
                 : originalPrice
             }
+            regularPrice={
+              regularPrice && parseFloat(regularPrice) > 0
+                ? parseFloat(regularPrice)
+                : undefined
+            }
+            salePrice={
+              salePrice && parseFloat(salePrice) > 0
+                ? parseFloat(salePrice)
+                : undefined
+            }
             image={imageUrl}
+            removeFromFavoritesOnAddToCart={removeFromFavoritesOnAddToCart}
+            requireAuth={false} // Продукти не вимагають авторизації
             className={`${styles.cartBtn} ${
               isNoCertificationProduct ? styles.cartBtnNoCert : ""
             }`}
             activeClassName={styles.cartBtnActive}
           />
         </div>
+
+        {/* Overlay для товарів, яких немає в наявності */}
+        {isOutOfStock && (
+          <div className={styles.outOfStockOverlay}>Немає в наявності</div>
+        )}
       </div>
     </Link>
   );

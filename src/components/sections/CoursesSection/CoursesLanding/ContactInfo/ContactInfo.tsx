@@ -12,7 +12,10 @@ import { getContactData } from "@/lib/themeSettingsUtils";
 
 const ContactInfo: React.FC = () => {
   const { data: themeSettings } = useThemeSettingsQuery();
-  const contactData = useMemo(() => getContactData(themeSettings), [themeSettings]);
+  const contactData = useMemo(
+    () => getContactData(themeSettings),
+    [themeSettings]
+  );
   return (
     <div className={s.contactInfo}>
       <div className={s.content}>
@@ -66,7 +69,10 @@ const ContactInfo: React.FC = () => {
                       {contactData.socialLinks
                         .slice(0, 2)
                         .map((social, index) => {
-                          const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+                          const iconMap: Record<
+                            string,
+                            React.ComponentType<{ className?: string }>
+                          > = {
                             Instagram: InstagramIcon,
                             Facebook: FacebookIcon,
                             Telegram: TelegramIcon,
@@ -95,7 +101,10 @@ const ContactInfo: React.FC = () => {
                       {contactData.socialLinks
                         .slice(2, 4)
                         .map((social, index) => {
-                          const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+                          const iconMap: Record<
+                            string,
+                            React.ComponentType<{ className?: string }>
+                          > = {
                             Instagram: InstagramIcon,
                             Facebook: FacebookIcon,
                             Telegram: TelegramIcon,

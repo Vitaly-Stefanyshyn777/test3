@@ -12,6 +12,7 @@ import {
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import type { SwiperRef } from "swiper/react";
+import type { Swiper as SwiperType } from "swiper";
 import s from "./Team.module.css";
 import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
 import { normalizeImageUrl } from "@/lib/imageUtils";
@@ -249,7 +250,7 @@ export default function Team() {
               1024: { slidesPerView: 3, spaceBetween: 20 },
               1280: { slidesPerView: 4, spaceBetween: 24 },
             }}
-            onSlideChange={(swiper) => setActive(swiper.activeIndex)}
+            onSlideChange={(swiper: SwiperType) => setActive(swiper.activeIndex)}
             className={s.swiper}
           >
             {teamMembers.map((member) => (

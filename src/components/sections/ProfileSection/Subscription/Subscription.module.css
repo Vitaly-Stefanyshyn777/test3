@@ -191,7 +191,8 @@
 
 /* Payment History Styles */
 .paymentHistory {
-  margin-top: 40px;
+  /* margin-top: 40px; */
+  width: 100%;
 }
 
 .paymentList {
@@ -209,6 +210,7 @@
   border-radius: 12px;
   border: 1px solid #e5e7eb;
   gap: 20px;
+  justify-content: space-between;
 }
 
 .paymentDate {
@@ -224,7 +226,6 @@
   font-weight: 400;
   font-size: 14px;
   color: var(--black);
-  flex: 1;
 }
 
 .paymentAmount {
@@ -240,9 +241,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+
   background: transparent;
-  border: 1px solid #d1d5db;
+
   border-radius: 8px;
   font-family: var(--font-family);
   font-weight: 500;
@@ -255,8 +256,7 @@
 }
 
 .downloadButton:hover {
-  background: #f3f4f6;
-  border-color: var(--violet);
+  color: var(--white);
 }
 
 .downloadButton svg {
@@ -470,23 +470,46 @@
   color: var(--black);
 }
 
+.planActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.changePlanBtn {
+  flex: 1;
+  background: var(--violet);
+  border: 2px solid var(--violet);
+  border-radius: 16px;
+  padding: 20px 24px;
+  font-family: var(--third-family);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 100%;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.changePlanBtn:hover {
+  background: var(--black);
+  border-color: var(--black);
+}
+
 .cancelBtn {
-  width: fit-content;
   color: var(--black);
   border: 2px solid var(--grey);
   cursor: pointer;
-  font-size: 16px;
   transition: all 0.2s ease;
-  align-self: flex-start;
   border-radius: 16px;
   padding: 24px 42px;
 
   font-family: var(--third-family);
   font-weight: 600;
-  font-size: 16px;
-  line-height: 135%;
-  color: var(--black);
-  width: 100%;
+  font-size: 14px;
+  line-height: 100%;
+  text-align: center;
 }
 
 .cancelBtn:hover {
@@ -514,6 +537,13 @@
 .selectBtn:hover {
   background: var(--black);
   /* transform: translateY(-1px); */
+}
+
+.noSubscriptions {
+  padding: mvw(10) mvw(0) mvw(0) mvw(0);
+  text-align: center;
+  font-size: 14px;
+  color: var(--black);
 }
 
 .mobileTitleDivider {
@@ -558,7 +588,7 @@
   }
 
   .content {
-    /* gap: mvw(24); */
+    gap: mvw(24);
   }
 
   .sectionTitle {
@@ -701,6 +731,14 @@
     line-height: 120%;
   }
 
+  .feature span {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: mvw(14);
+    line-height: 140%;
+    color: rgba(14, 14, 14, 0.4);
+  }
+
   .discount {
     padding: mvw(4) mvw(8);
     border-radius: mvw(6);
@@ -739,5 +777,370 @@
   .error {
     padding: mvw(24);
     font-size: mvw(14);
+  }
+
+  /* Payment History mobile styles */
+  .paymentHistory {
+    gap: mvw(16);
+  }
+
+  .paymentList {
+    gap: mvw(12);
+  }
+
+  .paymentItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: mvw(20);
+    padding: mvw(16);
+    border-radius: mvw(12);
+    background: var(--bg-color);
+    border: mvw(1) solid var(--light-gray);
+  }
+
+  .paymentDate {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(14);
+    line-height: 140%;
+    color: var(--black);
+  }
+
+  .paymentDescription {
+    font-size: mvw(14);
+    line-height: 140%;
+    color: var(--black);
+    font-weight: 500;
+    order: 2;
+  }
+
+  .paymentAmount {
+    font-size: mvw(16);
+    line-height: 120%;
+    font-weight: 600;
+    color: var(--black);
+    order: 3;
+    display: flex;
+    align-items: baseline;
+    gap: mvw(1);
+    align-items: center;
+  }
+
+  .paymentAmountValue {
+    font-family: var(--second-family);
+    font-weight: 600;
+    font-size: mvw(16);
+    line-height: 120%;
+    color: var(--black);
+  }
+
+  .paymentAmountCurrency {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(14);
+    line-height: 140%;
+    color: var(--black);
+  }
+
+  .downloadButton {
+    display: flex;
+    align-items: center;
+    gap: mvw(6);
+
+    cursor: pointer;
+    transition: background 0.2s ease;
+    order: 4;
+    align-self: flex-end;
+
+    border: mvw(2) solid var(--grey);
+    border-radius: mvw(16);
+    padding: mvw(16) mvw(24);
+    width: 100%;
+
+    font-family: var(--third-family);
+    font-weight: 700;
+    font-size: mvw(14);
+  }
+
+  .downloadButton:hover {
+    background: var(--black);
+  }
+
+  .downloadButton svg {
+    width: mvw(12);
+    height: mvw(12);
+    flex-shrink: 0;
+  }
+
+  /* Payment info wrapper for mobile */
+  .paymentInfoWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: mvw(8);
+    width: 100%;
+  }
+
+  /* Payment info container for mobile */
+  .paymentInfoContainer {
+    display: flex;
+    /* flex-direction: column; */
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  /* Pagination mobile styles */
+  .navContainer {
+    width: 100%;
+    height: mvw(48);
+    border-radius: mvw(25);
+    background: var(--light-gray);
+    padding: mvw(24) mvw(12) mvw(6) mvw(12);
+    gap: mvw(4);
+  }
+
+  .leftBtn,
+  .rightBtn {
+    width: mvw(36);
+    height: mvw(36);
+    border-radius: mvw(18);
+    border: none;
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .leftBtn:hover:not(:disabled),
+  .rightBtn:hover:not(:disabled) {
+    background: var(--violet);
+  }
+
+  .leftBtn:hover:not(:disabled) svg,
+  .rightBtn:hover:not(:disabled) svg {
+    stroke: #fff;
+  }
+
+  .leftBtn:disabled,
+  .rightBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .leftBtn svg,
+  .rightBtn svg {
+    width: mvw(16);
+    height: mvw(12);
+    stroke: var(--black);
+    transition: stroke 0.2s ease;
+  }
+
+  .pagesBlock {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: mvw(8);
+    flex: 1;
+  }
+
+  .pageNumber {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: mvw(32);
+    height: mvw(32);
+    border-radius: mvw(16);
+    font-size: mvw(14);
+    line-height: 120%;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--black);
+  }
+
+  .activePage {
+    background: var(--violet);
+    color: #fff;
+  }
+
+  .pageNumber:hover:not(.activePage) {
+    background: none;
+  }
+
+  .planActions {
+    gap: mvw(12);
+    margin-top: mvw(20);
+  }
+
+  .changePlanBtn {
+    padding: mvw(16) mvw(42);
+    border-radius: mvw(12);
+    font-size: mvw(14);
+    line-height: 100%;
+  }
+
+  .cancelBtn {
+    padding: mvw(16) mvw(42);
+    border-radius: mvw(12);
+    font-size: mvw(14);
+    line-height: 100%;
+  }
+
+  /* Plans grid responsive */
+  .plansGridContainer {
+    gap: mvw(16);
+  }
+
+  .plansContainer {
+    width: 100%;
+  }
+
+  .plansGrid {
+    flex-direction: column;
+    gap: mvw(24);
+    width: 100%;
+  }
+
+  .planCard {
+    width: 100%;
+    max-width: 100%;
+    border-radius: mvw(16);
+    padding: mvw(24);
+    gap: mvw(24);
+  }
+
+  .popularPlan {
+    border-color: var(--violet);
+  }
+
+  .popularBadge {
+    bottom: auto;
+    top: mvw(-12);
+    right: mvw(50%);
+    left: auto;
+    transform: translateX(50%);
+    border-radius: mvw(12);
+    font-size: mvw(10);
+    padding: mvw(6) mvw(10);
+    gap: mvw(6);
+  }
+
+  .popularBadge svg {
+    width: mvw(12);
+    height: mvw(12);
+  }
+
+  .planPriceBlock {
+    gap: mvw(8);
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .price {
+    font-size: mvw(28);
+    line-height: 120%;
+  }
+
+  .discount {
+    padding: mvw(4) mvw(8);
+    border-radius: mvw(6);
+    font-size: mvw(12);
+  }
+
+  .period {
+    font-size: mvw(14);
+    line-height: 120%;
+  }
+
+  .selectBtn {
+    width: 100%;
+    border-radius: mvw(12);
+    padding: mvw(16) mvw(24);
+    font-size: mvw(14);
+    line-height: 100%;
+  }
+
+  .singlePlan {
+    margin-top: mvw(24);
+  }
+
+  .singlePlan .planCard {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .noPlanMessage {
+    padding: mvw(20);
+    font-size: mvw(14);
+    border-radius: mvw(12);
+  }
+
+  .loading,
+  .error {
+    padding: mvw(20);
+    font-size: mvw(14);
+  }
+
+  /* Subscription History styles */
+  .subscriptionHistory {
+    gap: 16px;
+  }
+
+  .subscriptionList {
+    gap: 12px;
+  }
+
+  .subscriptionItem {
+    padding: 16px;
+    border-radius: 12px;
+    background: var(--bg-color);
+    border: 1px solid var(--light-gray);
+  }
+
+  .subscriptionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .subscriptionName {
+    font-family: var(--second-family);
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 120%;
+    color: var(--black);
+  }
+
+  .subscriptionPrice {
+    font-family: var(--second-family);
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 120%;
+    color: var(--violet);
+  }
+
+  .subscriptionDetails {
+    gap: 8px;
+  }
+
+  .subscriptionDate {
+    font-size: 14px;
+    line-height: 140%;
+    color: rgba(14, 14, 14, 0.6);
+  }
+
+  .subscriptionStatus {
+    font-size: 14px;
+    line-height: 140%;
+    color: var(--black);
+  }
+
+  .noSubscriptions {
+    padding: mvw(10) mvw(0) mvw(0) mvw(0);
+    text-align: center;
+    font-size: mvw(14);
+    color: var(--black);
   }
 }

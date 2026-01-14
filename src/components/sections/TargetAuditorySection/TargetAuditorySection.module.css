@@ -172,8 +172,8 @@
 
 @media (max-width: 1024px) {
   .section {
-    padding-top: mvw(80);
-    padding-bottom: mvw(80);
+    padding-top: mvw(70);
+    padding-bottom: mvw(70);
 
     .container {
       display: flex;

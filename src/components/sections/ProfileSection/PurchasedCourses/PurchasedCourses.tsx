@@ -2,64 +2,30 @@
 import React, { useEffect, useState } from "react";
 import styles from "./PurchasedCourses.module.css";
 import CoursesList, { type Course } from "./CoursesList";
+import PurchasedCoursesSkeleton from "./PurchasedCoursesSkeleton";
 import { fetchPurchasedProducts, PurchasedProduct } from "@/lib/bfbApi";
 import { useAuthStore } from "@/store/auth";
 
 interface PurchasedCoursesProps {
   title?: string;
-  courses?: Course[];
 }
 
-const defaultCourses: Course[] = [
-  {
-    id: "bfb-fundamentals-1",
-    title: "Основи тренерства BFB",
-    description: "Пройдено: 12 уроків з 20",
-    image: "/images/courses/bfb-fundamentals.jpg",
-    type: "Online",
-    progress: { completed: 12, total: 20 },
-    price: 0,
-    currency: "₴",
-    watchUrl: "/courses/bfb-fundamentals",
-  },
-  {
-    id: "bfb-fundamentals-2",
-    title: "Основи тренерства BFB",
-    description: "Пройдено: 12 уроків з 20",
-    image: "/images/courses/bfb-fundamentals.jpg",
-    type: "Online",
-    progress: { completed: 12, total: 20 },
-    price: 0,
-    currency: "₴",
-    watchUrl: "/courses/bfb-fundamentals",
-  },
-  {
-    id: "bfb-fundamentals-3",
-    title: "Основи тренерства BFB",
-    description: "Пройдено: 12 уроків з 20",
-    image: "/images/courses/bfb-fundamentals.jpg",
-    type: "Online",
-    progress: { completed: 12, total: 20 },
-    price: 0,
-    currency: "₴",
-    watchUrl: "/courses/bfb-fundamentals",
-  },
-  {
-    id: "bfb-fundamentals-4",
-    title: "Основи тренерства BFB",
-    description: "Пройдено: 12 уроків з 20",
-    image: "/images/courses/bfb-fundamentals.jpg",
-    type: "Online",
-    progress: { completed: 12, total: 20 },
-    price: 0,
-    currency: "₴",
-    watchUrl: "/courses/bfb-fundamentals",
-  },
-];
+const mapPurchasedProductToCourse = (product: PurchasedProduct): Course => ({
+  id: product.id?.toString() || "unknown",
+  title: product.name || "Невідомий курс",
+  description: product.purchase_date
+    ? `Придбано: ${new Date(product.purchase_date).toLocaleDateString("uk-UA")}`
+    : "Дата покупки невідома",
+  image: product.image || "/images/courses/default-course.jpg",
+  type: "Online",
+  progress: { completed: 0, total: 1 },
+  price: parseFloat(product.price || "0") || 0,
+  currency: "₴",
+  watchUrl: product.id ? `/courses/${product.id}` : "#",
+});
 
 const PurchasedCourses: React.FC<PurchasedCoursesProps> = ({
   title = "Придбані курси",
-  courses = defaultCourses,
 }) => {
   const [purchasedProducts, setPurchasedProducts] = useState<
     PurchasedProduct[]
@@ -68,10 +34,14 @@ const PurchasedCourses: React.FC<PurchasedCoursesProps> = ({
   const [error, setError] = useState<string | null>(null);
   const user = useAuthStore((s) => s.user);
   const token = useAuthStore((s) => s.token);
+  const isHydrated = useAuthStore((s) => s.isHydrated);
 
   useEffect(() => {
     (async () => {
       try {
+        // Чекаємо на гідратацію Zustand перед перевіркою токена
+        if (!isHydrated) return;
+
         if (!user?.id || !token) {
           setError("Користувач не авторизований");
           return;
@@ -107,7 +77,7 @@ const PurchasedCourses: React.FC<PurchasedCoursesProps> = ({
         setIsLoading(false);
       }
     })();
-  }, [user?.id, token]);
+  }, [user?.id, token, isHydrated]);
 
   const handleWatchCourse = (course: Course) => {
     if (course.watchUrl) {
@@ -116,13 +86,7 @@ const PurchasedCourses: React.FC<PurchasedCoursesProps> = ({
   };
 
   if (isLoading) {
-    return (
-      <div className={styles.purchasedCourses}>
-        <h2 className={styles.title}>{title}</h2>
-        <div className={styles.divider}></div>
-        <div className={styles.loading}>Завантаження...</div>
-      </div>
-    );
+    return <PurchasedCoursesSkeleton title={title} />;
   }
 
   if (error) {
@@ -135,7 +99,11 @@ const PurchasedCourses: React.FC<PurchasedCoursesProps> = ({
     );
   }
 
-  if (purchasedProducts.length === 0) {
+  const courseData: Course[] = purchasedProducts
+    .filter((product) => product && product.id)
+    .map(mapPurchasedProductToCourse);
+
+  if (courseData.length === 0) {
     return (
       <div className={styles.purchasedCourses}>
         <h2 className={styles.title}>{title}</h2>
@@ -149,7 +117,7 @@ const PurchasedCourses: React.FC<PurchasedCoursesProps> = ({
     <div className={styles.purchasedCourses}>
       <h2 className={styles.title}>{title}</h2>
       <div className={styles.divider}></div>
-      <CoursesList courses={courses} onWatch={handleWatchCourse} />
+      <CoursesList courses={courseData} onWatch={handleWatchCourse} />
     </div>
   );
 };

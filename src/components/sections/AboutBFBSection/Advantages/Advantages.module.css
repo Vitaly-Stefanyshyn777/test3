@@ -38,14 +38,15 @@
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(12px);
-  background: rgba(249, 249, 249, 0.1);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  /* background: rgba(249, 249, 249, 0.1); */
+  /* box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); */
   pointer-events: none;
+  background: var(--violet);
 }
 
 .plusIcon {
   font-size: 20px;
-  color: var(--violet);
+  color: var(--white);
   font-weight: 700;
 }
 .cardContentBlock4 {

@@ -20,14 +20,14 @@ interface TrainingTypeFilterProps {
 export const TrainingTypeFilter = ({
   value = [],
   onChange,
-  options = [
-    { key: "cardio", label: "Кардіо" },
-    { key: "dance", label: "Танцювальні" },
-    { key: "mindBody", label: "Mind body" },
-    { key: "strength", label: "Силові" },
-  ],
+  options = [],
   loading = false,
 }: TrainingTypeFilterProps) => {
+  // Якщо немає опцій і не завантажується, не відображаємо фільтр
+  if (!loading && (!options || options.length === 0)) {
+    return null;
+  }
+
   const handleToggle = (key: string) => {
     const next = value.includes(key)
       ? value.filter((v) => v !== key)

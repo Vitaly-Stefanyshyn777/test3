@@ -1,9 +1,10 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useFavoriteStore, selectIsFavorite } from "@/store/favorites";
 import {
   Favorite2Icon,
   FavoriteBlacIcon,
+  BasketMobileRedGreenIcon,
 } from "@/components/Icons/Icons";
 import s from "./FavoriteButton.module.css";
 
@@ -16,6 +17,11 @@ type Props = {
   image?: string;
   className?: string;
   activeClassName?: string;
+  useRedGreenIconOnMobile?: boolean; // для використання червоно-зеленої іконки на мобільній версії в FavoritesModal
+  variationId?: number;
+  color?: string;
+  size?: string;
+  stockQuantity?: number | null;
   wcProduct?: {
     prices?: {
       price: string;
@@ -35,27 +41,60 @@ export default function FavoriteButton({
   image,
   className = "",
   activeClassName = "",
+  useRedGreenIconOnMobile = false,
+  variationId,
+  color,
+  size,
+  stockQuantity,
   wcProduct,
 }: Props) {
+  const [isMobile, setIsMobile] = useState(false);
   const isFav = useFavoriteStore(selectIsFavorite(id));
   const toggleFav = useFavoriteStore((s) => s.toggleFavorite);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 1000);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleFav({ id, slug, name, price, originalPrice, image, wcProduct });
+    toggleFav({
+      id,
+      slug,
+      name,
+      price,
+      originalPrice,
+      image,
+      variationId,
+      color,
+      size,
+      stockQuantity,
+      wcProduct
+    });
   };
 
   return (
     <button
       className={`${s.root} ${className} ${
         isFav ? `${s.active} ${activeClassName}` : ""
-      }`}
+      } ${useRedGreenIconOnMobile && isMobile ? s.redGreenMode : ""}`}
       onClick={handleClick}
       aria-pressed={isFav}
       aria-label={isFav ? "Видалити з обраних" : "Додати в обрані"}
     >
-      {isFav ? <FavoriteBlacIcon /> : <Favorite2Icon />}
+      {useRedGreenIconOnMobile && isMobile ? (
+        <BasketMobileRedGreenIcon />
+      ) : isFav ? (
+        <FavoriteBlacIcon />
+      ) : (
+        <Favorite2Icon />
+      )}
     </button>
   );
 }

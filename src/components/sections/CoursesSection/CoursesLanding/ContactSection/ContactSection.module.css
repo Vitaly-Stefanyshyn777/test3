@@ -86,3 +86,287 @@
     font-size: mvw(14);
   }
 }
+
+/* Мобільні класи для ContactSection */
+.mobileContactInfo {
+  flex: 0 0 41.1%;
+  padding: 32px;
+  border-radius: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.mobileContactDetailsWrapper {
+  width: auto;
+  height: auto;
+  padding: mvw(20);
+  border-radius: mvw(32);
+  backdrop-filter: blur(10px);
+  background: rgba(249, 249, 249, 0.1);
+  gap: 0;
+  flex: none;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.mobileContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.mobileTitleTextBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.mobileTitle {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 120%;
+  color: var(--white);
+  margin: 0;
+}
+
+.mobileDescription {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  color: var(--white);
+  margin: 0;
+}
+
+.mobileContactDetails {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: mvw(16);
+}
+
+.mobileContactItemBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobileContactItem {
+  display: flex;
+  flex-direction: column;
+  gap: mvw(4);
+}
+
+.mobileLabel {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  color: var(--white);
+  opacity: 0.8;
+}
+
+.mobileValue {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 140%;
+  color: var(--white);
+}
+
+.mobileContactIconsBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mobileSocialIcons {
+  display: flex;
+  gap: 16px;
+}
+
+.mobileSocialIconsContainer {
+  display: flex;
+  gap: 12px;
+}
+
+.mobileSocialIconBlock {
+  display: flex;
+  gap: 12px;
+}
+
+.mobileSocialIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid rgba(255, 254, 252, 0.3);
+  backdrop-filter: blur(10px);
+  color: var(--white);
+}
+
+.mobileSocialIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.mobileContactInfoContainer {
+  flex: 0 0 41.1%;
+  padding: 32px;
+  border-radius: 32px;
+  display: flex;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.mobileContactDetailsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.mobileContactDetailsBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mobileContactIcons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Мобільні медіа-запити */
+@media (max-width: 1000px) {
+  .mobileContactInfo {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+    padding: mvw(0) mvw(16);
+    border-radius: mvw(16);
+  }
+
+  .mobileContactDetailsWrapper {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+    padding: mvw(20);
+    border-radius: mvw(32);
+    height: auto;
+
+    backdrop-filter: blur(10px);
+    background: rgba(249, 249, 249, 0.1);
+    border: 0.533333vw solid rgba(255, 254, 252, 0.3);
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  .mobileTitle {
+    font-size: mvw(28);
+    line-height: 120%;
+
+    font-family: var(--second-family);
+    font-weight: 700;
+
+    line-height: 120%;
+    letter-spacing: -0.01em;
+    text-align: center;
+    color: var(--white);
+    width: mvw(290);
+  }
+
+  .mobileDescription {
+    font-size: mvw(14);
+    line-height: 150%;
+
+    font-family: var(--font-family);
+    font-weight: 500;
+
+    line-height: 140%;
+
+    text-align: center;
+  }
+
+  .mobileContactItemBlock {
+    gap: mvw(12);
+  }
+
+  .mobileLabel {
+    font-family: var(--second-family);
+    font-weight: 400;
+    font-size: mvw(16);
+    line-height: 110%;
+  }
+
+  .mobileValue {
+    font-family: var(--second-family);
+    font-weight: 500;
+    font-size: mvw(16);
+    line-height: 110%;
+    letter-spacing: -0.02em;
+    color: var(--white);
+  }
+
+  .mobileNumberValue {
+    font-family: var(--second-family);
+    font-weight: 700;
+    font-size: mvw(24);
+    line-height: 110%;
+
+    color: var(--white);
+  }
+
+  .mobileContactIconsBlock {
+    display: flex;
+  }
+
+  .mobileSocialIcons {
+    gap: mvw(16);
+  }
+
+  .mobileSocialIconsContainer {
+    gap: mvw(12);
+  }
+
+  .mobileSocialIconBlock {
+    gap: mvw(12);
+  }
+
+  .mobileSocialIcon {
+    border: mvw(2) solid rgba(255, 254, 252, 0.3);
+    border-radius: mvw(16);
+    padding: 20px;
+    width: mvw(58);
+    height: mvw(58);
+  }
+
+  .mobileSocialIcon svg {
+    width: mvw(22);
+    height: mvw(22);
+  }
+
+  .mobileContactInfoContainer {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+    padding: mvw(24) mvw(16);
+    border-radius: mvw(16);
+    margin-top: mvw(16);
+  }
+
+  .mobileContactDetailsContainer {
+    gap: mvw(16);
+    margin-top: mvw(16);
+  }
+
+  .mobileContactDetailsBlock {
+    gap: mvw(12);
+  }
+}

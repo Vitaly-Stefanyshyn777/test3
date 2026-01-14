@@ -13,8 +13,7 @@
   transition: all 0.3s ease;
 }
 
-/* Клас для різних секцій, зміна стилів під тесну або світлу тему  */
-
+/* Клас для різних секцій, зміна стилів під тесну або світлу тему */
 .headerLight {
   color: #333;
 }
@@ -28,7 +27,6 @@
   height: auto;
   justify-content: space-between;
   border-radius: 28px;
-
   background: transparent;
   display: flex;
 }
@@ -38,48 +36,18 @@
   border-radius: 12px;
 }
 
-.headerTrainerProfile .logo a {
+.headerTrainerProfile .logo a,
+.headerTrainerProfile .phone a,
+.headerTrainerProfile .contactText,
+.headerTrainerProfile .nav a {
   color: var(--black);
 }
-
-.headerTrainerProfile .phone a {
-  color: var(--black);
-}
-
-.headerTrainerProfile .contactText {
-  color: var(--black);
-}
-
-/* .headerTrainerProfile .iconBtn {
-  color: var(--black);
-} */
-
-/* .headerTrainerProfile .iconBtn:hover {
-  background: rgba(0, 0, 0, 0.1);
-} */
 
 .headerTrainerProfile .iconBtn svg,
 .headerTrainerProfile .phone svg,
-.headerTrainerProfile .burger svg {
-  stroke: var(--black);
-  color: var(--black);
-}
-
-.headerTrainerProfile .nav svg {
-  stroke: var(--black);
-  color: var(--black);
-}
-
-.headerTrainerProfile .logo svg {
-  stroke: var(--black);
-  color: var(--black);
-}
-
-/* .headerTrainerProfile * svg {
-  stroke: var(--black);
-  color: var(--black);
-} */
-
+.headerTrainerProfile .burger svg,
+.headerTrainerProfile .nav svg,
+.headerTrainerProfile .logo svg,
 .headerTrainerProfile .nav a:hover svg {
   stroke: var(--black);
   color: var(--black);
@@ -88,55 +56,66 @@
 .headerTrainerProfile .register {
   color: var(--white);
   background: var(--violet);
-  border: 1px solid var(--black);
 }
 
 .headerTrainerProfile .register:hover {
-  backdrop-filter: blur(11.699999809265137px);
+  backdrop-filter: blur(11.7px);
   background: #8426d7;
   color: var(--white);
 }
 
-.headerTrainerProfile .nav {
-  backdrop-filter: none !important;
-  background: transparent !important;
-}
-
-.headerTrainerProfile .iconBtn {
-  backdrop-filter: none !important;
-  background: transparent !important;
-}
-
-.headerTrainerProfile .iconBtn:hover {
-  backdrop-filter: none !important;
-  background: rgba(0, 0, 0, 0.05) !important;
-}
-
-.headerTrainerProfile .nav a {
-  color: var(--black);
-}
-
+.headerTrainerProfile .nav,
+.headerTrainerProfile .iconBtn,
 .headerTrainerProfile .burger {
-  color: var(--black);
-  backdrop-filter: none !important;
-  background: transparent !important;
-}
-
-.headerTrainerProfile .burger:hover {
-  backdrop-filter: none !important;
-  background: rgba(0, 0, 0, 0.05) !important;
+  backdrop-filter: none;
+  background: transparent;
 }
 
 /* Додаткові класи для білого фону */
 @media (min-width: 1001px) {
+  /* Спільні стилі для Shop, Instructing, Product сторінок */
   .headerShop .nav,
   .headerInstructing .nav,
-  .headerProduct .nav {
-    backdrop-filter: none !important;
-    background: transparent !important;
+  .headerProduct .nav,
+  .headerShop .iconBtn,
+  .headerInstructing .iconBtn,
+  .headerProduct .iconBtn,
+  .headerShop .burger,
+  .headerInstructing .burger,
+  .headerProduct .burger {
+    backdrop-filter: none;
+    background: transparent;
   }
 
-  /* Стилізація nav для trainers як на our-courses */
+  .headerShop .iconBtn,
+  .headerInstructing .iconBtn,
+  .headerProduct .iconBtn,
+  .headerShop .burger,
+  .headerInstructing .burger,
+  .headerProduct .burger {
+    color: var(--white);
+  }
+
+  .headerShop .iconBtn svg *,
+  .headerInstructing .iconBtn svg *,
+  .headerProduct .iconBtn svg *,
+  .headerShop .burger svg,
+  .headerInstructing .burger svg,
+  .headerProduct .burger svg {
+    stroke: var(--white);
+    color: var(--white);
+  }
+
+  .headerShop .iconBtn:hover,
+  .headerInstructing .iconBtn:hover,
+  .headerProduct .iconBtn:hover,
+  .headerShop .burger:hover,
+  .headerInstructing .burger:hover,
+  .headerProduct .burger:hover {
+    background: var(--violet);
+  }
+
+  /* Спеціальні стилі тільки для Trainers сторінки */
   .headerTrainers .nav {
     z-index: 1001;
     -webkit-backdrop-filter: blur(1.04167vw);
@@ -152,60 +131,7 @@
     top: 0;
   }
 
-  .headerShop .iconBtn,
-  .headerInstructing .iconBtn,
-  .headerProduct .iconBtn {
-    backdrop-filter: none !important;
-    background: transparent !important;
-    color: var(--white);
-  }
-
-  /* Стилізація iconBtn для trainers як на our-courses */
-  .headerTrainers .iconBtn {
-    -webkit-backdrop-filter: blur(1.04167vw);
-    backdrop-filter: blur(1.04167vw);
-    background: rgba(255, 254, 252, 0.15);
-    color: var(--white);
-  }
-
-  .headerShop .iconBtn svg,
-  .headerInstructing .iconBtn svg,
-  .headerProduct .iconBtn svg,
-  .headerShop .iconBtn svg *,
-  .headerInstructing .iconBtn svg *,
-  .headerInstructing .burger svg *,
-  .headerProduct .iconBtn svg * {
-    stroke: var(--white) !important;
-    color: var(--white) !important;
-  }
-
-  .headerTrainers .iconBtn svg,
-  .headerTrainers .iconBtn svg * {
-    stroke: var(--white) !important;
-    color: var(--white) !important;
-  }
-
-  .headerShop .iconBtn:hover,
-  .headerInstructing .iconBtn:hover,
-  .headerProduct .iconBtn:hover {
-    backdrop-filter: none !important;
-    background: rgba(0, 0, 0, 0.05) !important;
-  }
-
-  .headerTrainers .iconBtn:hover {
-    -webkit-backdrop-filter: blur(1.04167vw);
-    backdrop-filter: blur(1.04167vw);
-    background: var(--violet);
-  }
-
-  .headerShop .burger,
-  .headerInstructing .burger,
-  .headerProduct .burger {
-    backdrop-filter: none !important;
-    background: transparent !important;
-  }
-
-  /* Стилізація burger для trainers як на our-courses */
+  .headerTrainers .iconBtn,
   .headerTrainers .burger {
     -webkit-backdrop-filter: blur(1.04167vw);
     backdrop-filter: blur(1.04167vw);
@@ -213,34 +139,74 @@
     color: var(--white);
   }
 
-  .headerShop .burger,
-  .headerInstructing .burger,
-  .headerProduct .burger {
+  .headerTrainers .iconBtn svg *,
+  .headerTrainers .burger svg {
+    /* stroke: var(--white); */
     color: var(--white);
   }
 
-  .headerShop .burger svg,
-  .headerInstructing .burger svg,
-  .headerProduct .burger svg {
-    stroke: currentColor;
-    color: currentColor;
-  }
-
-  .headerTrainers .burger svg {
-    stroke: currentColor;
-    color: currentColor;
-  }
-
-  .headerShop .burger:hover,
-  .headerInstructing .burger:hover,
-  .headerProduct .burger:hover {
-    backdrop-filter: none !important;
-    background: rgba(0, 0, 0, 0.05) !important;
+  .headerTrainers .iconBtn:hover {
+    background: var(--white);
   }
 
   .headerTrainers .burger:hover {
-    -webkit-backdrop-filter: blur(1.04167vw);
-    backdrop-filter: blur(1.04167vw);
+    background: var(--violet);
+  }
+
+  /* Hover SVG ефекти тільки для desktop */
+  .iconBtn:hover svg,
+  .iconBtn:hover svg * {
+    stroke: var(--violet);
+    fill: var(--violet);
+  }
+
+  .iconBtn.transparent:hover svg,
+  .iconBtn.transparent:hover svg * {
+    stroke: var(--violet);
+    fill: var(--violet);
+  }
+
+  .iconBtn.white:hover svg,
+  .iconBtn.white:hover svg * {
+    stroke: var(--violet);
+    fill: var(--violet);
+  }
+
+  .headerTrainerProfile .iconBtn:hover svg,
+  .headerTrainerProfile .iconBtn:hover svg * {
+    color: var(--white);
+    fill: var(--white);
+    stroke: var(--white);
+  }
+
+  .headerScrolled .iconBtn:hover,
+  .headerScrolled .burger:hover {
+    background: var(--violet);
+    color: var(--white);
+  }
+
+  .headerScrolled .iconBtn:hover svg,
+  .headerScrolled .iconBtn:hover svg *,
+  .headerScrolled .burger:hover svg,
+  .headerScrolled .burger:hover svg * {
+    stroke: var(--white);
+    fill: var(--white);
+    color: var(--white);
+  }
+
+  /* Hover ефекти тільки для desktop */
+  .iconBtn:hover {
+    border-radius: 16px;
+    background: var(--white);
+    backdrop-filter: blur(20px);
+    color: var(--white);
+  }
+
+  .headerTrainerProfile .iconBtn:hover {
+    background: var(--violet);
+  }
+
+  .headerTrainerProfile .burger:hover {
     background: var(--violet);
   }
 }
@@ -284,9 +250,7 @@
 
 .burger:hover svg,
 .burger:hover svg * {
-  stroke: var(--white) !important;
-  fill: var(--white) !important;
-  color: var(--white) !important;
+  color: var(--white);
 }
 
 .nav {
@@ -317,7 +281,6 @@
   text-decoration-skip-ink: none;
 }
 
-/* underline on hover for main nav links */
 .logo {
   display: flex;
   align-items: center;
@@ -330,10 +293,11 @@
   right: 46%;
   bottom: 0;
   top: 0;
-  svg {
-    width: 38px;
-    height: 38px;
-  }
+}
+
+.logo svg {
+  width: 48px;
+  height: 48px;
 }
 
 .logo a {
@@ -346,12 +310,6 @@
   opacity: 0.8;
 }
 
-.logo svg {
-  width: 48px;
-  height: 48px;
-}
-
-/* Ensure both white SVG logo and black raster SVG have identical box */
 .LogoIcon {
   width: 48px;
   height: 48px;
@@ -359,6 +317,7 @@
   align-items: center;
   justify-content: center;
 }
+
 .LogoIcon img,
 .LogoIcon svg {
   width: 48px;
@@ -470,44 +429,15 @@
   color: var(--white);
 }
 
-.iconBtn:hover {
-  border-radius: 16px;
-  background: var(--white);
-  backdrop-filter: blur(20px);
-  color: var(--violet);
-}
-
-/* Ensure full icon painting (stroke and fill) on hover */
-.iconBtn:hover svg,
-.iconBtn:hover svg * {
-  stroke: var(--violet) !important;
-  fill: var(--violet) !important;
-}
-
-/* Active state when modal is open */
 .iconBtn.active {
   border-radius: 16px;
   background: var(--violet);
   color: var(--white);
 }
-
-.iconBtn.active svg,
-.iconBtn.active svg * {
-  stroke: var(--white) !important;
-  fill: var(--white) !important;
-}
-
-/* icon buttons hover states depending on base bg */
 .iconBtn.transparent:hover {
   border-radius: 16px;
   background: var(--white);
   backdrop-filter: blur(20px);
-}
-
-.iconBtn.transparent:hover svg,
-.iconBtn.transparent:hover svg * {
-  stroke: var(--violet) !important;
-  fill: var(--violet) !important;
 }
 
 .iconBtn.white:hover {
@@ -515,18 +445,6 @@
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(20px);
   color: var(--violet);
-}
-
-.iconBtn.white:hover svg,
-.iconBtn.white:hover svg * {
-  stroke: var(--violet) !important;
-  fill: var(--violet) !important;
-}
-
-.headerTrainerProfile .iconBtn:hover svg,
-.headerTrainerProfile .iconBtn:hover svg * {
-  stroke: var(--violet) !important;
-  fill: var(--violet) !important;
 }
 
 .iconBtn:active {
@@ -542,15 +460,6 @@
   position: relative;
 }
 
-/* Let SVG inherit currentColor so hover color paints fill and stroke */
-.iconBtn svg,
-.iconBtn svg * {
-  stroke: currentColor;
-  color: currentColor;
-  /* fill: none; */
-}
-
-/* active state fill variations */
 .iconBtn.transparent:active svg {
   color: var(--violet);
   fill: var(--violet);
@@ -606,23 +515,10 @@
   /* transform: translateY(-1px); */
 }
 
-/* Додати після існуючих стилів для headerTrainerProfile */
-
-/* .headerProduct .headerTrainerProfileBlock {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-radius: 12px;
-} */
-
-.headerProduct .logo a {
-  color: var(--black);
-}
-
-.headerProduct .phone a {
-  color: var(--black);
-}
-
-.headerProduct .contactText {
+.headerProduct .logo a,
+.headerProduct .phone a,
+.headerProduct .contactText,
+.headerProduct .nav a {
   color: var(--black);
 }
 
@@ -630,34 +526,15 @@
 .headerProduct .headerActions .iconBtn {
   color: var(--black);
   background: transparent;
-  backdrop-filter: none !important;
-}
-
-.headerProduct .iconBtn:hover,
-.headerProduct .headerActions .iconBtn:hover {
-  background: rgba(0, 0, 0, 0.05) !important;
-  color: var(--black);
+  backdrop-filter: none;
 }
 
 .headerProduct .iconBtn svg,
 .headerProduct .iconBtn svg *,
 .headerProduct .phone svg,
-.headerProduct .burger svg {
-  stroke: var(--black) !important;
-  color: var(--black) !important;
-  /* fill: var(--black) !important; */
-}
-
-.headerProduct .nav svg {
-  stroke: var(--black);
-  color: var(--black);
-}
-
-.headerProduct .logo svg {
-  stroke: var(--black);
-  color: var(--black);
-}
-
+.headerProduct .burger svg,
+.headerProduct .nav svg,
+.headerProduct .logo svg,
 .headerProduct .nav a:hover svg {
   stroke: var(--black);
   color: var(--black);
@@ -666,17 +543,12 @@
 .headerProduct .register {
   color: var(--white);
   background: var(--violet);
-  border: 1px solid var(--black);
 }
 
 .headerProduct .register:hover {
-  backdrop-filter: blur(11.699999809265137px);
+  backdrop-filter: blur(11.7px);
   background: #8426d7;
   color: var(--white);
-}
-
-.headerProduct .nav a {
-  color: var(--black);
 }
 
 .headerProduct .burger {
@@ -684,18 +556,15 @@
 }
 
 .headerProduct .burger:hover {
-  background: var(--violet) !important;
-  color: var(--white) !important;
+  background: var(--violet);
+  color: var(--white);
 }
 
 .headerProduct .burger:hover svg,
 .headerProduct .burger:hover svg * {
-  stroke: var(--white) !important;
-  fill: var(--white) !important;
-  color: var(--white) !important;
+  color: var(--white);
 }
 
-/* Desktop Menu Styles */
 .menuOverlay {
   position: fixed;
   top: 0;
@@ -711,7 +580,7 @@
 .menuContainer {
   background: var(--white);
   width: 478px;
-  height: 1080px;
+  height: 100%;
   padding: 52px 44px;
   overflow-y: auto;
   display: flex;
@@ -820,7 +689,6 @@
 
 .contactGrid {
   display: flex;
-
   gap: 28px;
 }
 
@@ -874,12 +742,12 @@
   transition: all 0.2s ease;
   cursor: pointer;
   border: 1px solid rgba(14, 14, 14, 0.1);
-  /* backdrop-filter: blur(20px); */
   color: var(--black);
-  svg {
-    width: 24px;
-    height: 24px;
-  }
+}
+
+.socialIcon svg {
+  width: 24px;
+  height: 24px;
 }
 
 .socialIcon:hover {
@@ -894,239 +762,62 @@
 
 .headerScrolled .headerTrainerProfileBlock {
   background: white;
-
   border-radius: 12px;
-
   transition: all 0.3s ease;
 }
 
-.headerScrolled .logo a {
-  color: var(--black) !important;
+.headerScrolled .logo a,
+.headerScrolled .phone a,
+.headerScrolled .contactText,
+.headerScrolled .nav a {
+  color: var(--black);
   transition: color 0.3s ease;
 }
 
-.headerScrolled .phone a {
-  color: var(--black) !important;
-}
-
-.headerScrolled .contactText {
-  color: var(--black) !important;
-}
-
-/* .headerScrolled .iconBtn {
-  color: var(--black) !important;
-} */
-
-/* .headerScrolled .iconBtn:hover {
-  background: rgba(0, 0, 0, 0.1) !important;
-} */
-
 .headerScrolled .iconBtn svg,
 .headerScrolled .phone svg,
-.headerScrolled .burger svg {
-  stroke: var(--black) !important;
-  color: var(--black) !important;
-}
-
-.headerScrolled .nav svg {
-  stroke: var(--black) !important;
-  color: var(--black) !important;
-}
-
-.headerScrolled .logo svg {
-  stroke: var(--black) !important;
-  color: var(--black) !important;
-}
-
+.headerScrolled .burger svg,
+.headerScrolled .nav svg,
+.headerScrolled .logo svg,
 .headerScrolled .nav a:hover svg {
-  stroke: var(--black) !important;
-  color: var(--black) !important;
+  stroke: var(--black);
+  color: var(--black);
 }
 
 .headerScrolled .register {
-  color: var(--white) !important;
-  background: var(--violet) !important;
-  border: 1px solid var(--black) !important;
+  color: var(--white);
+  background: var(--violet);
 }
 
 .headerScrolled .register:hover {
-  backdrop-filter: blur(11.699999809265137px) !important;
-  background: #8426d7 !important;
-  color: var(--white) !important;
+  backdrop-filter: blur(11.7px);
+  background: #8426d7;
+  color: var(--white);
 }
 
-.headerScrolled .nav a {
-  color: var(--black) !important;
-}
-
+.headerScrolled .iconBtn,
 .headerScrolled .burger {
-  color: var(--black) !important;
+  color: var(--black);
+  background: transparent;
 }
 
-.headerScrolled .burger svg,
-.headerScrolled .burger svg * {
-  stroke: var(--black) !important;
-  fill: var(--black) !important;
-  color: var(--black) !important;
-}
-
-.headerScrolled .burger:hover {
-  background: var(--white) !important;
-  color: var(--violet) !important;
-}
-
-.headerScrolled .burger:hover svg,
-.headerScrolled .burger:hover svg * {
-  stroke: var(--violet) !important;
-  fill: var(--violet) !important;
-}
-
-/* Перекриваємо headerTrainerProfile коли є headerScrolled */
-.headerScrolled.headerTrainerProfile .burger,
-.headerScrolled .headerTrainerProfile .burger {
-  color: var(--black) !important;
-}
-
-.headerScrolled.headerTrainerProfile .burger svg,
-.headerScrolled .headerTrainerProfile .burger svg,
-.headerScrolled.headerTrainerProfile .burger svg *,
-.headerScrolled .headerTrainerProfile .burger svg * {
-  stroke: var(--black) !important;
-  fill: var(--black) !important;
-  color: var(--black) !important;
-}
-
-.headerScrolled.headerTrainerProfile .burger:hover,
-.headerScrolled .headerTrainerProfile .burger:hover {
-  background: var(--white) !important;
-  color: var(--violet) !important;
-}
-
-.headerScrolled.headerTrainerProfile .burger:hover svg,
-.headerScrolled .headerTrainerProfile .burger:hover svg,
-.headerScrolled.headerTrainerProfile .burger:hover svg *,
-.headerScrolled .headerTrainerProfile .burger:hover svg * {
-  stroke: var(--violet) !important;
-  fill: var(--violet) !important;
-}
-
-.headerScrolled .iconBtn {
-  color: var(--black) !important;
-  background: transparent !important;
-}
-
-.headerScrolled .iconBtn svg,
 .headerScrolled .iconBtn svg * {
-  stroke: var(--black) !important;
-  color: var(--black) !important;
-  /* fill: var(--black) !important; */
-}
-
-.headerScrolled .iconBtn:hover {
-  background: var(--white) !important;
-  color: var(--violet) !important;
-}
-
-.headerScrolled .iconBtn:hover svg,
-.headerScrolled .iconBtn:hover svg * {
-  stroke: var(--violet) !important;
-  fill: var(--violet) !important;
-}
-
-/* Стилі для скроленого стану на сторінці trainers */
-.headerScrolled.headerTrainers .iconBtn,
-.headerScrolled.headerShop .iconBtn,
-.headerScrolled.headerInstructing .iconBtn,
-.headerScrolled.headerProduct .iconBtn {
-  color: var(--black) !important;
-  background: transparent !important;
-}
-
-.headerScrolled.headerTrainers .iconBtn svg,
-.headerScrolled.headerShop .iconBtn svg,
-.headerScrolled.headerInstructing .iconBtn svg,
-.headerScrolled.headerProduct .iconBtn svg,
-.headerScrolled.headerTrainers .iconBtn svg *,
-.headerScrolled.headerShop .iconBtn svg *,
-.headerScrolled.headerInstructing .iconBtn svg *,
-.headerScrolled.headerProduct .iconBtn svg * {
-  stroke: var(--black) !important;
-  color: var(--black) !important;
-  /* fill: var(--black) !important; */
-}
-
-.headerScrolled.headerTrainers .iconBtn:hover,
-.headerScrolled.headerShop .iconBtn:hover,
-.headerScrolled.headerInstructing .iconBtn:hover,
-.headerScrolled.headerProduct .iconBtn:hover {
-  background: var(--white) !important;
-  color: var(--violet) !important;
-}
-
-.headerScrolled.headerTrainers .iconBtn:hover svg,
-.headerScrolled.headerShop .iconBtn:hover svg,
-.headerScrolled.headerInstructing .iconBtn:hover svg,
-.headerScrolled.headerProduct .iconBtn:hover svg,
-.headerScrolled.headerTrainers .iconBtn:hover svg *,
-.headerScrolled.headerShop .iconBtn:hover svg *,
-.headerScrolled.headerInstructing .iconBtn:hover svg *,
-.headerScrolled.headerProduct .iconBtn:hover svg * {
-  stroke: var(--violet) !important;
-  fill: var(--violet) !important;
-}
-
-.headerScrolled.headerTrainers .burger,
-.headerScrolled.headerShop .burger,
-.headerScrolled.headerInstructing .burger,
-.headerScrolled.headerProduct .burger {
-  color: var(--black) !important;
-}
-
-.headerScrolled.headerTrainers .burger svg,
-.headerScrolled.headerShop .burger svg,
-.headerScrolled.headerInstructing .burger svg,
-.headerScrolled.headerProduct .burger svg,
-.headerScrolled.headerTrainers .burger svg *,
-.headerScrolled.headerShop .burger svg *,
-.headerScrolled.headerInstructing .burger svg *,
-.headerScrolled.headerProduct .burger svg * {
-  stroke: var(--black) !important;
-  fill: var(--black) !important;
-  color: var(--black) !important;
-}
-
-.headerScrolled.headerTrainers .burger:hover,
-.headerScrolled.headerShop .burger:hover,
-.headerScrolled.headerInstructing .burger:hover,
-.headerScrolled.headerProduct .burger:hover {
-  background: var(--white) !important;
-  color: var(--violet) !important;
-}
-
-.headerScrolled.headerTrainers .burger:hover svg,
-.headerScrolled.headerShop .burger:hover svg,
-.headerScrolled.headerInstructing .burger:hover svg,
-.headerScrolled.headerProduct .burger:hover svg,
-.headerScrolled.headerTrainers .burger:hover svg *,
-.headerScrolled.headerShop .burger:hover svg *,
-.headerScrolled.headerInstructing .burger:hover svg *,
-.headerScrolled.headerProduct .burger:hover svg * {
-  stroke: var(--violet) !important;
-  fill: var(--violet) !important;
+  color: var(--black);
 }
 
 /* Мобільні стилі */
 @media (max-width: 1000px) {
   .badge {
-    width: auto !important;
-    height: mvw(20) !important;
-    padding: 0 !important;
-    font-size: mvw(10) !important;
-    top: mvw(30) !important;
-    right: auto !important;
-    left: mvw(30) !important;
-    border-radius: mvw(4) !important;
+    width: auto;
+    height: mvw(20);
+    padding: 0;
+    font-size: mvw(10);
+    top: mvw(30);
+    right: auto;
+    left: mvw(30);
+    border-radius: mvw(4);
   }
+
   .header {
     padding: mvw(12) mvw(16);
     z-index: 1001;
@@ -1141,18 +832,17 @@
     justify-content: space-between;
     align-items: center;
     position: relative;
-    border-radius: mvw(11) !important;
+    border-radius: mvw(11);
   }
 
   .headerTrainerProfile .headerTrainerProfileBlock {
-    background: #fff !important;
-    border-radius: mvw(11) !important;
+    background: #fff;
+    border-radius: mvw(11);
   }
 
   .mobileLeft {
     display: flex;
     align-items: center;
-
     flex-shrink: 0;
   }
 
@@ -1160,11 +850,8 @@
     width: mvw(48);
     height: mvw(48);
     border-radius: mvw(10);
-    color: var(--violet);
+    color: var(--white);
     backdrop-filter: none;
-  }
-
-  .mobileLeft .burger:hover {
     background: var(--violet);
   }
 
@@ -1173,55 +860,44 @@
     height: mvw(20);
     stroke: var(--white);
     fill: var(--white);
-    color: var(--violet);
-  }
-
-  /* Переконаємося, що для профілю тренера бургер меню також фіолетовий */
-  .headerTrainerProfile .mobileLeft .burger {
-    color: var(--violet) !important;
-  }
-
-  .headerTrainerProfile .mobileLeft .burger svg {
-    stroke: var(--violet) !important;
-    fill: var(--violet) !important;
-    color: var(--violet) !important;
-  }
-
-  .mobileLeft .iconBtn {
-    width: mvw(48);
-    height: mvw(48);
-    border-radius: mvw(10);
-    background: transparent;
-    backdrop-filter: none;
-    padding: mvw(8);
-    color: var(--violet);
-  }
-
-  .mobileLeft .iconBtn:hover {
-    background: var(--violet);
     color: var(--white);
   }
 
+  .headerTrainerProfile .mobileLeft .burger {
+    color: var(--violet);
+  }
+
+  .headerTrainerProfile .mobileLeft .burger svg {
+    stroke: var(--black);
+    fill: var(--black);
+    color: var(--black);
+  }
+
+  .mobileLeft .iconBtn {
+    width: 12.8vw;
+    height: 12.8vw;
+    color: var(--violet);
+    background: none;
+    border-radius: 2.66667vw;
+    padding: 2.13333vw;
+    backdrop-filter: none;
+  }
+
   .mobileLeft .iconBtn svg {
-    width: mvw(20);
-    height: mvw(20);
-    stroke: currentColor;
-    color: currentColor;
+    width: 5.33333vw;
+    height: 5.33333vw;
+    color: var(--violet);
     fill: none;
   }
 
-  .mobileLeft .iconBtn:hover svg,
-  .mobileLeft .iconBtn:hover svg * {
-    stroke: var(--white) !important;
-    fill: var(--white) !important;
-    color: var(--white) !important;
+  .mobileLeft .iconBtn.active {
+    background: var(--violet);
+    color: var(--white);
+    fill: var(--white);
   }
 
-  /* Mobile: фіолетовий колір для іконки юзера при ховері */
-  .mobileLeft .userBtn:hover .userIconHover {
-    display: inline-block;
-    filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%)
-      hue-rotate(246deg) brightness(104%) contrast(101%); /* Фіолетовий колір для мобілки */
+  .mobileLeft .iconBtn.active svg {
+    color: var(--white);
   }
 
   .mobileLogo {
@@ -1257,8 +933,8 @@
   .mobileRight {
     display: flex;
     align-items: center;
-
     flex-shrink: 0;
+    gap: mvw(4);
   }
 
   .mobileRight .iconBtn {
@@ -1272,48 +948,54 @@
     color: var(--violet);
   }
 
-  .mobileRight .iconBtn:hover {
-    background: var(--violet);
-    color: var(--white);
-  }
-
   .mobileRight .iconBtn svg {
     width: mvw(20);
     height: mvw(20);
-    stroke: currentColor;
-    color: currentColor;
-    fill: none;
+
+    color: var(--violet);
   }
 
-  .mobileRight .iconBtn:hover svg,
-  .mobileRight .iconBtn:hover svg * {
-    stroke: var(--white) !important;
-    fill: var(--white) !important;
+  /* Іконки чорні по замовчуванню на мобільній версії */
+  .iconBtn svg * {
+    color: var(--black);
+  }
+
+  .burger svg {
+    color: var(--white);
+  }
+
+  .burger svg * {
+    color: var(--white);
+  }
+
+  /* Іконки білі при активному стані на мобільній версії */
+  .mobileRight .iconBtn.active svg,
+  .mobileRight .iconBtn.active svg * {
     color: var(--white) !important;
   }
+  /* 
+  .headerScrolled .iconBtn svg *,
+  .headerScrolled .burger svg,
+  .headerScrolled .burger svg * {
+    color: var(--b);
+  } */
 
   .mobileRight .iconBtn.active {
     background: var(--violet);
     color: var(--white);
-  }
-
-  .mobileRight .iconBtn.active svg,
-  .mobileRight .iconBtn.active svg * {
-    stroke: var(--white) !important;
-    fill: var(--white) !important;
-    color: var(--white) !important;
+    fill: var(--white);
   }
 
   .mobileRight .iconBtn .badge {
     position: absolute;
-    top: mvw(4);
+    top: mvw(26);
     right: mvw(4);
     border-radius: mvw(8);
-    min-width: mvw(16) !important;
-    width: mvw(16) !important;
-    height: mvw(16) !important;
+    min-width: mvw(16);
+    width: mvw(16);
+    height: mvw(16);
     font-size: mvw(10);
-    padding: 0 !important;
+    padding: 0;
     background: var(--violet);
     color: var(--white);
     display: flex;
@@ -1322,14 +1004,12 @@
     box-sizing: border-box;
   }
 
-  /* Приховуємо елементи, які не потрібні на мобільній версії */
   .left,
   .right,
   .logo {
-    display: none !important;
+    display: none;
   }
 
-  /* Мобільні стилі для меню */
   .menuOverlay {
     background: rgba(0, 0, 0, 0.5);
   }
@@ -1428,26 +1108,5 @@
 
   .socialSection {
     display: none;
-  }
-
-  .headerScrolled .iconBtn:hover {
-    background: var(--violet) !important;
-    color: var(--violet) !important;
-  }
-
-  .burger:hover {
-    background: var(--violet) !important;
-    color: var(--white) !important;
-  }
-
-  .headerScrolled .burger:hover {
-    background: var(--violet) !important;
-    color: var(--white) !important;
-  }
-
-  .headerScrolled .burger:hover svg,
-  .headerScrolled .burger:hover svg * {
-    stroke: var(--white) !important;
-    fill: var(--white) !important;
   }
 }

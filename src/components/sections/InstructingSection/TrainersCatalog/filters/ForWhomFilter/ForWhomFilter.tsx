@@ -18,7 +18,7 @@ export const ForWhomFilter = ({ value, onChange }: ForWhomFilterProps) => {
 
   // Статичні опції як fallback
   const fallbackOptions = useMemo(
-    () => ["Універсальний", "Жінки", "Клієнти після травм", "Чоловіки"],
+    () => ["Універсальний", "Жінки", "Чоловіки"],
     []
   );
 
@@ -95,7 +95,10 @@ export const ForWhomFilter = ({ value, onChange }: ForWhomFilterProps) => {
         {loading ? (
           <div className={styles.radioGroup}>
             {[...Array(4)].map((_, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <div
+                key={i}
+                style={{ display: "flex", alignItems: "center", gap: "12px" }}
+              >
                 <Skeleton width={20} height={20} borderRadius={10} />
                 <Skeleton width={160} height={16} />
               </div>
@@ -105,7 +108,9 @@ export const ForWhomFilter = ({ value, onChange }: ForWhomFilterProps) => {
           <div className={styles.radioGroup}>
             {options.map((option) => {
               const isSelected = value === option;
-              const inputId = `for-whom-${option.toLowerCase().replace(/\s+/g, '-')}`;
+              const inputId = `for-whom-${option
+                .toLowerCase()
+                .replace(/\s+/g, "-")}`;
               return (
                 <label
                   key={option}

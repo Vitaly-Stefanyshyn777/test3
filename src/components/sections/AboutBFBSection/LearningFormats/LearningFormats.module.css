@@ -13,6 +13,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  align-items: center;
 }
 
 .cardBody {
@@ -54,7 +55,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-image: url(/images/image-1.png);
+
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -67,7 +68,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-image: url(/images/image-2.png);
+
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -185,7 +186,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 16px;
+  padding: 11px;
   background: #f7f7f8;
   border-radius: 14px;
   font-family: var(--font-family);
@@ -465,5 +466,461 @@
     font-size: mvw(14);
     line-height: 140%;
     color: var(--black);
+  }
+}
+
+/* Skeleton styles */
+.skeleton {
+  background: rgba(14, 14, 14, 0.08);
+  border-radius: 4px;
+  animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.skeletonCard {
+  width: 840px;
+  height: 830px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.skeletonCardImage {
+  width: 100%;
+  height: 220px;
+  background: rgba(132, 38, 215, 0.1);
+}
+
+.skeletonCardListTitle {
+  width: 80px;
+  height: 20px;
+  background: rgba(14, 14, 14, 0.1);
+}
+
+.skeletonCardListText {
+  width: 680px;
+  height: 25px;
+  background: rgba(14, 14, 14, 0.08);
+}
+
+.skeletonSubtitle {
+  width: 573px;
+  height: 56px;
+  background: rgba(14, 14, 14, 0.08);
+}
+
+.skeletonListItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.skeletonListItemIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  background: rgba(132, 38, 215, 0.1);
+}
+
+.skeletonListItemText {
+  width: 256px;
+  height: 22px;
+  background: rgba(14, 14, 14, 0.08);
+}
+
+.skeletonPill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(247, 247, 248, 0.8);
+  width: calc(50% - 6px);
+  min-height: 45px;
+}
+
+.skeletonPillIcon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(14, 14, 14, 0.1);
+  flex-shrink: 0;
+}
+
+.skeletonPillText {
+  flex: 1;
+  height: 16px;
+  background: rgba(14, 14, 14, 0.08);
+  border-radius: 4px;
+}
+
+.skeletonPrice {
+  width: 167px;
+  height: 26px;
+  background: rgba(14, 14, 14, 0.1);
+}
+
+.skeletonPriceOld {
+  width: 84px;
+  height: 20px;
+  background: rgba(14, 14, 14, 0.1);
+}
+
+.skeletonButton {
+  width: 185px;
+  height: 64px;
+  border-radius: 20px;
+  background: rgba(132, 38, 215, 0.2);
+}
+
+.skeletonCardBody {
+  padding: 48px 80px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.skeletonCardListContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.skeletonCardListBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeletonPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.skeletonCardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 80px 56px;
+  gap: 16px;
+}
+
+.skeletonPriceContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (max-width: 1200px) {
+  .skeletonCard {
+    width: 840px;
+    height: 830px;
+  }
+
+  .skeletonCardImage {
+    height: 220px;
+  }
+
+  .skeletonCardListTitle {
+    width: 80px;
+    height: 20px;
+  }
+
+  .skeletonCardListText {
+    width: 680px;
+    height: 25px;
+  }
+
+  .skeletonSubtitle {
+    width: 573px;
+    height: 56px;
+  }
+
+  .skeletonListItemIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+  }
+
+  .skeletonListItemText {
+    width: 256px;
+    height: 22px;
+  }
+
+  .skeletonPill {
+    width: calc(50% - 6px);
+    min-height: 45px;
+  }
+
+  .skeletonPillIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .skeletonPillText {
+    height: 16px;
+  }
+
+  .skeletonPrice {
+    width: 167px;
+    height: 26px;
+  }
+
+  .skeletonPriceOld {
+    width: 84px;
+    height: 20px;
+  }
+
+  .skeletonButton {
+    width: 185px;
+    height: 64px;
+    border-radius: 20px;
+    padding: 24px 42px;
+  }
+
+  .skeletonCardBody {
+    padding: 48px 80px 56px;
+  }
+
+  .skeletonCardListContainer {
+    gap: 24px;
+  }
+
+  .skeletonCardListBlock {
+    gap: 12px;
+  }
+
+  .skeletonPills {
+    gap: 12px;
+  }
+
+  .skeletonCardFooter {
+    padding: 0 80px 56px;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .skeletonCard {
+    width: 100%;
+    height: auto;
+    border-radius: mvw(12);
+  }
+
+  .skeletonCardImage {
+    height: mvw(180);
+  }
+
+  .skeletonCardListTitle {
+    width: mvw(133);
+    height: mvw(20);
+  }
+
+  .skeletonCardListText {
+    width: 100%;
+    height: mvw(20);
+  }
+
+  .skeletonSubtitle {
+    width: mvw(287);
+    height: mvw(34);
+  }
+
+  .skeletonListItem {
+    gap: mvw(6);
+  }
+
+  .skeletonListItemIcon {
+    width: mvw(24);
+    height: mvw(24);
+    border-radius: mvw(12);
+  }
+
+  .skeletonListItemText {
+    width: 100%;
+    height: mvw(18);
+  }
+
+  .skeletonPill {
+    width: 100%;
+    min-height: mvw(35);
+    gap: mvw(8);
+    padding: mvw(8) mvw(12);
+    border-radius: mvw(8);
+  }
+
+  .skeletonPillIcon {
+    width: mvw(16);
+    height: mvw(16);
+  }
+
+  .skeletonPillText {
+    height: mvw(14);
+  }
+
+  .skeletonPrice {
+    width: mvw(140);
+    height: mvw(22);
+  }
+
+  .skeletonPriceOld {
+    width: mvw(70);
+    height: mvw(18);
+  }
+
+  .skeletonButton {
+    width: 100%;
+    height: mvw(50);
+    border-radius: mvw(16);
+    padding: mvw(16) mvw(24);
+  }
+
+  .skeletonCardBody {
+    padding: mvw(20);
+    gap: mvw(20);
+  }
+
+  .skeletonCardListContainer {
+    gap: mvw(16);
+  }
+
+  .skeletonCardListBlock {
+    gap: mvw(8);
+  }
+
+  .skeletonPills {
+    gap: mvw(6);
+  }
+
+  .skeletonCardFooter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: mvw(12);
+    padding: 0 mvw(12) mvw(12);
+  }
+}
+
+@media (max-width: 1000px) {
+  .skeletonCard {
+    width: 100%;
+    height: auto;
+    border-radius: mvw(16);
+  }
+
+  .skeletonCardImage {
+    width: 100%;
+    height: mvw(160);
+  }
+
+  .skeletonCardListTitle {
+    width: mvw(80);
+    height: mvw(20);
+  }
+
+  .skeletonCardListText {
+    width: mvw(280);
+    height: mvw(25);
+  }
+
+  .skeletonSubtitle {
+    width: mvw(283);
+    height: mvw(34);
+  }
+
+  .skeletonListItem {
+    gap: mvw(8);
+  }
+
+  .skeletonListItemIcon {
+    width: mvw(28);
+    height: mvw(28);
+    border-radius: mvw(14);
+  }
+
+  .skeletonListItemText {
+    width: mvw(200);
+    height: mvw(22);
+  }
+
+  .skeletonPill {
+    gap: mvw(12);
+    padding: mvw(12) mvw(16);
+    width: 100%;
+    min-height: mvw(45);
+  }
+
+  .skeletonPillIcon {
+    width: mvw(20);
+    height: mvw(20);
+  }
+
+  .skeletonPillText {
+    height: mvw(16);
+  }
+
+  .skeletonPrice {
+    width: mvw(167);
+    height: mvw(26);
+  }
+
+  .skeletonPriceOld {
+    width: mvw(84);
+    height: mvw(20);
+  }
+
+  .skeletonButton {
+    width: 100%;
+    height: mvw(64);
+    border-radius: mvw(20);
+    padding: mvw(24) mvw(42);
+  }
+
+  .skeletonCardBody {
+    padding: mvw(16);
+    gap: mvw(30);
+  }
+
+  .skeletonCardListContainer {
+    gap: mvw(24);
+  }
+
+  .skeletonCardListBlock {
+    gap: mvw(12);
+  }
+
+  .skeletonPills {
+    gap: mvw(8);
+  }
+
+  .skeletonCardFooter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: mvw(16);
+    padding: 0 mvw(16) mvw(16);
+  }
+
+  .skeletonPriceContainer {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: mvw(12);
+    justify-content: flex-end;
   }
 }

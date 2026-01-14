@@ -43,7 +43,7 @@ export default function OrderSummary({
         </div>
       </div>
 
-      <Link href="/checkout" className={s.returnButton}>
+      <Link href="/" className={s.returnButton}>
         Повернутися на головну
       </Link>
     </>

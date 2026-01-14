@@ -101,6 +101,11 @@
     padding: mvw(0);
     border-bottom: none;
   }
+  .filterSection.collapsedSection {
+    gap: 0;
+    padding: mvw(0);
+    border-radius: mvw(8);
+  }
 
   .sectionTitle {
     font-size: mvw(16);

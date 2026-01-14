@@ -275,6 +275,13 @@ export async function fetchTrainer(id: string): Promise<TrainerUser> {
         rawData.meta?.img_link_data_certificate ||
         rawData.acf?.certificate ||
         rawData.acf?.img_link_data_certificate,
+      certificateContent:
+        rawData.certificateContent ||
+        rawData.certificates ||
+        rawData.meta?.certificateContent ||
+        rawData.meta?.certificates ||
+        rawData.acf?.certificateContent ||
+        rawData.acf?.certificates,
       input_text_phone:
         rawData.input_text_phone || rawData.meta?.input_text_phone,
       input_text_email:
@@ -283,8 +290,7 @@ export async function fetchTrainer(id: string): Promise<TrainerUser> {
         rawData.input_text_address || rawData.meta?.input_text_address,
       input_text_schedule:
         rawData.input_text_schedule || rawData.meta?.input_text_schedule,
-      hl_data_gallery:
-        rawData.hl_data_gallery || rawData.meta?.hl_data_gallery,
+      hl_data_gallery: rawData.hl_data_gallery || rawData.meta?.hl_data_gallery,
       hl_data_contact: rawData.hl_data_contact || rawData.meta?.hl_data_contact,
       social_phone:
         (rawData.acf?.phone as string) ||
@@ -357,6 +363,7 @@ export async function fetchTrainer(id: string): Promise<TrainerUser> {
               ? coach.gallery
               : coach.gallery,
             certificate: coach.certificate,
+            certificateContent: coach.certificateContent,
             input_text_phone: "",
             input_text_email: "",
             input_text_address: "",
@@ -400,9 +407,9 @@ export function getSpecialties(trainer: TrainerUser): string[] {
   if (!trainer.my_specialty || !Array.isArray(trainer.my_specialty)) {
     return ["Не вказано"];
   }
-  return trainer.my_specialty
-    .filter((spec: unknown): spec is string => typeof spec === "string")
-    .slice(0, 3);
+  return trainer.my_specialty.filter(
+    (spec: unknown): spec is string => typeof spec === "string"
+  );
 }
 
 export function getFavouriteExercises(user: TrainerUser): string[] {

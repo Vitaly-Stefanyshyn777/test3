@@ -12,6 +12,7 @@ export interface CoachApi {
   avatar?: string | string[];
   gallery?: string | string[];
   certificate?: string[];
+  certificateContent?: string | string[];
   super_power?: string;
   favourite_exercise?: string | string[];
   my_specialty?: string[] | string;

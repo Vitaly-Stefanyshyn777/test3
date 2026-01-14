@@ -207,4 +207,9 @@
   .radioLabel {
     font-size: mvw(14);
   }
+  .filterSection.collapsedSection {
+    gap: 0;
+    padding: mvw(0);
+    border-radius: mvw(8);
+  }
 }

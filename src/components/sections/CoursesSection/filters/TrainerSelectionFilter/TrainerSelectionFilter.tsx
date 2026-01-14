@@ -12,12 +12,17 @@ interface TrainerSelectionFilterProps {
   loading?: boolean;
 }
 
-export const CertificationFilter = ({
+export const TrainerSelectionFilter = ({
   value,
   onChange,
   options = [],
   loading = false,
 }: TrainerSelectionFilterProps) => {
+  // Якщо немає опцій і не завантажується, не відображаємо фільтр
+  if (!loading && (!options || options.length === 0)) {
+    return null;
+  }
+
   const cities = options;
   const [isExpanded, setIsExpanded] = useState(true);
 
@@ -51,10 +56,6 @@ export const CertificationFilter = ({
                   <Skeleton width={140} height={16} />
                 </div>
               ))}
-            </div>
-          ) : cities.length === 0 ? (
-            <div className={styles.checkboxGroup}>
-              <span className={styles.checkboxText}>Дані скоро з'являться</span>
             </div>
           ) : (
             <div className={styles.checkboxGroup}>

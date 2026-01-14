@@ -49,22 +49,16 @@ function CartItemRow({ item }: CartItemRowProps) {
         // Отримуємо свіжі ціни з API
         const freshPrices = await getProductPriceAsync(item.id);
 
+        // Якщо отримали некоректні ціни (0), не оновлюємо
+        if (freshPrices.currentPrice === 0) {
+          return;
+        }
+
         // Якщо ціни відрізняються від тих, що в кошику, оновлюємо
         if (
           freshPrices.currentPrice !== item.price ||
           freshPrices.originalPrice !== item.originalPrice
         ) {
-          console.log("🛒 CartItemRow: Оновлюємо ціни для товару", {
-            itemId: item.id,
-            oldPrice: item.price,
-            newPrice: freshPrices.currentPrice,
-            oldOriginalPrice: item.originalPrice,
-            newOriginalPrice: freshPrices.originalPrice,
-          });
-
-          // Оновлюємо локальний стан з новими цінами
-          // (тимчасово, без збереження в store)
-
           // Зберігаємо виправлені ціни для поточного рендерингу
           setCorrectedPrices({
             price: freshPrices.currentPrice,
@@ -72,25 +66,35 @@ function CartItemRow({ item }: CartItemRowProps) {
           });
         }
       } catch (error) {
+        // При помилці не перезаписуємо ціни - залишаємо оригінальні з кошика
         console.error("Error updating cart item prices:", error);
       }
     };
 
-    // Перевіряємо тільки якщо товар може бути варіативним (містить цифри в ID)
-    if (/\d/.test(item.id)) {
+    // Перевіряємо тільки якщо товар може бути варіативним WooCommerce продуктом
+    // Виключаємо курси (course-XXX) та інші не-WooCommerce товари
+    if (/\d/.test(item.id) && !item.id.startsWith("course-")) {
       checkAndUpdatePrices();
     }
   }, [item.id, item.price, item.originalPrice]);
 
   const finalImageUrl = imageError ? "/placeholder.svg" : imageUrl;
 
+  // Витягуємо колір з назви товару, якщо він там є
+  // Шукаємо патерни: (Колір: назва), (Color: назва) або інші варіації
+  // Використовуємо колір і розмір напряму з item
+  const extractedColor = item.color;
+  const extractedSize = item.size;
+
   // Використовуємо виправлені ціни, якщо вони є, інакше - з кошика
-  const priceToUse = correctedPrices?.price ?? item.price;
-  const originalPriceToUse =
-    correctedPrices?.originalPrice ?? item.originalPrice;
+  // Пріоритет: salePrice > price
+  const priceToUse = correctedPrices?.price ?? (item.salePrice && item.salePrice > 0 ? item.salePrice : item.price);
+  const originalPriceToUse = correctedPrices?.originalPrice ?? (item.regularPrice && item.regularPrice > 0 ? item.regularPrice : item.originalPrice);
 
   const { finalPrice, originalPrice, shouldShowOldPrice } = calculatePrice({
     price: priceToUse,
+    regularPrice: item.regularPrice,
+    salePrice: item.salePrice,
     originalPrice: originalPriceToUse,
     isLoggedIn,
   });
@@ -121,7 +125,13 @@ function CartItemRow({ item }: CartItemRowProps) {
               </button>
             </div>
 
-            <div className={s.color}>{item.color || "Колір не вказано"}</div>
+            {(extractedColor || extractedSize) && (
+              <div className={s.color}>
+                {extractedColor && `Колір: ${extractedColor}`}
+                {extractedColor && extractedSize && ", "}
+                {extractedSize && `Розмір: ${extractedSize}`}
+              </div>
+            )}
           </div>
 
           <div className={s.controlsBlock}>
@@ -160,9 +170,9 @@ function CartItemRow({ item }: CartItemRowProps) {
 }
 
 export default function CartItemsList({ items }: CartItemsListProps) {
-  if (items.length === 0) {
-    return <div className={s.empty}>Кошик порожній</div>;
-  }
+  // if (items.length === 0) {
+  //   return <div className={s.empty}>Кошик порожній</div>;
+  // }
 
   return (
     <div className={s.leftList}>

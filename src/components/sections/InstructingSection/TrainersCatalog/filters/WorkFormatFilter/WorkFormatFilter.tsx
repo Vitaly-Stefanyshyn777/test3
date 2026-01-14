@@ -20,7 +20,10 @@ export const WorkFormatFilter = ({
   const [formats, setFormats] = useState<string[]>([]);
 
   // Статичні формати як fallback
-  const fallbackFormats = useMemo(() => ["Індивідуальні", "Групові"], []);
+  const fallbackFormats = useMemo(
+    () => ["Групові", "Індивідуальні", "Міні - групи"],
+    []
+  );
 
   const loadFormats = useCallback(async () => {
     try {
@@ -96,7 +99,10 @@ export const WorkFormatFilter = ({
         {loading ? (
           <div className={styles.radioGroup}>
             {[...Array(2)].map((_, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <div
+                key={i}
+                style={{ display: "flex", alignItems: "center", gap: "12px" }}
+              >
                 <Skeleton width={20} height={20} borderRadius={10} />
                 <Skeleton width={140} height={16} />
               </div>

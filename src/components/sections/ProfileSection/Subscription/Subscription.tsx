@@ -10,7 +10,7 @@ import PlansGrid from "./PlansGrid";
 const Subscription: React.FC = () => {
   return (
     <div className={styles.subscriptionContainer}>
-      <SubscriptionHeader />
+      <SubscriptionHeader backHref="/profile/subscription/current" />
       <div className={styles.mobileTitleDivider} />
       <SectionDivider />
 

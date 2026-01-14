@@ -10,6 +10,7 @@ import CartButton from "@/components/ui/Buttons/CartButton";
 import Badge from "@/components/ui/Badge/Badge";
 import BadgeContainer from "@/components/ui/Badge/BadgeContainer";
 import SubscriptionBadge from "@/components/ui/SubscriptionBadge/SubscriptionBadge";
+import { calculatePrice, formatPrice } from "@/lib/priceUtils";
 
 interface CourseCardProps {
   id: string;
@@ -100,7 +101,7 @@ const CourseCard = ({
   name,
   description,
   price = 0,
-  originalPrice = 0,
+  originalPrice: propOriginalPrice = 0,
   isNew = false,
   isHit = false,
   isFavorite = false,
@@ -149,13 +150,7 @@ const CourseCard = ({
     return totalSales >= topSalesThreshold;
   };
 
-  // Функція для форматування ціни
-  const formatPrice = (price: string | number | undefined): string => {
-    if (!price) return "0";
-    const priceValue = parseFloat(price.toString());
-    if (isNaN(priceValue)) return "0";
-    return priceValue.toLocaleString("uk-UA");
-  };
+  // Використовуємо уніфіковані функції з priceUtils
 
   const currentPrice =
     wcProduct?.prices?.price &&
@@ -163,9 +158,13 @@ const CourseCard = ({
     wcProduct.prices.price !== "" &&
     wcProduct.prices.price.trim() !== ""
       ? wcProduct.prices.price
-      : (price !== undefined && price !== null && price.toString() !== "0" && price.toString() !== "" && price.toString().trim() !== "")
-        ? price.toString()
-        : "0";
+      : price !== undefined &&
+        price !== null &&
+        price.toString() !== "0" &&
+        price.toString() !== "" &&
+        price.toString().trim() !== ""
+      ? price.toString()
+      : "0";
 
   const regularPrice =
     wcProduct?.prices?.regular_price &&
@@ -173,9 +172,13 @@ const CourseCard = ({
     wcProduct.prices.regular_price !== "" &&
     wcProduct.prices.regular_price.trim() !== ""
       ? wcProduct.prices.regular_price
-      : (originalPrice !== undefined && originalPrice !== null && originalPrice.toString() !== "0" && originalPrice.toString() !== "" && originalPrice.toString().trim() !== "")
-        ? originalPrice.toString()
-        : "0";
+      : propOriginalPrice !== undefined &&
+        propOriginalPrice !== null &&
+        propOriginalPrice.toString() !== "0" &&
+        propOriginalPrice.toString() !== "" &&
+        propOriginalPrice.toString().trim() !== ""
+      ? propOriginalPrice.toString()
+      : "0";
 
   const salePrice =
     wcProduct?.prices?.sale_price &&
@@ -186,45 +189,38 @@ const CourseCard = ({
 
   const isOnSale = wcProduct?.on_sale || false;
 
-  const formattedCurrentPrice = formatPrice(currentPrice);
-  const formattedRegularPrice = formatPrice(regularPrice);
-  const formattedSalePrice = salePrice ? formatPrice(salePrice) : null;
-
+  // Розрахунок цін з урахуванням авторизації та знижок
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-  const authDiscount = 0.2;
 
-  const basePrice = salePrice || currentPrice || regularPrice;
+  const priceCalculation = calculatePrice({
+    price: parseFloat(salePrice || currentPrice || "0"),
+    regularPrice: regularPrice ? parseFloat(regularPrice) : undefined,
+    isLoggedIn,
+  });
 
-  const baseDiscount =
-    salePrice && regularPrice
-      ? ((parseFloat(regularPrice) - parseFloat(salePrice)) /
-          parseFloat(regularPrice)) *
-        100
-      : currentPrice &&
-        regularPrice &&
-        parseFloat(currentPrice) < parseFloat(regularPrice)
-      ? ((parseFloat(regularPrice) - parseFloat(currentPrice)) /
-          parseFloat(regularPrice)) *
-        100
-      : 0;
+  const {
+    finalPrice,
+    originalPrice: calculatedOriginalPrice,
+    totalDiscount,
+    shouldShowOldPrice,
+  } = priceCalculation;
 
-  const finalPrice = basePrice
-    ? isLoggedIn
-      ? parseFloat(basePrice) * (1 - authDiscount)
-      : parseFloat(basePrice)
-    : 0;
 
-  const totalDiscount =
-    regularPrice && finalPrice
-      ? ((parseFloat(regularPrice) - finalPrice) / parseFloat(regularPrice)) *
-        100
-      : 0;
+  // Форматовані ціни для відображення
+  const formattedCurrentPrice = formatPrice(currentPrice);
+  const formattedRegularPrice = shouldShowOldPrice
+    ? formatPrice(calculatedOriginalPrice)
+    : null;
+  const formattedSalePrice = salePrice ? formatPrice(salePrice) : null;
+  const formattedFinalPrice = formatPrice(finalPrice);
 
   const isActuallyNew = isNewProduct(dateCreated) || isNew;
   const isActuallyHit =
     wcProduct && allProducts?.length
       ? isHitProduct(wcProduct, allProducts)
       : isHit;
+
+  // Використовуємо стан авторизації для розрахунку цін (вже оголошений вище)
 
   const truncateDescription = (text: string, maxLength: number = 80) => {
     if (text.length <= maxLength) return text;
@@ -267,19 +263,12 @@ const CourseCard = ({
 
         <BadgeContainer>
           {isActuallyNew && <Badge variant="new" />}
-          {isLoggedIn
-            ? totalDiscount > 0 && (
-                <Badge
-                  variant="discount"
-                  text={`-${Math.round(totalDiscount)}%`}
-                />
-              )
-            : baseDiscount > 0 && (
-                <Badge
-                  variant="discount"
-                  text={`-${Math.round(baseDiscount)}%`}
-                />
-              )}
+          {totalDiscount > 0 && (
+            <Badge
+              variant="discount"
+              text={`-${Math.round(totalDiscount)}%`}
+            />
+          )}
           {isActuallyHit && <Badge variant="hit" />}
         </BadgeContainer>
 
@@ -288,7 +277,7 @@ const CourseCard = ({
           name={name}
           price={price || 0}
           originalPrice={
-            regularPrice ? parseFloat(regularPrice) : originalPrice
+            regularPrice ? parseFloat(regularPrice) : calculatedOriginalPrice
           }
           image={image}
           className={styles.favoriteBtn}
@@ -362,9 +351,9 @@ const CourseCard = ({
                 <>
                   <span className={styles.currentPrice}>
                     <span className={styles.currentPriceValue}>
-                      {formatPrice(finalPrice.toString())}
+                      {formattedFinalPrice}
                     </span>
-                    <span className={styles.priceCurrency}>₴</span>
+                    <span className={styles.priceCurrency}></span>
                   </span>
                   {regularPrice &&
                     parseFloat(regularPrice) > 0 &&
@@ -373,7 +362,6 @@ const CourseCard = ({
                         <span className={styles.originalPriceValue}>
                           {formattedRegularPrice}
                         </span>
-                        <span className={styles.originalPriceCurrency}>₴</span>
                       </span>
                     )}
                 </>
@@ -383,7 +371,6 @@ const CourseCard = ({
                     <span className={styles.currentPriceValue}>
                       {formattedSalePrice || formattedCurrentPrice || "0"}
                     </span>
-                    <span className={styles.priceCurrency}>₴</span>
                   </span>
                   {salePrice &&
                     regularPrice &&
@@ -392,7 +379,6 @@ const CourseCard = ({
                         <span className={styles.originalPriceValue}>
                           {formattedRegularPrice}
                         </span>
-                        <span className={styles.originalPriceCurrency}>₴</span>
                       </span>
                     )}
                 </>
@@ -405,11 +391,27 @@ const CourseCard = ({
             name={name}
             price={
               // Зберігаємо базову ціну (без знижки авторизації), знижка застосовується при відображенні
-              parseFloat(salePrice || currentPrice || basePrice || "0")
+              parseFloat(
+                salePrice ||
+                  currentPrice ||
+                  regularPrice ||
+                  price?.toString() ||
+                  "0"
+              )
             }
             originalPrice={
               regularPrice && parseFloat(regularPrice) > 0
                 ? parseFloat(regularPrice)
+                : propOriginalPrice
+            }
+            regularPrice={
+              regularPrice && parseFloat(regularPrice) > 0
+                ? parseFloat(regularPrice)
+                : undefined
+            }
+            salePrice={
+              salePrice && parseFloat(salePrice) > 0
+                ? parseFloat(salePrice)
                 : undefined
             }
             image={imageUrl}

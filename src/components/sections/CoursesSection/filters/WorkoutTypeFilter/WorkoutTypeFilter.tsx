@@ -17,14 +17,14 @@ interface WorkoutTypeFilterProps {
 export const WorkoutTypeFilter = ({
   value,
   onChange,
-  options = [
-    "З додатковим обладнанням",
-    "З власною вагою",
-    "Тренування в залі",
-    "Тренування вдома",
-  ],
+  options = [],
   loading = false,
 }: WorkoutTypeFilterProps) => {
+  // Якщо немає опцій і не завантажується, не відображаємо фільтр
+  if (!loading && (!options || options.length === 0)) {
+    return null;
+  }
+
   const cities = options;
   const [isExpanded, setIsExpanded] = useState(true);
   const norm = (s: string) => s.toLowerCase().trim();

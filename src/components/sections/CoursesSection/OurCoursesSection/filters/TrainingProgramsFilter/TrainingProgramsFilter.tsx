@@ -12,13 +12,13 @@ interface TrainingProgramsFilterProps {
 const TrainingProgramsFilter: React.FC<TrainingProgramsFilterProps> = ({
   value,
   onChange,
-  options = [
-    "Kids classes",
-    "BFB для вагітних",
-    "Базовий рівень інструктора групових програм",
-    "Воркшопи з інвентарем",
-  ],
+  options = [],
 }) => {
+  // Якщо немає опцій, не відображаємо фільтр
+  if (!options || options.length === 0) {
+    return null;
+  }
+
   const [isExpanded, setIsExpanded] = useState(true);
 
   const handleRadioChange = (opt: string) => {

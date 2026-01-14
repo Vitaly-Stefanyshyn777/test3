@@ -9,7 +9,6 @@ import {
 } from "@/components/Icons/Icons";
 import { useCourseQuery } from "@/components/hooks/useWpQueries";
 import { CourseData } from "@/lib/bfbApi";
-import CourseHeroSkeleton from "./CourseHeroSkeleton";
 
 interface CourseHeroProps {
   courseId?: string | number;
@@ -38,8 +37,7 @@ const CourseHero: React.FC<CourseHeroProps> = ({ courseId = 169 }) => {
             data.categories?.map((cat: { id: number }) => cat.id) || [];
           setCategories(categoryIds);
         }
-      } catch (err) {
-      }
+      } catch (err) {}
     };
 
     if (courseId) {
@@ -65,7 +63,7 @@ const CourseHero: React.FC<CourseHeroProps> = ({ courseId = 169 }) => {
   const hasOfflineFormat = categories.includes(68);
 
   if (isLoading) {
-    return <CourseHeroSkeleton />;
+    return null;
   }
 
   if (error || !course) {
@@ -119,24 +117,30 @@ const CourseHero: React.FC<CourseHeroProps> = ({ courseId = 169 }) => {
                 </div>
               )}
             </div>
-            <div className={styles.courseCode}>
-              <p className={styles.courseCodeText}>Код курсу:</p>
-              <p className={styles.courseCodeNumber}>{course.id}</p>
-            </div>
+            {course.id && (
+              <div className={styles.courseCode}>
+                <p className={styles.courseCodeText}>Код курсу:</p>
+                <p className={styles.courseCodeNumber}>{course.id}</p>
+              </div>
+            )}
           </div>
-          <h1 className={styles.title}>
-            {course.title?.rendered?.replace(/____FULL____/g, "") || "Основи тренерства BFB"}
-          </h1>
+          {course.title?.rendered && (
+            <h1 className={styles.title}>
+              {course.title.rendered.replace(/____FULL____/g, "").trim()}
+            </h1>
+          )}
           <div className={styles.tagsCodeContainer}>
             <div className={styles.description}>
-            <div
-              dangerouslySetInnerHTML={{ __html: course.content?.rendered || "Опис курсу тимчасово недоступний" }}
-            />
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: course.content?.rendered || "",
+                }}
+              />
             </div>
           </div>
         </div>
       )}
-      {        course.course_data?.Course_themes &&
+      {course.course_data?.Course_themes &&
         course.course_data?.Course_themes.length > 0 && (
           <div className={styles.topicsSection}>
             <h3>ЯКІ ТЕМИ ПОКРИВАЄ КУРС:</h3>

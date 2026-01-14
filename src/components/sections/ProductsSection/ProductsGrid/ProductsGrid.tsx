@@ -145,6 +145,7 @@ export default function ProductsGrid({
             image={image}
             sku={p.sku}
             categories={productCategories[p.id] || p.categories}
+            stockStatus={p.stock_status}
             dateCreated={p.date_created}
             wcProduct={storeProduct}
             allProducts={products.map((p) => ({

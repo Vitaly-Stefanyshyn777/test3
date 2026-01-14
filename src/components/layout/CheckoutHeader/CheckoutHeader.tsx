@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import s from "./CheckoutHeader.module.css";
-import { LogoHeader, NumberHeader, EntranceIcon } from "../../Icons/Icons";
+import { LogoHeader, NumberTwoHeader, EntranceIcon } from "../../Icons/Icons";
 
 const LIGHT_LOGO_SRC = "/Vector2.svg";
 const MOBILE_DEFAULT_LOGO_SRC = "/Vector6.svg";
@@ -117,7 +117,7 @@ export default function CheckoutHeader() {
 
             <div className={s.right}>
               <div className={s.phone}>
-                <NumberHeader />
+                <NumberTwoHeader />
                 <div className={s.contacts}>
                   <p className={s.contactText}>Ми на зв&apos;язку:</p>
                   <div className={s.phoneWrapper}>

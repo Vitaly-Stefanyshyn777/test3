@@ -31,6 +31,11 @@ const ManagementMarketingFilter: React.FC<ManagementMarketingFilterProps> = ({
     onChange(next);
   };
 
+  // Якщо немає опцій, не відображаємо фільтр
+  if (normalized.length === 0) {
+    return null;
+  }
+
   return (
     <div className={styles.filterSection}>
       <button
@@ -44,25 +49,21 @@ const ManagementMarketingFilter: React.FC<ManagementMarketingFilterProps> = ({
       </button>
       {isExpanded && (
         <div className={styles.checkboxGroup}>
-          {normalized.length === 0 ? (
-            <div className={styles.placeholder}>Дані скоро з'являться</div>
-          ) : (
-            normalized.map((opt) => {
-              const inputId = `management-${opt.key.toLowerCase().replace(/\s+/g, '-')}`;
-              return (
-                <label key={opt.key} htmlFor={inputId} className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    id={inputId}
-                    checked={value.includes(opt.key)}
-                    onChange={() => toggle(opt.key)}
-                    className={styles.checkboxInput}
-                  />
-                  <span className={styles.checkboxText}>{opt.label}</span>
-                </label>
-              );
-            })
-          )}
+          {normalized.map((opt) => {
+            const inputId = `management-${opt.key.toLowerCase().replace(/\s+/g, '-')}`;
+            return (
+              <label key={opt.key} htmlFor={inputId} className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  id={inputId}
+                  checked={value.includes(opt.key)}
+                  onChange={() => toggle(opt.key)}
+                  className={styles.checkboxInput}
+                />
+                <span className={styles.checkboxText}>{opt.label}</span>
+              </label>
+            );
+          })}
         </div>
       )}
     </div>

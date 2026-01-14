@@ -9,7 +9,6 @@ import {
   InstagramIcon,
 } from "@/components/Icons/Icons";
 import { useCourseQuery } from "@/components/hooks/useWpQueries";
-import CourseInstructorSkeleton from "./CourseInstructorSkeleton";
 
 interface CourseInstructorProps {
   courseId?: string | number;
@@ -22,61 +21,58 @@ const CourseInstructor: React.FC<CourseInstructorProps> = ({
   const [activeCoachIndex, setActiveCoachIndex] = React.useState(0);
 
   if (isLoading) {
-    return <CourseInstructorSkeleton />;
+    return null;
   }
 
+  // Якщо немає курсу, помилка або немає інструктора - не показуємо секцію
   if (error || !course || !course.course_data?.Course_coach) {
-    return (
-      <section className={styles.instructor}>
-        <div className={styles.container}>
-          <div className={styles.error}>
-            Помилка завантаження інформації про інструктора
-          </div>
-        </div>
-      </section>
-    );
+    return null;
   }
 
   // Підтримка як одного об'єкта, так і масиву інструкторів
   const coachData = course.course_data?.Course_coach;
+  
+  // Якщо немає даних інструктора - не показуємо секцію
+  if (!coachData) {
+    return null;
+  }
+  
   const coaches = Array.isArray(coachData) ? coachData : [coachData];
 
   // Відображаємо активного інструктора (можна перемикати якщо їх кілька)
   const coach = coaches[activeCoachIndex] || coaches[0];
+  
+  // Якщо немає базових даних інструктора (title) - не показуємо секцію
+  if (!coach || !coach.title) {
+    return null;
+  }
 
   // Парсимо спеціалізацію з JSON string (з безпечною обробкою)
   const getSpecializations = () => {
     if (!coach.point_specialization) {
-      return [
-        "Спеціаліст",
-        "Супервізор",
-        "Персональний тренер",
-        "Майстер спорту",
-      ];
+      return [];
     }
 
     // Якщо це вже масив, повертаємо як є
     if (Array.isArray(coach.point_specialization)) {
-      return coach.point_specialization;
+      return coach.point_specialization.filter((spec: string) => spec && spec.trim());
     }
 
     // Якщо це рядок, намагаємося розпарсити JSON
     if (typeof coach.point_specialization === "string") {
       try {
         const parsed = JSON.parse(coach.point_specialization);
-        return Array.isArray(parsed) ? parsed : [coach.point_specialization];
+        if (Array.isArray(parsed)) {
+          return parsed.filter((spec: string) => spec && spec.trim());
+        }
+        return parsed && parsed.trim() ? [parsed.trim()] : [];
       } catch {
         // Якщо не JSON, повертаємо як масив з одного елемента
-        return [coach.point_specialization];
+        return coach.point_specialization.trim() ? [coach.point_specialization.trim()] : [];
       }
     }
 
-    return [
-      "Спеціаліст",
-      "Супервізор",
-      "Персональний тренер",
-      "Майстер спорту",
-    ];
+    return [];
   };
 
   const specializations = getSpecializations();
@@ -95,12 +91,12 @@ const CourseInstructor: React.FC<CourseInstructorProps> = ({
 
     // Потім перевіряємо поле img_link_avatar
     if (!coach.img_link_avatar) {
-      return "/images/instructor-course1.png";
+      return null;
     }
 
     // Якщо це вже масив, беремо перший елемент
     if (Array.isArray(coach.img_link_avatar)) {
-      return coach.img_link_avatar[0] || "/images/instructor-course1.png";
+      return coach.img_link_avatar[0] || null;
     }
 
     // Якщо це рядок, намагаємося розпарсити JSON
@@ -125,7 +121,7 @@ const CourseInstructor: React.FC<CourseInstructorProps> = ({
       }
     }
 
-    // return "/images/instructor-course1.png";
+    return null;
   };
 
   const avatarUrl = getAvatarUrl();
@@ -139,62 +135,73 @@ const CourseInstructor: React.FC<CourseInstructorProps> = ({
             <div className={styles.titleTextBlock}>
               <div className={styles.titleBlock}>
                 <h2 className={styles.title}>{coach.title}</h2>
-                <p className={styles.description}>
-                  {coach.textarea_description ||
-                    "Досвідчений тренер з багаторічним стажем роботи. Спеціалізується на функціональному тренуванні та реабілітації."}
-                </p>
+                {coach.textarea_description && (
+                  <p className={styles.description}>
+                    {coach.textarea_description}
+                  </p>
+                )}
               </div>
 
-              <div className={styles.tagsBlock}>
-                <p className={styles.tagsBlockTitle}>Спеціалізація:</p>
+              {specializations.length > 0 && (
+                <div className={styles.tagsBlock}>
+                  <p className={styles.tagsBlockTitle}>Спеціалізація:</p>
 
-                <div className={styles.tags}>
-                  {specializations.map((spec: string, index: number) => (
-                    <span key={index} className={styles.tag}>
-                      {spec}
-                    </span>
-                  ))}
+                  <div className={styles.tags}>
+                    {specializations.map((spec: string, index: number) => (
+                      <span key={index} className={styles.tag}>
+                        {spec}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
-            <div className={styles.stats}>
-              <div className={styles.statCard}>
-                <div className={styles.statIcon}>
-                  <HeartbeatIcon />
-                </div>
-                <div className={styles.statContent}>
-                  <span className={styles.statNumber}>
-                    {coach.input_text_experience || "12 років"}
-                  </span>
-                  <span className={styles.statLabel}>Практичного досвіду</span>
-                </div>
+            {(coach.input_text_experience || coach.input_text_count_training || coach.input_text_history) && (
+              <div className={styles.stats}>
+                {coach.input_text_experience && (
+                  <div className={styles.statCard}>
+                    <div className={styles.statIcon}>
+                      <HeartbeatIcon />
+                    </div>
+                    <div className={styles.statContent}>
+                      <span className={styles.statNumber}>
+                        {coach.input_text_experience}
+                      </span>
+                      <span className={styles.statLabel}>Практичного досвіду</span>
+                    </div>
+                  </div>
+                )}
+                {coach.input_text_count_training && (
+                  <div className={styles.statCard}>
+                    <div className={styles.statIcon}>
+                      <DumbbellsIcon />
+                    </div>
+                    <div className={styles.statContent}>
+                      <span className={styles.statNumber}>
+                        {coach.input_text_count_training}
+                      </span>
+                      <span className={styles.statLabel}>Проведено тренувань</span>
+                    </div>
+                  </div>
+                )}
+                {coach.input_text_history && (
+                  <div className={styles.statCard}>
+                    <div className={styles.statIcon}>
+                      <SpineIcon />
+                    </div>
+                    <div className={styles.statContent}>
+                      <span className={styles.statNumber}>
+                        {coach.input_text_history}
+                      </span>
+                      <span className={styles.statLabel}>
+                        Історій трансформацій
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className={styles.statCard}>
-                <div className={styles.statIcon}>
-                  <DumbbellsIcon />
-                </div>
-                <div className={styles.statContent}>
-                  <span className={styles.statNumber}>
-                    {coach.input_text_count_training || "100+"}
-                  </span>
-                  <span className={styles.statLabel}>Проведено тренувань</span>
-                </div>
-              </div>
-              <div className={styles.statCard}>
-                <div className={styles.statIcon}>
-                  <SpineIcon />
-                </div>
-                <div className={styles.statContent}>
-                  <span className={styles.statNumber}>
-                    {coach.input_text_history || "70+"}
-                  </span>
-                  <span className={styles.statLabel}>
-                    Історій трансформацій
-                  </span>
-                </div>
-              </div>
-            </div>
+            )}
 
             {coaches.length > 1 && (
               <div className={styles.sliderSection}>
@@ -219,15 +226,17 @@ const CourseInstructor: React.FC<CourseInstructorProps> = ({
 
           <div className={styles.rightColumn}>
             <div className={styles.imageContainer}>
-              <img
-                src={avatarUrl}
-                alt={`${coach.title} - інструктор BFB`}
-                className={styles.instructorImage}
-                style={{ width: "100%", height: "auto", maxHeight: "none" }}
-              />
+              {avatarUrl && (
+                <img
+                  src={avatarUrl}
+                  alt={`${coach.title} - інструктор BFB`}
+                  className={styles.instructorImage}
+                  style={{ width: "100%", height: "auto", maxHeight: "none" }}
+                />
+              )}
 
               {/* Instagram картка поверх фото */}
-              {coach.input_text_link_instagram &&
+              {avatarUrl && coach.input_text_link_instagram &&
                 coach.input_text_text_instagram && (
                   <div className={styles.instagramSection}>
                     <div className={styles.instagramCard}>

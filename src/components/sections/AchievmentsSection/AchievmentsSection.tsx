@@ -6,7 +6,7 @@ import Image from "next/image";
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { A11y } from "swiper/modules";
-import type { Swiper as SwiperClass } from "swiper/types";
+import type { Swiper as SwiperClass } from "swiper";
 import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
 import "swiper/css";
 import "swiper/css/pagination";
@@ -175,8 +175,8 @@ export default function AchievmentsSection() {
                 speed={350}
                 grabCursor={true}
                 className={s.mobileSlider}
-                onSwiper={(inst) => setSwiper(inst)}
-                onSlideChange={(inst) => setActiveIndex(inst.activeIndex || 0)}
+                onSwiper={(inst: SwiperClass) => setSwiper(inst)}
+                onSlideChange={(inst: SwiperClass) => setActiveIndex(inst.activeIndex || 0)}
               >
                 {slidesMobile.map((el, idx) => (
                   <SwiperSlide key={idx}>{el}</SwiperSlide>

@@ -18,28 +18,32 @@ export default function CartModal() {
   const itemsMap = useCartStore((st) => st.items);
   const items = useMemo(() => Object.values(itemsMap), [itemsMap]);
   const isLoggedIn = useAuthStore((st) => st.isLoggedIn);
-  
-  // Обчислюємо total з урахуванням знижки для авторизованих
+
   const total = useMemo(() => {
     return items.reduce((acc, it) => {
       const { finalPrice } = calculatePrice({
         price: it.price,
+        regularPrice: it.regularPrice,
+        salePrice: it.salePrice,
         originalPrice: it.originalPrice,
         isLoggedIn,
       });
       return acc + finalPrice * it.quantity;
     }, 0);
   }, [items, isLoggedIn]);
-  
-  // Обчислюємо знижку (різниця між originalPrice та finalPrice)
+
   const discount = useMemo(() => {
     return items.reduce((acc, it) => {
       const { finalPrice, originalPrice, shouldShowOldPrice } = calculatePrice({
         price: it.price,
+        regularPrice: it.regularPrice,
+        salePrice: it.salePrice,
         originalPrice: it.originalPrice,
         isLoggedIn,
       });
-      const diff = shouldShowOldPrice ? (originalPrice - finalPrice) * it.quantity : 0;
+      const diff = shouldShowOldPrice
+        ? (originalPrice - finalPrice) * it.quantity
+        : 0;
       return acc + diff;
     }, 0);
   }, [items, isLoggedIn]);
@@ -88,16 +92,12 @@ export default function CartModal() {
   };
 
   const itemsContent = (() => {
-    if (items.length === 0) {
-      return <div className={s.empty}>Кошик порожній</div>;
-    }
-
     if (isMobile) {
       // На мобілці використовуємо скрол замість слайдера
       return (
         <div className={s.mobileItemsScroll}>
           <CartItemsList items={items} />
-            </div>
+        </div>
       );
     }
 

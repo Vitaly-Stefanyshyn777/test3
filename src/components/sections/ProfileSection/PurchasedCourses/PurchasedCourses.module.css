@@ -62,42 +62,35 @@
   max-height: 165px;
 }
 
-.courseCard:hover {
-  border-color: #8b5cf6;
-  background-color: #f0f9ff;
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.1);
-}
-
 .courseImageOverlay {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
 }
 
 .courseImageContainer {
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
   width: auto;
   height: auto;
   border-radius: 8px;
-  gap: 37px;
+  gap: 32px;
   overflow: hidden;
   flex-shrink: 0;
 }
 
 .courseImage {
-  position: relative;
-  width: 80px;
-  height: 60px;
-  border-radius: 8px;
-  overflow: hidden;
-  flex-shrink: 0;
+  border-radius: 18px;
+  width: 220px;
+  height: 101px;
 }
 
 .image {
+  /* width: 100%;
+  height: 100%; */
   object-fit: cover;
+  /* border-radius: 18px; */
 }
 
 .courseInfo {
@@ -136,6 +129,7 @@
   font-weight: 600;
   font-size: 24px;
   line-height: 120%;
+  letter-spacing: -0.02em;
   color: var(--black);
 }
 
@@ -144,16 +138,18 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 140%;
-
+  letter-spacing: -0.01em;
+  text-align: left;
   color: var(--black);
+
   opacity: 0.16;
 }
 
 .courseActions {
   display: flex;
   align-items: center;
-  gap: 24px;
   flex-shrink: 0;
+  gap: 24px;
 }
 
 .coursePrice {
@@ -161,13 +157,14 @@
   font-weight: 600;
   font-size: 32px;
   line-height: 120%;
+  letter-spacing: -0.02em;
   color: var(--black);
 }
 
 .watchButton {
   border-radius: 16px;
   background-color: var(--violet);
-  color: #ffffff;
+
   border: none;
   padding: 12px 24px;
   font-size: 14px;
@@ -179,12 +176,13 @@
   font-weight: 800;
   font-size: 16px;
   line-height: 135%;
-  color: #f9f9f9;
   height: 66px;
+
+  color: var(--bg-color);
 }
 
 .watchButton:hover {
-  background-color: #7c3aed;
+  background-color: var(--black);
   /* transform: translateY(-1px); */
 }
 
@@ -213,6 +211,88 @@
   color: #6b7280;
 }
 
+/* Skeleton loading styles - Desktop */
+.skeletonCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--white);
+  border-radius: 24px;
+  padding: 32px;
+  max-height: 165px;
+  animation: skeletonPulse 1.5s ease-in-out infinite alternate;
+}
+
+.skeletonImageContainer {
+  width: 220px;
+  height: 101px;
+  border-radius: 18px;
+  background: #f0f0f0;
+  flex-shrink: 0;
+  animation: skeletonPulse 1.5s ease-in-out infinite alternate;
+}
+
+.skeletonInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeletonType {
+  width: 120px;
+  height: 32px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  animation: skeletonPulse 1.5s ease-in-out infinite alternate;
+}
+
+.skeletonTitle {
+  width: 70%;
+  height: 24px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  animation: skeletonPulse 1.5s ease-in-out infinite alternate;
+}
+
+.skeletonDescription {
+  width: 50%;
+  height: 16px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  animation: skeletonPulse 1.5s ease-in-out infinite alternate;
+}
+
+.skeletonActions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.skeletonPrice {
+  width: 100px;
+  height: 32px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  animation: skeletonPulse 1.5s ease-in-out infinite alternate;
+}
+
+.skeletonButtonContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.skeletonButton {
+  width: 120px;
+  height: 40px;
+  background: #f0f0f0;
+  border-radius: 16px;
+  animation: skeletonPulse 1.5s ease-in-out infinite alternate;
+}
+
 @media (max-width: 1000px) {
   .purchasedCourses {
     border-radius: mvw(12);
@@ -237,16 +317,19 @@
   }
 
   .courseCard {
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
     gap: mvw(12);
     padding: mvw(16);
     border-radius: mvw(16);
     max-height: none;
+    background: var(--white);
+
+    align-items: center;
   }
 
   .courseImageOverlay {
-    gap: mvw(12);
+    gap: mvw(8);
     width: 100%;
   }
 
@@ -258,6 +341,7 @@
     width: mvw(80);
     height: mvw(60);
     border-radius: mvw(8);
+    display: none;
   }
 
   .courseInfo {
@@ -266,7 +350,7 @@
   }
 
   .courseType {
-    padding: mvw(6) mvw(10);
+    padding: mvw(0);
     border-radius: mvw(8);
     gap: mvw(8);
   }
@@ -281,8 +365,8 @@
   }
 
   .courseTitle {
-    font-size: mvw(18);
-    line-height: 120%;
+    font-weight: 600;
+    font-size: mvw(14);
   }
 
   .courseDescription {
@@ -291,29 +375,142 @@
   }
 
   .courseActions {
-    width: 100%;
+    flex-shrink: unset;
+    width: auto;
     justify-content: space-between;
-    align-items: center;
-    gap: mvw(16);
+    gap: mvw(11);
+    flex-direction: column;
   }
 
   .coursePrice {
-    font-size: mvw(24);
+    font-family: var(--second-family);
+    font-weight: 600;
+    font-size: mvw(16);
     line-height: 120%;
+    letter-spacing: -0.02em;
+    color: var(--black);
   }
 
   .watchButton {
-    padding: mvw(12) mvw(20);
-    border-radius: mvw(12);
+    font-family: var(--third-family);
+    font-weight: 700;
     font-size: mvw(14);
-    height: mvw(48);
-    white-space: nowrap;
+    line-height: 100%;
+    color: var(--violet);
+    background: none;
+    padding: 0;
   }
 
-  .loading,
-  .error,
-  .empty {
-    padding: mvw(30);
-    font-size: mvw(14);
+  .watchButtonContainer {
+    display: flex;
+    flex-direction: column;
+    gap: mvw(4);
+    align-items: flex-start;
+  }
+
+  .watchButtonLine {
+    width: 100%;
+    height: mvw(1);
+    background: var(--violet);
+  }
+
+  /* Skeleton loading styles */
+  .skeletonCard {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: mvw(12);
+    padding: mvw(16);
+    border-radius: mvw(16);
+    background: var(--white);
+    min-height: mvw(98);
+    align-items: center;
+    animation: skeletonPulse 1.5s ease-in-out infinite alternate;
+  }
+
+  .skeletonImageContainer {
+    width: mvw(80);
+    height: mvw(60);
+    min-width: 80px;
+    min-height: 60px;
+    border-radius: mvw(8);
+    background: #f0f0f0;
+    display: none;
+    animation: skeletonPulse 1.5s ease-in-out infinite alternate;
+  }
+
+  .skeletonInfo {
+    gap: mvw(8);
+    width: 100%;
+  }
+
+  .skeletonType {
+    width: mvw(80);
+    height: mvw(24);
+    min-width: 80px;
+    min-height: 24px;
+    background: #f0f0f0;
+    border-radius: mvw(8);
+    animation: skeletonPulse 1.5s ease-in-out infinite alternate;
+  }
+
+  .skeletonTitle {
+    width: 70%;
+    height: mvw(18);
+    min-height: 18px;
+    background: #f0f0f0;
+    border-radius: mvw(4);
+    animation: skeletonPulse 1.5s ease-in-out infinite alternate;
+  }
+
+  .skeletonDescription {
+    width: 50%;
+    height: mvw(14);
+    min-height: 14px;
+    background: #f0f0f0;
+    border-radius: mvw(4);
+    animation: skeletonPulse 1.5s ease-in-out infinite alternate;
+  }
+
+  .skeletonActions {
+    gap: mvw(11);
+    flex-direction: column;
+    display: flex;
+  }
+
+  .skeletonPrice {
+    width: mvw(60);
+    height: mvw(16);
+    min-width: 60px;
+    min-height: 16px;
+    background: #f0f0f0;
+    border-radius: mvw(4);
+    animation: skeletonPulse 1.5s ease-in-out infinite alternate;
+  }
+
+  .skeletonButtonContainer {
+    gap: mvw(4);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .skeletonButton {
+    width: mvw(80);
+    height: mvw(20);
+    min-width: 80px;
+    min-height: 20px;
+    background: #f0f0f0;
+    border-radius: mvw(8);
+    animation: skeletonPulse 1.5s ease-in-out infinite alternate;
+  }
+}
+
+/* Skeleton pulse animation */
+@keyframes skeletonPulse {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
   }
 }

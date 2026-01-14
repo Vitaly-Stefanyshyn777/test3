@@ -6,6 +6,7 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { Сheck2Icon, СheckIcon } from "@/components/Icons/Icons";
 import { fetchTariffs, Tariff } from "@/lib/bfbApi";
+import { formatPrice } from "@/lib/priceUtils";
 
 export default function PlansGrid() {
   const [tariffs, setTariffs] = useState<Tariff[]>([]);
@@ -29,15 +30,32 @@ export default function PlansGrid() {
   if (isLoading) {
     return (
       <div className={styles.availablePlans}>
-        <Skeleton width={200} height={28} style={{ marginBottom: "24px" }} className={styles.sectionTitle} />
+        <Skeleton
+          width={200}
+          height={28}
+          style={{ marginBottom: "24px" }}
+          className={styles.sectionTitle}
+        />
         <div className={styles.plansGridContainer}>
           <div className={styles.plansContainer}>
             <div className={styles.plansGrid}>
               {[...Array(2)].map((_, i) => (
                 <div key={i} className={styles.planCard}>
                   <div className={styles.planPrice}>
-                    <Skeleton width={150} height={24} style={{ marginBottom: "12px" }} />
-                    <div className={styles.planPriceBlock} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                    <Skeleton
+                      width={150}
+                      height={24}
+                      style={{ marginBottom: "12px" }}
+                    />
+                    <div
+                      className={styles.planPriceBlock}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        marginBottom: "8px",
+                      }}
+                    >
                       <Skeleton width={120} height={28} />
                       <Skeleton width={50} height={20} />
                     </div>
@@ -45,13 +63,30 @@ export default function PlansGrid() {
                   </div>
                   <div className={styles.planFeatures}>
                     {[...Array(3)].map((_, j) => (
-                      <div key={j} className={styles.feature} style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                      <div
+                        key={j}
+                        className={styles.feature}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          marginBottom: "12px",
+                        }}
+                      >
                         <Skeleton circle width={20} height={20} />
-                        <Skeleton width={200 + Math.random() * 50} height={16} />
+                        <Skeleton
+                          width={200 + Math.random() * 50}
+                          height={16}
+                        />
                       </div>
                     ))}
                   </div>
-                  <Skeleton width="100%" height={48} borderRadius={8} style={{ marginTop: "16px" }} />
+                  <Skeleton
+                    width="100%"
+                    height={48}
+                    borderRadius={8}
+                    style={{ marginTop: "16px" }}
+                  />
                 </div>
               ))}
             </div>
@@ -103,11 +138,13 @@ export default function PlansGrid() {
                         {tariff.title.rendered}
                       </h3>
                       <div className={styles.planPriceBlock}>
-                        <p className={styles.price}>{tariff.Price}$/місяць</p>
+                        <p className={styles.price}>
+                          {formatPrice(tariff.Price)}/місяць
+                        </p>
                         <p className={styles.discount}>-30%</p>
                       </div>
                       <span className={styles.period}>
-                        {tariff.Time} місяців - {totalPrice} $
+                        {tariff.Time} місяців - {formatPrice(totalPrice)}
                       </span>
                     </div>
                     <div className={styles.planFeatures}>
@@ -141,11 +178,13 @@ export default function PlansGrid() {
                   <div className={styles.planPrice}>
                     <h3 className={styles.planName}>{tariff.title.rendered}</h3>
                     <div className={styles.planPriceBlock}>
-                      <p className={styles.price}>{tariff.Price}$/місяць</p>
+                      <p className={styles.price}>
+                        {formatPrice(tariff.Price)}/місяць
+                      </p>
                       <p className={styles.discount}>-30%</p>
                     </div>
                     <span className={styles.period}>
-                      {tariff.Time} місяців - {totalPrice} $
+                      {tariff.Time} місяців - {formatPrice(totalPrice)}
                     </span>
                   </div>
                   <div className={styles.planFeatures}>

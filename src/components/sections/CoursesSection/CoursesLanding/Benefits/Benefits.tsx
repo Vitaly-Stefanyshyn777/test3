@@ -72,10 +72,10 @@ const Benefits: React.FC = () => {
                 className={s.mobileSlider}
                 slidesPerView="auto"
                 spaceBetween={12}
-                onSwiper={(swiper) => {
+                onSwiper={(swiper: SwiperType) => {
                   mobileSwiperRef.current = swiper;
                 }}
-                onSlideChange={(swiper) => {
+                onSlideChange={(swiper: SwiperType) => {
                   setActiveMobile(swiper.activeIndex);
                 }}
               >

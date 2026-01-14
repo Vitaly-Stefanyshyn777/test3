@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import styles from "./OurCoursesInfo.module.css";
 import {
   AcademicCapIcon,
@@ -35,11 +34,9 @@ const OurCoursesInfo = () => {
     <div className={styles.infoBlock}>
       <div className={styles.textContent}>
         <div className={styles.badgeBlock}>
-          <div className={styles.badge}>Курс BFB</div>
+          <div className={styles.badge}>Курс</div>
           <h2 className={styles.title}>
-            Інструктор групових
-            <br />
-            програм 4.0
+            Інструктор групових програм від А до Я
           </h2>
         </div>
 
@@ -48,9 +45,14 @@ const OurCoursesInfo = () => {
           методикою BFB. Системне навчання, сертифікація, інвентар і підтримка
           після курсу – усе, щоб почати новий напрям без зайвих кроків.
         </p>
-        <Link href="/courses-landing" className={styles.detailsBtn}>
+        <a
+          href="https://t.me/+UK6OTs2kHIsxZWFi"
+          className={styles.detailsBtn}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           Детальніше
-        </Link>
+        </a>
       </div>
       <div className={styles.imageContentTwo}>
         <Image
@@ -78,7 +80,9 @@ const OurCoursesInfo = () => {
     <div className={styles.infoBlock}>
       <div className={styles.imageContent}>
         <Image
-          src={isMobile ? "/images/Frame13213181269.png" : "/Frame-13213181265.png"}
+          src={
+            isMobile ? "/images/Frame13213181269.png" : "/Frame-13213181265.png"
+          }
           alt="Як проходить навчання"
           width={500}
           height={600}
@@ -97,7 +101,7 @@ const OurCoursesInfo = () => {
       </div>
       <div className={styles.textContent}>
         <div className={styles.badgeBlock}>
-          <div className={styles.badge}>Курс BFB</div>
+          <div className={styles.badge}>Курс</div>
           <h2 className={styles.title}>Як проходить навчання</h2>
         </div>
 
@@ -155,10 +159,10 @@ const OurCoursesInfo = () => {
                 className={styles.mobileSlider}
                 slidesPerView={1}
                 spaceBetween={16}
-                onSwiper={(swiper) => {
+                onSwiper={(swiper: SwiperType) => {
                   mobileSwiperRef.current = swiper;
                 }}
-                onSlideChange={(swiper) => {
+                onSlideChange={(swiper: SwiperType) => {
                   setActiveMobile(swiper.activeIndex);
                 }}
               >

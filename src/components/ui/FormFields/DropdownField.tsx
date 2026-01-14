@@ -78,7 +78,7 @@ const DropdownField: React.FC<DropdownFieldProps> = ({
   }, [isOpen, onOpenChange]);
 
   const currentLabel =
-    options.find((o) => o.value === value)?.label || placeholder || label;
+    options.find((o) => o.value === value)?.label || value || placeholder || label;
   const selectedOption = options.find((o) => o.value === value);
 
   return (

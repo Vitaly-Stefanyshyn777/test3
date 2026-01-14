@@ -18,7 +18,17 @@ export const CountryFilter = ({ value, onChange }: CountryFilterProps) => {
 
   // Статичні країни як fallback
   const fallbackCountries = useMemo(
-    () => ["Україна", "Польща", "Німеччина", "Чехія", "Словаччина"],
+    () => [
+      "Україна",
+      "Польща",
+      "Німеччина",
+      "Франція",
+      "Італія",
+      "Іспанія",
+      "Великобританія",
+      "США",
+      "Канада",
+    ],
     []
   );
 
@@ -33,7 +43,11 @@ export const CountryFilter = ({ value, onChange }: CountryFilterProps) => {
       const uniqueCountries = [
         ...new Set(
           trainers
-            .map((trainer) => trainer.acf?.location_country)
+            .map(
+              (trainer) =>
+                (trainer as any).acf?.country ||
+                (trainer as any).acf?.location_country
+            )
             .filter((country) => country && country.trim() !== "")
         ),
       ] as string[];
@@ -81,7 +95,10 @@ export const CountryFilter = ({ value, onChange }: CountryFilterProps) => {
         {loading ? (
           <div className={styles.radioGroup}>
             {[...Array(5)].map((_, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <div
+                key={i}
+                style={{ display: "flex", alignItems: "center", gap: "12px" }}
+              >
                 <Skeleton width={20} height={20} borderRadius={10} />
                 <Skeleton width={120} height={16} />
               </div>

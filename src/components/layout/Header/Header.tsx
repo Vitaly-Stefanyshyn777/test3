@@ -17,21 +17,24 @@ import {
   NumberHeader,
   TelegramIcon,
   UserHeader,
+  UserHeaderWhite,
   WhatsappIcon,
 } from "../../Icons/Icons";
 import RegisterModal from "@/components/auth/RegisterModal/RegisterModal";
 import LoginModal from "@/components/auth/LoginModal/LoginModal";
+import ResetPasswordModal from "@/components/auth/ResetPasswordModal/ResetPasswordModal";
 import { useCartStore } from "@/store/cart";
 import { useFavoriteStore } from "@/store/favorites";
 import CartModal from "../../CartModal/CartModal";
 import FavoritesModal from "../../FavoritesModal/FavoritesModal";
 import { mainNavigation, burgerMenuNavigation } from "@/lib/navigation";
-import { useThemeSettingsQuery } from "@/components/hooks/useWpQueries";
+import { useThemeSettings } from "@/components/providers/ThemeSettingsProvider";
 import { getContactData } from "@/lib/themeSettingsUtils";
 
 export default function Header() {
   const [headerClass, setHeaderClass] = useState("");
   const pathname = usePathname();
+  const [is404Page, setIs404Page] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -39,6 +42,8 @@ export default function Header() {
   const [isEventsModalOpen, setIsEventsModalOpen] = useState(false);
   const [isTrenersModalOpen, setIsTrenersModalOpen] = useState(false);
   const [isUserHovered, setIsUserHovered] = useState(false);
+  const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
+
   const { isLoggedIn } = useAuthStore();
   const isHydrated = useAuthStore((s) => s.isHydrated);
   const isLoginModalOpen = useAuthStore((s) => s.isLoginModalOpen);
@@ -70,7 +75,7 @@ export default function Header() {
   const favoriteCount = useMemo(() => favoriteItems.length, [favoriteItems]);
 
   // Отримуємо контактні дані з theme_settings
-  const { data: themeSettings } = useThemeSettingsQuery();
+  const { themeSettings } = useThemeSettings();
   const contactData = useMemo(
     () => getContactData(themeSettings),
     [themeSettings]
@@ -82,16 +87,20 @@ export default function Header() {
     if (pathname === "/courses") return s.headerTrainerProfile;
     if (pathname.startsWith("/courses/")) return s.headerTrainerProfile;
     if (pathname === "/courses-landing") return s.headerTrainerProfile;
+    if (pathname === "/oferta") return s.headerTrainerProfile;
+    if (pathname === "/privacy-policy") return s.headerTrainerProfile;
     if (pathname === "/photo-session") return s.headerTrainerProfile;
     if (pathname === "/about-bfb") return s.headerTrainerProfile;
     if (pathname === "/course") return s.headerTrainerProfile;
     if (pathname.startsWith("/profile")) return s.headerTrainerProfile;
     if (pathname === "/shop") return s.headerTrainerProfile;
     if (pathname === "/instructing") return s.headerTrainerProfile;
+    // Для 404 сторінки використовуємо headerTrainerProfile стиль (як на courses)
+    if (is404Page) return s.headerTrainerProfile;
     // Treat both catalog and product detail routes as profile header style (фіолетовий)
     if (pathname.startsWith("/products")) return s.headerTrainerProfile;
     return "";
-  }, [pathname]);
+  }, [pathname, is404Page]);
 
   // Визначаємо чи є світла тема (білий фон)
   const isLightTheme = useMemo(() => {
@@ -114,13 +123,14 @@ export default function Header() {
         window.requestAnimationFrame(() => {
           const baseClass = getHeaderColorByPath();
           const heroSection = document.querySelector("[data-hero-section]");
-
           if (heroSection) {
             const heroBottom = heroSection.getBoundingClientRect().bottom;
             // Застосовуємо клас коли hero секція ще в viewport, але нижче 300px від верху
             if (heroBottom < 200) {
               // Застосовуємо клас раніше, ще до виходу з hero секції
-              setHeaderClass(`${baseClass} ${s.headerScrolled}`);
+              setHeaderClass(
+                `${baseClass} ${s.headerScrolled} ${s.headerScrolledViolet}`
+              );
             } else {
               // Ще в хіро секції
               setHeaderClass(baseClass);
@@ -128,7 +138,9 @@ export default function Header() {
           } else {
             // Якщо хіро секції немає, використовуємо стару логіку
             if (window.scrollY > 100) {
-              setHeaderClass(`${baseClass} ${s.headerScrolled}`);
+              setHeaderClass(
+                `${baseClass} ${s.headerScrolled} ${s.headerScrolledViolet}`
+              );
             } else {
               setHeaderClass(baseClass);
             }
@@ -145,6 +157,28 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [pathname, getHeaderColorByPath]);
+
+  // Перевіряємо чи це 404 сторінка
+  useEffect(() => {
+    const checkFor404Page = () => {
+      if (
+        typeof window !== "undefined" &&
+        document.querySelector('[data-page="404"]')
+      ) {
+        setIs404Page(true);
+      } else {
+        setIs404Page(false);
+      }
+    };
+
+    // Перевіряємо одразу
+    checkFor404Page();
+
+    // Також перевіряємо через деякий час, бо елемент може з'явитися пізніше
+    const timeoutId = setTimeout(checkFor404Page, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   const handleUserIconClick = () => {
     if (isLoggedIn) {
@@ -304,7 +338,7 @@ export default function Header() {
                 }
                 suppressHydrationWarning
               >
-                <UserHeader />
+                <UserHeaderWhite />
               </button>
             </div>
 
@@ -351,6 +385,7 @@ export default function Header() {
                 <BasketHeader />
                 {cartCount > 0 && <span className={s.badge}>{cartCount}</span>}
               </button>
+
             </div>
           </>
         ) : (
@@ -408,7 +443,7 @@ export default function Header() {
 
             <div className={s.logo}>
               <Link href="/">
-                <div className={s.LogoIcon}>
+                <div className={s.LogoIcon} suppressHydrationWarning>
                   {isLightTheme || pathname.startsWith("/products") ? (
                     <Image
                       src="/Vector2.svg"
@@ -475,15 +510,9 @@ export default function Header() {
                     suppressHydrationWarning
                   >
                     {!isMobile && isUserHovered ? (
-                      <Image
-                        src="/images/fi_232123248.svg"
-                        alt="User hover icon"
-                        width={16}
-                        unoptimized
-                        height={16}
-                      />
-                    ) : (
                       <UserHeader />
+                    ) : (
+                      <UserHeaderWhite />
                     )}
                   </button>
                 </div>
@@ -497,6 +526,7 @@ export default function Header() {
                       Реєстрація
                     </button>
                   )}
+
                 </div>
               </div>
             </div>
@@ -513,6 +543,15 @@ export default function Header() {
         onClose={closeLoginModal}
         onSubmit={handleLoginSuccess}
         onOpenRegister={openRegisterModal}
+      />
+      <ResetPasswordModal
+        isOpen={isResetPasswordOpen}
+        onClose={() => setIsResetPasswordOpen(false)}
+        onOpenLogin={() => {
+          setIsResetPasswordOpen(false);
+          openLoginModal();
+        }}
+        initialStep="email"
       />
       <CartModal />
       <FavoritesModal />

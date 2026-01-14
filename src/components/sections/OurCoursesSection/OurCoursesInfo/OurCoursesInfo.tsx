@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import Link from "next/link";
 import styles from "./OurCoursesInfo.module.css";
 
 const OurCoursesInfo = () => {
@@ -11,11 +10,11 @@ const OurCoursesInfo = () => {
         <div className={styles.blocksContainer}>
           <div className={styles.infoBlock}>
             <div className={styles.textContent}>
-              <div className={styles.badge}>Курс BFB</div>
+              <div className={styles.badge}>Курс</div>
               <h2 className={styles.title}>
                 Інструктор групових
                 <br />
-                програм 4.0
+                програм від А до Я
               </h2>
               <p className={styles.description}>
                 Авторська навчальна програма для тренерів, які хочуть працювати
@@ -23,12 +22,14 @@ const OurCoursesInfo = () => {
                 підтримка після курсу – усе, щоб почати новий напрям без зайвих
                 кроків.
               </p>
-              <Link
-                href="/courses/instructor-4-0"
+              <a
+                href="https://t.me/+UK6OTs2kHIsxZWFi"
                 className={styles.detailsBtn}
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 Детальніше
-              </Link>
+              </a>
             </div>
             <div className={styles.imageContent}>
               <Image
@@ -59,7 +60,7 @@ const OurCoursesInfo = () => {
               </div>
             </div>
             <div className={styles.textContent}>
-              <div className={styles.badge}>Курс BFB</div>
+              <div className={styles.badge}>Курс</div>
               <h2 className={styles.title}>Як проходить навчання</h2>
 
               <div className={styles.features}>

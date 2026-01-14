@@ -85,8 +85,8 @@ const CourseProcess: React.FC = () => {
           <div className={s.mobileSliderWrap}>
             <Swiper
               modules={[Navigation, Pagination, A11y]}
-              onSwiper={(sw) => (swiperRef.current = sw)}
-              onSlideChange={(sw) => setActiveIndex(sw.activeIndex)}
+              onSwiper={(sw: SwiperType) => (swiperRef.current = sw)}
+              onSlideChange={(sw: SwiperType) => setActiveIndex(sw.activeIndex)}
               spaceBetween={16}
               slidesPerView="auto"
               centeredSlides={false}

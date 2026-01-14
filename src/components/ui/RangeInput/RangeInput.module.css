@@ -67,26 +67,26 @@
 .slider__leftValue {
   border-radius: 8px;
   padding: 22px 24px;
-  width: 118px;
-  height: 64px;
-  background: var(--bg-color);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  border-radius: 8px;
-  padding: 22px 24px;
-}
-
-.slider__rightValue {
-  border-radius: 8px;
-  padding: 22px 24px;
   width: auto;
   height: 64px;
   background: var(--bg-color);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 7px;
+
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.slider__rightValue {
+  border-radius: 8px;
+  padding: 20px;
+  width: auto;
+  height: 64px;
+  background: var(--bg-color);
+  display: flex;
+  align-items: center;
+  gap: 7px;
 }
 
 .fromLabel {
@@ -98,7 +98,7 @@
 }
 
 .lineBetween {
-  width: 75px;
+  width: 20%;
   height: 2px;
   background: #e1e1e1;
   align-self: center;
@@ -198,11 +198,11 @@
 }
 
 .thumb--left {
-  z-index: 5;
+  z-index: 6;
 }
 
 .thumb--right {
-  z-index: 4;
+  z-index: 5;
 }
 
 /* For Chrome browsers */
@@ -324,5 +324,9 @@
     z-index: 2;
     pointer-events: none;
     height: mvw(3);
+  }
+  .filterSection.collapsedSection {
+    gap: 0;
+    padding: mvw(0);
   }
 }

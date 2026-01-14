@@ -1,7 +1,8 @@
 "use client";
-import React from "react";
+import React, { useMemo, useRef } from "react";
 import { FormData } from "./types";
 import { useWcPaymentGatewaysQuery } from "@/components/hooks/useWpQueries";
+import { useCartStore } from "@/store/cart";
 import s from "./CheckoutSection.module.css";
 
 interface PaymentFormProps {
@@ -15,27 +16,67 @@ export default function PaymentForm({
 }: PaymentFormProps) {
   const { data: paymentGateways = [], isLoading } = useWcPaymentGatewaysQuery();
 
-  // Мапінг платіжних методів для відображення (ID → DisplayName)
+  const itemsMap = useCartStore((st) => st.items);
+  const items = useMemo(() => Object.values(itemsMap), [itemsMap]);
+
+  const hasSetWayForPay = useRef(false);
+
+  const hasCourses = useMemo(() => {
+    return items.some((item) => {
+      if (item.id.startsWith("course-")) {
+        return true;
+      }
+      const itemName = item.name?.toLowerCase() || "";
+      const isCourseByName =
+        itemName.includes("курс") ||
+        itemName.includes("workshop") ||
+        itemName.includes("тренування") ||
+        itemName.includes("менеджмент") ||
+        itemName.includes("афірмації");
+      return (
+        isCourseByName &&
+        !item.variationId &&
+        !item.color &&
+        !item.size &&
+        item.stockQuantity === null
+      );
+    });
+  }, [items]);
+
   const paymentMethodMap: Record<string, string> = {
     cod: "Накладений платіж",
     wayforpay: "Онлайн-оплата WayForPay",
     bacs: "Оплата при отриманні",
   };
 
-  // Фільтруємо тільки активні платіжні методи
-  // Тип для платіжного шлюзу з мінімально потрібними полями
   type Gateway = { id: string; title: string; enabled: boolean };
 
-  const activePaymentGateways = (paymentGateways as Gateway[]).filter(
-    (gateway) => gateway.enabled
-  );
+  const activePaymentGateways = useMemo(() => {
+    const allGateways = (paymentGateways as Gateway[]).filter(
+      (gateway) => gateway.enabled
+    );
 
-  // Логування тільки при зміні даних
-  React.useEffect(() => {
-    if (paymentGateways && paymentGateways.length > 0) {
-      // Payment gateways loaded
+    if (hasCourses) {
+      return allGateways.filter((gateway) => gateway.id === "wayforpay");
     }
-  }, [paymentGateways, activePaymentGateways]);
+
+    return allGateways;
+  }, [paymentGateways, hasCourses]);
+
+  React.useEffect(() => {
+    if (hasCourses) {
+      if (formData.paymentMethod !== "wayforpay" && !hasSetWayForPay.current) {
+        setFormData({
+          ...formData,
+          paymentMethod: "wayforpay",
+        });
+        hasSetWayForPay.current = true;
+      }
+    } else {
+      hasSetWayForPay.current = false;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasCourses]);
 
   return (
     <div className={s.paymentBlock}>
@@ -46,7 +87,6 @@ export default function PaymentForm({
         <div className={s.radioRow}>
           {activePaymentGateways.map((gateway) => {
             const displayName = paymentMethodMap[gateway.id] || gateway.title;
-            // Зберігаємо ID платіжного методу, а не displayName
             return (
               <div key={gateway.id} className={s.radioBlock}>
                 <label className={s.radio}>

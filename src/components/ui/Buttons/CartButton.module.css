@@ -31,21 +31,22 @@
   color: var(--black);
 }
 
-.active svg {
-  stroke: var(--black);
-}
-
 @media (max-width: 1000px) {
   .root {
     /* position: absolute; */
-    width: mvw(40);
-    height: mvw(40);
+    width: auto;
+    height: auto;
     border-radius: mvw(8);
     /* bottom: mvw(12);
     right: mvw(12); */
+    background: none;
   }
   .root svg {
     width: mvw(18);
     height: mvw(18);
+  }
+  .root:hover {
+    background: none;
+    color: var(--white);
   }
 }

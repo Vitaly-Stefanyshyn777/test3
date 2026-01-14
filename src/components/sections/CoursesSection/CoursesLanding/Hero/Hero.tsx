@@ -1,11 +1,30 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import s from "./Hero.module.css";
 import { TimeIcon } from "@/components/Icons/Icons";
-import Link from "next/link";
 
 const Hero: React.FC = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Визначення мобільної версії
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 768px)");
+    const update = () => setIsMobile(mql.matches);
+    update();
+    if (mql.addEventListener) mql.addEventListener("change", update);
+    else mql.addListener(update);
+    return () => {
+      if (mql.removeEventListener) mql.removeEventListener("change", update);
+      else mql.removeListener(update);
+    };
+  }, []);
+
+  // Функція для отримання правильного якоря
+  const getLearningFormatsAnchor = () => {
+    return isMobile ? "/#LearningMobileFormats" : "/#LearningFormats";
+  };
+
   return (
     <section className={s.infoSection}>
       <div className={s.container}>
@@ -41,15 +60,26 @@ const Hero: React.FC = () => {
               </p>
             </div>
             <div className={s.buttonsContainer}>
-              <Link href="/courses/instructor-4-0" className={s.detailsBtn}>
+              <a
+                href={getLearningFormatsAnchor()}
+                className={s.detailsBtn}
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.assign(getLearningFormatsAnchor());
+                }}
+              >
                 Обрати курс
-              </Link>
-              <Link
-                href="/courses/instructor-4-0"
+              </a>
+              <a
+                href={getLearningFormatsAnchor()}
                 className={s.detailsBtLowern}
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.assign(getLearningFormatsAnchor());
+                }}
               >
                 Переглянути тарифи
-              </Link>
+              </a>
             </div>
           </div>
         </div>

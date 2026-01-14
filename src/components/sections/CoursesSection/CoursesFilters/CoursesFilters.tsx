@@ -4,7 +4,7 @@ import styles from "./CoursesFilters.module.css";
 import { WorkoutTypeFilter } from "../filters/WorkoutTypeFilter/WorkoutTypeFilter";
 import { TrainingTypeFilter } from "../filters/TrainingTypeFilter/TrainingTypeFilter";
 import ButtonFilter from "@/components/ui/ButtonFilter/ButtonFilter";
-import { CertificationFilter } from "../filters/TrainerSelectionFilter/TrainerSelectionFilter";
+import { TrainerSelectionFilter } from "../filters/TrainerSelectionFilter/TrainerSelectionFilter";
 import { fetchCourseCategories, WooCommerceCategory } from "@/lib/bfbApi";
 
 interface FilterState {
@@ -244,7 +244,7 @@ const CoursesFilters = ({
           loading={loading}
         />
 
-        <CertificationFilter
+        <TrainerSelectionFilter
           value={filters.certification}
           onChange={(vals: string[]) =>
             handleFilterChange("certification", vals)

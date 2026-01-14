@@ -14,7 +14,10 @@ import s from "./CheckoutSection.module.css";
 
 interface OrderSummaryProps {
   total: number;
-  updateItem?: (id: string, updates: Partial<{ price: number; originalPrice?: number }>) => void;
+  updateItem?: (
+    id: string,
+    updates: Partial<{ price: number; originalPrice?: number }>
+  ) => void;
 }
 
 export default function OrderSummary({ total, updateItem }: OrderSummaryProps) {
@@ -36,17 +39,10 @@ export default function OrderSummary({ total, updateItem }: OrderSummaryProps) {
           const freshPrices = await getProductPriceAsync(item.id);
 
           // Якщо ціни відрізняються від тих, що в кошику, оновлюємо
-          if (freshPrices.currentPrice !== item.price ||
-              freshPrices.originalPrice !== item.originalPrice) {
-
-            console.log('🛒 OrderSummary: Оновлюємо ціни для товару', {
-              itemId: item.id,
-              oldPrice: item.price,
-              newPrice: freshPrices.currentPrice,
-              oldOriginalPrice: item.originalPrice,
-              newOriginalPrice: freshPrices.originalPrice
-            });
-
+          if (
+            freshPrices.currentPrice !== item.price ||
+            freshPrices.originalPrice !== item.originalPrice
+          ) {
             // Оновлюємо товар в кошику
             updateItem(item.id, {
               price: freshPrices.currentPrice,
@@ -54,13 +50,16 @@ export default function OrderSummary({ total, updateItem }: OrderSummaryProps) {
             });
           }
         } catch (error) {
-          console.error('Error updating cart item prices in OrderSummary:', error);
+          console.error(
+            "Error updating cart item prices in OrderSummary:",
+            error
+          );
         }
       }
     };
 
     // Перевіряємо тільки товари, які можуть бути варіативними
-    const itemsToCheck = items.filter(item => /\d/.test(item.id));
+    const itemsToCheck = items.filter((item) => /\d/.test(item.id));
     if (itemsToCheck.length > 0) {
       checkAndUpdateAllPrices();
     }
@@ -117,15 +116,20 @@ export default function OrderSummary({ total, updateItem }: OrderSummaryProps) {
                       <CloseButtonIcon />
                     </button>
                   </div>
-                  <div className={s.color}>
-                    {it.color || "Колір не вказано"}
-                    {(it.sku || it.id) && (
+                  {(it.color || it.size) && (
+                    <div className={s.color}>
+                      {it.color && `Колір: ${it.color}`}
+                      {it.color && it.size && ", "}
+                      {it.size && `Розмір: ${it.size}`}
+                    </div>
+                  )}
+                  {(it.sku || it.id) && (
+                    <div className={s.color}>
                       <span className={s.colorCode}>
-                        {" "}
-                        | Код товару: {it.sku || it.id}
+                        Код товару: {it.sku || it.id}
                       </span>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
                 <div className={s.controlsBlock}>
                   <div className={s.controls}>
@@ -148,19 +152,19 @@ export default function OrderSummary({ total, updateItem }: OrderSummaryProps) {
                           originalPrice,
                           shouldShowOldPrice,
                         } = calculatePrice({
-                            price: it.price,
-                            originalPrice: it.originalPrice,
-                            isLoggedIn,
-                          });
+                          price: it.price,
+                          originalPrice: it.originalPrice,
+                          isLoggedIn,
+                        });
 
                         return (
                           <>
-                              <span className={s.currentPrice}>
-                                <span className={s.currentPriceValue}>
-                                  {finalPrice.toLocaleString()}
-                                </span>
-                                <span className={s.priceCurrency}>₴</span>
+                            <span className={s.currentPrice}>
+                              <span className={s.currentPriceValue}>
+                                {finalPrice.toLocaleString()}
                               </span>
+                              <span className={s.priceCurrency}>₴</span>
+                            </span>
                             {shouldShowOldPrice && (
                               <span className={s.oldPrice}>
                                 <span className={s.originalPriceValue}>

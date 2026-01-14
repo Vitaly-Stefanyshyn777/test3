@@ -4,7 +4,7 @@
 
 .container {
   width: 100%;
-  padding: 89px 40px 0px 40px;
+  padding: 100px 40px 0px 40px;
 }
 
 .blocksContainer {
@@ -276,8 +276,15 @@
   }
 
   .badgeText {
-    font-size: mvw(10);
+    font-size: mvw(12);
     line-height: 140%;
+    font-family: var(--font-family);
+    font-weight: 600;
+
+    line-height: 140%;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--violet);
   }
 
   .title {

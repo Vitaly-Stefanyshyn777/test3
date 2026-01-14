@@ -4,7 +4,9 @@ import styles from "./TrainersCatalog.module.css";
 import TrainersHeroSection from "../TrainersHeroSection/TrainersHeroSection";
 import TrainersFilter from "../TrainersFilter/TrainersFilter";
 import { useTrainers } from "@/components/hooks/useTrainers";
-import FilterSortPanel, { type SortType } from "@/components/ui/FilterSortPanel/FilterSortPanel";
+import FilterSortPanel, {
+  type SortType,
+} from "@/components/ui/FilterSortPanel/FilterSortPanel";
 import TrainersCatalogContainer from "../TrainersCatalogContainer/TrainersCatalogContainer";
 import { useCoachesQuery } from "@/components/hooks/useCoachesQuery";
 import TrainersFilterModal from "@/components/ui/TrainersFilterModal/TrainersFilterModal";
@@ -19,11 +21,20 @@ const TrainersCatalog = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [sortBy, setSortBy] = useState<SortType>("popular");
-  const [itemsPerPage, setItemsPerPage] = useState<number>(16);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(16); // Початкове значення, буде змінено в useEffect
 
+  // Ініціалізація мобільного стану та початкової кількості елементів
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 1000px)");
-    const update = () => setIsMobile(mql.matches);
+    const update = () => {
+      const mobile = mql.matches;
+      setIsMobile(mobile);
+      // Встановлюємо початкову кількість карток тільки при першому завантаженні
+      if (itemsPerPage === 16) {
+        // Якщо ще не змінювалось користувачем
+        setItemsPerPage(mobile ? 12 : 16);
+      }
+    };
     update();
     if (mql.addEventListener) mql.addEventListener("change", update);
     else mql.addListener(update);
@@ -31,7 +42,7 @@ const TrainersCatalog = () => {
       if (mql.removeEventListener) mql.removeEventListener("change", update);
       else mql.removeListener(update);
     };
-  }, []);
+  }, []); // Прибрали itemsPerPage з залежностей
 
   const trainers = coaches.map((c) => ({ location: c.location }));
   const searchTerm = "";
@@ -75,10 +86,16 @@ const TrainersCatalog = () => {
               </button>
               <div className={styles.sortSection}>
                 <SortDropdown
-                  label="Сортування"
-                  value={sortBy}
-                  options={SORT_OPTIONS}
-                  onChange={(value) => setSortBy(value as SortType)}
+                  label="Показати по"
+                  value={String(itemsPerPage)}
+                  options={[
+                    { value: "12", label: "12" },
+                    { value: "16", label: "16" },
+                    { value: "20", label: "20" },
+                    { value: "24", label: "24" },
+                  ]}
+                  onChange={(value) => setItemsPerPage(Number(value))}
+                  variant="itemsPerPage"
                 />
               </div>
             </div>
@@ -90,6 +107,7 @@ const TrainersCatalog = () => {
             itemsPerPage={itemsPerPage}
             onItemsPerPageChange={setItemsPerPage}
             hideSort={true}
+            hideItemsPerPage={false}
           />
         )}
         <div className={styles.catalogContent}>
@@ -127,9 +145,7 @@ const TrainersCatalog = () => {
           trainers={trainers}
           searchTerm={searchTerm}
           onApply={handleApplyFilters}
-          onTrainersChange={(items) =>
-            setFilteredTrainers(items as unknown[])
-          }
+          onTrainersChange={(items) => setFilteredTrainers(items as unknown[])}
         />
       )}
     </div>

@@ -252,12 +252,12 @@
   font-size: 14px;
   line-height: 140%;
   color: rgba(14, 14, 14, 0.4);
-  text-decoration: underline;
+
   text-decoration-skip-ink: none;
 }
 
 .privacyLink:hover {
-  color: #667eea;
+  text-decoration: underline  
 }
 
 .ratingRow {

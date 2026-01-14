@@ -58,6 +58,11 @@ export const SizeFilter = ({ selectedSizes, onChange, loading }: SizeFilterProps
     setIsExpanded(!isExpanded);
   };
 
+  // Якщо немає термінів і не завантажується, не відображаємо фільтр
+  if (!showSkeleton && terms.length === 0) {
+    return null;
+  }
+
   return (
     <div
       className={`${styles.filterSection} ${

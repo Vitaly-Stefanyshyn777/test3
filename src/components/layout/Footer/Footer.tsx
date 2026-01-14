@@ -20,6 +20,7 @@ import {
 } from "../../Icons/Icons";
 import RegisterModal from "@/components/auth/RegisterModal/RegisterModal";
 import LoginModal from "@/components/auth/LoginModal/LoginModal";
+import ResetPasswordModal from "@/components/auth/ResetPasswordModal/ResetPasswordModal";
 import { useAuthStore } from "@/store/auth";
 import { useThemeSettingsQuery } from "@/components/hooks/useWpQueries";
 import { getContactData } from "@/lib/themeSettingsUtils";
@@ -28,10 +29,15 @@ import { useMemo } from "react";
 const Footer = () => {
   const pathname = usePathname();
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
   const isLoginModalOpen = useAuthStore((s) => s.isLoginModalOpen);
   const openLoginModal = useAuthStore((s) => s.openLoginModal);
   const closeLoginModal = useAuthStore((s) => s.closeLoginModal);
   const openRegisterModal = () => setIsRegisterOpen(true);
+  const openResetPasswordModal = () => {
+    // Невелика затримка щоб уникнути конфлікту з закриттям попередньої модалки
+    setTimeout(() => setIsResetPasswordOpen(true), 100);
+  };
 
   // Отримуємо контактні дані з theme_settings
   const { data: themeSettings } = useThemeSettingsQuery();
@@ -248,12 +254,12 @@ const Footer = () => {
               <h3 className={s.sectionTitle}>ДОКУМЕНТАЦІЯ</h3>
               <ul className={s.navList}>
                 <li className={s.navItem}>
-                  <Link href="/privacy" className={s.navLink}>
+                  <Link href="/privacy-policy" className={s.navLink}>
                     Політика конфіденційності
                   </Link>
                 </li>
                 <li className={s.navItem}>
-                  <Link href="/terms" className={s.navLink}>
+                  <Link href="/oferta" className={s.navLink}>
                     Умови співпраці
                   </Link>
                 </li>
@@ -346,6 +352,12 @@ const Footer = () => {
         isOpen={isLoginModalOpen}
         onClose={closeLoginModal}
         onOpenRegister={openRegisterModal}
+        onOpenResetPassword={openResetPasswordModal}
+      />
+      <ResetPasswordModal
+        isOpen={isResetPasswordOpen}
+        onClose={() => setIsResetPasswordOpen(false)}
+        onOpenLogin={openLoginModal}
       />
     </footer>
   );

@@ -77,7 +77,7 @@ export default function CheckoutFooter() {
           <h3 className={s.sectionTitle}>ДОКУМЕНТАЦІЯ</h3>
           <ul className={s.list}>
             <li>
-              <Link href="/privacy" className={s.listLink}>
+              <Link href="/privacy-policy" className={s.listLink}>
                 Політика конфіденційності
               </Link>
             </li>

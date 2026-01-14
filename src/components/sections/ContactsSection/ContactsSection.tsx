@@ -9,6 +9,7 @@ import { useThemeSettingsQuery } from "@/components/hooks/useWpQueries";
 import { useContactQuestion } from "@/lib/useMutation";
 import { getContactData } from "@/lib/themeSettingsUtils";
 import { useMemo } from "react";
+import { toast } from "react-toastify";
 
 const ContactsSection: React.FC = () => {
   const [themeSettings, setThemeSettings] = useState<ThemeSettingsPost[]>([]);
@@ -53,9 +54,10 @@ const ContactsSection: React.FC = () => {
     contactMutation.mutate(payload, {
       onSuccess: () => {
         reset();
+        toast.success("Ваше повідомлення успішно надіслано!");
       },
       onError: () => {
-        // Silent error handling
+        toast.error("Не вдалося надіслати повідомлення. Спробуйте ще раз.");
       },
     });
   };

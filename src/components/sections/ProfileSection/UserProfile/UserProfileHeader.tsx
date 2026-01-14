@@ -12,7 +12,7 @@ export default function UserProfileHeader({
 }: Props) {
   // Стійкий src: не міняємо на плейсхолдер при короткочасних помилках мережі
   const initialSrc = useMemo(
-    () => avatar || "/images/avatar1.png",
+    () => avatar || "/images/avatar-placeholder.png",
     [avatar]
   );
   const [src, setSrc] = useState(initialSrc);
@@ -29,7 +29,7 @@ export default function UserProfileHeader({
     };
     img.onerror = () => {
       // Ігноруємо помилку: лишаємо попередній робочий src
-      setSrc(lastGoodSrcRef.current || "/images/avatar1.png");
+      setSrc(lastGoodSrcRef.current || "/images/avatar-placeholder.png");
     };
     img.src = avatar;
   }, [avatar]);

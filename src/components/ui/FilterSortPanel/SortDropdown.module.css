@@ -165,7 +165,18 @@
     height: mvw(8);
   }
 
-  .itemsPerPageDropdown,
+  .itemsPerPageDropdown {
+    left: mvw(60);
+    top: mvw(30);
+    border: mvw(2) solid var(--grey);
+    border-radius: mvw(12);
+    padding: mvw(16);
+    gap: mvw(12);
+    width: auto;
+    z-index: 1000;
+    overflow: hidden;
+  }
+
   .sortDropdown {
     position: absolute;
     min-width: mvw(180);

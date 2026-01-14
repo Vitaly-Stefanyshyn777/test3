@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import type { SwiperRef } from "swiper/react";
+import type { Swiper as SwiperType } from "swiper";
 import { useProductsByCategory } from "@/components/hooks/useFilteredProducts";
 import ProductCard from "../ProductCard/ProductCard";
 import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
@@ -102,6 +103,8 @@ const ProductsShowcase: React.FC = () => {
     regularPrice?: number | string;
     image?: string;
     categories?: Array<{ id: number; name: string; slug: string }>;
+    stockStatus?: string;
+    stockQuantity?: number | null;
     dateCreated?: string;
     wcProduct?: {
       prices?: {
@@ -138,6 +141,7 @@ const ProductsShowcase: React.FC = () => {
           categories?: Array<{ id: number; name: string; slug: string }>;
         }
       ).categories,
+      stockQuantity: (p as { stockQuantity?: number | null }).stockQuantity,
       dateCreated:
         (p as { dateCreated?: string }).dateCreated ??
         (p as { date_created?: string }).date_created,
@@ -303,7 +307,7 @@ const ProductsShowcase: React.FC = () => {
               loop={true}
               allowSlideNext={true}
               allowSlidePrev={true}
-              onSlideChange={(sw) => {
+              onSlideChange={(sw: SwiperType) => {
                 const realIndex = sw.realIndex;
                 setActiveIndex(realIndex);
               }}
@@ -338,6 +342,8 @@ const ProductsShowcase: React.FC = () => {
                     }
                     image={product.image}
                     categories={product.categories}
+                    stockStatus={product.stockStatus}
+                    stockQuantity={product.stockQuantity}
                     dateCreated={product.dateCreated}
                     // wcProduct={product.wcProduct}
                   />
@@ -364,6 +370,8 @@ const ProductsShowcase: React.FC = () => {
                     }
                     image={product.image}
                     categories={product.categories}
+                    stockStatus={product.stockStatus}
+                    stockQuantity={product.stockQuantity}
                     dateCreated={product.dateCreated}
                     // wcProduct={product.wcProduct}
                   />

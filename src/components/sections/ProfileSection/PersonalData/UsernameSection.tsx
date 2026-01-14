@@ -32,22 +32,15 @@ export default function UsernameSection({
             type="text"
             value={fullName}
             onChange={(e) => {
-              // Зберігаємо все значення як є, дозволяємо пробіли
+              // Дозволяємо будь-яке введення, включаючи пробіли
               const value = e.target.value;
-              // Розділяємо на перше слово і решту (зберігаємо всі пробіли в lastName)
-              const trimmedValue = value.trimStart(); // Видаляємо тільки пробіли на початку
-              const firstSpaceIndex = trimmedValue.indexOf(" ");
-              
-              if (firstSpaceIndex === -1) {
-                // Немає пробілів - все в firstName
-                onChange(trimmedValue, "");
-              } else {
-                // Є пробіли - перше слово в firstName, решта (включно з пробілами) в lastName
-                const first = trimmedValue.substring(0, firstSpaceIndex);
-                // Беремо все після першого пробілу, включаючи всі інші пробіли
-                const last = trimmedValue.substring(firstSpaceIndex + 1);
-                onChange(first, last);
-              }
+
+              // Очищаємо від зайвих символів, але зберігаємо пробіли
+              const cleanValue = value.replace(/[.!]+$/, ""); // Видаляємо крапки та знаки оклику в кінці
+
+              // Зберігаємо все як firstName, а lastName залишаємо пустим
+              // Це спростить логіку і дозволить пробіли
+              onChange(cleanValue, "");
             }}
           />
         </div>

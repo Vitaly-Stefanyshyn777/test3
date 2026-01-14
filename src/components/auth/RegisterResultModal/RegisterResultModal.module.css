@@ -136,12 +136,12 @@
   font-size: 14px;
   line-height: 140%;
   color: var(--violet);
-  text-decoration: underline;
+ 
   text-decoration-skip-ink: none;
 }
 
 .privacyLink:hover {
-  color: #667eea;
+  text-decoration: underline;
 }
 
 @media (max-width: 1000px) {

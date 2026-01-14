@@ -64,7 +64,11 @@ export interface WooCommerceProduct {
     name: string;
     slug: string;
   }>;
-  brands: unknown[];
+  brands: Array<{
+    id: number;
+    name: string;
+    slug: string;
+  }>;
   tags: unknown[];
   images: Array<{
     id: number;
@@ -133,6 +137,11 @@ export interface Product {
     alt: string;
   }>;
   categories: Array<{
+    id: number;
+    name: string;
+    slug: string;
+  }>;
+  brands: Array<{
     id: number;
     name: string;
     slug: string;
@@ -323,7 +332,6 @@ export const getProductById = async (
   }
 };
 
-// Функція для отримання даних варіації товару
 export const fetchProductVariation = async (
   variationId: number,
   parentId: number
@@ -335,80 +343,6 @@ export const fetchProductVariation = async (
     throw new Error(`Failed to fetch variation: ${response.status}`);
   }
   return response.json();
-};
-
-// Функція для отримання цін товару (з урахуванням варіацій)
-export const getProductPrices = async (
-  productId: string,
-  wcProduct?: {
-    id: number;
-    type: string;
-    variations: number[];
-    price: string;
-    regular_price: string;
-    sale_price: string;
-  }
-): Promise<{
-  currentPrice: number;
-  originalPrice?: number;
-  isLoading?: boolean;
-}> => {
-  try {
-    // Якщо це не варіативний товар, повертаємо звичайні ціни
-    if (wcProduct?.type !== "variable") {
-      const currentPrice = parseFloat(wcProduct?.price || "0");
-      const originalPrice = wcProduct?.regular_price
-        ? parseFloat(wcProduct.regular_price)
-        : undefined;
-
-      return {
-        currentPrice,
-        originalPrice:
-          originalPrice && originalPrice > currentPrice
-            ? originalPrice
-            : undefined,
-      };
-    }
-
-    // Для варіативних товарів отримуємо дані першої варіації
-    if (wcProduct?.variations?.[0]) {
-      const firstVariationId = wcProduct.variations[0];
-      const variation = await fetchProductVariation(
-        firstVariationId,
-        wcProduct.id
-      );
-
-      const currentPrice = parseFloat(
-        variation.price ||
-          variation.sale_price ||
-          variation.regular_price ||
-          "0"
-      );
-      const regularPrice = variation.regular_price
-        ? parseFloat(variation.regular_price)
-        : undefined;
-
-      return {
-        currentPrice,
-        originalPrice:
-          regularPrice && regularPrice > currentPrice
-            ? regularPrice
-            : undefined,
-      };
-    }
-
-    // Fallback для варіативних товарів без варіацій
-    return {
-      currentPrice: parseFloat(wcProduct?.price || "0"),
-      originalPrice: undefined,
-    };
-  } catch (error) {
-    console.error("Error fetching product prices:", error);
-    return {
-      currentPrice: 0,
-      originalPrice: undefined,
-    };
-  }
 };
 
 export const mapProductToUi = (wcProduct: WooCommerceProduct): Product => {
@@ -482,6 +416,12 @@ export const mapProductToUi = (wcProduct: WooCommerceProduct): Product => {
         name: cat.name,
         slug: cat.slug,
       })) || [],
+    brands:
+      wcProduct.brands?.map((brand) => ({
+        id: brand.id,
+        name: brand.name,
+        slug: brand.slug,
+      })) || [],
     attributes:
       wcProduct.attributes?.map((attr) => ({
         id: attr.id,
@@ -499,6 +439,17 @@ export const mapProductToUi = (wcProduct: WooCommerceProduct): Product => {
     averageRating: wcProduct.average_rating,
     ratingCount: wcProduct.rating_count,
     dateCreated: wcProduct.date_created, // Додаємо дату створення
+    isNew: (() => {
+      // Визначаємо чи товар новий (30 днів)
+      if (!wcProduct.date_created) return false;
+      try {
+        const createdDate = new Date(wcProduct.date_created);
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        return createdDate > thirtyDaysAgo;
+      } catch {
+        return false;
+      }
+    })(),
     wcProduct: {
       id: wcProduct.id,
       name: wcProduct.name,
@@ -515,11 +466,11 @@ export const mapProductToUi = (wcProduct: WooCommerceProduct): Product => {
       images: wcProduct.images,
       sku: wcProduct.sku,
       type: wcProduct.type,
-      variations: wcProduct.variations,
+      variations: (wcProduct.variations as number[]) || [],
     },
   };
 
-  return mapped as Product;
+  return mapped;
 };
 
 // Отримати товари за категорією
@@ -537,5 +488,50 @@ export const getProductsByCategory = async (
     return allProducts.filter((product) =>
       product.categories.some((cat) => cat.id.toString() === categoryId)
     );
+  }
+};
+
+export async function checkProductsWithImageColors() {
+  try {
+    const allProducts = await getAllProducts();
+    const productsWithImageColors = allProducts.filter((wcProduct) => {
+      // Перевіряємо чи продукт має атрибути кольору
+      if (wcProduct.attributes && Array.isArray(wcProduct.attributes)) {
+        const colorAttribute = wcProduct.attributes.find(
+          (attr) => attr.name === 'pa_color' || attr.slug === 'pa_color'
+        );
+
+        if (colorAttribute && colorAttribute.options && Array.isArray(colorAttribute.options)) {
+          // Перевіряємо чи будь-який варіант кольору є URL
+          const hasImageColor = colorAttribute.options.some((option) =>
+            typeof option === 'string' && (
+              option.startsWith('http') ||
+              option.includes('.jpg') ||
+              option.includes('.png') ||
+              option.includes('.webp') ||
+              option.includes('.jpeg') ||
+              option.includes('.gif')
+            )
+          );
+
+          if (hasImageColor) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    });
+
+    return productsWithImageColors.map(wcProduct => ({
+      id: wcProduct.id.toString(),
+      name: wcProduct.name,
+      slug: wcProduct.slug,
+      hasImageColors: true
+    }));
+
+  } catch (error) {
+    console.error('Error checking products with image colors:', error);
+    return [];
   }
 };

@@ -49,12 +49,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("Order created successfully:", {
-      orderId: data.id,
-      status: data.status,
-      total: data.total,
-    });
-
     return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json(

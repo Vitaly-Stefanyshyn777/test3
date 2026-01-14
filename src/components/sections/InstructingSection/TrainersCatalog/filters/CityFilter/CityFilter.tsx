@@ -68,7 +68,7 @@ export const CityFilter = ({
       const uniqueCities = [
         ...new Set(
           trainers
-            .map((trainer) => trainer.acf?.location_city)
+            .map((trainer) => trainer.acf?.city)
             .filter((city) => city && city.trim() !== "")
         ),
       ] as string[];

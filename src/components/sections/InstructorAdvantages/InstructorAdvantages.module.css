@@ -1206,12 +1206,12 @@
     padding: mvw(24) 0;
   }
   .advantagesContainer {
-    padding: 0;
+    padding: 0 mvw(16);
     gap: mvw(32);
   }
   .advantagesHeader {
     gap: mvw(8);
-    padding: 0 mvw(16);
+    padding: 0 mvw(0);
     text-align: center;
     /* display: flex; */
     flex-direction: column;
@@ -1233,7 +1233,7 @@
     width: 100%;
     overflow: hidden;
     margin: 0; /* уникаємо виходу за межі контейнера */
-    padding: 0 mvw(16);
+    padding: 0 mvw(0);
   }
   .mobileSlider {
     width: 100%;
@@ -1340,7 +1340,7 @@
     align-items: center;
   }
   .statusBadge {
-    padding: mvw(2) mvw(5);
+    padding: mvw(2) mvw(16);
     height: auto;
     border-radius: mvw(20);
     font-size: mvw(14);
@@ -1359,7 +1359,7 @@
     justify-content: center;
   }
   .medalIcon {
-    width: mvw(32);
+    width: mvw(20);
     height: mvw(32);
     display: flex;
     align-items: center;

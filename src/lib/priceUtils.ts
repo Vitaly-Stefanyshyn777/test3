@@ -1,8 +1,6 @@
-/**
- * Утиліти для розрахунку цін з урахуванням знижок та авторизації
- */
+// price.ts
 
-export const AUTH_DISCOUNT = 0.2; // 20% знижка для авторизованих користувачів
+export const AUTH_DISCOUNT = 0.2; // 20%
 
 export interface PriceCalculationParams {
   price?: number | string | null;
@@ -20,63 +18,84 @@ export interface PriceCalculationResult {
 }
 
 /**
- * Розраховує фінальну ціну з урахуванням знижок та авторизації
+ * Безпечне перетворення в число
+ */
+const toNumber = (value?: number | string | null): number => {
+  if (value === null || value === undefined || value === "") return 0;
+  const num = Number(value);
+  return isNaN(num) ? 0 : num;
+};
+
+/**
+ * Основний розрахунок ціни
  */
 export function calculatePrice({
   price = 0,
-  originalPrice,
   regularPrice,
   salePrice,
   isLoggedIn,
 }: PriceCalculationParams): PriceCalculationResult {
-  // Нормалізуємо ціни до чисел
-  const currentPrice = price ? Number(price) : 0;
-  const regularPriceNum = regularPrice ? Number(regularPrice) : 0;
-  const salePriceNum = salePrice && Number(salePrice) > 0 ? Number(salePrice) : null;
-  const originalPriceNum = originalPrice ? Number(originalPrice) : 0;
+  const priceNum = toNumber(price);
+  const regularPriceNum = toNumber(regularPrice);
+  const salePriceNum = toNumber(salePrice);
 
-  // Визначаємо базову ціну (пріоритет: salePrice -> currentPrice -> regularPrice)
-  const basePrice = salePriceNum || currentPrice || regularPriceNum;
+  /**
+   * Актуальна ціна з бекенду:
+   * priority: price -> sale_price -> regular_price
+   */
+  const actualPrice =
+    priceNum > 0 ? priceNum : salePriceNum > 0 ? salePriceNum : regularPriceNum;
 
-  // Розраховуємо фінальну ціну з урахуванням авторизації
-  const finalPrice = basePrice
-    ? isLoggedIn
-      ? basePrice * (1 - AUTH_DISCOUNT)
-      : basePrice
-    : 0;
+  /**
+   * Базова ціна для перекреслення
+   */
+  const displayRegularPrice =
+    regularPriceNum > 0 ? regularPriceNum : actualPrice;
 
-  // Визначаємо originalPrice для відображення (пріоритет: regularPrice -> originalPrice)
-  const displayOriginalPrice = regularPriceNum || originalPriceNum;
+  /**
+   * Якщо користувач НЕ авторизований
+   */
+  if (!isLoggedIn) {
+    const finalPrice = actualPrice;
 
-  // Розраховуємо загальну знижку
-  const totalDiscount =
-    displayOriginalPrice && finalPrice
-      ? ((displayOriginalPrice - finalPrice) / displayOriginalPrice) * 100
+    const hasWcDiscount =
+      displayRegularPrice > 0 && actualPrice < displayRegularPrice;
+
+    const totalDiscount = hasWcDiscount
+      ? ((displayRegularPrice - actualPrice) / displayRegularPrice) * 100
       : 0;
 
-  // Визначаємо чи показувати стару ціну
-  const shouldShowOldPrice =
-    displayOriginalPrice > 0 && totalDiscount > 0 && displayOriginalPrice > finalPrice;
-
-  // Додаємо логування для діагностики
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🧮 calculatePrice:', {
-      input: { price, originalPrice, regularPrice, salePrice, isLoggedIn },
-      normalized: { currentPrice, regularPriceNum, salePriceNum, originalPriceNum },
-      calculated: { basePrice, finalPrice, displayOriginalPrice, totalDiscount, shouldShowOldPrice }
-    });
+    return {
+      finalPrice,
+      originalPrice: displayRegularPrice,
+      totalDiscount,
+      shouldShowOldPrice: hasWcDiscount,
+    };
   }
+
+  /**
+   * Якщо користувач АВТОРИЗОВАНИЙ → мінус 20%
+   */
+  const finalPrice = actualPrice * (1 - AUTH_DISCOUNT);
+
+  const hasWcDiscount =
+    displayRegularPrice > 0 && actualPrice < displayRegularPrice;
+
+  const totalDiscount =
+    displayRegularPrice > 0
+      ? ((displayRegularPrice - finalPrice) / displayRegularPrice) * 100
+      : AUTH_DISCOUNT * 100;
 
   return {
     finalPrice,
-    originalPrice: displayOriginalPrice,
+    originalPrice: displayRegularPrice,
     totalDiscount,
-    shouldShowOldPrice,
+    shouldShowOldPrice: hasWcDiscount,
   };
 }
 
 /**
- * Розраховує ціну для додавання в кошик
+ * Для кошика
  */
 export function calculateCartPrice({
   price = 0,
@@ -104,3 +123,20 @@ export function calculateCartPrice({
   };
 }
 
+/**
+ * Формат ціни: 1200₴
+ */
+export const formatPrice = (amount: string | number): string => {
+  const num = typeof amount === "string" ? toNumber(amount) : amount;
+  return isNaN(num) ? "0₴" : `${Math.round(num)}₴`;
+};
+
+/**
+ * Формат ціни з періодом: 1200₴/місяць
+ */
+export const formatPriceWithPeriod = (
+  amount: string | number,
+  period: string = "/місяць"
+): string => {
+  return `${formatPrice(amount)}${period}`;
+};

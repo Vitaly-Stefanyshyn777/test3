@@ -249,18 +249,23 @@
   color: rgba(14, 14, 14, 0.4);
   text-decoration: underline;
   text-decoration-skip-ink: none;
-}
-
-.privacyLink:hover {
-  color: #667eea;
+  cursor: pointer;
 }
 
 /* LoginModal.module.css */
 
+.bottomLinksBlock {
+  display: flex;
+
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+  justify-content: center;
+}
+
 .registerSwitchBlock {
   color: var(--black);
   display: flex;
-  justify-content: center;
   align-items: center;
   gap: 8px;
 }
@@ -278,13 +283,13 @@
 
   font-size: 14px;
   font-weight: 500;
-  text-decoration: underline;
+  /* text-decoration: underline; */
   transition: color 0.2s ease;
   color: var(--violet);
 }
 
 .registerButton:hover {
-  color: var(--primary-color-darker);
+  text-decoration: underline;
 }
 
 @keyframes slideUp {
@@ -294,6 +299,30 @@
   to {
     transform: translateY(0);
   }
+}
+
+/* Стилі для кнопки забутого пароля */
+.forgotPasswordBlock {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.forgotPasswordButton {
+  background: none;
+  border: none;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  color: var(--violet);
+  cursor: pointer;
+
+  padding: 4px 0;
+  transition: color 0.2s ease;
+}
+
+.forgotPasswordButton:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 1000px) {
@@ -392,6 +421,9 @@
     width: mvw(20);
     height: mvw(20);
   }
+  .forgotPasswordButton {
+    font-size: mvw(12);
+  }
 
   .inputIcon svg {
     width: mvw(20);
@@ -420,10 +452,10 @@
   }
 
   /* Стилі для PasswordField в LoginModal на мобілці */
-  .loginPasswordLabel {
-    /* top: 55% !important;
-    transform: translateY(-50%) !important; */
-  }
+  /* .loginPasswordLabel {
+    top: 55% !important;
+    transform: translateY(-50%) !important;
+  } */
 
   .loginPasswordBlock:has(input:focus) .loginPasswordLabel,
   .loginPasswordBlock:has(input:not(:placeholder-shown)) .loginPasswordLabel {

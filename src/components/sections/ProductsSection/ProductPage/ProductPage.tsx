@@ -25,11 +25,17 @@ import { useAuthStore } from "@/store/auth";
 import RegisterModal from "@/components/auth/RegisterModal/RegisterModal";
 import { normalizeImageUrl } from "@/lib/imageUtils";
 import { useCartStore } from "@/store/cart";
+import { calculatePrice, formatPrice } from "@/lib/priceUtils";
 import ProductPageSkeleton from "./ProductPageSkeleton";
 
 export default function ProductPage({ productSlug }: { productSlug: string }) {
   // productSlug може бути як slug так і ID для сумісності
-  const { data: product, isLoading, isError } = useProductQuery(productSlug);
+  const {
+    data: product,
+    isLoading,
+    isError,
+    error,
+  } = useProductQuery(productSlug);
   // Товари для спорту (категорія 30)
   const { data: relatedCategoryProducts = [] } = useProductsByCategory("30");
 
@@ -39,21 +45,14 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
       return undefined; // Використаємо автоматичне визначення в FAQSection
     }
 
-    // Перевіряємо категорії продукту
-    // Якщо продукт належить до категорії "Борди" або інших категорій продуктів - використовуємо 70
-    // Можна додати інші маппінги за потреби
-    const productCategorySlugs = product.categories.map((cat) =>
-      cat.slug.toLowerCase()
-    );
-
-    // Якщо є категорія, пов'язана з продуктами/бордами
+    // Якщо продукт належить до категорії "Борди" - використовуємо 70
     if (
-      productCategorySlugs.some(
-        (slug) =>
-          slug.includes("board") ||
-          slug.includes("борд") ||
-          slug.includes("product") ||
-          slug.includes("товар")
+      product.categories.some(
+        (cat) =>
+          cat.id === 71 || // Категорія "Борди" за ID
+          cat.id === 30 || // Інша категорія бордів за ID
+          cat.slug.toLowerCase().includes("board") || // Slug містить "board"
+          cat.slug.toLowerCase().includes("борд") // Slug містить "борд"
       )
     ) {
       return 70; // Борди
@@ -65,11 +64,26 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
 
   const faqCategoryId = getFaqCategoryId();
 
+  // Перевіряємо, чи товар відноситься до бордів (за ID або slug)
+  const isBoardProduct = (): boolean => {
+    if (!product?.categories || product.categories.length === 0) {
+      return false;
+    }
+
+    return product.categories.some(
+      (cat) =>
+        cat.id === 71 || // Категорія "Борди" за ID
+        cat.id === 30 || // Інша категорія бордів за ID
+        cat.slug.toLowerCase().includes("board") || // Slug містить "board"
+        cat.slug.toLowerCase().includes("борд") // Slug містить "борд"
+    );
+  };
+
   const baseItemsPerView = 5;
   const [slideIdx, setSlideIdx] = useState(0);
 
-  const [selectedSize, setSelectedSize] = useState("Big");
-  const [selectedColor, setSelectedColor] = useState("Білий");
+  const [selectedSize, setSelectedSize] = useState<string>("");
+  const [selectedColor, setSelectedColor] = useState<string>("");
   const [variationsData, setVariationsData] = useState<
     Array<{
       id: number;
@@ -92,6 +106,7 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
     sale_price: string;
   } | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const isFavorite = useFavoriteStore(selectIsFavorite(product?.id || ""));
   const toggleFav = useFavoriteStore((s) => s.toggleFavorite);
   const addItem = useCartStore((s) => s.addItem);
@@ -99,6 +114,7 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
   const cartItems = useCartStore((s) => s.items);
   const productId = product?.id?.toString() || productSlug;
   const isInCart = !!cartItems[productId] && cartItems[productId].quantity > 0;
+  const cartQuantity = cartItems[productId]?.quantity || 0;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const thumbsRef = useRef<HTMLDivElement | null>(null);
   const imagesLength = product?.images?.length ?? 0;
@@ -118,7 +134,7 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Завантажуємо варіації продукту
+  // Оптимізація: завантажуємо варіації лише коли продукт має варіації
   useEffect(() => {
     const loadVariations = async () => {
       if (!product?.wcProduct?.variations?.length) {
@@ -126,9 +142,11 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
         return;
       }
 
+      // Завантажуємо варіації лише якщо вони дійсно потрібні
       setVariationsLoading(true);
 
       try {
+        // Завантажуємо лише перші 10 варіацій для оптимізації
         const variations = await Promise.all(
           product.wcProduct.variations
             .slice(0, 10)
@@ -143,20 +161,10 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
 
         const validVariations = variations.filter(Boolean);
         setVariationsData(validVariations);
-        setVariationsLoading(false);
 
-        // Знаходимо варіацію за замовчуванням (Big + Білий)
-        const defaultVariation = validVariations.find(
-          (v) =>
-            v.attributes?.some(
-              (attr: any) =>
-                attr.slug === "pa_size" && attr.option === selectedSize
-            ) &&
-            v.attributes?.some(
-              (attr: any) =>
-                attr.slug === "pa_color" && attr.option === selectedColor
-            )
-        );
+        // Знаходимо варіацію за замовчуванням - першу доступну
+        // (логіка вибору буде оброблена окремим useEffect)
+        const defaultVariation = validVariations[0];
 
         if (defaultVariation) {
           setSelectedVariation({
@@ -166,13 +174,51 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
             sale_price: defaultVariation.sale_price,
           });
         }
-      } catch (error) {}
+      } catch (error) {
+        console.warn("Не вдалося завантажити варіації продукту:", error);
+      } finally {
+        setVariationsLoading(false);
+      }
     };
 
     if (product) {
       loadVariations();
     }
-  }, [product, selectedSize, selectedColor]);
+  }, [product]); // Завантажуємо варіації лише при зміні продукту
+
+  // Спрощена логіка вибору варіації - шукаємо точну комбінацію або першу доступну
+  useEffect(() => {
+    if (!variationsData.length) return;
+
+    // Знаходимо варіацію за точною комбінацією розмір + колір
+    // Якщо комбінація не знайдена або не вибрана, беремо першу доступну варіацію
+    const matchingVariation =
+      variationsData.find((v) => {
+        if (selectedSize && selectedColor) {
+          // Шукаємо точну комбінацію
+          return (
+            v.attributes?.some(
+              (attr: any) =>
+                attr.slug === "pa_size" && attr.option === selectedSize
+            ) &&
+            v.attributes?.some(
+              (attr: any) =>
+                attr.slug === "pa_color" && attr.option === selectedColor
+            )
+          );
+        }
+        return false; // Якщо не вибрано повну комбінацію, не шукаємо
+      }) || variationsData[0]; // За замовчуванням перша варіація
+
+    if (matchingVariation) {
+      setSelectedVariation({
+        id: matchingVariation.id,
+        price: matchingVariation.price,
+        regular_price: matchingVariation.regular_price,
+        sale_price: matchingVariation.sale_price,
+      });
+    }
+  }, [selectedSize, selectedColor, variationsData]);
 
   useEffect(() => {
     setSlideIdx(0);
@@ -251,7 +297,8 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
   });
 
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
-  const isControlsDisabled = !isLoggedIn;
+  const isOutOfStock = product?.stockStatus === "outofstock";
+  const isControlsDisabled = isOutOfStock; // Продукти не вимагають авторизації
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
   if (isLoading) return <ProductPageSkeleton />;
@@ -316,41 +363,57 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
   // Визначаємо чи є продукт хітом
   const isActuallyHit = isHitProduct();
 
-  // Функція для розрахунку знижки
-  const calculateDiscount = () => {
-    if (!product.regularPrice || !product.price) return 0;
-    const regularPrice = parseFloat(product.regularPrice.toString());
-    const salePrice = parseFloat(product.price.toString());
-    if (regularPrice <= salePrice) return 0;
-    return Math.round(((regularPrice - salePrice) / regularPrice) * 100);
-  };
+  // Розрахунок цін з урахуванням авторизації та знижок
+  const priceCalculation = calculatePrice({
+    price: selectedVariation?.price || product?.price || 0,
+    regularPrice: selectedVariation?.regular_price || product?.regularPrice,
+    isLoggedIn,
+  });
 
-  const discountPercentage = calculateDiscount();
-  const hasDiscount = discountPercentage > 0;
+  const { finalPrice, originalPrice, totalDiscount, shouldShowOldPrice } =
+    priceCalculation;
+  const hasDiscount = totalDiscount > 0;
 
-  // Отримуємо унікальні розміри та кольори з варіацій
-  // Обчислюємо доступні розміри на основі завантажених варіацій
-  const availableSizes = Array.from(
-    new Set(
-      variationsData
-        .flatMap((v) => v.attributes || [])
-        .filter((attr) => attr.slug === "pa_size")
-        .map((attr) => attr.option)
-    )
+  // Отримуємо унікальні розміри та кольори з атрибутів продукту або варіацій
+  // Спочатку пробуємо отримати з основних атрибутів продукту
+  const productSizeAttribute = product.attributes?.find(
+    (attr) => attr.slug === "pa_size"
   );
+  const productSizes = productSizeAttribute?.options || [];
 
-  // Обчислюємо доступні кольори на основі завантажених варіацій
-  const availableColors = Array.from(
-    new Set(
-      variationsData
-        .flatMap((v) => v.attributes || [])
-        .filter((attr) => attr.slug === "pa_color")
-        .map((attr) => attr.option)
-    )
+  // Якщо немає в основних атрибутах, отримуємо з варіацій
+  const availableSizes =
+    productSizes.length > 0
+      ? productSizes
+      : Array.from(
+          new Set(
+            variationsData
+              .flatMap((v) => v.attributes || [])
+              .filter((attr) => attr.slug === "pa_size")
+              .map((attr) => attr.option)
+          )
+        );
+
+  // Аналогічно для кольорів
+  const productColorAttribute = product.attributes?.find(
+    (attr) => attr.slug === "pa_color"
   );
+  const productColors = productColorAttribute?.options || [];
 
-  const sizes =
-    availableSizes.length > 0 ? availableSizes : ["Standart", "Medium", "Big"];
+  const availableColors =
+    productColors.length > 0
+      ? productColors
+      : Array.from(
+          new Set(
+            variationsData
+              .flatMap((v) => v.attributes || [])
+              .filter((attr) => attr.slug === "pa_color")
+              .map((attr) => attr.option)
+          )
+        );
+
+  // Якщо немає динамічних розмірів, використовуємо порожній масив (не статичні розміри)
+  const sizes = availableSizes.length > 0 ? availableSizes : [];
 
   const toggleSection = (section: SectionKey) => {
     setExpandedSections((prev) => ({
@@ -359,66 +422,130 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
     }));
   };
 
-  const addToCart = () => {
+  const addToCart = async () => {
     if (!product) return;
 
-    // Використовуємо дані вибраної варіації або дані продукту
-    const priceSource = selectedVariation || product;
-    const parsedPrice = (() => {
-      const raw = priceSource.price ?? 0;
-      const num = parseFloat(raw.toString());
-      return Number.isFinite(num) && !Number.isNaN(num) ? num : 0;
-    })();
-    const parsedOriginalPrice = (() => {
-      const regularPrice =
-        selectedVariation?.regular_price || product.regularPrice;
-      if (!regularPrice) return undefined;
-      const num = parseFloat(regularPrice.toString());
-      return Number.isFinite(num) && !Number.isNaN(num) ? num : undefined;
-    })();
+    setIsAddingToCart(true);
+
+    // Базові ціни з варіації або продукту (без знижки авторизації)
+    const basePrice = selectedVariation?.price || product.price || 0;
+    const baseRegularPrice =
+      selectedVariation?.regular_price || product.regularPrice;
+    const baseSalePrice = selectedVariation?.sale_price || product.salePrice;
+
+    // Базова ціна для кошика - використовуємо sale_price якщо є, інакше price
+    // Це та ціна, яка буде відображатися як основна
+    const priceToUse =
+      baseSalePrice && parseFloat(baseSalePrice) > 0
+        ? parseFloat(baseSalePrice)
+        : parseFloat(basePrice.toString());
     const previewImage =
       normalizeImageUrl(product.images?.[selectedImageIndex]?.src) ||
       normalizeImageUrl(product.images?.[0]?.src) ||
       normalizeImageUrl(product.image);
 
-    // Створюємо назву товару з варіацією
-    let productName = product.name || "Товар без назви";
+    // Витягуємо колір і розмір з варіації
+    let selectedColor = "";
+    let selectedSize = "";
+
     if (selectedVariation && variationsData.length > 0) {
       const variation = variationsData.find(
         (v) => v.id === selectedVariation.id
       );
       if (variation?.attributes) {
-        const attrs = variation.attributes
-          .map((attr) => `${attr.name}: ${attr.option}`)
-          .join(", ");
-        productName += ` (${attrs})`;
+        variation.attributes.forEach((attr) => {
+          const attrName = attr.name.toLowerCase();
+          if (attrName.includes("колір") || attrName.includes("color")) {
+            selectedColor = attr.option;
+          } else if (attrName.includes("розмір") || attrName.includes("size")) {
+            selectedSize = attr.option;
+          }
+        });
       }
     }
 
-    addItem(
-      {
-        id:
-          selectedVariation?.id.toString() ||
-          product.id?.toString() ||
-          productSlug,
-        name: productName,
-        price: parsedPrice,
-        image: previewImage,
-        originalPrice: parsedOriginalPrice,
-        sku: product.sku,
-      },
-      quantity
-    );
+    // Створюємо назву товару - очищаємо від зайвих слів
+    let productName = (product.name || "Товар без назви").replace(
+      /\s*-\s*.*$/gi,
+      ""
+    ); // видаляємо все після тире з пробілом
+
+    // Динамічно видаляємо вибрані розмір і колір з назви
+    if (selectedSize) {
+      productName = productName
+        .replace(new RegExp(`,\\s*${selectedSize}`, "gi"), "")
+        .replace(new RegExp(`\\s*-\\s*${selectedSize}`, "gi"), "")
+        .replace(new RegExp(`\\s*${selectedSize}\\s*$`, "gi"), "");
+    }
+    if (selectedColor) {
+      productName = productName
+        .replace(new RegExp(`,\\s*${selectedColor}`, "gi"), "")
+        .replace(new RegExp(`\\s*-\\s*${selectedColor}`, "gi"), "")
+        .replace(new RegExp(`\\s*${selectedColor}\\s*$`, "gi"), "");
+    }
+
+    productName = productName.trim();
+
+    try {
+      await addItem(
+        {
+          id:
+            selectedVariation?.id.toString() ||
+            product.id?.toString() ||
+            productSlug,
+          name: productName,
+          price: priceToUse,
+          image: previewImage,
+          color: selectedColor,
+          size: selectedSize,
+          originalPrice: baseRegularPrice
+            ? parseFloat(baseRegularPrice)
+            : undefined,
+          regularPrice: baseRegularPrice
+            ? parseFloat(baseRegularPrice)
+            : undefined,
+          salePrice: baseSalePrice ? parseFloat(baseSalePrice) : undefined,
+          sku: product.sku,
+          stockQuantity: product.stockQuantity,
+          variationId: selectedVariation?.id,
+        },
+        quantity
+      );
+    } catch (error) {
+      alert((error as Error).message);
+      return;
+    }
+
+    // Показуємо повідомлення кілька секунд, потім повертаємося до звичайного стану
+    setTimeout(() => {
+      setIsAddingToCart(false);
+    }, 1500);
   };
 
   // const toggleFavorite = () => {
   //   setIsFavorite(!isFavorite);
   // };
 
+  // Функція для визначення статусу наявності на основі stock_status
+  const getStockStatusText = (stockStatus: string): string => {
+    switch (stockStatus) {
+      case "instock":
+        return "В наявності";
+      case "outofstock":
+        return "Немає в наявності";
+      case "onbackorder":
+        return "Під замовлення";
+      default:
+        return "В наявності";
+    }
+  };
+
   const isAvailable =
     typeof product.stockQuantity === "number"
       ? product.stockQuantity > 0
-      : true;
+      : product.stockStatus !== "outofstock";
+
+  const stockStatusText = getStockStatusText(product.stockStatus || "instock");
 
   type ProductLike = {
     id: number | string;
@@ -431,6 +558,7 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
     onSale?: boolean;
     images?: Array<{ src: string }>;
     categories?: Array<{ name: string }>;
+    stockStatus?: string;
     isNew?: boolean;
     isHit?: boolean;
   };
@@ -458,6 +586,7 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
         isHit: !!p.isHit,
         image: normalizeImageUrl(p.images?.[0]?.src),
         category: p.categories?.[0]?.name,
+        stockStatus: p.stockStatus,
       }))
     : [];
 
@@ -475,7 +604,11 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
   const onNext = () => setSlideIdx((idx) => (idx + 1) % totalSlides);
 
   return (
-    <div className={styles.productPage}>
+    <div
+      className={`${styles.productPage} ${
+        isOutOfStock ? styles.productPageOutOfStock : ""
+      }`}
+    >
       <div className={styles.productContainer}>
         <div className={styles.imageSection}>
           <div
@@ -545,10 +678,10 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
               {isActuallyNew && (
                 <Badge variant="new" className={styles.imageBadge} />
               )}
-              {hasDiscount && (
+              {totalDiscount > 0 && (
                 <Badge
                   variant="discount"
-                  text={`-${discountPercentage}%`}
+                  text={`-${Math.round(totalDiscount)}%`}
                   className={styles.imageBadge}
                 />
               )}
@@ -562,17 +695,24 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
         <div className={styles.productInfo}>
           <div className={styles.productInfoBlock}>
             <div className={styles.categoryTagBlock}>
-              <div className={styles.categoryTag}>Борди</div>
+              <div className={styles.categoryTag}>
+                {product.categories?.[0]?.name || "Без категорії"}
+              </div>
               <div className={styles.titleWithBadges}>
                 <h1 className={styles.productTitle}>{product.name}</h1>
                 <div className={styles.productBadges}>
                   {isActuallyHit && <Badge variant="hit" />}
                 </div>
               </div>
-              <p className={styles.productText}>
-                Комфортний килимок для пілатесу забезпечує зручність під час
-                занять пілатесом та м&#39;якою гімнастикою.
-              </p>
+              {product.shortDescription?.trim() && (
+                <p className={styles.productText}>
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: product.shortDescription.trim(),
+                    }}
+                  />
+                </p>
+              )}
             </div>
 
             {isMobile && (
@@ -581,115 +721,103 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
                   <span className={styles.checkmark}>
                     {isAvailable ? <CheckMarkIcon /> : <CloseButtonIcon />}
                   </span>
-                  <span className={styles.detailText}>
-                    {isAvailable ? "В наявності" : "Немає в наявності"}
-                  </span>
+                  <span className={styles.detailText}>{stockStatusText}</span>
                 </div>
                 <div className={styles.productCode}>
                   <span>Код товару: </span>
-                  {product.sku || product.id || "10001"}
+                  {product.sku || product.id || ""}
                 </div>
               </div>
             )}
 
             <div className={styles.productDescriptionBlock}>
-              <div className={styles.colorSection}>
-                <h3>Колір:</h3>
-                <div className={styles.colorOptions}>
-                  {variationsLoading ? (
-                    <>
-                      <div
-                        className={`${styles.skeleton} ${styles.skeletonColorOption}`}
-                      ></div>
-                      <div
-                        className={`${styles.skeleton} ${styles.skeletonColorOption}`}
-                      ></div>
-                    </>
-                  ) : availableColors.length > 0 ? (
-                    availableColors.map((color) => {
-                      // Перевіряємо, чи це URL фото (починається з http)
-                      const isImageUrl =
-                        typeof color === "string" && color.startsWith("http");
+              {/* Відображаємо секції тільки якщо продукт має варіації або відповідні атрибути */}
+              {(product.wcProduct?.type === "variable" ||
+                availableColors.length > 0 ||
+                product.images.length > 1) &&
+                (availableColors.length > 0 || product.images.length > 1) && (
+                  <div className={styles.colorSection}>
+                    <h3>Колір:</h3>
+                    <div className={styles.colorOptions}>
+                      {availableColors.length > 0
+                        ? availableColors.map((color) => {
+                            // Перевіряємо, чи це URL фото (починається з http)
+                            const isImageUrl =
+                              typeof color === "string" &&
+                              color.startsWith("http");
 
-                      if (isImageUrl) {
-                        // Відображаємо як фото
-                        return (
-                          <button
-                            key={`color-${color}`}
-                            className={`${styles.colorImageOption} ${
-                              selectedColor === color ? styles.selected : ""
-                            }`}
-                            onClick={() => setSelectedColor(color)}
-                            title="Колір з фото"
-                          >
-                            <Image
-                              src={color}
-                              alt="Колір варіації"
-                              width={80}
-                              height={80}
-                              className={styles.colorImage}
-                            />
-                          </button>
-                        );
-                      } else {
-                        // Відображаємо як текст
-                        return (
-                          <button
-                            key={`color-${color}`}
-                            className={`${styles.colorButton} ${
-                              selectedColor === color ? styles.selected : ""
-                            }`}
-                            onClick={() => setSelectedColor(color)}
-                            title={color}
-                          >
-                            {color}
-                          </button>
-                        );
-                      }
-                    })
-                  ) : (
-                    product.images.map((img, index) => (
-                      <button
-                        key={`color-thumb-${index}`}
-                        className={`${styles.colorImageOption} ${
-                          selectedImageIndex === index ? styles.selected : ""
-                        }`}
-                        onClick={() => {
-                          setSelectedImageIndex(index);
-                        }}
-                        title={img.alt || `Колір ${index + 1}`}
-                      >
-                        <Image
-                          src={img.src}
-                          alt={img.alt || "color option"}
-                          width={80}
-                          height={80}
-                          className={styles.colorImage}
-                        />
-                      </button>
-                    ))
-                  )}
-                </div>
-              </div>
+                            if (isImageUrl) {
+                              // Відображаємо як фото
+                              return (
+                                <button
+                                  key={`color-${color}`}
+                                  className={`${styles.colorImageOption} ${
+                                    selectedColor === color
+                                      ? styles.selected
+                                      : ""
+                                  }`}
+                                  onClick={() => setSelectedColor(color)}
+                                  title="Колір з фото"
+                                >
+                                  <Image
+                                    src={color}
+                                    alt="Колір варіації"
+                                    width={80}
+                                    height={80}
+                                    className={styles.colorImage}
+                                  />
+                                </button>
+                              );
+                            } else {
+                              // Відображаємо як текст
+                              return (
+                                <button
+                                  key={`color-${color}`}
+                                  className={`${styles.colorButton} ${
+                                    selectedColor === color
+                                      ? styles.selected
+                                      : ""
+                                  }`}
+                                  onClick={() => setSelectedColor(color)}
+                                  title={color}
+                                >
+                                  {color}
+                                </button>
+                              );
+                            }
+                          })
+                        : product.images.map((img, index) => (
+                            <button
+                              key={`color-thumb-${index}`}
+                              className={`${styles.colorImageOption} ${
+                                selectedImageIndex === index
+                                  ? styles.selected
+                                  : ""
+                              }`}
+                              onClick={() => {
+                                setSelectedImageIndex(index);
+                              }}
+                              title={img.alt || `Колір ${index + 1}`}
+                            >
+                              <Image
+                                src={img.src}
+                                alt={img.alt || "color option"}
+                                width={80}
+                                height={80}
+                                className={styles.colorImage}
+                              />
+                            </button>
+                          ))}
+                    </div>
+                  </div>
+                )}
 
-              {(sizes.length > 1 || variationsLoading) && (
-                <div className={styles.sizeSection}>
-                  <h3>Розмір:</h3>
-                  <div className={styles.sizeOptions}>
-                    {variationsLoading ? (
-                      <>
-                        <div
-                          className={`${styles.skeleton} ${styles.skeletonSizeOption}`}
-                        ></div>
-                        <div
-                          className={`${styles.skeleton} ${styles.skeletonSizeOption}`}
-                        ></div>
-                        <div
-                          className={`${styles.skeleton} ${styles.skeletonSizeOption}`}
-                        ></div>
-                      </>
-                    ) : (
-                      sizes.map((size) => (
+              {(product.wcProduct?.type === "variable" || sizes.length > 0) &&
+                sizes.length > 0 && (
+                  <div className={styles.sizeSection}>
+                    <h3>Розмір:</h3>
+                    <div className={styles.sizeOptions}>
+                      {sizes.map((size) => (
                         <button
                           key={size}
                           className={`${styles.sizeButton} ${
@@ -699,11 +827,10 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
                         >
                           {size}
                         </button>
-                      ))
-                    )}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </div>
 
             <div className={styles.currenInfoBlock}>
@@ -720,30 +847,11 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
                 ) : (
                   <>
                     <div className={styles.currentPrice}>
-                      {(() => {
-                        const raw =
-                          selectedVariation?.price || product?.price || 0;
-                        const num = parseFloat(raw.toString());
-                        const safe =
-                          Number.isFinite(num) && !Number.isNaN(num) ? num : 0;
-                        return `${safe.toLocaleString()} ₴`;
-                      })()}
+                      {formatPrice(finalPrice)}
                     </div>
-                    {((hasDiscount && product.regularPrice) ||
-                      selectedVariation?.regular_price) && (
+                    {shouldShowOldPrice && (
                       <div className={styles.originalPrice}>
-                        {(() => {
-                          const raw =
-                            selectedVariation?.regular_price ||
-                            product?.regularPrice ||
-                            0;
-                          const num = parseFloat(raw.toString());
-                          const safe =
-                            Number.isFinite(num) && !Number.isNaN(num)
-                              ? num
-                              : 0;
-                          return `${safe.toLocaleString()} ₴`;
-                        })()}
+                        {formatPrice(originalPrice)}
                       </div>
                     )}
                   </>
@@ -761,7 +869,7 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
                   </span>
                 </div>
 
-                {!isLoggedIn && (
+                {isBoardProduct() && !isLoggedIn ? (
                   <div className={styles.registerCallout}>
                     <div
                       className={styles.registerBlock}
@@ -780,86 +888,84 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
                       Зареєструватися
                     </button>
                   </div>
-                )}
-
-                <div className={styles.actionButtons}>
-                  <div className={`${styles.quantitySection}`}>
-                    <div
-                      className={`${styles.quantityControls} ${
-                        isControlsDisabled ? styles.quantityDisabled : ""
-                      }`}
-                    >
-                      <button
-                        onClick={() =>
-                          !isControlsDisabled &&
-                          setQuantity(Math.max(1, quantity - 1))
-                        }
-                        disabled={isControlsDisabled}
+                ) : (
+                  <div className={styles.actionButtons}>
+                    <div className={`${styles.quantitySection}`}>
+                      <div
+                        className={`${styles.quantityControls} ${
+                          isControlsDisabled ? styles.quantityDisabled : ""
+                        }`}
                       >
-                        <MinuswIcon />
+                        <button
+                          onClick={() =>
+                            !isControlsDisabled &&
+                            setQuantity(Math.max(1, quantity - 1))
+                          }
+                          disabled={isControlsDisabled}
+                        >
+                          <MinuswIcon />
+                        </button>
+                        <input
+                          type="number"
+                          value={quantity}
+                          onChange={(e) =>
+                            !isControlsDisabled &&
+                            setQuantity(
+                              Math.max(1, parseInt(e.target.value) || 1)
+                            )
+                          }
+                          min="1"
+                          disabled={isControlsDisabled}
+                        />
+                        <button
+                          onClick={() =>
+                            !isControlsDisabled && setQuantity(quantity + 1)
+                          }
+                          disabled={isControlsDisabled}
+                        >
+                          <PlusIcon />
+                        </button>
+                      </div>
+                    </div>
+                    <div className={styles.addToCartBtnWrapper}>
+                      <button
+                        className={`${styles.addToCartBtn} ${
+                          isControlsDisabled ? styles.addToCartBtnDisabled : ""
+                        } ${isAddingToCart ? styles.addToCartBtnInCart : ""}`}
+                        onClick={() => {
+                          if (isControlsDisabled) return;
+                          addToCart();
+                        }}
+                        disabled={isControlsDisabled || isAddingToCart}
+                      >
+                        <BasketHeader />
+                        {isAddingToCart
+                          ? `Додано в кошик ${cartQuantity}`
+                          : "Додати в кошик"}
                       </button>
-                      <input
-                        type="number"
-                        value={quantity}
-                        onChange={(e) =>
-                          !isControlsDisabled &&
-                          setQuantity(
-                            Math.max(1, parseInt(e.target.value) || 1)
-                          )
-                        }
-                        min="1"
-                        disabled={isControlsDisabled}
-                      />
                       <button
-                        onClick={() =>
-                          !isControlsDisabled && setQuantity(quantity + 1)
-                        }
+                        className={`${styles.favoriteBtn} ${
+                          isFavorite ? styles.favoriteActive : ""
+                        } ${
+                          isControlsDisabled ? styles.favoriteBtnDisabled : ""
+                        }`}
+                        onClick={() => {
+                          if (isControlsDisabled) return;
+                          toggleFav({
+                            id: product?.id || "",
+                            name: product?.name || "",
+                            // price: product?.price || 0,
+                            image: product?.image,
+                          });
+                        }}
+                        title="Додати в улюблені"
                         disabled={isControlsDisabled}
                       >
-                        <PlusIcon />
+                        {isFavorite ? <FavoriteBlacIcon /> : <Favorite2Icon />}
                       </button>
                     </div>
                   </div>
-                  <div className={styles.addToCartBtnWrapper}>
-                    <button
-                      className={`${styles.addToCartBtn} ${
-                        isControlsDisabled ? styles.addToCartBtnDisabled : ""
-                      } ${isInCart ? styles.addToCartBtnInCart : ""}`}
-                      onClick={() => {
-                        if (isControlsDisabled) return;
-                        if (isInCart) {
-                          removeItem(productId);
-                        } else {
-                          addToCart();
-                        }
-                      }}
-                      disabled={isControlsDisabled}
-                    >
-                      <BasketHeader />
-                      {isInCart ? "Видалити з кошика" : "Додати в кошик"}
-                    </button>
-                    <button
-                      className={`${styles.favoriteBtn} ${
-                        isFavorite ? styles.favoriteActive : ""
-                      } ${
-                        isControlsDisabled ? styles.favoriteBtnDisabled : ""
-                      }`}
-                      onClick={() => {
-                        if (isControlsDisabled) return;
-                        toggleFav({
-                          id: product?.id || "",
-                          name: product?.name || "",
-                          // price: product?.price || 0,
-                          image: product?.image,
-                        });
-                      }}
-                      title="Додати в улюблені"
-                      disabled={isControlsDisabled}
-                    >
-                      {isFavorite ? <FavoriteBlacIcon /> : <Favorite2Icon />}
-                    </button>
-                  </div>
-                </div>
+                )}
               </div>
 
               {!isMobile && (
@@ -868,13 +974,11 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
                     <span className={styles.checkmark}>
                       {isAvailable ? <CheckMarkIcon /> : <CloseButtonIcon />}
                     </span>
-                    <span className={styles.detailText}>
-                      {isAvailable ? "В наявності" : "Немає в наявності"}
-                    </span>
+                    <span className={styles.detailText}>{stockStatusText}</span>
                   </div>
                   <div className={styles.productCode}>
                     <span>Код товару: </span>
-                    {product.sku || product.id || "10001"}
+                    {product.sku || product.id || ""}
                   </div>
                 </div>
               )}
@@ -887,8 +991,8 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
                 <span className={styles.sectionHeaderText}>Опис товару</span>
               </div>
               <div className={styles.sectionContent}>
-                {product.description?.trim() ||
-                product.shortDescription?.trim() ? (
+                {(product.description?.trim() ||
+                  product.shortDescription?.trim()) && (
                   <div
                     className={styles.sectionContentText}
                     dangerouslySetInnerHTML={{
@@ -898,10 +1002,6 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
                         "",
                     }}
                   />
-                ) : (
-                  <p className={styles.sectionContentText}>
-                    Поки що опис відсутній
-                  </p>
                 )}
               </div>
             </div>
@@ -914,7 +1014,7 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
                 <span className={styles.sectionHeaderText}>Доставка</span>
                 <span
                   className={`${styles.chevron} ${
-                    expandedSections.delivery ? styles.rotated : ""
+                    expandedSections.delivery ? "" : styles.rotated
                   }`}
                 >
                   <СhevronIcon />
@@ -948,7 +1048,7 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
                 <span className={styles.sectionHeaderText}>Оплата</span>
                 <span
                   className={`${styles.chevron} ${
-                    expandedSections.payment ? styles.rotated : ""
+                    expandedSections.payment ? "" : styles.rotated
                   }`}
                 >
                   <СhevronIcon />
@@ -976,7 +1076,7 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
                 </span>
                 <span
                   className={`${styles.chevron} ${
-                    expandedSections.return ? styles.rotated : ""
+                    expandedSections.return ? "" : styles.rotated
                   }`}
                 >
                   <СhevronIcon />
@@ -1005,7 +1105,7 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
                 <span className={styles.sectionHeaderText}>Характеристики</span>
                 <span
                   className={`${styles.chevron} ${
-                    expandedSections.characteristics ? styles.rotated : ""
+                    expandedSections.characteristics ? "" : styles.rotated
                   }`}
                 >
                   <СhevronIcon />
@@ -1106,17 +1206,20 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
               isHit={item.isHit}
               image={item.image}
               category={item.category}
+              stockStatus={item.stockStatus}
               isFluid
             />
           ))}
         </div>
-        <SliderNav
-          activeIndex={slideIdx}
-          dots={totalSlides}
-          onPrev={onPrev}
-          onNext={onNext}
-          onDotClick={(i) => setSlideIdx(i)}
-        />
+        {mappedRelated.length > 5 && (
+          <SliderNav
+            activeIndex={slideIdx}
+            dots={totalSlides}
+            onPrev={onPrev}
+            onNext={onNext}
+            onDotClick={(i) => setSlideIdx(i)}
+          />
+        )}
       </div>
 
       {!isLoggedIn && (
@@ -1124,6 +1227,11 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
           isOpen={isRegisterOpen}
           onClose={() => setIsRegisterOpen(false)}
         />
+      )}
+
+      {/* Overlay для товарів, яких немає в наявності */}
+      {isOutOfStock && (
+        <div className={styles.outOfStockOverlay}>Немає в наявності</div>
       )}
     </div>
   );

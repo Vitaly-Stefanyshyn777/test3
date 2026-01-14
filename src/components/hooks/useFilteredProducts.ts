@@ -5,6 +5,7 @@ export interface ProductFilters {
   category?: string | string[];
   attribute?: string | string[];
   attribute_term?: string | string[];
+  sizes?: string[]; // Розміри для фільтрації по варіаціях
   min_price?: number;
   max_price?: number;
   on_sale?: boolean;

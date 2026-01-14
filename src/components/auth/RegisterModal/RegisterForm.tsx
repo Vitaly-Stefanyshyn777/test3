@@ -105,14 +105,14 @@ export default function RegisterForm({
             id="register-form-certificate-field"
             hasError={!!errors.certificate}
             supportingText="Будь ласка, вкажіть номер сертифіката"
-            {...register("certificate", { 
+            {...register("certificate", {
               required: "Номер сертифіката обов'язковий для заповнення",
               validate: (value) => {
                 if (!value || value.trim() === "") {
                   return "Номер сертифіката не може бути порожнім";
                 }
                 return true;
-              }
+              },
             })}
           />
         </div>
@@ -152,7 +152,7 @@ export default function RegisterForm({
 
         <p className={s.privacyText}>
           Натискаючи на кнопку, ви погоджуєтесь з{" "}
-          <a href="/privacy" className={s.privacyLink}>
+          <a href="/privacy-policy" className={s.privacyLink}>
             Політикою конфіденційності
           </a>
         </p>

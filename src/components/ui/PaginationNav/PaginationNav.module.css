@@ -17,8 +17,8 @@
   border-radius: 50%;
   justify-content: center;
   align-items: center;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   transition: opacity 0.2s;
   display: flex;
   backdrop-filter: blur(20px);
@@ -38,16 +38,23 @@
   height: 20px;
 }
 
+.leftBtn:hover,
+.rightBtn:hover {
+  opacity: 0.85;
+  color: var(--white);
+  background: var(--black) !important;
+}
+
 .pagesBlock {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 23px;
 }
 
 .pageNumber {
-  width: 40px;
-  height: 40px;
+  width: auto;
+  height: auto;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -59,15 +66,21 @@
   color: var(--black);
   background: transparent;
   transition: all 0.2s ease;
+  opacity: 0.2;
 }
 
 .pageNumber:hover {
-  background: rgba(0, 0, 0, 0.1);
+  background: none;
 }
 
 .activePage {
-  background: var(--black);
-  color: var(--white);
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+  opacity: 0.4;
 }
 
 .activePage:hover {
@@ -96,17 +109,14 @@
   .leftBtn,
   .rightBtn {
     background: #fff;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
-  }
-
-  .leftBtn:hover,
-  .rightBtn:hover {
-    opacity: 0.85;
+    width: mvw(50);
+    height: mvw(50);
+    border-radius: mvw(62);
   }
 
   .pageNumber {
-    width: 32px;
-    height: 32px;
+    width: auto;
+    height: auto;
     font-size: 14px;
   }
 }

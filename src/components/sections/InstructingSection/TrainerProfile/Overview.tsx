@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import styles from "./TrainerProfile.module.css";
 import { TrainerUser } from "./types";
@@ -16,6 +16,7 @@ import { normalizeImageUrl } from "@/lib/imageUtils";
 
 export default function Overview({ trainer }: { trainer: TrainerUser }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   const avatar = getAvatarUrl(trainer?.avatar);
   const specialties = getSpecialties(trainer);
@@ -31,6 +32,19 @@ export default function Overview({ trainer }: { trainer: TrainerUser }) {
       ? normalizedAvatar
       : placeholderAvatar
   );
+
+  // Визначення мобільної версії
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 1000px)");
+    const update = () => setIsMobile(mql.matches);
+    update();
+    if (mql.addEventListener) mql.addEventListener("change", update);
+    else mql.addListener(update);
+    return () => {
+      if (mql.removeEventListener) mql.removeEventListener("change", update);
+      else mql.removeListener(update);
+    };
+  }, []);
 
   // Контакти тренера (телефон = також WhatsApp)
   const rawPhone =
@@ -84,6 +98,29 @@ export default function Overview({ trainer }: { trainer: TrainerUser }) {
       }
     } else if (Array.isArray(trainer.gallery)) {
       galleryImages = trainer.gallery
+        .map((item) => {
+          if (typeof item === "string") {
+            return normalizeImageUrl(item);
+          }
+          return null;
+        })
+        .filter(
+          (url): url is string => url !== null && url !== "/placeholder.svg"
+        );
+    }
+  }
+
+  // Обробка сертифікатів
+  let certificateImages: string[] = [];
+
+  if (trainer?.certificateContent) {
+    if (typeof trainer.certificateContent === "string") {
+      const normalized = normalizeImageUrl(trainer.certificateContent);
+      if (normalized && normalized !== "/placeholder.svg") {
+        certificateImages = [normalized];
+      }
+    } else if (Array.isArray(trainer.certificateContent)) {
+      certificateImages = trainer.certificateContent
         .map((item) => {
           if (typeof item === "string") {
             return normalizeImageUrl(item);
@@ -172,6 +209,7 @@ export default function Overview({ trainer }: { trainer: TrainerUser }) {
             )}
           </div>
 
+          {!isMobile && (
           <div className={styles.ContactsContainer}>
             {hasContacts && (
               <>
@@ -198,6 +236,7 @@ export default function Overview({ trainer }: { trainer: TrainerUser }) {
               Зв&apos;язатися з тренером
             </button>
           </div>
+          )}
         </div>
 
         <div className={styles.headerContainer}>
@@ -332,6 +371,54 @@ export default function Overview({ trainer }: { trainer: TrainerUser }) {
           </div>
         </div>
       </div>
+
+      {isMobile && (
+        <div className={styles.ContactsContainer}>
+          {hasContacts && (
+            <>
+              <p className={styles.ContactsText}>Контакти:</p>
+              <div className={styles.IconsContainer}>
+                {contactItems.map((item, index) => (
+                  <a
+                    key={`${item.type}-${index}`}
+                    href={item.href}
+                    className={styles.IconsBlock}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {item.type === "instagram" && <InstagramIcon />}
+                    {item.type === "facebook" && <FacebookIcon />}
+                    {item.type === "telegram" && <TelegramIcon />}
+                    {item.type === "whatsapp" && <WhatsappIcon />}
+                  </a>
+                ))}
+              </div>
+            </>
+          )}
+          <button className={styles.contactButton}>
+            Зв&apos;язатися з тренером
+          </button>
+        </div>
+      )}
+
+      {certificateImages.length > 0 && (
+        <div className={styles.certificatesSection}>
+          <h3 className={styles.certificatesTitle}>Сертифікати</h3>
+          <div className={styles.certificatesContainer}>
+            {certificateImages.map((certUrl, index) => (
+              <div key={index} className={styles.certificateItem}>
+                <Image
+                  src={certUrl}
+                  alt={`Сертифікат ${index + 1}`}
+                  width={300}
+                  height={200}
+                  className={styles.certificateImage}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

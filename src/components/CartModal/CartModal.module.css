@@ -337,7 +337,7 @@
 .recoThumb {
   width: 128px;
   height: 116px;
-  object-fit: contain;
+  object-fit: cover;
   border-radius: 8px;
 }
 .recoInfo {
@@ -538,7 +538,7 @@
 .thumb {
   width: 144px;
   height: 115px;
-  object-fit: contain !important;
+  object-fit: cover !important;
   border-radius: 12px;
 }
 .meta {

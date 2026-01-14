@@ -14,16 +14,40 @@ export default function AnchorHandler() {
     const scrollToElement = (id: string) => {
       const el = document.getElementById(id);
       if (el) {
-        const headerHeight = 120; // Висота фіксованого хедера
+        // Динамічно отримуємо висоту хедера
+        const header = document.querySelector('header') as HTMLElement ||
+                      document.querySelector('.header') as HTMLElement;
+        const headerHeight = header ? header.offsetHeight : 120; // fallback 120px
+
         const targetPosition = el.offsetTop - headerHeight;
 
-        window.scrollTo({
-          top: Math.max(0, targetPosition),
-          behavior: "smooth",
-        });
-        return true;
+
+        // Невелика затримка для мобільних пристроїв
+        setTimeout(() => {
+          window.scrollTo({
+            top: Math.max(0, targetPosition),
+            behavior: "smooth", // Плавна анімація
+          });
+
+          // Перевіряємо результат через 1 секунду
+          setTimeout(() => {
+            const rect = el.getBoundingClientRect();
+            const isVisible = rect.top >= headerHeight && rect.top <= window.innerHeight;
+
+            if (!isVisible) {
+              console.log(`⚠️ AnchorHandler: Element ${id} not properly positioned, adjusting...`);
+              // Додаткова корекція для мобільних
+              const correction = window.innerWidth <= 1000 ? 20 : 0;
+              window.scrollTo({
+                top: Math.max(0, targetPosition + correction),
+                behavior: "smooth",
+              });
+            }
+          }, 1000);
+        }, 50);
+        return true; // Успіх!
       }
-      return false;
+      return false; // Елемент не знайдений
     };
 
     // Функція для обробки хешу

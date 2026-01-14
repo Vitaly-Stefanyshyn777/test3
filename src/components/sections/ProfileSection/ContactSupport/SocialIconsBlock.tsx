@@ -28,8 +28,9 @@ export default function SocialIconsBlock({ onClick, links }: Props) {
   }, []);
 
   // Перевірка та забезпечення наявності всіх 4 елементів
-  const safeLinks = Array.from({ length: 4 }, (_, i) => 
-    links[i] || { name: "", url: "#" }
+  const safeLinks = Array.from(
+    { length: 4 },
+    (_, i) => links[i] || { name: "", url: "#" }
   );
 
   if (isMobile) {
@@ -46,15 +47,6 @@ export default function SocialIconsBlock({ onClick, links }: Props) {
                 <InstagramIcon />
               </div>
             )}
-            {safeLinks[1] && safeLinks[1].name && (
-              <div
-                className={styles.socialIcon}
-                onClick={() => onClick(safeLinks[1].url)}
-                title={safeLinks[1].name}
-              >
-                <FacebookIcon />
-              </div>
-            )}
             {safeLinks[2] && safeLinks[2].name && (
               <div
                 className={styles.socialIcon}
@@ -62,6 +54,15 @@ export default function SocialIconsBlock({ onClick, links }: Props) {
                 title={safeLinks[2].name}
               >
                 <TelegramIcon />
+              </div>
+            )}
+            {safeLinks[1] && safeLinks[1].name && (
+              <div
+                className={styles.socialIcon}
+                onClick={() => onClick(safeLinks[1].url)}
+                title={safeLinks[1].name}
+              >
+                <FacebookIcon />
               </div>
             )}
             {safeLinks[3] && safeLinks[3].name && (
@@ -93,17 +94,6 @@ export default function SocialIconsBlock({ onClick, links }: Props) {
                 <InstagramIcon />
               </div>
             )}
-            {safeLinks[2] && safeLinks[2].name && (
-              <div
-                className={styles.socialIcon}
-                onClick={() => onClick(safeLinks[2].url)}
-                title={safeLinks[2].name}
-              >
-                <TelegramIcon />
-              </div>
-            )}
-          </div>
-          <div className={styles.socialIconBlock}>
             {safeLinks[1] && safeLinks[1].name && (
               <div
                 className={styles.socialIcon}
@@ -111,6 +101,17 @@ export default function SocialIconsBlock({ onClick, links }: Props) {
                 title={safeLinks[1].name}
               >
                 <FacebookIcon />
+              </div>
+            )}
+          </div>
+          <div className={styles.socialIconBlock}>
+            {safeLinks[2] && safeLinks[2].name && (
+              <div
+                className={styles.socialIcon}
+                onClick={() => onClick(safeLinks[2].url)}
+                title={safeLinks[2].name}
+              >
+                <TelegramIcon />
               </div>
             )}
             {safeLinks[3] && safeLinks[3].name && (

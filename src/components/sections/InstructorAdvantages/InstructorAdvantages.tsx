@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, A11y } from "swiper/modules";
 import type { SwiperRef } from "swiper/react";
-import type { Swiper as SwiperClass } from "swiper/types";
+import type { Swiper as SwiperClass } from "swiper";
 import {
   WalkingIcon,
   DollarIcon,
@@ -205,8 +205,8 @@ export default function InstructorAdvantages() {
               speed={350}
               grabCursor={true}
               className={s.mobileSlider}
-              onSwiper={(inst) => (mobileSwiperRef.current = inst)}
-              onSlideChange={(inst) => setActiveMobile(inst.activeIndex || 0)}
+              onSwiper={(inst: SwiperClass) => (mobileSwiperRef.current = inst)}
+              onSlideChange={(inst: SwiperClass) => setActiveMobile(inst.activeIndex || 0)}
             >
               {mappedAdvantages.map((advantage, cardIndex) => (
                 <SwiperSlide
@@ -400,10 +400,10 @@ export default function InstructorAdvantages() {
               spaceBetween={16}
               slidesPerView={"auto"}
               slidesPerGroup={1}
-              onSwiper={(swiper) => {
+              onSwiper={(swiper: SwiperClass) => {
                 setActive(swiper.activeIndex);
               }}
-              onSlideChange={(swiper) => {
+              onSlideChange={(swiper: SwiperClass) => {
                 setActive(swiper.activeIndex);
               }}
               breakpoints={{

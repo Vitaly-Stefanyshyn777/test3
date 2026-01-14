@@ -290,4 +290,17 @@
     color: var(--black);
     opacity: 0.4;
   }
+
+  /* Мобільні стилі для spinner */
+  .spinner {
+    width: mvw(32);
+    height: mvw(32);
+    border: mvw(3) solid rgba(255, 255, 255, 0.3);
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+  }
 }

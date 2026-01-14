@@ -63,8 +63,14 @@ const ProductsFilter = ({
   };
 
   const handlePriceChange = (values: { min: number; max: number }) => {
-    handleFilterChange("priceMin", values.min);
-    handleFilterChange("priceMax", values.max);
+    // Змінюємо тільки один фільтр за раз для уникнення конфліктів
+    if (values.min !== filters.priceMin) {
+      handleFilterChange("priceMin", values.min);
+    }
+
+    if (values.max !== filters.priceMax) {
+      handleFilterChange("priceMax", values.max);
+    }
   };
 
   // Build WC filter params for useFilteredProducts

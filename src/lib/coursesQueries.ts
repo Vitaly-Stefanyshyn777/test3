@@ -113,11 +113,6 @@ const mapWcCourseToCourse = (wcCourse: Record<string, unknown>) => {
       courseProgramRaw[0].hl_data_course_program &&
       Array.isArray(courseProgramRaw[0].hl_data_course_program)
     ) {
-      console.log(
-        "📚 Used hl_data_course_program format for course",
-        wcCourse.id,
-        { courseProgram }
-      );
       courseProgram = courseProgramRaw[0].hl_data_course_program.map(
         (item: WcCourseProgramNestedItem) => ({
           hl_input_text_title: item.title,

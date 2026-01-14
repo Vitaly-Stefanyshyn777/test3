@@ -46,12 +46,6 @@ export default function OrderProducts({
   // Отримуємо товари: спочатку з order, якщо він є, інакше з кошика
   const productsToShow: ProductWithImage[] = React.useMemo(() => {
     if (order?.line_items && order.line_items.length > 0) {
-      console.log("📦 OrderProducts: Беремо товари з ЗАМОВЛЕННЯ (бекенд)", {
-        orderId: order.id,
-        totalItems: order.line_items.length,
-        showingItems: order.line_items.length,
-      });
-
       // Використовуємо товари з замовлення, але шукаємо зображення в кошику або WooCommerce
       return order.line_items.map((item) => {
         // Спочатку шукаємо зображення в кошику за product_id
@@ -64,16 +58,6 @@ export default function OrderProducts({
         const finalImage =
           cartItem?.image || productImages[item.product_id.toString()];
 
-        console.log("🛒 OrderProducts: Товар з замовлення:", {
-          productId: item.product_id,
-          name: item.name,
-          quantity: item.quantity,
-          hasImageInCart: !!cartItem?.image,
-          hasImageFromApi: !!productImages[item.product_id.toString()],
-          finalImage: finalImage ? "✅ Є фото" : "❌ Немає фото",
-          cartItemId: cartItem?.id,
-        });
-
         return {
           id: item.product_id,
           name: item.name,
@@ -82,24 +66,8 @@ export default function OrderProducts({
         };
       });
     } else {
-      console.log(
-        "🛒 OrderProducts: Беремо товари з КОШИКА (fallback, order ще не завантажено)",
-        {
-          cartItemsCount: cartItems.length,
-          showingItems: cartItems.length,
-        }
-      );
-
       // Fallback до товарів з кошика
       return cartItems.map((item) => {
-        console.log("🛒 OrderProducts: Товар з кошика:", {
-          cartItemId: item.id,
-          name: item.name,
-          quantity: item.quantity,
-          hasImage: !!item.image,
-          imageUrl: item.image || "Немає",
-        });
-
         return {
           id: item.id,
           name: item.name,
@@ -113,9 +81,6 @@ export default function OrderProducts({
   // Отримуємо зображення для товарів з замовлення
   useEffect(() => {
     if (!order?.line_items) {
-      console.log(
-        "📦 OrderProducts: Order ще не завантажено, пропускаємо завантаження зображень"
-      );
       return;
     }
 
@@ -124,18 +89,7 @@ export default function OrderProducts({
         (item) => !productImages[item.product_id.toString()]
       );
 
-      console.log(
-        "🖼️ OrderProducts: Завантажуємо зображення для товарів:",
-        productsToFetch.map((item) => ({
-          id: item.product_id,
-          name: item.name,
-        }))
-      );
-
       if (productsToFetch.length === 0) {
-        console.log(
-          "🖼️ OrderProducts: Всі зображення вже завантажено або немає товарів"
-        );
         return;
       }
 
@@ -146,9 +100,6 @@ export default function OrderProducts({
           productsToFetch.map(async (item) => {
             try {
               // Спочатку намагаємося отримати як WooCommerce продукт
-              console.log(
-                `🔍 OrderProducts: Шукаємо зображення для ${item.product_id} в WooCommerce API...`
-              );
               const wcResponse = await fetch(
                 `/api/wc/products/${item.product_id}`
               );
@@ -156,27 +107,11 @@ export default function OrderProducts({
                 const product = await wcResponse.json();
                 if (product.images && product.images.length > 0) {
                   imagesMap[item.product_id.toString()] = product.images[0].src;
-                  console.log(
-                    `✅ OrderProducts: Знайдено фото в WooCommerce для ${item.product_id}:`,
-                    product.images[0].src
-                  );
                   return;
-                } else {
-                  console.log(
-                    `❌ OrderProducts: WooCommerce продукт ${item.product_id} не має зображень`
-                  );
                 }
-              } else {
-                console.log(
-                  `❌ OrderProducts: WooCommerce API помилка для ${item.product_id}:`,
-                  wcResponse.status
-                );
               }
 
               // Якщо не знайшли в WooCommerce, намагаємося отримати як курс
-              console.log(
-                `🔍 OrderProducts: Шукаємо зображення для ${item.product_id} в Course API...`
-              );
               const courseResponse = await fetch(
                 `/api/course?id=${item.product_id}`
               );
@@ -187,42 +122,17 @@ export default function OrderProducts({
                   course.featured_image_url || course.image || course.thumbnail;
                 if (imageUrl) {
                   imagesMap[item.product_id.toString()] = imageUrl;
-                  console.log(
-                    `✅ OrderProducts: Знайдено фото в Course API для ${item.product_id}:`,
-                    imageUrl
-                  );
-                } else {
-                  console.log(
-                    `❌ OrderProducts: Course API не повернув зображення для ${item.product_id}`
-                  );
                 }
-              } else {
-                console.log(
-                  `❌ OrderProducts: Course API помилка для ${item.product_id}:`,
-                  courseResponse.status
-                );
               }
             } catch (error) {
-              console.error(
-                `❌ OrderProducts: Помилка завантаження зображення для ${item.product_id}:`,
-                error
-              );
+              // Помилка обробляється мовчки
             }
           })
         );
 
-        const loadedImagesCount = Object.keys(imagesMap).length;
-        console.log(
-          `🖼️ OrderProducts: Завантажено ${loadedImagesCount} зображень з API`,
-          imagesMap
-        );
-
         setProductImages((prev) => ({ ...prev, ...imagesMap }));
       } catch (error) {
-        console.error(
-          "❌ OrderProducts: Загальна помилка завантаження зображень:",
-          error
-        );
+        // Помилка обробляється мовчки
       }
     };
 

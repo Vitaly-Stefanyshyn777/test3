@@ -20,6 +20,7 @@ import TrainingLocationModal from "./TrainingLocationModal";
 import CertificatesSection from "./CertificatesSection";
 import PersonalGallerySection from "./PersonalGallerySection";
 import { uploadCoachMedia } from "@/lib/bfbApi";
+import { toast } from "react-toastify";
 
 const emptyExperience: WorkExperienceEntry = {
   gym: "",
@@ -49,6 +50,8 @@ const parseExperienceDate = (value?: string | null) => {
 
 const TrainerProfile: React.FC = () => {
   const token = useAuthStore((s) => s.token);
+  const isHydrated = useAuthStore((s) => s.isHydrated);
+
   const [formData, setFormData] = useState<TrainerProfileForm>({
     position: "",
     experience: "",
@@ -120,6 +123,9 @@ const TrainerProfile: React.FC = () => {
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
 
   useEffect(() => {
+    // Чекаємо на гідратацію перед перевіркою
+    if (!isHydrated) return;
+
     if (!isLoggedIn && !token) {
       setFormData({
         position: "",
@@ -698,6 +704,7 @@ const TrainerProfile: React.FC = () => {
 
     try {
       await updateProfile({ payload, token: authToken });
+      toast.success("Профіль тренера успішно збережено!");
 
       try {
         const locationsPayload = (formData.trainingLocations || []).map(
@@ -749,15 +756,6 @@ const TrainerProfile: React.FC = () => {
 
         if (filesToUpload.length > 0 && authToken) {
           try {
-            if (process.env.NODE_ENV !== "production") {
-              console.log(
-                "[TrainerProfile] Завантаження нових файлів галереї:",
-                {
-                  filesCount: filesToUpload.length,
-                }
-              );
-            }
-
             // Завантажуємо файли послідовно
             for (const file of filesToUpload) {
               try {
@@ -822,15 +820,6 @@ const TrainerProfile: React.FC = () => {
 
         if (certificatesFilesToUpload.length > 0 && authToken) {
           try {
-            if (process.env.NODE_ENV !== "production") {
-              console.log(
-                "[TrainerProfile] Завантаження нових файлів сертифікатів:",
-                {
-                  filesCount: certificatesFilesToUpload.length,
-                }
-              );
-            }
-
             // Завантажуємо файли послідовно
             for (const file of certificatesFilesToUpload) {
               try {
@@ -939,16 +928,6 @@ const TrainerProfile: React.FC = () => {
               : [];
         }
 
-        if (process.env.NODE_ENV !== "production") {
-          console.log("[TrainerProfile] Збереження галереї:", {
-            uploadedUrlsCount: uploadedUrls.length,
-            currentGalleryFromStateCount: currentGalleryFromState.length,
-            finalGalleryUrlsCount: galleryUrls.length,
-            uploadedUrls,
-            currentGalleryFromState,
-            galleryUrls,
-          });
-        }
 
         // Формуємо фінальний масив сертифікатів (аналогічно до галереї)
         let certificatesUrls: string[] = [];
@@ -985,17 +964,6 @@ const TrainerProfile: React.FC = () => {
               : [];
         }
 
-        if (process.env.NODE_ENV !== "production") {
-          console.log("[TrainerProfile] Збереження сертифікатів:", {
-            uploadedCertificatesUrlsCount: uploadedCertificatesUrls.length,
-            currentCertificatesFromStateCount:
-              currentCertificatesFromState.length,
-            finalCertificatesUrlsCount: certificatesUrls.length,
-            uploadedCertificatesUrls,
-            currentCertificatesFromState,
-            certificatesUrls,
-          });
-        }
 
         const metaToSave: Record<string, unknown> = {
           ...(freshMeta.input_text_social_phone !== undefined
@@ -1055,7 +1023,7 @@ const TrainerProfile: React.FC = () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       await refetchProfile();
     } catch (e) {
-      // Помилка оновлення профілю
+      toast.error("Не вдалося зберегти профіль тренера. Спробуйте ще раз.");
     }
   };
 

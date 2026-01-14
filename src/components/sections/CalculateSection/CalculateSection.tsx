@@ -23,10 +23,8 @@ const initialValues: CalculatorValues = {
 };
 
 // Значення за замовчуванням для розрахунків
-const DEFAULT_HOURS_PER_DAY = 2;
-const DEFAULT_WORKING_DAYS_PER_WEEK = 5;
-const DEFAULT_BOARD_PRICE = 6000; // ₴
-const DEFAULT_TRAINING_TYPE_COST = 6000; // Онлайн навчання
+const DEFAULT_BOARD_PRICE = 2900; // ₴
+const DEFAULT_TRAINING_TYPE_COST = 7500; // Вартість навчання
 
 const formatCurrency = (value: number) => {
   if (!Number.isFinite(value)) return "0";
@@ -91,20 +89,18 @@ export default function CalculateSection() {
             const boardsCount = toNumber(values.boardsCount);
             const trainingsPerWeek = toNumber(values.trainingsPerWeek);
 
-            // Використовуємо значення за замовчуванням для прихованих параметрів
-            const hoursPerDay = DEFAULT_HOURS_PER_DAY;
-            const workingDaysPerWeek = DEFAULT_WORKING_DAYS_PER_WEEK;
             const boardPrice = DEFAULT_BOARD_PRICE;
             const trainingTypeCost = DEFAULT_TRAINING_TYPE_COST;
 
-            const weeklyIncome =
-              averageTrainingCost * trainingsPerWeek * boardsCount -
-              rentPerHour;
-            const monthlyIncome = weeklyIncome * 4;
-            const weeklyExpenses =
-              rentPerHour * hoursPerDay * workingDaysPerWeek;
             const totalInvestment =
-              boardPrice * boardsCount + weeklyExpenses * 4 + trainingTypeCost;
+              rentPerHour * trainingsPerWeek * 4 +
+              boardPrice * boardsCount +
+              trainingTypeCost;
+
+            const monthlyIncome =
+              boardsCount * averageTrainingCost * trainingsPerWeek * 4;
+            const weeklyIncome = monthlyIncome / 4;
+            const weeklyExpenses = rentPerHour * trainingsPerWeek;
 
             setCalculationResults({
               weeklyIncome,
@@ -130,7 +126,9 @@ export default function CalculateSection() {
                     полів.
                   </h3>
                   <Form className={s.form}>
-                    <div className={`${s.fields} ${!isMobile ? s.columns : ''}`}>
+                    <div
+                      className={`${s.fields} ${!isMobile ? s.columns : ""}`}
+                    >
                       {!isMobile ? (
                         // Десктоп: 2 колонки по 2 поля
                         <>
@@ -141,9 +139,13 @@ export default function CalculateSection() {
                                   label="Ціна оренди зали за годину"
                                   type="text"
                                   {...field}
-                                  inputClassName={CalculatorInputStyles.inputWhite}
+                                  inputClassName={
+                                    CalculatorInputStyles.inputWhite
+                                  }
                                   hasError={meta.touched && !!meta.error}
-                                  supportingText={meta.touched ? meta.error : ""}
+                                  supportingText={
+                                    meta.touched ? meta.error : ""
+                                  }
                                 />
                               )}
                             </Field>
@@ -153,9 +155,13 @@ export default function CalculateSection() {
                                   label="Бажана кількість бордів"
                                   type="text"
                                   {...field}
-                                  inputClassName={CalculatorInputStyles.inputWhite}
+                                  inputClassName={
+                                    CalculatorInputStyles.inputWhite
+                                  }
                                   hasError={meta.touched && !!meta.error}
-                                  supportingText={meta.touched ? meta.error : ""}
+                                  supportingText={
+                                    meta.touched ? meta.error : ""
+                                  }
                                 />
                               )}
                             </Field>
@@ -167,9 +173,13 @@ export default function CalculateSection() {
                                   label="Середня вартість тренування для клієнта"
                                   type="text"
                                   {...field}
-                                  inputClassName={CalculatorInputStyles.inputWhite}
+                                  inputClassName={
+                                    CalculatorInputStyles.inputWhite
+                                  }
                                   hasError={meta.touched && !!meta.error}
-                                  supportingText={meta.touched ? meta.error : ""}
+                                  supportingText={
+                                    meta.touched ? meta.error : ""
+                                  }
                                 />
                               )}
                             </Field>
@@ -179,9 +189,13 @@ export default function CalculateSection() {
                                   label="Кількість тренувань на тиждень"
                                   type="text"
                                   {...field}
-                                  inputClassName={CalculatorInputStyles.inputWhite}
+                                  inputClassName={
+                                    CalculatorInputStyles.inputWhite
+                                  }
                                   hasError={meta.touched && !!meta.error}
-                                  supportingText={meta.touched ? meta.error : ""}
+                                  supportingText={
+                                    meta.touched ? meta.error : ""
+                                  }
                                 />
                               )}
                             </Field>
@@ -196,7 +210,9 @@ export default function CalculateSection() {
                                 label="Ціна оренди зали за годину"
                                 type="text"
                                 {...field}
-                                inputClassName={CalculatorInputStyles.inputWhite}
+                                inputClassName={
+                                  CalculatorInputStyles.inputWhite
+                                }
                                 hasError={meta.touched && !!meta.error}
                                 supportingText={meta.touched ? meta.error : ""}
                               />
@@ -208,7 +224,9 @@ export default function CalculateSection() {
                                 label="Бажана кількість бордів"
                                 type="text"
                                 {...field}
-                                inputClassName={CalculatorInputStyles.inputWhite}
+                                inputClassName={
+                                  CalculatorInputStyles.inputWhite
+                                }
                                 hasError={meta.touched && !!meta.error}
                                 supportingText={meta.touched ? meta.error : ""}
                               />
@@ -220,7 +238,9 @@ export default function CalculateSection() {
                                 label="Середня вартість тренування для клієнта"
                                 type="text"
                                 {...field}
-                                inputClassName={CalculatorInputStyles.inputWhite}
+                                inputClassName={
+                                  CalculatorInputStyles.inputWhite
+                                }
                                 hasError={meta.touched && !!meta.error}
                                 supportingText={meta.touched ? meta.error : ""}
                               />
@@ -232,7 +252,9 @@ export default function CalculateSection() {
                                 label="Кількість тренувань на тиждень"
                                 type="text"
                                 {...field}
-                                inputClassName={CalculatorInputStyles.inputWhite}
+                                inputClassName={
+                                  CalculatorInputStyles.inputWhite
+                                }
                                 hasError={meta.touched && !!meta.error}
                                 supportingText={meta.touched ? meta.error : ""}
                               />

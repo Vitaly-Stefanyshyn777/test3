@@ -60,6 +60,8 @@ export default function TrainingLocationModal({
   initialLocation = null,
 }: Props) {
   const token = useAuthStore((s) => s.token);
+  const isHydrated = useAuthStore((s) => s.isHydrated);
+
   const [uploadingGym, setUploadingGym] = useState(false);
   const [gymPhotos, setGymPhotos] = useState<string[]>([]);
   const [title, setTitle] = useState("");
@@ -76,6 +78,7 @@ export default function TrainingLocationModal({
   const [coordinates, setCoordinates] = useState(""); // координати у форматі "lat, lng"
 
   const [errors, setErrors] = useState<{
+    title?: string;
     phone?: string;
     weekendStart?: string;
     weekendEnd?: string;
@@ -233,6 +236,24 @@ export default function TrainingLocationModal({
               <h4 className={styles.sectionLabel}>Контакта інформація залу:</h4>
 
               <div className={styles.inputGroupBlock}>
+                <div className={styles.inputGroup}>
+                  <InputField
+                    wrapperClassName={styles.fullWidthInput}
+                    icon={<LocationIcon className={styles.inputIcon} />}
+                    label="Назва залу"
+                    value={title}
+                    hasError={!!errors.title}
+                    supportingText={errors.title}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setTitle(value);
+                      if (value.trim()) {
+                        setErrors((prev) => ({ ...prev, title: undefined }));
+                      }
+                    }}
+                  />
+                </div>
+
                 <div className={styles.inputGroup}>
                   <InputField
                     wrapperClassName={styles.fullWidthInput}
@@ -444,7 +465,8 @@ export default function TrainingLocationModal({
                 style={{ display: "none" }}
                 onChange={async (e) => {
                   const files = e.target.files;
-                  if (!files || files.length === 0 || !token) {
+                  // Чекаємо на гідратацію перед використанням токена
+                  if (!files || files.length === 0 || !isHydrated || !token) {
                     return;
                   }
                   try {
@@ -456,7 +478,7 @@ export default function TrainingLocationModal({
                         try {
                           const result = await uploadMedia({
                             file,
-                            token,
+                            token: token,
                             fieldType: "img_link_data_gallery_", // fieldType не використовується в стандартному endpoint, але потрібен для типу
                           });
                           return result.url || null;
@@ -506,6 +528,7 @@ export default function TrainingLocationModal({
             className={styles.modalSaveBtn}
             onClick={() => {
               const nextErrors: {
+                title?: string;
                 phone?: string;
                 weekendStart?: string;
                 weekendEnd?: string;
@@ -513,6 +536,9 @@ export default function TrainingLocationModal({
                 weekdayEnd?: string;
               } = {};
 
+              if (!title.trim()) {
+                nextErrors.title = "Обов'язкове поле";
+              }
               if (!phone.trim()) {
                 nextErrors.phone = "Невірний номер";
               }
@@ -530,6 +556,7 @@ export default function TrainingLocationModal({
               }
 
               if (
+                nextErrors.title ||
                 nextErrors.phone ||
                 nextErrors.weekendStart ||
                 nextErrors.weekendEnd ||

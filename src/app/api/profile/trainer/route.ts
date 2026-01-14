@@ -100,17 +100,11 @@ export async function PATCH(req: NextRequest) {
       const adminToken = req.cookies.get("bfb_admin_jwt")?.value;
       if (adminToken) {
         authHeader = `Bearer ${adminToken}`;
-        console.log(
-          "[PATCH /api/profile/trainer] Використовуємо адмінський токен з cookie"
-        );
       } else {
         // Якщо немає адмінського токена, перевіряємо токен користувача
         const userToken = req.cookies.get("bfb_user_jwt")?.value;
         if (userToken) {
           authHeader = `Bearer ${userToken}`;
-          console.log(
-            "[PATCH /api/profile/trainer] Використовуємо токен користувача з cookie"
-          );
         } else {
           // Якщо немає токена в cookies, використовуємо env токен
           const jwt = process.env.WP_JWT_TOKEN;
@@ -124,9 +118,6 @@ export async function PATCH(req: NextRequest) {
             );
           }
           authHeader = `Bearer ${jwt}`;
-          console.log(
-            "[PATCH /api/profile/trainer] Використовуємо токен з env"
-          );
         }
       }
     }
@@ -146,13 +137,7 @@ export async function PATCH(req: NextRequest) {
       const idStr = String(bodyId);
       if (!isNaN(Number(idStr)) && idStr.trim() !== "") {
         targetId = idStr;
-        console.log(
-          `[PATCH /api/profile/trainer] Адмін редагує користувача з ID: ${targetId}`
-        );
       } else {
-        console.log(
-          `[PATCH /api/profile/trainer] Отримано slug замість числового ID: "${idStr}"`
-        );
         return NextResponse.json(
           {
             error:
@@ -165,9 +150,6 @@ export async function PATCH(req: NextRequest) {
     } else {
       // Звичайний користувач завжди редагує свій профіль через "me"
       targetId = "me";
-      console.log(
-        `[PATCH /api/profile/trainer] Використовуємо "me" для редагування власного профілю`
-      );
     }
 
     const url = `${UPSTREAM_BASE}/wp-json/wp/v2/users/${targetId}`;
@@ -182,16 +164,7 @@ export async function PATCH(req: NextRequest) {
       cache: "no-store",
     });
 
-    console.log(
-      `[PATCH /api/profile/trainer] WordPress response status: ${upstreamRes.status}`
-    );
     const text = await upstreamRes.text();
-    console.log(
-      `[PATCH /api/profile/trainer] WordPress response (first 200 chars): ${text.substring(
-        0,
-        200
-      )}`
-    );
 
     return new NextResponse(text, {
       status: upstreamRes.status,

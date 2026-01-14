@@ -146,3 +146,15 @@ header {
     opacity: 1;
   }
 }
+
+/* Адаптивні стилі для toast повідомлень */
+.Toastify__toast {
+  font-size: 16px;
+}
+
+/* Мобільні стилі для toast */
+@media (max-width: 1000px) {
+  .Toastify__toast {
+    font-size: mvw(16);
+  }
+}

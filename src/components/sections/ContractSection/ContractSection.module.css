@@ -1,0 +1,175 @@
+.contract {
+  min-height: 100vh;
+  padding: 180px 0 200px;
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+
+.title {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 62px;
+  line-height: 110%;
+  letter-spacing: -0.01em;
+  text-align: center;
+  color: var(--black);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sectionTitle {
+  font-family: var(--second-family);
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 125%;
+  letter-spacing: -0.03em;
+  color: var(--black);
+}
+
+.sectionContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+}
+
+.text {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.link {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.01em;
+  color: var(--black);
+}
+
+.link:hover {
+  text-decoration: none;
+}
+
+.list {
+  padding-left: 0px;
+  margin: 0px;
+  list-style-type: none;
+}
+
+.list li {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  color: var(--black);
+}
+
+.listDashed {
+  padding-left: 0px;
+  margin: 0px;
+  list-style-type: none;
+}
+
+.listDashed li {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  color: var(--black);
+}
+
+/* Мобільні стилі */
+@media (max-width: 1000px) {
+  .contract {
+    padding: mvw(130) 0 mvw(60);
+    gap: mvw(40);
+  }
+
+  .link {
+    font-weight: 500;
+    font-size: mvw(14);
+    line-height: 140%;
+  }
+
+  .container {
+    padding: 0 mvw(16);
+    gap: mvw(24);
+    max-width: 100%;
+  }
+
+  .title {
+    font-weight: 700;
+    font-size: mvw(28);
+    line-height: 120%;
+    text-align: left;
+  }
+
+  .content {
+    gap: mvw(32);
+  }
+
+  .section {
+    gap: mvw(24);
+  }
+
+  .sectionTitle {
+    font-weight: 700;
+    font-size: mvw(24);
+    line-height: 120%;
+  }
+
+  .sectionContent {
+    gap: mvw(6);
+  }
+
+  .text {
+    font-weight: 500;
+    font-size: mvw(14);
+    line-height: 140%;
+  }
+
+  .list {
+    font-weight: 500;
+    font-size: mvw(14);
+    line-height: 140%;
+
+    gap: mvw(6);
+  }
+
+  .list li {
+    font-weight: 500;
+    font-size: mvw(14);
+    line-height: 140%;
+  }
+
+  .listDashed li {
+    font-weight: 500;
+    font-size: mvw(14);
+    line-height: 140%;
+  }
+}

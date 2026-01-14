@@ -198,15 +198,15 @@
   }
 
   .icon svg {
-    width: mvw(32);
-    height: mvw(32);
+    width: mvw(25);
+    height: mvw(25);
   }
 
   .number {
     border-radius: mvw(8);
     font-size: mvw(12);
     bottom: mvw(48);
-    right: mvw(19);
+    right: mvw(14);
 
     width: mvw(28);
     height: mvw(20);

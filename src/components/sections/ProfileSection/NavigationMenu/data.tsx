@@ -46,7 +46,7 @@ export const navigationItems: NavigationItem[] = [
   {
     id: "subscription",
     label: "Підписка",
-    href: "/profile/subscription",
+    href: "/profile/subscription/current",
     icon: BagMoneyIcon,
   },
   {

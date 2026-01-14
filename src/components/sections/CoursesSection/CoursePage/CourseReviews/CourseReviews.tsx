@@ -127,8 +127,8 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({ courseId }) => {
           ) : (
             <Swiper
               modules={[Navigation, Pagination, A11y]}
-              onSwiper={(sw) => (swiperRef.current = sw)}
-              onSlideChange={(sw) => {
+              onSwiper={(sw: SwiperType) => (swiperRef.current = sw)}
+              onSlideChange={(sw: SwiperType) => {
                 // Обмежуємо максимальний індекс, щоб останній слайд не враховувався
                 const maxIndex = Math.max(0, reviews.length - 2);
                 const currentIndex = Math.min(sw.activeIndex, maxIndex);

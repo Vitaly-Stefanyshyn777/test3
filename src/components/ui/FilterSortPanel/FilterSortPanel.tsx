@@ -43,6 +43,7 @@ export interface FilterSortPanelProps {
   itemsPerPage?: number;
   onItemsPerPageChange?: (perPage: number) => void;
   hideSort?: boolean;
+  hideItemsPerPage?: boolean;
 }
 
 export const SORT_OPTIONS: SortOption[] = [
@@ -76,6 +77,7 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
   itemsPerPage = 16,
   onItemsPerPageChange = () => {},
   hideSort = false,
+  hideItemsPerPage = false,
 }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -102,7 +104,7 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
                 className={styles.filterMobileButton}
                 onClick={() => setIsFilterModalOpen(true)}
               >
-                {/* <FilterMobileIcon className={styles.filterMobileIcon} /> */}
+                <FilterMobileIcon className={styles.filterMobileIcon} />
                 <span className={styles.filterMobileLabel}>Фільтр</span>
               </button>
               <div className={styles.sortSection}>
@@ -122,6 +124,7 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
                 <span className={styles.label}>Фільтр</span>
               </div>
               <div className={styles.sortSection}>
+                {!hideItemsPerPage && (
                 <SortDropdown
                   label="Показувати по"
                   value={String(itemsPerPage)}
@@ -132,6 +135,7 @@ const FilterSortPanel: React.FC<FilterSortPanelProps> = ({
                   className="itemsPerPage"
                   variant="itemsPerPage"
                 />
+                )}
                 {!hideSort && (
                   <SortDropdown
                     label="Сортування"

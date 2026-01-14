@@ -731,20 +731,20 @@
 }
 
 .contactButton {
-  width: 100%;
-  border-radius: 20px;
-  padding: 24px 42px;
+  border-radius: 16px;
+  padding: 20px 24px;
+  width: 343px;
+  height: 54px;
   background: var(--violet);
-  color: white;
   border: none;
   font-family: var(--third-family);
-  font-weight: 800;
-  font-size: 16px;
+  font-weight: 700;
+  font-size: 14px;
   line-height: 100%;
-  color: var(--white);
+  color: #fff;
   cursor: pointer;
   transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
-  display: none;
+  display: block;
 }
 
 .contactButton:hover {
@@ -878,7 +878,7 @@
     width: 100%;
     position: relative;
     z-index: 1;
-    padding-bottom: mvw(240);
+    padding-bottom: mvw(80);
     margin-bottom: mvw(0);
     overflow: visible;
     min-height: auto;
@@ -886,9 +886,9 @@
 
   .trainerProfile {
     flex-direction: column;
-    padding: mvw(124) mvw(16);
+    padding: mvw(124) mvw(16) mvw(20) mvw(16);
     gap: mvw(24);
-    background-color: var(--white);
+    background-color: var(--bg-color);
     margin-bottom: 0;
   }
   .galleryEmpty {
@@ -916,6 +916,7 @@
   }
 
   .overview {
+    background-color: var(--bg-color);
     border-radius: 0;
     flex-direction: column;
     gap: mvw(24);
@@ -967,7 +968,7 @@
   }
 
   .ContactsContainer {
-    display: none; /* Приховуємо контакти в Overview, вони будуть в TrainerMap */
+    /* display: none; */
   }
 
   .avatar {
@@ -1066,8 +1067,10 @@
   }
 
   .ContactsText {
-    font-size: mvw(18);
-    line-height: 120%;
+    font-family: var(--second-family);
+    font-weight: 600;
+    font-size: mvw(16);
+    color: var(--black);
   }
 
   .IconsContainer {
@@ -1075,22 +1078,30 @@
   }
 
   .IconsBlock {
-    width: mvw(44);
-    height: mvw(44);
-    padding: mvw(10);
-    border-radius: mvw(12);
+    border: mvw(2) solid rgba(14, 14, 14, 0.1);
+    border-radius: mvw(16);
+    /* padding: mvw(20); */
+    width: mvw(58);
+    height: mvw(58);
   }
 
   .IconsBlock svg {
-    width: mvw(20);
-    height: mvw(20);
+    width: mvw(24);
+    height: mvw(24);
   }
 
   .contactButton {
-    padding: mvw(16) mvw(24);
+    padding: mvw(20) mvw(24);
     border-radius: mvw(16);
     font-size: mvw(14);
     line-height: 100%;
+    width: mvw(343);
+    height: mvw(54);
+    position: fixed;
+    bottom: mvw(20);
+    /* left: 50%;
+    transform: translateX(-50%); */
+    z-index: 1000;
   }
 
   .specializationsContainer {
@@ -1111,6 +1122,7 @@
   }
 
   .tag {
+    background-color: var(--white);
     padding: mvw(10) mvw(14);
     font-size: mvw(12);
     line-height: 140%;
@@ -1237,5 +1249,57 @@ height: mvw(44); */
   .galleryContainer :global(.activeDot) {
     width: mvw(6);
     height: mvw(6);
+  }
+}
+
+.certificatesSection {
+  margin-top: 40px;
+}
+
+.certificatesTitle {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 140%;
+  color: var(--black);
+  margin-bottom: 20px;
+}
+
+.certificatesContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.certificateItem {
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--white);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.certificateImage {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+@media (max-width: 1000px) {
+  .certificatesSection {
+    margin-top: mvw(40);
+  }
+
+  .certificatesTitle {
+    font-size: mvw(24);
+    margin-bottom: mvw(20);
+  }
+
+  .certificatesContainer {
+    grid-template-columns: 1fr;
+    gap: mvw(20);
+  }
+
+  .certificateItem {
+    border-radius: mvw(12);
   }
 }

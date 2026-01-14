@@ -13,17 +13,21 @@ import {
   useFilteredProducts,
   type ProductFilters,
 } from "@/components/hooks/useFilteredProducts";
-import { ProductsNewShowcase } from "@/components/ProductsShowcase/ProductsNewShowcase";
+// import { ProductsNewShowcase } from "@/components/ProductsShowcase/ProductsNewShowcase";
+import { ProductsShowcase } from "@/components/ProductsShowcase/ProductsShowcase";
 import { fetchWcCategories } from "@/lib/bfbApi";
 import { mapSortTypeToWcParams } from "@/lib/sortMapping";
+import { useWcCategoriesQuery } from "@/components/hooks/useWpQueries";
 
 const ProductsCatalog = () => {
   const { filters, updateFilters, resetFilters } = useProducts();
   // Видалено useProductsQuery, використовуємо тільки useFilteredProducts
 
   const [appliedWcFilters, setAppliedWcFilters] =
-    useState<Partial<ProductFilters> | null>({ category: "30" });
-  const [catalogTitle, setCatalogTitle] = useState<string>("Товари для спорту");
+    useState<Partial<ProductFilters> | null>({
+      category: ["30", "85", "86", "87"],
+    }); // Показуємо товари з категорій: Товари для спорту (30) та Інвентар (85, 86, 87)
+  const [catalogTitle, setCatalogTitle] = useState<string>("Каталог товарів");
   const [sortBy, setSortBy] = useState<SortType>("popular");
   const [itemsPerPage, setItemsPerPage] = useState<number>(12);
   const appliedCategoryRef = useRef<string | string[] | undefined>(
@@ -39,9 +43,11 @@ const ProductsCatalog = () => {
   useEffect(() => {
     const q = searchParams.get("category");
     if (!q) {
-      setCatalogTitle("Товари для спорту");
+      setCatalogTitle("Каталог товарів");
       // Скидаємо фільтри при переході на /products без category
       resetFilters();
+      // Встановлюємо дефолтні категорії
+      setAppliedWcFilters({ category: ["30", "85", "86", "87"] });
       return;
     }
 
@@ -53,49 +59,25 @@ const ProductsCatalog = () => {
       }
       if (q === "30") {
         setCatalogTitle("Товари для спорту");
+      } else if (q === appliedCategoryRef.current) {
+        // Якщо це та сама категорія, зберігаємо попередній заголовок
       } else {
-        // Спроба дістати назву категорії за ID
-        (async () => {
-          try {
-            const cats = (await fetchWcCategories({ include: q })) as Array<{
-              id: number;
-              name: string;
-            }>;
-            const byId = (cats || []).find((c) => String(c.id) === q);
-            if (byId?.name) setCatalogTitle(byId.name);
-          } catch {
-            // залишаємо попередній заголовок
-          }
-        })();
+        // Шукаємо в закешованих даних
+        const allCategories = [...(categories85 || []), ...(categories77 || [])];
+        const byId = allCategories.find((c) => String(c.id) === q);
+        if (byId?.name) setCatalogTitle(byId.name);
       }
       return;
     }
 
     (async () => {
       try {
-        // Шукаємо категорію за slug серед ВСІХ категорій, а не тільки з parent=85
-        // Спочатку пробуємо знайти в категоріях інвентарю (parent=85)
-        let cats = (await fetchWcCategories({
-          parent: 85,
-          per_page: 100,
-        })) as Array<{
-          id: number;
-          name: string;
-          slug: string;
-        }>;
+        // Використовуємо закешовані дані замість нових запитів
+        let found = (categories85 || []).find((c) => c.slug === q);
 
-        let found = (cats || []).find((c) => c.slug === q);
-
-        // Якщо не знайшли, шукаємо серед всіх категорій
+        // Якщо не знайшли в інвентарі, шукаємо в інших категоріях
         if (!found) {
-          cats = (await fetchWcCategories({
-            per_page: 100,
-          })) as Array<{
-            id: number;
-            name: string;
-            slug: string;
-          }>;
-          found = (cats || []).find((c) => c.slug === q);
+          found = (categories77 || []).find((c) => c.slug === q);
         }
 
         if (found) {
@@ -112,7 +94,7 @@ const ProductsCatalog = () => {
             // Скидаємо локальні фільтри при зміні категорії
             resetFilters();
           }
-          setCatalogTitle("Товари для спорту");
+          setCatalogTitle("Каталог товарів");
         }
       } catch {
         if (q !== appliedCategoryRef.current) {
@@ -136,13 +118,15 @@ const ProductsCatalog = () => {
     };
   }, [appliedWcFilters, sortBy, itemsPerPage]);
 
+  // Оптимізовані запити на категорії з кешуванням
+  const { data: categories85 = [] } = useWcCategoriesQuery(85); // Інвентар
+  const { data: categories77 = [] } = useWcCategoriesQuery(77); // Інші категорії
 
   const {
     data: wcFilteredProducts = [],
     isLoading,
     isError,
   } = useFilteredProducts(wcFiltersWithSort);
-
 
   type FilterProduct = {
     id?: string | number;
@@ -225,28 +209,12 @@ const ProductsCatalog = () => {
         // Якщо це slug, потрібно знайти ID серед ВСІХ категорій
         (async () => {
           try {
-            // Спочатку шукаємо в категоріях інвентарю
-            let cats = (await fetchWcCategories({
-              parent: 85,
-              per_page: 100,
-            })) as Array<{
-              id: number;
-              name: string;
-              slug: string;
-            }>;
+            // Використовуємо закешовані дані
+            let found = (categories85 || []).find((c) => c.slug === categoryParam);
 
-            let found = (cats || []).find((c) => c.slug === categoryParam);
-
-            // Якщо не знайшли, шукаємо серед всіх категорій
+            // Якщо не знайшли в інвентарі, шукаємо в інших категоріях
             if (!found) {
-              cats = (await fetchWcCategories({
-                per_page: 100,
-              })) as Array<{
-                id: number;
-                name: string;
-                slug: string;
-              }>;
-              found = (cats || []).find((c) => c.slug === categoryParam);
+              found = (categories77 || []).find((c) => c.slug === categoryParam);
             }
             if (found) {
               setAppliedWcFilters({ category: String(found.id) });
@@ -259,15 +227,18 @@ const ProductsCatalog = () => {
         })();
       }
     } else {
-      // Якщо немає категорії в URL, скидаємо на дефолтну категорію "30"
-      setAppliedWcFilters({ category: "30" });
+      // Якщо немає категорії в URL, завжди скидаємо на дефолтні категорії (всі товари)
+      setAppliedWcFilters({
+        category: ["30", "85", "86", "87"],
+      });
     }
   };
 
   return (
     <div className={styles.productsCatalog}>
       <div className={styles.catalogContentBlock}>
-        <ProductsNewShowcase />
+        {/* <ProductsNewShowcase /> */}
+        <ProductsShowcase title="Товари для спорту" />
         <div className={styles.catalogContentContainer}>
           <FilterSortPanel
             filters={filters}
@@ -287,13 +258,17 @@ const ProductsCatalog = () => {
           <div className={styles.catalogContent}>
             <ProductsFilter
               filters={filters}
-              onFiltersChange={(newFilters) => updateFilters(newFilters)}
+              onFiltersChange={updateFilters}
               onReset={handleReset}
               products={wcFilteredProductsForFilter}
               searchTerm={searchTerm}
               loading={isLoading}
               onApply={(params) => {
-                setAppliedWcFilters(params as Partial<ProductFilters>);
+                // Зберігаємо поточні категорії та додаємо фільтри
+                setAppliedWcFilters({
+                  ...appliedWcFilters,
+                  ...params,
+                } as Partial<ProductFilters>);
               }}
             />
             <ProductsCatalogContainer

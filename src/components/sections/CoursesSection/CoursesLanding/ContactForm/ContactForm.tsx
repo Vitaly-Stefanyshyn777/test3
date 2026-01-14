@@ -134,7 +134,7 @@ export default function ContactForm({
 
         <p className={s.privacyText}>
           Натискаючи на кнопку, ви погоджуєтесь з{" "}
-          <a href="/privacy" className={s.privacyLink}>
+          <a href="/privacy-policy" className={s.privacyLink}>
             Політикою конфіденційності
           </a>
         </p>

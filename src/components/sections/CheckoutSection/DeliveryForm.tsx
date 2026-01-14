@@ -12,6 +12,17 @@ import BranchDropdownField, {
 import SecondaryInput from "@/components/ui/FormFields/SecondaryInput";
 import secondaryInputStyles from "@/components/ui/FormFields/SecondaryInput.module.css";
 
+interface Warehouse {
+  name: string;
+  position?: {
+    latitude: number;
+    longitude: number;
+  };
+  maxWeightPlaceSender?: number;
+  maxWeightPlaceRecipient?: number;
+  workSchedule?: string;
+}
+
 interface DeliveryFormProps {
   deliveryType: string;
   formData: FormData;
@@ -40,7 +51,7 @@ export default function DeliveryForm({
 
   const deliveryOptions: BranchDropdownOption[] = [
     { value: "branch", label: "На відділення" },
-    { value: "cargo", label: "Грузове відділення" },
+    { value: "postomat", label: "Поштомат" },
     { value: "courier", label: "Курʼєр" },
   ];
 
@@ -104,7 +115,6 @@ export default function DeliveryForm({
           data as Array<{
             name?: string;
             branches?: Array<{ name: string }>;
-            postomats?: Array<{ name: string }>;
             warehouses?: Array<{ name: string }>;
           }>
         ).find((city) => city.name === formData.city);
@@ -113,20 +123,42 @@ export default function DeliveryForm({
           return;
         }
 
-        // Витягуємо всі відділення та поштомати
-        const allWarehouses = [
-          ...(selectedCity.branches || []),
-          ...(selectedCity.postomats || []),
-          ...(selectedCity.warehouses || []),
-        ];
+        // Фільтруємо відділення залежно від типу доставки
+        let allWarehouses: Warehouse[] = [];
+
+        if (deliveryType === "branch") {
+          // Для "На відділення" показуємо відділення та пункти приймання (без поштоматів)
+          allWarehouses = [
+            ...(selectedCity.branches || []),
+            ...(selectedCity.warehouses || []).filter(warehouse =>
+              !warehouse.name.includes("Поштомат")
+            ),
+          ];
+        } else if (deliveryType === "postomat") {
+          // Для "Поштомат" показуємо тільки поштомати з warehouses
+          allWarehouses = [
+            ...(selectedCity.warehouses || []).filter(warehouse =>
+              warehouse.name.includes("Поштомат")
+            ),
+          ];
+        } else {
+          // Для інших типів (якщо знадобиться) показуємо все
+          allWarehouses = [
+            ...(selectedCity.branches || []),
+            ...(selectedCity.warehouses || []),
+          ];
+        }
 
         const branchesList: DropdownOption[] = allWarehouses
-          .map((warehouse: { name: string }) => ({
-            value: warehouse.name,
-            label: warehouse.name
+          .map((warehouse: { name: string }) => {
+            const formattedName = warehouse.name
               .replace(/Пункт приймання-видачі \(до \d+ кг\): /, "")
-              .replace(/Поштомат "Нова Пошта" №\d+: /, "Поштомат: "),
-          }))
+              .replace(/Поштомат "Нова Пошта" №\d+: /, "Поштомат: ");
+            return {
+              value: formattedName,
+              label: formattedName,
+            };
+          })
           .slice(0, 50); // Обмежуємо до 50 для продуктивності
 
         setBranches(branchesList);
@@ -139,7 +171,7 @@ export default function DeliveryForm({
     };
 
     loadBranches();
-  }, [formData.city]);
+  }, [formData.city, deliveryType]);
 
   return (
     <div className={s.deliveryBlock}>
@@ -152,7 +184,11 @@ export default function DeliveryForm({
               value={deliveryType}
               options={deliveryOptions}
               placeholder="Обери спосіб доставки"
-              onChange={(value) => setDeliveryType(value)}
+              onChange={(value) => {
+                setDeliveryType(value);
+                // Очищуємо обране відділення при зміні типу доставки
+                setFormData({ ...formData, branch: "" });
+              }}
               showLabel={false}
               icon={<NovaPoshtaIcon />}
               hasError={!!errors.deliveryType}
@@ -189,28 +225,48 @@ export default function DeliveryForm({
 
         <div className={s.deliveryRow}>
           <div className={s.inputWrapBranch}>
-            <DropdownField
-              label=""
-              value={formData.branch}
-              options={branches}
-              placeholder={
-                loadingBranches
-                  ? "Завантаження..."
-                  : !formData.city
-                  ? "Спочатку оберіть місто"
-                  : "На відділення"
-              }
-              onChange={(value) => setFormData({ ...formData, branch: value })}
-              showLabel={false}
-              hasError={!!errors.branch}
-              supportingText={errors.branch || ""}
-              isOpen={openDropdown === "branch"}
-              onOpenChange={(isOpen) =>
-                setOpenDropdown(isOpen ? "branch" : null)
-              }
-              backgroundColor="white"
-              disabled={!formData.city}
-            />
+            {deliveryType === "courier" ? (
+              <SecondaryInput
+                label="Адреса доставки"
+                type="text"
+                value={formData.branch}
+                onChange={(e) =>
+                  setFormData({ ...formData, branch: e.target.value })
+                }
+                inputClassName={secondaryInputStyles.inputWhite}
+                hasError={!!errors.branch}
+                supportingText={errors.branch || ""}
+                placeholder="Введіть повну адресу доставки"
+              />
+            ) : (
+              <DropdownField
+                label=""
+                value={formData.branch}
+                options={branches}
+                key={branches.length} // Force re-render when branches change
+                placeholder={
+                  loadingBranches
+                    ? "Завантаження..."
+                    : !formData.city
+                    ? "Спочатку оберіть місто"
+                    : branches.length === 0
+                    ? "Немає поштових відділень"
+                    : deliveryType === "postomat"
+                    ? "Оберіть поштомат"
+                    : "На відділення"
+                }
+                onChange={(value) => setFormData({ ...formData, branch: value })}
+                showLabel={false}
+                hasError={!!errors.branch}
+                supportingText={errors.branch || ""}
+                isOpen={openDropdown === "branch"}
+                onOpenChange={(isOpen) =>
+                  setOpenDropdown(isOpen ? "branch" : null)
+                }
+                backgroundColor="white"
+                disabled={!formData.city || branches.length === 0}
+              />
+            )}
           </div>
           {deliveryType === "courier" && (
             <div className={s.addressFields}>

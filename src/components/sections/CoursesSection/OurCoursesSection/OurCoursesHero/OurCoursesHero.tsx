@@ -12,13 +12,13 @@ const OurCoursesHero = () => {
               <div className={styles.roiIcon}>
                 <Weight4Icon />
               </div>
-              <span className={styles.roiText}>Курси bfb</span>
+              <span className={styles.roiText}>Курси воркшопи</span>
             </div>
 
             <h1 className={styles.heroTitle}>Наші курси</h1>
 
             <p className={styles.heroDescription}>
-              Наші курси BFB створені для тренерів, залів і всіх, хто хоче
+              Наші курси створені для тренерів, залів і всіх, хто хоче
               тренуватись глибше та свідоміше. Знання легко застосовувати на
               практиці у роботі з клієнтами, у студії або для власного розвитку
             </p>

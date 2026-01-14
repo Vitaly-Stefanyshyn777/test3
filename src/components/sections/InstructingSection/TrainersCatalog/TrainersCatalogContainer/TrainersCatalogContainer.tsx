@@ -16,7 +16,10 @@ interface Props {
   itemsPerPage?: number;
 }
 
-const TrainersCatalogContainer = ({ filteredPosts, itemsPerPage = 16 }: Props) => {
+const TrainersCatalogContainer = ({
+  filteredPosts,
+  itemsPerPage = 16,
+}: Props) => {
   const { data: coaches = [], isLoading, isError } = useCoachesQuery();
 
   const [sortBy] = useState("name");
@@ -63,7 +66,7 @@ const TrainersCatalogContainer = ({ filteredPosts, itemsPerPage = 16 }: Props) =
   useEffect(() => {
     setActiveIndex(0);
     setCurrentPage(1);
-  }, [filteredPosts]);
+  }, [filteredPosts, itemsPerPage]); // Додаємо itemsPerPage до залежностей
 
   // pagination handled via SliderNav
 

@@ -9,7 +9,6 @@ import {
   Check3Icon,
 } from "@/components/Icons/Icons";
 import styles from "./CourseProgram.module.css";
-import CourseProgramSkeleton from "./CourseProgramSkeleton";
 
 interface CourseModule {
   id: number;
@@ -67,10 +66,10 @@ const CourseProgram: React.FC<CourseProgramProps> = ({ courseId = 169 }) => {
         (program: CourseProgramItem, index: number) => ({
           id: index + 1,
           title: program.hl_input_text_title || `Модуль ${index + 1}`,
-          description: program.hl_textarea_description || "Опис модуля",
+          description: program.hl_textarea_description || "",
           lessonsCount:
             parseInt(
-              program.hl_input_text_lesson_count?.replace(/\D/g, "") || "1"
+              program.hl_input_text_lesson_count?.replace(/\D/g, "") || ""
             ) || 1,
           isExpanded: false,
         })
@@ -103,19 +102,17 @@ const CourseProgram: React.FC<CourseProgramProps> = ({ courseId = 169 }) => {
   };
 
   if (isLoading) {
-    return <CourseProgramSkeleton />;
+    return null;
   }
 
+  // Якщо немає курсу або помилка - не показуємо секцію
   if (error || !course) {
-    return (
-      <section className={styles.program}>
-        <div className={styles.content}>
-          <div className={styles.error}>
-            Помилка завантаження програми курсу
-          </div>
-        </div>
-      </section>
-    );
+    return null;
+  }
+
+  // Якщо програма курсу порожня - не показуємо секцію
+  if (!modules || modules.length === 0) {
+    return null;
   }
 
   return (
@@ -194,55 +191,67 @@ const CourseProgram: React.FC<CourseProgramProps> = ({ courseId = 169 }) => {
         </div>
 
         <div className={styles.rightColumn}>
-          <div className={styles.statsCardBlock}>
-            <div className={styles.statsCard}>
-              <div className={styles.statBlock}>
-                <div className={styles.statIcon}>
-                  <BooksIcon />
-                </div>
-                <div className={styles.statItemBlock}>
-                  <div className={styles.statItem}>
-                    <span className={styles.statLabel}>Блоки:</span>
-                    <span className={styles.statNumber}>
-                      {course?.course_data.Blocks || "201"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.statsCardRight}>
-              <div className={styles.statBlock}>
-                <div className={styles.statIcon}>
-                  <GlobeIcon />
-                </div>
-                <div className={styles.statItemBlock}>
-                  <div className={styles.statItem}>
-                    <span className={styles.statLabel}>Онлайн заняття:</span>
-                    <span className={styles.statNumber}>
-                      {course?.course_data.Online_lessons || "12"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.learningOutcomes}>
-            <h3>ЧОГО ВИ НАВЧИТЕСЬ</h3>
-            <ul className={styles.learningList}>
-              {course.course_data.What_learn.map(
-                (item: string, index: number) => (
-                  <li key={index} className={styles.learningItem}>
-                    <div className={styles.learningIcon}>
-                      <Check3Icon />
+          {(course?.course_data.Blocks ||
+            course?.course_data.Online_lessons) && (
+            <div className={styles.statsCardBlock}>
+              <div className={styles.statsCard}>
+                {course?.course_data.Blocks && (
+                  <div className={styles.statBlock}>
+                    <div className={styles.statIcon}>
+                      <BooksIcon />
                     </div>
-                    <span className={styles.learningText}>{item}</span>
-                  </li>
-                )
-              )}
-            </ul>
-          </div>
+                    <div className={styles.statItemBlock}>
+                      <div className={styles.statItem}>
+                        <span className={styles.statLabel}>Блоки:</span>
+                        <span className={styles.statNumber}>
+                          {course.course_data.Blocks}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className={styles.statsCardRight}>
+                {course?.course_data.Online_lessons && (
+                  <div className={styles.statBlock}>
+                    <div className={styles.statIcon}>
+                      <GlobeIcon />
+                    </div>
+                    <div className={styles.statItemBlock}>
+                      <div className={styles.statItem}>
+                        <span className={styles.statLabel}>
+                          Онлайн заняття:
+                        </span>
+                        <span className={styles.statNumber}>
+                          {course.course_data.Online_lessons}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {course.course_data.What_learn &&
+            course.course_data.What_learn.length > 0 && (
+              <div className={styles.learningOutcomes}>
+                <h3>ЧОГО ВИ НАВЧИТЕСЬ</h3>
+                <ul className={styles.learningList}>
+                  {course.course_data.What_learn.filter(
+                    (item: string) => item && item.trim()
+                  ).map((item: string, index: number) => (
+                    <li key={index} className={styles.learningItem}>
+                      <div className={styles.learningIcon}>
+                        <Check3Icon />
+                      </div>
+                      <span className={styles.learningText}>{item.trim()}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
         </div>
       </div>
     </section>

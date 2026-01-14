@@ -196,6 +196,7 @@
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
+    border-radius: 0 0 mvw(16) mvw(16);
   }
 
   .heroContainer {

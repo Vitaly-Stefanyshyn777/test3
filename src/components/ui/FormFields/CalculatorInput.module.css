@@ -213,7 +213,7 @@
 
   .input:focus + .label,
   .input:not(:placeholder-shown) + .label {
-    top: mvw(8);
+    top: mvw(6);
     transform: translateY(0);
     font-size: mvw(11);
   }
@@ -242,7 +242,7 @@
     height: mvw(25);
     right: mvw(16);
 
-    top: 55%;
+    top: 50%;
     svg {
       width: mvw(25);
       height: mvw(25);

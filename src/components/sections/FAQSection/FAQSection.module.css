@@ -283,7 +283,7 @@
 
 @media (max-width: 1000px) {
   .faqSection {
-    padding: mvw(24) 0;
+    padding: mvw(0) 0;
   }
 
   .container {

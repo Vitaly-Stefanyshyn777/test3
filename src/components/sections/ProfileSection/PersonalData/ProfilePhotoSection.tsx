@@ -21,39 +21,28 @@ export default function ProfilePhotoSection({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const token = useAuthStore((s) => s.token);
+  const isHydrated = useAuthStore((s) => s.isHydrated);
 
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
-    if (!file || !token) return;
+    // Чекаємо на гідратацію перед використанням токена
+    if (!file || !isHydrated || !token) return;
 
     try {
       setUploading(true);
       setError(null);
 
-      if (process.env.NODE_ENV !== "production") {
-        console.log({
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          field_type: "img_link_data_avatar",
-        });
-      }
-
       // Використовуємо кастомний ендпоїнт для збереження аватару у мета
       const result = await uploadCoachMedia({
-        token,
+        token: token,
         fieldType: "img_link_data_avatar",
         files: [file],
       });
 
       const uploadedUrl =
         result?.files?.[0]?.url || result?.current_field_value || null;
-
-      if (process.env.NODE_ENV !== "production") {
-        console.log("Uploaded URL:", uploadedUrl);
-      }
 
       if (uploadedUrl) {
         // Створюємо File-обʼєкт з доданою url-властивістю для батьківського компонента

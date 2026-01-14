@@ -8,8 +8,9 @@ import { fetchBanners, BannerPost } from "../../lib/bfbApi";
 import VideoPlayer from "./ProfileSection/VideoInstruction/VideoPlayer";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { A11y } from "swiper/modules";
-import type { Swiper as SwiperClass } from "swiper/types";
+import type { Swiper as SwiperClass } from "swiper";
 import "swiper/css";
+import HeroSectionPlaceholder from "./HeroSectionPlaceholder";
 
 const HeroSection = () => {
   const [banners, setBanners] = useState<BannerPost[]>([]);
@@ -121,7 +122,9 @@ const HeroSection = () => {
     if (upstreamBase) {
       try {
         const apiDomain = new URL(upstreamBase).origin;
-        const existingPreconnect = document.querySelector(`link[href="${apiDomain}"]`);
+        const existingPreconnect = document.querySelector(
+          `link[href="${apiDomain}"]`
+        );
         if (!existingPreconnect) {
           const preconnect = document.createElement("link");
           preconnect.rel = "preconnect";
@@ -322,7 +325,9 @@ const HeroSection = () => {
 
       const posterUrl = getPosterFromBanner(activeBanner);
       if (posterUrl) {
-        const existingPosterLink = document.querySelector(`link[href="${posterUrl}"]`);
+        const existingPosterLink = document.querySelector(
+          `link[href="${posterUrl}"]`
+        );
         if (!existingPosterLink) {
           const posterLink = document.createElement("link");
           posterLink.rel = "preload";
@@ -347,14 +352,19 @@ const HeroSection = () => {
     (activeBanner?.Description as string) ||
     "";
 
+  // Показуємо плейсхолдер під час завантаження
+  if (isLoading) {
+    return <HeroSectionPlaceholder isMobile={isMobile} />;
+  }
+
   return (
     <section className={s.hero} data-hero-section>
       {/* Banner slider (background) */}
       {banners.length > 0 && (
         <Swiper
           modules={[A11y]}
-          onSwiper={(inst) => setSwiper(inst)}
-          onSlideChange={(inst) => {
+          onSwiper={(inst: SwiperClass) => setSwiper(inst)}
+          onSlideChange={(inst: SwiperClass) => {
             setActiveIndex(inst.activeIndex || 0);
             const b = banners[inst.activeIndex] || null;
             setActiveBannerId(b ? b.id : null);

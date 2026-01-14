@@ -49,7 +49,8 @@ function loadUserData(userId: string) {
 
   const tokenInStorage =
     typeof window !== "undefined" &&
-    (localStorage.getItem("bfb_token") || localStorage.getItem("bfb_token_old"));
+    (localStorage.getItem("bfb_token") ||
+      localStorage.getItem("bfb_token_old"));
 
   if (!tokenInStorage) return;
 
@@ -62,6 +63,34 @@ function loadUserData(userId: string) {
       // Silently handle errors
     }
   }, 200);
+}
+
+// Функція для синхронізації даних після авторизації
+function syncUserDataAfterLogin(userId: string) {
+  // Використовуємо setTimeout щоб дати час на ініціалізацію компонентів
+  setTimeout(async () => {
+    try {
+      // Динамічно імпортуємо stores щоб уникнути циклічних залежностей
+      const { useCartStore } = await import("./cart");
+      const { useFavoriteStore } = await import("./favorites");
+
+      const cartStore = useCartStore.getState();
+      const favoriteStore = useFavoriteStore.getState();
+
+      // Встановлюємо ID користувача
+      cartStore.setUserId(userId);
+      favoriteStore.setUserId(userId);
+
+      // Очищаємо старі дані та завантажуємо нові
+      cartStore.clear();
+      favoriteStore.clear();
+
+      await cartStore.loadUserData(userId);
+      await favoriteStore.loadUserData(userId);
+    } catch (err) {
+      console.error("Error syncing user data after login:", err);
+    }
+  }, 500); // Трохи більше часу для ініціалізації
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -121,15 +150,19 @@ export const useAuthStore = create<AuthState>()(
             return false;
           }
 
-          const fullName = `${profile?.first_name ?? ""} ${profile?.last_name ?? ""}`.trim();
+          const fullName = `${profile?.first_name ?? ""} ${
+            profile?.last_name ?? ""
+          }`.trim();
           const resolvedName = fullName || profile?.name || "";
-          const resolvedEmail = profile?.email || profile?.user_email || user?.email;
+          const resolvedEmail =
+            profile?.email || profile?.user_email || user?.email;
 
           let previousSavedAvatar: string | undefined;
           try {
             const raw = localStorage.getItem("bfb_user");
             if (raw) {
-              previousSavedAvatar = (JSON.parse(raw) as AuthUser | null)?.avatar || undefined;
+              previousSavedAvatar =
+                (JSON.parse(raw) as AuthUser | null)?.avatar || undefined;
             }
           } catch {}
 
@@ -143,12 +176,14 @@ export const useAuthStore = create<AuthState>()(
               const anyAvatar = profile?.avatar;
               const avatar96 = profile?.avatar_urls?.["96"];
 
-              const serverCandidate = metaAvatar || anyAvatar || avatar96 || undefined;
+              const serverCandidate =
+                metaAvatar || anyAvatar || avatar96 || undefined;
               const serverHasUploads =
                 typeof serverCandidate === "string" &&
                 serverCandidate.includes("/wp-content/uploads/");
               const clientHasUploads =
-                typeof user?.avatar === "string" && user.avatar.includes("/wp-content/uploads/");
+                typeof user?.avatar === "string" &&
+                user.avatar.includes("/wp-content/uploads/");
 
               if (!serverHasUploads && clientHasUploads) {
                 return user!.avatar;
@@ -163,6 +198,7 @@ export const useAuthStore = create<AuthState>()(
 
           if (nextUser?.id) {
             loadUserData(nextUser.id);
+            syncUserDataAfterLogin(nextUser.id);
           }
 
           return true;
@@ -204,6 +240,8 @@ export const useAuthStore = create<AuthState>()(
           const finalUserId = numericId || user.id;
           if (finalUserId) {
             loadUserData(finalUserId);
+            // Синхронізуємо кошик після авторизації
+            syncUserDataAfterLogin(finalUserId);
           }
         } catch (error) {
           throw error;
@@ -242,8 +280,7 @@ export const useAuthStore = create<AuthState>()(
             localStorage.removeItem("orderData");
             localStorage.removeItem("userLocationConfirmed");
             localStorage.removeItem("userLocation");
-          } catch (error) {
-          }
+          } catch (error) {}
         }
 
         try {

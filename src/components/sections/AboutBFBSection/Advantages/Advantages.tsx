@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, A11y } from "swiper/modules";
 import type { SwiperRef } from "swiper/react";
-import type { Swiper as SwiperClass } from "swiper/types";
+import type { Swiper as SwiperClass } from "swiper";
 import {
   BackIcon,
   LegconIcon,
@@ -299,8 +299,10 @@ export default function Advantages() {
               speed={350}
               grabCursor={true}
               className={s.mobileSlider}
-              onSwiper={(inst) => (mobileSwiperRef.current = inst)}
-              onSlideChange={(inst) => setActiveMobile(inst.activeIndex || 0)}
+              onSwiper={(inst: SwiperClass) => (mobileSwiperRef.current = inst)}
+              onSlideChange={(inst: SwiperClass) =>
+                setActiveMobile(inst.activeIndex || 0)
+              }
             >
               {advantages.map((advantage, cardIndex) => (
                 <SwiperSlide key={advantage.id}>
@@ -319,7 +321,7 @@ export default function Advantages() {
               slidesPerGroup={1}
               allowTouchMove={false}
               simulateTouch={false}
-              onSlideChange={(sw) => {
+              onSlideChange={(sw: SwiperClass) => {
                 const maxIndex = 3;
                 const currentIndex = Math.min(sw.activeIndex, maxIndex);
                 setActive(currentIndex);

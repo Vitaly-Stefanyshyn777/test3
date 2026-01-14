@@ -50,14 +50,17 @@ export function useUserProfile() {
       const t = setTimeout(() => setIsReady(true), 50);
       return () => clearTimeout(t);
     }
-  }, [isHydrated]);
+  }, [isHydrated, token]);
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
+        // Чекаємо на гідратацію перед виконанням запиту
+        if (!isHydrated) return;
+
         if (!token) return;
-        const data = await getMyProfile();
+        const data = await getMyProfile(token);
         if (!mounted || !data) return;
         // SSOT: first_name + last_name має бути головним джерелом імені
         const fullName = `${data?.first_name ?? ""} ${data?.last_name ?? ""}`.trim();

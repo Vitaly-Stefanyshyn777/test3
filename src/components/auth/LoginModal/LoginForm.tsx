@@ -19,6 +19,7 @@ interface LoginFormProps {
   handleSubmit: UseFormHandleSubmit<LoginFormValues>;
   onSubmit: (data: LoginFormValues) => Promise<void>;
   onSwitchToRegister: () => void;
+  onForgotPassword?: () => void;
   isSubmitting: boolean;
   isPending: boolean;
   isError: boolean;
@@ -33,6 +34,7 @@ export default function LoginForm({
   isPending,
   isError,
   onSwitchToRegister,
+  onForgotPassword,
 }: LoginFormProps) {
   return (
     <form className={s.form} onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -74,20 +76,35 @@ export default function LoginForm({
           {isPending ? "Вхід..." : "Увійти"}
         </button>
 
-        <div className={s.registerSwitchBlock}>
-          <span className={s.registerText}>У мене немає акаунту?</span>
-          <button
-            type="button" // Важливо: запобігає відправці форми
-            className={s.registerButton}
-            onClick={onSwitchToRegister} // ✅ Викликаємо функцію перемикання
-          >
-            Зареєструватися
-          </button>
+        <div className={s.bottomLinksBlock}>
+          {/* Посилання на скидання пароля */}
+          {onForgotPassword && (
+            <div className={s.forgotPasswordBlock}>
+              <button
+                type="button"
+                className={s.forgotPasswordButton}
+                onClick={onForgotPassword}
+              >
+                Забули пароль?
+              </button>
+            </div>
+          )}
+
+          <div className={s.registerSwitchBlock}>
+            <span className={s.registerText}>У мене немає акаунту?</span>
+            <button
+              type="button" // Важливо: запобігає відправці форми
+              className={s.registerButton}
+              onClick={onSwitchToRegister} // ✅ Викликаємо функцію перемикання
+            >
+              Зареєструватися
+            </button>
+          </div>
         </div>
 
         <p className={s.privacyText}>
           Натискаючи на кнопку, ви погоджуєтесь з{" "}
-          <a href="/privacy" className={s.privacyLink}>
+          <a href="/privacy-policy" className={s.privacyLink}>
             Політикою конфіденційності
           </a>
         </p>

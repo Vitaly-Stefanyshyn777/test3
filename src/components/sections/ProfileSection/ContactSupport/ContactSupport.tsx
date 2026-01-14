@@ -64,12 +64,12 @@ const ContactSupport: React.FC<ContactSupportProps> = ({
       icon: () => null,
       url: "https://www.instagram.com/bfb.official_ukraine?igsh=enFybWFmZGE3NG8z",
     },
-    { name: "Telegram", icon: () => null, url: "https://t.me/bfbfitness" },
     {
       name: "Facebook",
       icon: () => null,
       url: "https://facebook.com/bfbfitness",
     },
+    { name: "Telegram", icon: () => null, url: "https://t.me/bfbfitness" },
     { name: "WhatsApp", icon: () => null, url: "https://wa.me/380954372575" },
   ];
 

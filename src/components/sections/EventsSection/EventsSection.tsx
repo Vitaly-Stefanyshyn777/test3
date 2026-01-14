@@ -267,9 +267,12 @@ const EventsSection: React.FC = () => {
 
   const events: Event[] = useMemo(() => {
     if (!eventsData || eventsData.length === 0) return [];
-    return eventsData.map((eventPost) =>
-      mapEventPostToEvent(eventPost, isMobile)
-    );
+
+    return eventsData.map((eventPost) => {
+      const schedule = getScheduleFromEventPost(eventPost);
+      const mappedEvent = mapEventPostToEvent(eventPost, isMobile);
+      return mappedEvent;
+    });
   }, [eventsData, isMobile]);
 
   const eventsByDate = useMemo(() => {
@@ -618,6 +621,8 @@ const EventsSection: React.FC = () => {
                         const schedule = eventPost
                           ? getScheduleFromEventPost(eventPost)
                           : [];
+
+
                         const firstScheduleDate = schedule[0]?.date;
                         const eventDay = firstScheduleDate
                           ? (() => {

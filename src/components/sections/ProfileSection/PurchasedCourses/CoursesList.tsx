@@ -33,8 +33,8 @@ export default function CoursesList({ courses, onWatch }: Props) {
               <Image
                 src={course.image}
                 alt={course.title}
-                fill
-                sizes="(max-width: 768px) 100vw, 300px"
+                width={500}
+                height={300}
                 className={styles.image}
               />
             </div>
@@ -58,12 +58,15 @@ export default function CoursesList({ courses, onWatch }: Props) {
             <div className={styles.coursePrice}>
               {formatCurrencyUA(course.price, course.currency || "₴")}
             </div>
-            <button
-              className={styles.watchButton}
-              onClick={() => onWatch(course)}
-            >
-              Дивитися
-            </button>
+            <div className={styles.watchButtonContainer}>
+              <button
+                className={styles.watchButton}
+                onClick={() => onWatch(course)}
+              >
+                Дивитися
+              </button>
+              <div className={styles.watchButtonLine}></div>
+            </div>
           </div>
         </div>
       ))}

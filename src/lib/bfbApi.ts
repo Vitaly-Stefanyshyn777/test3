@@ -82,6 +82,10 @@ export type MainCoursePost = {
   Image?: string;
   featured_media?: number;
   About_course?: string[];
+  Result?: {
+    hl_input_text_text: string;
+    hl_img_svg_icon: string;
+  }[];
   Course_info?:
     | {
         опис?: string;
@@ -379,7 +383,18 @@ export async function fetchCourse(
         textarea_about_me: (coachAcf as any).textarea_about_me || "",
         textarea_my_mission: (coachAcf as any).textarea_my_mission || "",
         img_link_avatar: (coachAcf as any).img_link_data_avatar || "",
-        point_specialization: "",
+        point_specialization: (() => {
+          const specializations = Array.isArray(
+            (coachAcf as any).point_data_specialization
+          )
+            ? (coachAcf as any).point_data_specialization
+                .map((item: any) => item?.specialization || item?.point)
+                .filter(Boolean)
+            : [];
+          return specializations.length > 0
+            ? JSON.stringify(specializations)
+            : "";
+        })(),
       };
     } catch (error) {
       // Якщо не вдалося отримати ACF дані, використовуємо базові дані
@@ -413,6 +428,15 @@ export async function fetchCourse(
         if (coachResponse.ok) {
           const coachData = await coachResponse.json();
           const coachAcf = coachData.acf || {};
+          // Отримуємо спеціалізації з ACF
+          const specializations = Array.isArray(
+            coachAcf.point_data_specialization
+          )
+            ? coachAcf.point_data_specialization
+                .map((item: any) => item?.specialization || item?.point)
+                .filter(Boolean)
+            : [];
+
           courseCoach = {
             ID: coachId,
             title: coachData.title?.rendered || "",
@@ -435,7 +459,8 @@ export async function fetchCourse(
             textarea_about_me: (coachAcf.textarea_about_me as string) || "",
             textarea_my_mission: (coachAcf.textarea_my_mission as string) || "",
             img_link_avatar: (coachAcf.img_link_data_avatar as string) || "",
-            point_specialization: "",
+            point_specialization:
+              specializations.length > 0 ? JSON.stringify(specializations) : "",
           };
         }
       }
@@ -883,6 +908,11 @@ export type PurchasedProduct = {
   status: string;
 };
 
+export type PurchasedProductApiItem = {
+  product_id: number;
+  // Додайте інші поля, які повертає API, якщо вони є
+};
+
 export type Tariff = {
   id: number;
   title: { rendered: string };
@@ -914,13 +944,13 @@ export async function fetchTariffs(): Promise<Tariff[]> {
   }
 }
 
-export async function fetchPurchasedProducts(
+export async function fetchPurchasedProductsApi(
   userId: number,
   token?: string
-): Promise<PurchasedProduct[]> {
+): Promise<Record<string, PurchasedProductApiItem>> {
   try {
     if (!Number.isFinite(userId) || userId <= 0) {
-      return [];
+      return {};
     }
     const headers: HeadersInit = {
       "Content-Type": "application/json",
@@ -946,6 +976,231 @@ export async function fetchPurchasedProducts(
   } catch (error) {
     // Silent error handling
     throw new Error("Не вдалося завантажити придбані курси");
+  }
+}
+
+export async function fetchPurchasedProducts(
+  userId: number,
+  token?: string
+): Promise<PurchasedProduct[]> {
+  try {
+    // Отримуємо список придбаних продуктів з API
+    const purchasedItems = await fetchPurchasedProductsApi(userId, token);
+
+    // Для кожного product_id отримуємо повну інформацію про продукт
+    const purchasedProducts: PurchasedProduct[] = [];
+
+    for (const item of Object.values(purchasedItems)) {
+      try {
+        // Отримуємо інформацію про продукт з WooCommerce API
+        const productResponse = await fetch(
+          `${BASE_URL}/wp-json/wc/v3/products/${item.product_id}`,
+          {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          }
+        );
+
+        if (productResponse.ok) {
+          const productData = await productResponse.json();
+
+          purchasedProducts.push({
+            id: productData.id,
+            name: productData.name,
+            price: productData.price,
+            image: productData.images?.[0]?.src || "",
+            purchase_date: new Date().toISOString(), // API не повертає дату покупки
+            status: "completed", // Припускаємо, що всі придбані продукти мають статус completed
+          });
+        }
+      } catch (error) {
+        // Якщо не вдалося отримати інформацію про продукт, пропускаємо його
+        if (process.env.NODE_ENV !== "production") {
+          console.warn(
+            `Не вдалося отримати інформацію про продукт ${item.product_id}:`,
+            error
+          );
+        }
+      }
+    }
+
+    return purchasedProducts;
+  } catch (error) {
+    console.error("Помилка при отриманні придбаних продуктів:", error);
+    throw error;
+  }
+}
+
+// Типи для інформації про підписку користувача
+export interface UserSubscription {
+  hasActivePlan: boolean;
+  currentPlan?: {
+    id: number;
+    name: string;
+    price: string;
+    period: string;
+    nextPaymentDate?: string;
+    features: string[];
+    status: "active" | "inactive" | "cancelled";
+  };
+  subscriptionHistory?: Array<{
+    id: number;
+    planName: string;
+    price: string;
+    period: string;
+    purchaseDate: string;
+    status: string;
+  }>;
+  paymentHistory?: Array<{
+    id: number;
+    date: string;
+    description: string;
+    amount: string;
+    status: string;
+  }>;
+}
+
+export async function fetchUserSubscription(
+  userId: number,
+  token?: string
+): Promise<UserSubscription> {
+  try {
+    if (!Number.isFinite(userId) || userId <= 0) {
+      return { hasActivePlan: false };
+    }
+
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+    };
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    // Спочатку отримуємо інформацію про користувача та його підписку
+    const userPath = `/wp-json/wp/v2/users/${userId}?context=edit`;
+    const userResponse = await fetch(
+      `/api/proxy?path=${encodeURIComponent(userPath)}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-internal-admin": "1", // Адмінський доступ
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      }
+    );
+
+    if (!userResponse.ok) {
+      // Якщо не вдалося отримати дані користувача, повертаємо порожній результат
+      return { hasActivePlan: false };
+    }
+
+    const userData = await userResponse.json();
+    const userMeta = userData.meta || {};
+
+    // Отримуємо інформацію про активну підписку з мета-даних
+    const activePlanId =
+      userMeta.active_tariff_id || userMeta.subscription_plan_id;
+    const nextPaymentDate =
+      userMeta.next_payment_date || userMeta.subscription_next_payment;
+
+    let currentPlan: UserSubscription["currentPlan"];
+
+    if (activePlanId) {
+      // Якщо є активний план, отримуємо його деталі
+      try {
+        const tariffs = await fetchTariffs();
+        const activeTariff = tariffs.find(
+          (t) => t.id === parseInt(activePlanId)
+        );
+
+        if (activeTariff) {
+          currentPlan = {
+            id: activeTariff.id,
+            name: activeTariff.title.rendered,
+            price: activeTariff.Price,
+            period: `${activeTariff.Time} місяців`,
+            nextPaymentDate: nextPaymentDate,
+            features: activeTariff.Points.map((p) => p.Текст),
+            status: "active",
+          };
+        }
+      } catch (error) {
+        // Якщо не вдалося отримати тариф, продовжуємо без деталей плану
+        console.warn("Не вдалося отримати деталі тарифу:", error);
+      }
+    }
+
+    // Отримуємо історію платежів та підписок (замовлень)
+    let paymentHistory: UserSubscription["paymentHistory"] = [];
+    let subscriptionHistory: UserSubscription["subscriptionHistory"] = [];
+
+    try {
+      const orders = await fetchUserOrders(userId);
+
+      // Хелпер для перевірки наявності елемента в масиві з типобезпекою
+      const isInArray = <T>(item: T, array: readonly T[]): boolean => {
+        return array.includes(item);
+      };
+
+      // Список ID продуктів-підписок (можна додавати нові ID)
+      const subscriptionProductIds: readonly number[] = [
+        // тут можна додати ID продуктів-підписок
+      ];
+
+      // Фільтруємо замовлення, які містять товари-підписки
+      const subscriptionOrders = orders.filter((order) =>
+        order.line_items.some(
+          (item) =>
+            item.name.toLowerCase().includes("підписка") ||
+            item.name.toLowerCase().includes("subscription") ||
+            (item.product_id &&
+              isInArray(item.product_id, subscriptionProductIds))
+        )
+      );
+
+      // Створюємо історію підписок
+      subscriptionHistory = subscriptionOrders.map((order) => {
+        const subscriptionItem = order.line_items.find(
+          (item) =>
+            item.name.toLowerCase().includes("підписка") ||
+            item.name.toLowerCase().includes("subscription")
+        );
+
+        return {
+          id: order.id,
+          planName: subscriptionItem?.name || "Підписка",
+          price: subscriptionItem?.total || order.total,
+          period: "1 місяць", // Можна отримати з мета-даних товару
+          purchaseDate: new Date(order.date_created).toLocaleDateString(
+            "uk-UA"
+          ),
+          status: order.status,
+        };
+      });
+
+      // Створюємо історію платежів (всі замовлення)
+      paymentHistory = orders.slice(0, 10).map((order) => ({
+        id: order.id,
+        date: new Date(order.date_created).toLocaleDateString("uk-UA"),
+        description: order.line_items.map((item) => item.name).join(", "),
+        amount: order.total,
+        status: order.status,
+      }));
+    } catch (error) {
+      // Якщо не вдалося отримати історію платежів, продовжуємо без неї
+      console.warn("Не вдалося отримати історію платежів:", error);
+    }
+
+    return {
+      hasActivePlan: !!currentPlan,
+      currentPlan,
+      subscriptionHistory,
+      paymentHistory,
+    };
+  } catch (error) {
+    // Silent error handling
+    console.error("Помилка при отриманні інформації про підписку:", error);
+    return { hasActivePlan: false };
   }
 }
 
@@ -1407,14 +1662,19 @@ export type WooCommerceOrder = {
 };
 
 export async function fetchUserOrders(
-  userId: number
+  userId: number,
+  token?: string
 ): Promise<WooCommerceOrder[]> {
   try {
+    // Використовуємо proxy з адмінськими правами для отримання замовлень
+    const path = `/wp-json/wc/v3/orders?customer=${userId}`;
     const response = await fetch(
-      `${BASE_URL}/wp-json/wc/v3/orders?customer=${userId}`,
+      `/api/proxy?path=${encodeURIComponent(path)}`,
       {
         headers: {
-          Authorization: "Bearer " + "your-jwt-token", // JWT token
+          "Content-Type": "application/json",
+          "x-internal-admin": "1", // Адмінський доступ
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       }
     );
@@ -1424,7 +1684,6 @@ export async function fetchUserOrders(
     }
 
     const data = await response.json();
-    // Silent logging
     return data;
   } catch (error) {
     // Silent error handling
@@ -1466,14 +1725,6 @@ export async function uploadMedia(
 
     const mediaUrl = `${browserBaseUrl}/wp-json/wp/v2/media`;
 
-    if (process.env.NODE_ENV !== "production") {
-      console.log("[uploadMedia] Завантаження файлу:", {
-        url: mediaUrl,
-        fileName: data.file.name,
-        fileSize: data.file.size,
-      });
-    }
-
     const response = await fetch(mediaUrl, {
       method: "POST",
       headers: {
@@ -1497,12 +1748,6 @@ export async function uploadMedia(
     }
 
     const result = await response.json();
-    if (process.env.NODE_ENV !== "production") {
-      console.log("[uploadMedia] Файл завантажено:", {
-        id: result.id,
-        url: result.source_url,
-      });
-    }
 
     return {
       success: true,
@@ -1544,13 +1789,6 @@ export async function uploadCoachMedia(params: {
   const browserBaseUrl = process.env.NEXT_PUBLIC_UPSTREAM_BASE as string;
   const targetUrl = `${browserBaseUrl}/wp-json/custom/v1/upload-media`;
 
-  // ⭐️ ЛОГ 1: Початок запиту та метадані
-  if (process.env.NODE_ENV !== "production") {
-    console.log(`[Media Upload] 🚀 Відправка медіа...`);
-    console.log(`[Media Upload] ➡️ URL: ${targetUrl}`);
-    console.log(`[Media Upload] 📦 Тип поля (Field Type): ${params.fieldType}`);
-  }
-
   const res = await fetch(targetUrl, {
     method: "POST",
     body: form,
@@ -1568,11 +1806,6 @@ export async function uploadCoachMedia(params: {
 
   try {
     data = await res.json();
-    // ⭐️ ЛОГ 2: Успішне парсинг JSON
-    if (process.env.NODE_ENV !== "production") {
-      console.log(`[Media Upload] 🟢 Успішний статус відповіді: ${res.status}`);
-      console.log(`[Media Upload] 📨 JSON дані:`, data);
-    }
   } catch {
     // Якщо не вдалося розпарсити JSON, спробуємо отримати текст
     const text = await res.text();
@@ -1602,13 +1835,6 @@ export async function uploadCoachMedia(params: {
       );
     }
     throw new Error(errorMessage);
-  }
-
-  // ⭐️ ЛОГ 5: Успішне завершення
-  if (process.env.NODE_ENV !== "production") {
-    console.log(
-      `[Media Upload] ✅ Завантаження успішне. Оброблені файли: ${data.processed_count}`
-    );
   }
 
   return data as {
@@ -1659,7 +1885,8 @@ export async function fetchFilteredProducts(
     // Додаємо параметри фільтрації
     if (filters.category) {
       if (Array.isArray(filters.category)) {
-        filters.category.forEach((cat) => params.append("category", cat));
+        // Передаємо всі категорії через кому в одному параметрі (OR логіка)
+        params.append("category", filters.category.join(","));
       } else {
         params.append("category", filters.category);
       }
@@ -1772,15 +1999,6 @@ export async function updateTrainerProfile(
     "Content-Type": "application/json",
   };
   if (bearerToken) headers.Authorization = `Bearer ${bearerToken}`;
-
-  // Логування перед відправкою запиту (тільки в development)
-  if (process.env.NODE_ENV !== "production") {
-    console.log("[updateTrainerProfile] PATCH /api/profile/trainer");
-    console.log(
-      "[updateTrainerProfile] Payload:",
-      JSON.stringify(cleanedPayload, null, 2)
-    );
-  }
 
   const res = await fetch("/api/profile/trainer", {
     method: "PATCH",
@@ -1895,6 +2113,8 @@ export interface Trainer {
     "48": string;
     "96": string;
   };
+  location_city?: string;
+  location_country?: string;
   acf?: {
     full_name?: string;
     bio?: string;
@@ -1904,6 +2124,8 @@ export interface Trainer {
     };
     location_city?: string;
     location_country?: string;
+    country?: string;
+    city?: string;
     experience?: string;
     position?: string;
     social_instagram?: string;
@@ -1980,6 +2202,7 @@ export const createWcOrder = async (orderData: {
   payment_method: string;
   payment_method_title: string;
   set_paid: boolean;
+  customer_id: number;
   billing: {
     first_name: string;
     last_name: string;
@@ -1998,6 +2221,13 @@ export const createWcOrder = async (orderData: {
   line_items: Array<{
     product_id: number;
     quantity: number;
+    price: number;
+    subtotal?: string;
+    total?: string;
+    meta_data?: Array<{
+      key: string;
+      value: string;
+    }>;
   }>;
   shipping_lines?: Array<{
     method_id: string;
@@ -2029,10 +2259,15 @@ export interface CartItemResponse {
   product_id: number;
   variation_id: number;
   quantity: number;
-  product_name: string;
-  product_price: string;
-  product_image: string;
-  item_total: number;
+  product_name?: string;
+  name?: string;
+  product_price?: string;
+  price?: string;
+  regular_price?: string;
+  sale_price?: string;
+  product_image?: string;
+  image?: string;
+  item_total?: number;
   added_at: string;
 }
 

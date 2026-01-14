@@ -7,6 +7,7 @@ import {
   ShieldIcon,
   WalkingIcon,
   CheckBorder2Icon,
+  CertificateViolateIcon,
 } from "@/components/Icons/Icons";
 
 const BoardSection: React.FC = () => {
@@ -163,6 +164,14 @@ const BoardSection: React.FC = () => {
                 <p className={s.mobileItemText}>
                   Матеріали, що гарантують довговічність та витривалість виробу
                 </p>
+              </li>
+              <li className={s.mobileItem}>
+                <div className={s.mobileItemIcon} aria-hidden>
+                  <span>
+                    <CertificateViolateIcon />
+                  </span>
+                </div>
+                <p className={s.mobileItemText}>Почни свій шлях з BFB</p>
               </li>
             </ul>
           </div>

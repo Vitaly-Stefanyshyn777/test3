@@ -1,5 +1,6 @@
 import {
   getAllProducts,
+  getProductById,
   getProductsByCategory,
   mapProductToUi,
 } from "./products";
@@ -24,14 +25,44 @@ export const productQuery = (slugOrId: string) => ({
     if (!slugOrId || slugOrId.trim() === "" || slugOrId === "skip") {
       throw new Error("Product slug is empty");
     }
-    
+
+    // Спочатку спробуємо отримати продукт напряму по ID через WC API
+    // Це працює для всіх продуктів, включаючи інвентар
+    if (/^\d+$/.test(slugOrId)) {
+      try {
+        const product = await getProductById(slugOrId);
+        return await mapProductToUi(product);
+      } catch (error) {
+        // Продовжуємо до пошуку по slug
+      }
+    }
+
+    // Якщо slugOrId не є числом (тобто це slug), спробуємо знайти продукт через WC v3 API по slug'у
+    try {
+      // Використовуємо прямий fetch запит
+      const response = await fetch(
+        `/api/wc/v3/products?slug=${encodeURIComponent(slugOrId)}`
+      );
+
+      if (response.ok) {
+        const products = await response.json();
+        if (products && Array.isArray(products) && products.length > 0) {
+          const product = products[0];
+          return await mapProductToUi(product);
+        }
+      }
+    } catch (error) {
+      // Продовжуємо до fallback пошуку
+    }
+
+    // Fallback: шукаємо серед всіх продуктів по slug (старий спосіб)
     const products = await getAllProducts();
-    
+
     // Next.js автоматично декодує slug з URL, тому slugOrId приходить декодованим
     // Але slug з API може бути в різних форматах (encoded або decoded)
     // Нормалізуємо обидва значення для порівняння
     const normalizeSlug = (slug: string): string => {
-      if (!slug) return '';
+      if (!slug) return "";
       try {
         // Спробуємо декодувати, якщо це encoded
         let decoded = slug;
@@ -41,7 +72,7 @@ export const productQuery = (slugOrId: string) => ({
           // Якщо не вдалося декодувати, використовуємо оригінал
           decoded = slug;
         }
-        
+
         // Нормалізуємо: приводимо до нижнього регістру та прибираємо зайві пробіли
         return decoded.toLowerCase().trim();
       } catch {
@@ -49,39 +80,38 @@ export const productQuery = (slugOrId: string) => ({
         return slug.toLowerCase().trim();
       }
     };
-    
+
     const normalizedSlugOrId = normalizeSlug(slugOrId);
-    
+
     const product = products.find((p) => {
-      if (!p.slug) {
-        // Якщо немає slug, перевіряємо тільки по ID
-        return p.id.toString() === slugOrId;
+      // Спочатку перевіряємо по ID (як fallback)
+      const idMatch = p.id.toString() === slugOrId;
+      if (idMatch) {
+        return true;
       }
-      
+
+      // Якщо у продукту немає slug, не перевіряємо по slug
+      if (!p.slug) {
+        return false;
+      }
+
       // Нормалізуємо slug з API
       const normalizedApiSlug = normalizeSlug(p.slug);
-      
+
       // Порівнюємо нормалізовані значення (case-insensitive)
-      const slugMatch = 
+      const slugMatch =
         p.slug === slugOrId || // Exact match (якщо обидва однаково)
         normalizedApiSlug === normalizedSlugOrId || // Нормалізовані значення
         p.slug.toLowerCase() === slugOrId.toLowerCase() || // Case-insensitive exact
         normalizedApiSlug === slugOrId.toLowerCase(); // Нормалізований API slug === URL slug (lowercase)
-      
-      // Також перевіряємо ID як fallback
-      const idMatch = p.id.toString() === slugOrId;
-      
-      return slugMatch || idMatch;
+
+      return slugMatch;
     });
-    
+
     if (!product) {
-      // Не логуємо помилку, якщо slug порожній (це очікувана поведінка)
-      if (slugOrId && slugOrId.trim() !== "" && slugOrId !== "skip") {
-        // Product not found logging removed
-      }
       throw new Error(`Product not found: ${slugOrId}`);
     }
-    
+
     return await mapProductToUi(product);
   },
   staleTime: 5 * 60 * 1000,
@@ -157,12 +187,13 @@ export const productsWithFiltersQuery = (filters: Record<string, unknown>) => ({
       const categoryFilter = filters.category as string;
       // Перевіряємо, чи це ID (число) чи slug
       const isNumericId = /^\d+$/.test(categoryFilter);
-      
+
       filteredProducts = filteredProducts.filter((product) =>
-        product.categories.some((cat) => 
-          // Порівнюємо по slug або по ID
-          cat.slug === categoryFilter || 
-          (isNumericId && cat.id.toString() === categoryFilter)
+        product.categories.some(
+          (cat) =>
+            // Порівнюємо по slug або по ID
+            cat.slug === categoryFilter ||
+            (isNumericId && cat.id.toString() === categoryFilter)
         )
       );
     }

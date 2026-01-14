@@ -145,6 +145,12 @@
     flex-direction: column;
     background: none;
   }
+  .contactInfo {
+    border: mvw(2) solid rgba(255, 254, 252, 0.3);
+    border-radius: mvw(32);
+    backdrop-filter: blur(10px);
+    background: rgba(249, 249, 249, 0.1);
+  }
 
   .content {
     gap: mvw(24);

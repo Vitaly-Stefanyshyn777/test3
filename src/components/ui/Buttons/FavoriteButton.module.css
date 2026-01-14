@@ -26,13 +26,8 @@
 .root svg,
 .root svg * {
   transition: fill 0.2s ease, stroke 0.2s ease;
-  stroke: currentColor;
-  transform: none;
-}
 
-.active svg,
-.active svg * {
-  fill: currentColor;
+  transform: none;
 }
 
 @media (max-width: 1000px) {
@@ -44,7 +39,14 @@
     right: mvw(8);
   }
   .root svg {
-    width: mvw(11);
-    height: mvw(11);
+    width: mvw(12);
+    height: mvw(12);
+  }
+
+  .redGreenMode svg {
+    width: mvw(28);
+    height: mvw(28);
+    transition: all 0.3s ease;
+    transform: none;
   }
 }

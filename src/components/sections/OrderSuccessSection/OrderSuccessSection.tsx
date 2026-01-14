@@ -46,48 +46,16 @@ export default function OrderSuccessSection({
 
   useEffect(() => {
     const fetchOrder = async () => {
-      console.log("📦 OrderSuccessSection: Початок завантаження замовлення", {
-        orderId,
-      });
-
       try {
         if (orderId) {
           const response = await fetch(`/api/wc/orders/${orderId}`);
           if (response.ok) {
             const orderData = await response.json();
-            console.log(
-              "✅ OrderSuccessSection: Замовлення завантажено успішно",
-              {
-                orderId: orderData.id,
-                itemsCount: orderData.line_items?.length || 0,
-                items: orderData.line_items?.map((item: any) => ({
-                  id: item.product_id,
-                  name: item.name,
-                  quantity: item.quantity,
-                })),
-              }
-            );
             setOrder(orderData);
-          } else {
-            console.log(
-              "❌ OrderSuccessSection: Помилка завантаження замовлення",
-              {
-                orderId,
-                status: response.status,
-                statusText: response.statusText,
-              }
-            );
           }
-        } else {
-          console.log(
-            "⚠️ OrderSuccessSection: orderId не вказано, пропускаємо завантаження"
-          );
         }
       } catch (error) {
-        console.log(
-          "❌ OrderSuccessSection: Виняток при завантаженні замовлення",
-          error
-        );
+        // Помилка обробляється мовчки
       } finally {
         setIsLoading(false);
       }
@@ -179,6 +147,7 @@ export default function OrderSuccessSection({
     return () => clearTimeout(timer);
   }, []);
 
+
   return (
     <>
       <CheckoutHeader />
@@ -188,20 +157,7 @@ export default function OrderSuccessSection({
             {isHeaderSkeleton ? <OrderHeaderSkeleton /> : <OrderHeader />}
 
             {orderId && orderNumber ? (
-              (() => {
-                console.log(
-                  "🎯 OrderSuccessSection: Передаємо дані в OrderProducts",
-                  {
-                    orderNumber,
-                    hasOrder: !!order,
-                    orderId: order?.id,
-                    itemsCount: order?.line_items?.length || 0,
-                  }
-                );
-                return (
-                  <OrderProducts orderNumber={orderNumber} order={order} />
-                );
-              })()
+              <OrderProducts orderNumber={orderNumber} order={order} />
             ) : (
               <div className={s.errorBlock}>
                 <p>Не знайдено інформацію про замовлення</p>

@@ -5,7 +5,10 @@ import styles from "./TrainerMap.module.css";
 import { TrainerUser } from "../types";
 import InstructingSlider from "../../InstructingSlider/InstructingSlider";
 import { useThemeSettingsQuery } from "@/components/hooks/useWpQueries";
-import { getContactData, convertSvgAttributesToCamelCase } from "@/lib/themeSettingsUtils";
+import {
+  getContactData,
+  convertSvgAttributesToCamelCase,
+} from "@/lib/themeSettingsUtils";
 import {
   InstagramIcon,
   TelegramIcon,
@@ -78,11 +81,15 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
   const { data: themeSettings } = useThemeSettingsQuery();
   const contactData = getContactData(themeSettings);
   // Перевіряємо map_markers на верхньому рівні або в acf
-  const themeMapMarkers = 
+  const themeMapMarkers =
     (Array.isArray(themeSettings) && themeSettings[0]?.map_markers) ||
     (Array.isArray(themeSettings) && themeSettings[0]?.acf?.map_markers) ||
-    (themeSettings && !Array.isArray(themeSettings) && (themeSettings as ThemeSettingsPost).map_markers) ||
-    (themeSettings && !Array.isArray(themeSettings) && (themeSettings as ThemeSettingsPost).acf?.map_markers);
+    (themeSettings &&
+      !Array.isArray(themeSettings) &&
+      (themeSettings as ThemeSettingsPost).map_markers) ||
+    (themeSettings &&
+      !Array.isArray(themeSettings) &&
+      (themeSettings as ThemeSettingsPost).acf?.map_markers);
 
   // Контакти активного залу (my_wlocation[activeLocationIndex])
   // Перевіряємо, чи індекс не виходить за межі масиву
@@ -294,7 +301,7 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
             ) {
               const parts = trainer.location_city
                 .split(",")
-                .map((p) => p.trim());
+                .map((p: string) => p.trim());
               if (
                 parts.length === 2 &&
                 parts[0] &&
@@ -577,7 +584,9 @@ export default function TrainerMap({ mapMarkers, trainer }: TrainerMapProps) {
                   href={contact.hl_input_text_link || "#"}
                   className={styles.socialIcon}
                   dangerouslySetInnerHTML={{
-                    __html: convertSvgAttributesToCamelCase(contact.hl_img_svg_icon),
+                    __html: convertSvgAttributesToCamelCase(
+                      contact.hl_img_svg_icon
+                    ),
                   }}
                 />
               )

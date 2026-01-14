@@ -1,7 +1,7 @@
 .container {
   width: 100%;
   border-radius: 12px;
-  padding: 155px 20px 155px 20px;
+  padding: 0 20px 0 20px;
   display: flex;
   flex-direction: column;
   gap: 50px;
@@ -22,14 +22,16 @@
   position: relative;
   width: 100%;
   height: 880px;
-  margin-bottom: 24px;
+  margin-bottom: 100px;
   z-index: 1;
+  border-radius: 20px;
+  display: block;
 }
 
 .map {
   width: 100%;
   height: 100%;
-  border-radius: 8px;
+  border-radius: 20px;
   overflow: hidden;
   border: 1px solid #e0e0e0;
 }
@@ -300,12 +302,27 @@
 .contactsTitle {
   display: none;
 }
+.mapHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+}
+.mapTitle {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 135%;
+  text-align: center;
+  color: var(--violet);
+}
 
 @media (max-width: 1000px) {
   .container {
-    padding: mvw(32) mvw(16) mvw(200) mvw(16);
+    padding: mvw(0) mvw(16) mvw(0) mvw(16);
     gap: mvw(32);
-    margin-bottom: mvw(120);
+    /* margin-bottom: mvw(120); */
     position: relative;
     z-index: 1;
     min-height: auto;
@@ -313,6 +330,23 @@
     max-width: 100%;
     box-sizing: border-box;
     overflow: visible;
+  }
+
+  .mapHeader {
+    display: flex;
+    flex-direction: column;
+    gap: mvw(6);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mapTitle {
+    font-family: var(--font-family);
+    font-weight: 600;
+    font-size: mvw(14);
+    line-height: 140%;
+    text-align: center;
+    color: var(--violet);
   }
 
   .title {
@@ -369,16 +403,24 @@
   }
 
   .mapContainer {
-    height: mvw(400);
+    height: auto;
+    min-height: mvw(400);
     margin-bottom: mvw(16);
     padding: 0;
     position: relative;
     z-index: 1;
     overflow: visible;
+    border-radius: mvw(16);
+    display: flex;
+    flex-direction: column;
   }
 
   .map {
-    border-radius: mvw(12);
+    border-radius: mvw(16);
+    height: mvw(400);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
   }
 
   .locationCard {
@@ -387,14 +429,14 @@
     left: 0 !important;
     width: 100%;
     height: auto;
-    padding: mvw(20);
+    padding: mvw(16);
     border-radius: mvw(16);
-    margin-top: mvw(16);
-    margin-bottom: mvw(120);
-    gap: mvw(16);
+    margin-top: mvw(0);
+    /* margin-bottom: mvw(120); */
+    gap: mvw(24);
     box-shadow: none;
-
-    z-index: 1;
+    z-index: 2;
+    order: 2;
   }
 
   .locationImages {
@@ -433,7 +475,7 @@
   }
 
   .infoItem {
-    gap: mvw(4);
+    gap: mvw(16);
   }
 
   .infoItemCenter {
