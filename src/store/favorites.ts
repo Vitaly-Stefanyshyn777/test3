@@ -53,6 +53,8 @@ export interface FavoriteItem {
   color?: string;
   size?: string;
   stockQuantity?: number | null;
+  productType?: string;
+  variations?: number[];
   wcProduct?: {
     prices?: {
       price: string;
@@ -80,6 +82,8 @@ const mapWishlistItemResponseToFavoriteItem = (
   color: existingItem?.color,
   size: existingItem?.size,
   stockQuantity: existingItem?.stockQuantity,
+  productType: existingItem?.productType,
+  variations: existingItem?.variations,
   wcProduct: existingItem?.wcProduct,
 });
 
@@ -96,6 +100,14 @@ function extractProductId(id: string): number | null {
     return parseInt(numberMatch[0], 10);
   }
   return null;
+}
+
+function countItemsByProductId(
+  items: Record<string, FavoriteItem>,
+  productId: number
+): number {
+  return Object.keys(items).filter((key) => extractProductId(key) === productId)
+    .length;
 }
 
 interface FavoriteState {
@@ -154,15 +166,28 @@ export const useFavoriteStore = create<FavoriteState>()(
 
             const wishlistData = await getWishlist();
             const currentItems = state.items;
-            const itemsMap: Record<string, FavoriteItem> = {};
-            wishlistData.items.forEach((item) => {
-              const existing = currentItems[item.product_id.toString()];
-              const favoriteItem = mapWishlistItemResponseToFavoriteItem(
-                item,
-                existing
+            const itemsMap: Record<string, FavoriteItem> = { ...currentItems };
+
+            wishlistData.items.forEach((apiItem) => {
+              const baseKey = apiItem.product_id.toString();
+              const existingBase = currentItems[baseKey];
+              const base = mapWishlistItemResponseToFavoriteItem(
+                apiItem,
+                existingBase
               );
-              itemsMap[favoriteItem.id] = favoriteItem;
+
+              // Оновлюємо базовий елемент або створюємо його, якщо взагалі нічого немає по цьому продукту
+              const hasAnyForProduct =
+                Object.keys(itemsMap).some(
+                  (k) => extractProductId(k) === apiItem.product_id
+                );
+              if (!hasAnyForProduct) {
+                itemsMap[base.id] = base;
+              } else if (itemsMap[baseKey] && !itemsMap[baseKey].variationId) {
+                itemsMap[baseKey] = { ...itemsMap[baseKey], ...base };
+              }
             });
+
             set({
               items: itemsMap,
               currentUserId: userId,
@@ -201,15 +226,26 @@ export const useFavoriteStore = create<FavoriteState>()(
         try {
           const wishlistData = await getWishlist();
           const currentItems = get().items;
-          const itemsMap: Record<string, FavoriteItem> = {};
-          wishlistData.items.forEach((item) => {
-            const existing = currentItems[item.product_id.toString()];
-            const favoriteItem = mapWishlistItemResponseToFavoriteItem(
-              item,
-              existing
+          const itemsMap: Record<string, FavoriteItem> = { ...currentItems };
+
+          wishlistData.items.forEach((apiItem) => {
+            const baseKey = apiItem.product_id.toString();
+            const existingBase = currentItems[baseKey];
+            const base = mapWishlistItemResponseToFavoriteItem(
+              apiItem,
+              existingBase
             );
-            itemsMap[favoriteItem.id] = favoriteItem;
+
+            const hasAnyForProduct = Object.keys(itemsMap).some(
+              (k) => extractProductId(k) === apiItem.product_id
+            );
+            if (!hasAnyForProduct) {
+              itemsMap[base.id] = base;
+            } else if (itemsMap[baseKey] && !itemsMap[baseKey].variationId) {
+              itemsMap[baseKey] = { ...itemsMap[baseKey], ...base };
+            }
           });
+
           set({ items: itemsMap });
         } catch (error) {
           // Fallback to local state on error
@@ -240,33 +276,16 @@ export const useFavoriteStore = create<FavoriteState>()(
           return;
         }
 
-        // Шукаємо існуючий товар за різними ключами (аналогічно до cart store)
-        let existing = state.items[item.id];
-        let existingKey = item.id;
-
-        if (!existing && item.variationId) {
-          // Якщо не знайшли за item.id і є variationId, шукаємо за базовим productId
-          const currentProductId = extractProductId(item.id);
-          if (currentProductId) {
-            const foundByProductId = Object.entries(state.items).find(
-              ([key, favItem]) => {
-                const favProductId = extractProductId(favItem.id);
-                return favProductId === currentProductId;
-              }
-            );
-            if (foundByProductId) {
-              existing = foundByProductId[1];
-              existingKey = foundByProductId[0];
-            }
-          }
-        }
+        // Для варіацій зберігаємо унікальні елементи (не затираємо інші варіації цього ж товару)
+        const existing = state.items[item.id];
+        const beforeCount = countItemsByProductId(state.items, productId);
 
         const exists = !!existing;
 
         const next = { ...state.items };
         if (exists) {
           // Видаляємо існуючий товар (за знайденим ключем)
-          delete next[existingKey];
+          delete next[item.id];
         } else {
           // Додаємо новий товар
           next[item.id] = item;
@@ -280,10 +299,15 @@ export const useFavoriteStore = create<FavoriteState>()(
           (async () => {
             try {
               set({ isLoading: true });
-              if (exists) {
-                await removeFromWishlistApi(productId);
-              } else {
+              const afterCount = countItemsByProductId(next, productId);
+
+              // Бекенд wishlist зберігає тільки product_id:
+              // - при додаванні першої варіації/товару -> додаємо product_id
+              // - при видаленні останньої варіації/товару -> видаляємо product_id
+              if (!exists && beforeCount === 0 && afterCount > 0) {
                 await addToWishlistApi(productId);
+              } else if (exists && afterCount === 0) {
+                await removeFromWishlistApi(productId);
               }
               // Не оновлюємо стан після API, бо він вже оновлений негайно
               set({ isLoading: false });

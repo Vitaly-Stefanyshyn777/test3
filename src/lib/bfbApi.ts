@@ -906,11 +906,19 @@ export type PurchasedProduct = {
   image: string;
   purchase_date: string;
   status: string;
+  telegram_link?: string;
 };
 
 export type PurchasedProductApiItem = {
   product_id: number;
-  // Додайте інші поля, які повертає API, якщо вони є
+  name?: string;
+  image?: string;
+  categories?: string[];
+  purchase_date?: string;
+  price_paid?: number;
+  currency?: string;
+  link_telegram?: string;
+  order_id?: number;
 };
 
 export type Tariff = {
@@ -992,9 +1000,11 @@ export async function fetchPurchasedProducts(
 
     for (const item of Object.values(purchasedItems)) {
       try {
-        // Отримуємо інформацію про продукт з WooCommerce API
+        const apiItem = item as PurchasedProductApiItem;
+
+        // Отримуємо інформацію про продукт з WooCommerce API для додаткових даних
         const productResponse = await fetch(
-          `${BASE_URL}/wp-json/wc/v3/products/${item.product_id}`,
+          `${BASE_URL}/wp-json/wc/v3/products/${apiItem.product_id}`,
           {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
           }
@@ -1005,18 +1015,22 @@ export async function fetchPurchasedProducts(
 
           purchasedProducts.push({
             id: productData.id,
-            name: productData.name,
+            name: apiItem.name || productData.name,
             price: productData.price,
-            image: productData.images?.[0]?.src || "",
-            purchase_date: new Date().toISOString(), // API не повертає дату покупки
-            status: "completed", // Припускаємо, що всі придбані продукти мають статус completed
+            image: apiItem.image || productData.images?.[0]?.src || "",
+            purchase_date: apiItem.purchase_date || new Date().toISOString(),
+            status: "completed",
+
+            telegram_link: apiItem.link_telegram,
           });
         }
       } catch (error) {
         // Якщо не вдалося отримати інформацію про продукт, пропускаємо його
         if (process.env.NODE_ENV !== "production") {
           console.warn(
-            `Не вдалося отримати інформацію про продукт ${item.product_id}:`,
+            `Не вдалося отримати інформацію про продукт ${
+              (item as PurchasedProductApiItem).product_id
+            }:`,
             error
           );
         }
@@ -1137,38 +1151,22 @@ export async function fetchUserSubscription(
     try {
       const orders = await fetchUserOrders(userId);
 
-      // Хелпер для перевірки наявності елемента в масиві з типобезпекою
-      const isInArray = <T>(item: T, array: readonly T[]): boolean => {
-        return array.includes(item);
-      };
+      const hasOrderMetaKey = (order: WooCommerceOrder, key: string) =>
+        Array.isArray(order?.meta_data) &&
+        order.meta_data.some((m) => m?.key === key);
 
-      // Список ID продуктів-підписок (можна додавати нові ID)
-      const subscriptionProductIds: readonly number[] = [
-        // тут можна додати ID продуктів-підписок
-      ];
-
-      // Фільтруємо замовлення, які містять товари-підписки
+      // Відповідно до бекенд-документації: підписка маркується мета-ключем _subscription_tariff_id
       const subscriptionOrders = orders.filter((order) =>
-        order.line_items.some(
-          (item) =>
-            item.name.toLowerCase().includes("підписка") ||
-            item.name.toLowerCase().includes("subscription") ||
-            (item.product_id &&
-              isInArray(item.product_id, subscriptionProductIds))
-        )
+        hasOrderMetaKey(order, "_subscription_tariff_id")
       );
 
       // Створюємо історію підписок
       subscriptionHistory = subscriptionOrders.map((order) => {
-        const subscriptionItem = order.line_items.find(
-          (item) =>
-            item.name.toLowerCase().includes("підписка") ||
-            item.name.toLowerCase().includes("subscription")
-        );
+        const subscriptionItem = order.line_items?.[0];
 
         return {
           id: order.id,
-          planName: subscriptionItem?.name || "Підписка",
+          planName: subscriptionItem?.name || "Тариф",
           price: subscriptionItem?.total || order.total,
           period: "1 місяць", // Можна отримати з мета-даних товару
           purchaseDate: new Date(order.date_created).toLocaleDateString(
@@ -1404,6 +1402,10 @@ export type WooCommerceAttributeTerm = {
   description: string;
   menu_order: number;
   count: number;
+  acf?: {
+    color?: string;
+    [key: string]: unknown;
+  };
 };
 
 export type PasswordResetData = {
@@ -2252,6 +2254,43 @@ export const fetchWcPaymentGateways = async (): Promise<unknown[]> => {
     throw error;
   }
 };
+
+// MyPlugin Subscription API (assign tariff / cancel subscription)
+export type AssignTariffResponse = {
+  message?: string;
+  order_id?: number;
+  subscription?: {
+    action: string;
+    fields: Record<string, unknown>;
+  };
+};
+
+export async function assignTariff(params: {
+  userId: number;
+  tariffId: number;
+}): Promise<AssignTariffResponse> {
+  const res = await api.post("/api/myplugin/assign-tariff", {
+    user_id: params.userId,
+    tariff_id: params.tariffId,
+  });
+  return res.data as AssignTariffResponse;
+}
+
+export type CancelSubscriptionResponse = {
+  message?: string;
+  order_id?: number;
+  code?: string;
+  data?: { status?: number };
+};
+
+export async function cancelSubscription(params: {
+  userId: number;
+}): Promise<CancelSubscriptionResponse> {
+  const res = await api.post("/api/myplugin/cancel-subscription", {
+    user_id: params.userId,
+  });
+  return res.data as CancelSubscriptionResponse;
+}
 
 // Cart API
 export interface CartItemResponse {

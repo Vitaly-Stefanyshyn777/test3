@@ -188,6 +188,15 @@
   color: var(--black);
 }
 
+.variantInfo {
+  margin-top: 6px;
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 140%;
+  color: rgba(14, 14, 14, 0.6);
+}
+
 .subscriptionBlock {
   width: 100%;
   height: auto;

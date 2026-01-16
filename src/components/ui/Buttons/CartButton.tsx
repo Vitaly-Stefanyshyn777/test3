@@ -3,16 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cart";
 import { useAuthStore } from "@/store/auth";
 import { useFavoriteStore } from "@/store/favorites";
-
-// Функція для нормалізації ключа товару в кошику
-function normalizeCartKey(id: string): string {
-  // Якщо id містить префікс (course-, product-), витягуємо число
-  const match = id.match(/(?:course|product)-(\d+)/i);
-  if (match && match[1]) {
-    return match[1]; // Повертаємо тільки число
-  }
-  return id; // Повертаємо як є для звичайних товарів
-}
+import { useRouter } from "next/navigation";
 import {
   BasketIcon,
   SmitnikIcon,
@@ -21,9 +12,17 @@ import {
 } from "@/components/Icons/Icons";
 import s from "./CartButton.module.css";
 
+function normalizeCartKey(id: string): string {
+  const match = id.match(/(?:course|product)-(\d+)/i);
+  return match?.[1] ?? id;
+}
+
 type Props = {
   id: string;
   name: string;
+  slug?: string;
+  productType?: string;
+  variations?: number[];
   price?: number;
   originalPrice?: number;
   regularPrice?: number;
@@ -33,12 +32,15 @@ type Props = {
   className?: string;
   activeClassName?: string;
   removeFromFavoritesOnAddToCart?: boolean;
-  requireAuth?: boolean; // Додатковий проп для вимоги авторизації
+  requireAuth?: boolean;
 };
 
 export default function CartButton({
   id,
   name,
+  slug,
+  productType,
+  variations,
   price = 0,
   originalPrice,
   regularPrice,
@@ -48,8 +50,9 @@ export default function CartButton({
   className = "",
   activeClassName = "",
   removeFromFavoritesOnAddToCart = false,
-  requireAuth = true, // За замовчуванням вимагає авторизації (для курсів)
+  requireAuth = true,
 }: Props) {
+  const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
   const removeItem = useCartStore((s) => s.removeItem);
@@ -64,6 +67,31 @@ export default function CartButton({
     (cartItems[id] && cartItems[id].quantity > 0) ||
     (cartItems[normalizedKey] && cartItems[normalizedKey].quantity > 0);
 
+  const isCourse = id.includes("course") || name.toLowerCase().includes("курс");
+
+  const numericId = (() => {
+    const raw = normalizeCartKey(id);
+    return /^\d+$/.test(raw) ? raw : null;
+  })();
+
+  const getProductHref = () => {
+    const rawSlug = slug?.trim();
+    if (rawSlug) {
+      if (rawSlug.startsWith("/")) return rawSlug;
+      try {
+        return `/products/${
+          rawSlug.includes("%") ? decodeURIComponent(rawSlug) : rawSlug
+        }`;
+      } catch {
+        return `/products/${rawSlug}`;
+      }
+    }
+    return numericId ? `/products/${numericId}` : "/products";
+  };
+
+  const isVariableByProps =
+    productType === "variable" || (variations?.length ?? 0) > 0;
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 1000);
@@ -77,10 +105,14 @@ export default function CartButton({
     e.preventDefault();
     e.stopPropagation();
 
-    // Додаткова перевірка: курси вимагають авторизації, продукти - ні
-    const isCourse =
-      id.includes("course") || name.toLowerCase().includes("курс");
     const needsAuth = requireAuth || isCourse;
+
+    if (!isCourse) {
+      if (isVariableByProps) {
+        router.push(getProductHref());
+        return;
+      }
+    }
 
     if (needsAuth && !isLoggedIn && !inCart) {
       openLoginModal();
@@ -88,7 +120,6 @@ export default function CartButton({
     }
 
     if (inCart) {
-      // Для видалення шукаємо товар за різними ключами
       const itemToRemove = cartItems[id] || cartItems[normalizedKey];
       if (itemToRemove) {
         const keyToRemove = cartItems[id] ? id : normalizedKey;
@@ -97,7 +128,16 @@ export default function CartButton({
     } else {
       try {
         await addItem(
-          { id, name, price, originalPrice, regularPrice, salePrice, image, stockQuantity },
+          {
+            id,
+            name,
+            price,
+            originalPrice,
+            regularPrice,
+            salePrice,
+            image,
+            stockQuantity,
+          },
           1
         );
       } catch (error) {
@@ -105,7 +145,6 @@ export default function CartButton({
         return;
       }
 
-      // Якщо потрібно, видаляємо товар з favorites після додавання в кошик
       if (removeFromFavoritesOnAddToCart && isInFavorites) {
         removeFromFavorites(id);
       }

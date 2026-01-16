@@ -63,7 +63,10 @@ const ProductsCatalog = () => {
         // Якщо це та сама категорія, зберігаємо попередній заголовок
       } else {
         // Шукаємо в закешованих даних
-        const allCategories = [...(categories85 || []), ...(categories77 || [])];
+        const allCategories = [
+          ...(categories85 || []),
+          ...(categories77 || []),
+        ];
         const byId = allCategories.find((c) => String(c.id) === q);
         if (byId?.name) setCatalogTitle(byId.name);
       }
@@ -210,11 +213,15 @@ const ProductsCatalog = () => {
         (async () => {
           try {
             // Використовуємо закешовані дані
-            let found = (categories85 || []).find((c) => c.slug === categoryParam);
+            let found = (categories85 || []).find(
+              (c) => c.slug === categoryParam
+            );
 
             // Якщо не знайшли в інвентарі, шукаємо в інших категоріях
             if (!found) {
-              found = (categories77 || []).find((c) => c.slug === categoryParam);
+              found = (categories77 || []).find(
+                (c) => c.slug === categoryParam
+              );
             }
             if (found) {
               setAppliedWcFilters({ category: String(found.id) });
@@ -285,9 +292,9 @@ const ProductsCatalog = () => {
               }
               isLoading={isLoading}
             />
-            {isError && (
+            {/* {isError && (
               <div className={styles.error}>Не вдалося завантажити товари</div>
-            )}
+            )} */}
             {isLoading && <div className={styles.loading}>Завантаження…</div>}
           </div>
         </div>

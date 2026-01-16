@@ -5,6 +5,8 @@ import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
 import type SwiperType from "swiper";
 import ProductsGrid from "../CoursesGrid/CoursesGrid";
 import { SortType } from "@/components/ui/FilterSortPanel/FilterSortPanel";
+import { calculatePrice, getPriceSellRegistry } from "@/lib/priceUtils";
+import { useAuthStore } from "@/store/auth";
 
 interface Props {
   block: {
@@ -50,8 +52,8 @@ const CourseCatalogContainer = ({
 
   const [currentPage, setCurrentPage] = useState(1);
   const sourceProducts: Course[] = (filteredProducts as Course[]) || [];
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
-  // Спрощена функція розрахунку ціни з урахуванням знижки для авторизованих користувачів
   const getCoursePrice = (course: Course): number => {
     // Пріоритет цін: sale_price -> regular_price -> price
     let price: string | number | undefined =
@@ -70,8 +72,36 @@ const CourseCatalogContainer = ({
       price = 0;
     }
 
-    // Застосовуємо знижку 20% для авторизованих користувачів
-    return price * 0.8; // 20% знижка = множимо на 0.8
+    const regularPrice = (course as any).wcProduct?.prices?.regular_price
+      ? parseFloat(
+          String((course as any).wcProduct.prices.regular_price)
+            .replace(/[₴$€£\s,]/g, "")
+            .replace(",", ".")
+        ) || undefined
+      : undefined;
+
+    const priceSellRegistry = getPriceSellRegistry({
+      acf: (course as any).acf,
+      metaData: (course as any).metaData,
+      meta_data: (course as any).meta_data,
+      wcProduct: (course as any).wcProduct,
+    });
+
+    const priceCalculation = calculatePrice({
+      price,
+      regularPrice,
+      salePrice: (course as any).wcProduct?.prices?.sale_price
+        ? parseFloat(
+            String((course as any).wcProduct.prices.sale_price)
+              .replace(/[₴$€£\s,]/g, "")
+              .replace(",", ".")
+          ) || undefined
+        : undefined,
+      isLoggedIn,
+      priceSellRegistry,
+    });
+
+    return priceCalculation.finalPrice;
   };
 
   // Спрощена логіка сортування

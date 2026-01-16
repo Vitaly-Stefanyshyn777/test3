@@ -5,44 +5,67 @@ import Link from "next/link";
 import styles from "./Subscription.module.css";
 import { СheckIcon } from "@/components/Icons/Icons";
 import { useAuthStore } from "@/store/auth";
-import { fetchUserSubscription, UserSubscription } from "@/lib/bfbApi";
+import {
+  cancelSubscription,
+  fetchUserSubscription,
+  UserSubscription,
+} from "@/lib/bfbApi";
 
 export default function CurrentPlanCard() {
   const [subscriptionData, setSubscriptionData] =
     useState<UserSubscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isCancelling, setIsCancelling] = useState(false);
   const user = useAuthStore((s) => s.user);
 
+  const loadSubscriptionData = async () => {
+    if (!user?.id) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("wp_jwt") ||
+            localStorage.getItem("wp_jwt_override") ||
+            undefined
+          : undefined;
+
+      const data = await fetchUserSubscription(Number(user.id), token);
+      setSubscriptionData(data);
+    } catch (err) {
+      setError("Не вдалося завантажити інформацію про підписку");
+      console.error("Error loading subscription:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadSubscriptionData = async () => {
-      if (!user?.id) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        // Отримуємо JWT токен для авторизації
-        const token =
-          typeof window !== "undefined"
-            ? localStorage.getItem("wp_jwt") ||
-              localStorage.getItem("wp_jwt_override") ||
-              undefined
-            : undefined;
-
-        const data = await fetchUserSubscription(Number(user.id), token);
-        setSubscriptionData(data);
-      } catch (err) {
-        setError("Не вдалося завантажити інформацію про підписку");
-        console.error("Error loading subscription:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadSubscriptionData();
   }, [user?.id]);
+
+  const handleCancel = async () => {
+    const userId = user?.id ? Number(user.id) : NaN;
+    if (!Number.isFinite(userId) || userId <= 0) return;
+
+    if (!confirm("Скасувати підписку?")) return;
+
+    try {
+      setIsCancelling(true);
+      await cancelSubscription({ userId });
+      await loadSubscriptionData();
+      alert("Підписку скасовано.");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Невідома помилка";
+      alert(`Не вдалося скасувати підписку. ${msg}`);
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -100,7 +123,13 @@ export default function CurrentPlanCard() {
                 : "Дата наступного списання не вказана"}
             </div>
             <div className={styles.planActions}>
-            <button className={styles.cancelBtn}>Скасувати підписку</button>
+              <button
+                className={styles.cancelBtn}
+                onClick={handleCancel}
+                disabled={isCancelling}
+              >
+                {isCancelling ? "Скасовуємо..." : "Скасувати підписку"}
+              </button>
             </div>
           </div>
         ) : (

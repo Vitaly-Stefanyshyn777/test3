@@ -5,7 +5,7 @@ import s from "./CartModal.module.css";
 import { useCartStore } from "@/store/cart";
 import { useAuthStore } from "@/store/auth";
 import { useScrollLock } from "@/components/hooks/useScrollLock";
-import { calculatePrice, AUTH_DISCOUNT } from "@/lib/priceUtils";
+import { calculatePrice } from "@/lib/priceUtils";
 import CartHeader from "./CartHeader";
 import CartItemsList from "./CartItemsList";
 import CartSummary from "./CartSummary";

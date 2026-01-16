@@ -22,6 +22,8 @@ export function useCheckoutState() {
     apartment: "",
     paymentMethod: "Накладений платіж",
     comment: "",
+    mailSend: false,
+    acceptTerms: false,
   });
 
   // Стан помилок

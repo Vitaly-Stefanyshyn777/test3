@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { useCreateWcOrder } from "@/lib/useMutation";
 import { useCartStore, type CartItem } from "@/store/cart";
 import { useAuthStore } from "@/store/auth";
@@ -33,9 +34,16 @@ export function useOrderSubmission({
   const { user } = useAuthStore();
   const { createOrderData } = useOrderData();
   const { handleWayForPayPayment } = useWayForPay({ safeTotal, setErrors });
+  const isSubmittingRef = React.useRef(false);
 
   const submitOrder = async () => {
+    // Захист від подвійного натискання
+    if (isSubmittingRef.current || createOrderMutation.isPending) {
+      return;
+    }
+
     try {
+      isSubmittingRef.current = true;
       // Передаємо isLoggedIn як булевий стан замість перевірки наявності user
       const isLoggedIn = !!user;
       const orderData = createOrderData({
@@ -51,6 +59,53 @@ export function useOrderSubmission({
         id: number | string;
         status?: string;
       };
+
+      // Оновлюємо користувача з полем mail_send, якщо користувач авторизований
+      if (user?.id && formData.mailSend) {
+        try {
+          const userId = Number(user.id);
+          // Отримуємо поточний профіль для збереження існуючих даних
+          const profileRes = await fetch(
+            `/api/proxy?path=${encodeURIComponent(
+              `/wp-json/wp/v2/users/${userId}?context=edit`
+            )}`,
+            {
+              method: "GET",
+              headers: {
+                "x-internal-admin": "1",
+              },
+            }
+          );
+
+          if (profileRes.ok) {
+            const profile = await profileRes.json();
+            const currentAcf = (profile.acf as Record<string, unknown>) || {};
+
+            // Оновлюємо профіль з полем mail_send
+            await fetch(
+              `/api/proxy?path=${encodeURIComponent(
+                `/wp-json/wp/v2/users/${userId}`
+              )}`,
+              {
+                method: "PATCH",
+                headers: {
+                  "Content-Type": "application/json",
+                  "x-internal-admin": "1",
+                },
+                body: JSON.stringify({
+                  acf: {
+                    ...currentAcf,
+                    mail_send: true,
+                  },
+                }),
+              }
+            );
+          }
+        } catch (error) {
+          // Не блокуємо процес, якщо оновлення профілю не вдалося
+          console.error("Failed to update user mail_send:", error);
+        }
+      }
 
       // Очищуємо кошик після успішного створення замовлення
       await cartStore.clear();
@@ -106,6 +161,8 @@ export function useOrderSubmission({
       if (showAlert) {
         alert(errorMessage);
       }
+    } finally {
+      isSubmittingRef.current = false;
     }
   };
 

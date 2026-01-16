@@ -1,5 +1,6 @@
 "use client";
 import { CheckoutErrors } from "@/components/sections/CheckoutSection/types";
+import { submitWayForPayForm } from "@/lib/wayforpayForm";
 
 interface UseWayForPayProps {
   safeTotal: number;
@@ -54,30 +55,7 @@ export function useWayForPay({ safeTotal, setErrors }: UseWayForPayProps) {
         );
       }
 
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = payload.action;
-
-      Object.entries(payload.fields).forEach(([key, val]) => {
-        if (Array.isArray(val)) {
-          val.forEach((v) => {
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = `${key}[]`;
-            input.value = String(v);
-            form.appendChild(input);
-          });
-        } else {
-          const input = document.createElement("input");
-          input.type = "hidden";
-          input.name = key;
-          input.value = String(val);
-          form.appendChild(input);
-        }
-      });
-
-      document.body.appendChild(form);
-      form.submit();
+      submitWayForPayForm(payload.action, payload.fields);
       return true;
     } catch (e) {
       const errorMessage =

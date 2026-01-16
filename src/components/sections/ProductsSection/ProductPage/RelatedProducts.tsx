@@ -25,6 +25,8 @@ const RelatedProducts = memo(function RelatedProducts({
       id: String(p.id),
       slug: p.slug || "",
       name: p.name,
+      productType: p.type,
+      variations: p.variations,
       price: Number(p.price) || 0,
       originalPrice: Number(p.regularPrice) || undefined,
       discount:
@@ -80,6 +82,8 @@ const RelatedProducts = memo(function RelatedProducts({
             id={item.id}
             slug={item.slug}
             name={item.name}
+            productType={item.productType}
+            variations={item.variations}
             price={item.price}
             originalPrice={item.originalPrice}
             discount={item.discount}

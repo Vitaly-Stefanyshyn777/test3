@@ -62,10 +62,11 @@ export default function CoursesList({ courses, onWatch }: Props) {
               <button
                 className={styles.watchButton}
                 onClick={() => onWatch(course)}
+                disabled={!course.watchUrl}
               >
                 Дивитися
               </button>
-              <div className={styles.watchButtonLine}></div>
+              {course.watchUrl && <div className={styles.watchButtonLine}></div>}
             </div>
           </div>
         </div>

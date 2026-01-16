@@ -32,12 +32,25 @@ interface Product {
   stockStatus: string;
 }
 
-type Term = { id: number; name: string; slug: string; count?: number };
+type Term = {
+  id: number;
+  name: string;
+  slug: string;
+  count?: number;
+  acf?: {
+    color?: string;
+    [key: string]: unknown;
+  };
+};
 
-export const ColorFilter = ({ selectedColors, onChange, loading }: ColorFilterProps) => {
+export const ColorFilter = ({
+  selectedColors,
+  onChange,
+  loading,
+}: ColorFilterProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const { data: attrs = [], isLoading, isError } = useProductAttributesQuery();
-  
+
   const showSkeleton = loading || isLoading;
   const colorAttr = (attrs || []).find((a) => {
     const slug = (a.slug || "").toLowerCase();
@@ -98,7 +111,13 @@ export const ColorFilter = ({ selectedColors, onChange, loading }: ColorFilterPr
               const widths = [120, 110, 100]; // Фіксовані ширини замість Math.random()
               return (
                 <div key={i} className={styles.colorItem}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                    }}
+                  >
                     <Skeleton width={24} height={24} borderRadius={8} />
                     <Skeleton width={widths[i]} height={16} />
                   </div>
@@ -112,26 +131,15 @@ export const ColorFilter = ({ selectedColors, onChange, loading }: ColorFilterPr
         ) : (
           <div className={styles.colorList}>
             {terms.map((term) => {
-              const slug = (term.slug || "").toLowerCase();
-              const name = (term.name || "").toLowerCase();
-              const colorHexByKey: Record<string, string> = {
-                beige: "#F5F5DC",
-                green: "#4CAF50",
-                white: "#FFFFFF",
-                red: "#F44336",
-                blue: "#2196F3",
-                black: "#000000",
-                grey: "#9E9E9E",
-                gray: "#9E9E9E",
-                brown: "#795548",
-                pink: "#E91E63",
-                purple: "#9C27B0",
-                yellow: "#FFEB3B",
-                orange: "#FF9800",
-              };
-              const key = slug || name;
-              const swatchColor = colorHexByKey[key] || "#EEEEEE";
-              const isWhite = key === "white" || swatchColor === "#FFFFFF";
+              const acfColor =
+                term.acf &&
+                typeof term.acf === "object" &&
+                !Array.isArray(term.acf)
+                  ? term.acf.color
+                  : undefined;
+
+              // Використовуємо колір з ACF або дефолтний сірий, якщо не встановлено
+              const swatchColor = acfColor || "#EEEEEE";
 
               const count: number | undefined = term.count;
 
@@ -155,7 +163,7 @@ export const ColorFilter = ({ selectedColors, onChange, loading }: ColorFilterPr
                       selectedColors.includes(String(term.id))
                         ? styles.selected
                         : ""
-                    } ${isWhite ? styles.whiteColor : ""}`}
+                    } ${styles.whiteColor}`}
                     style={{ backgroundColor: swatchColor }}
                   />
                   <span className={styles.colorName}>{term.name}</span>

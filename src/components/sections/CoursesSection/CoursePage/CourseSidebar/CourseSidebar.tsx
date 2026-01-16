@@ -30,7 +30,7 @@ import { useCourseQuery as useCourseDataQuery } from "@/lib/coursesQueries";
 import { useCartStore } from "@/store/cart";
 import CourseSidebarCourseInfoSkeleton from "./CourseSidebarCourseInfoSkeleton";
 import CourseSidebarImageSkeleton from "./CourseSidebarImageSkeleton";
-import { calculatePrice, formatPrice } from "@/lib/priceUtils";
+import { calculatePrice, formatPrice, getPriceSellRegistry } from "@/lib/priceUtils";
 
 interface CourseSidebarProps {
   courseId?: string | number;
@@ -515,11 +515,18 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
     ? parseFloat(courseData.originalPrice)
     : 0;
 
-  // Розрахунок цін з урахуванням авторизації та знижок
+  const priceSellRegistry = getPriceSellRegistry({
+    acf: courseData?.courseData as Record<string, unknown> | undefined,
+    metaData: courseData?.metaData,
+    meta_data: courseData?.metaData,
+    wcProduct: courseData?.wcProduct,
+  });
+
   const priceCalculation = calculatePrice({
     price: parseFloat(salePrice || currentPrice || "0"),
     regularPrice: regularPrice ? parseFloat(regularPrice) : undefined,
     isLoggedIn,
+    priceSellRegistry,
   });
 
   const {

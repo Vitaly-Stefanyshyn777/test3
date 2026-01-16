@@ -129,6 +129,11 @@ export function useCheckoutValidation() {
       }
     }
 
+    // Валідація чекбоксу з умовами
+    if (!formData.acceptTerms) {
+      newErrors.acceptTerms = "Необхідно прийняти умови оферти";
+    }
+
     return newErrors;
   };
 

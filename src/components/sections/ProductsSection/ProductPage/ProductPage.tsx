@@ -25,7 +25,7 @@ import { useAuthStore } from "@/store/auth";
 import RegisterModal from "@/components/auth/RegisterModal/RegisterModal";
 import { normalizeImageUrl } from "@/lib/imageUtils";
 import { useCartStore } from "@/store/cart";
-import { calculatePrice, formatPrice } from "@/lib/priceUtils";
+import { calculatePrice, formatPrice, getPriceSellRegistry } from "@/lib/priceUtils";
 import ProductPageSkeleton from "./ProductPageSkeleton";
 
 export default function ProductPage({ productSlug }: { productSlug: string }) {
@@ -107,7 +107,11 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
   } | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const isFavorite = useFavoriteStore(selectIsFavorite(product?.id || ""));
+  const favoriteKey =
+    selectedVariation?.id && product?.id
+      ? `product-${product.id}-var-${selectedVariation.id}`
+      : (product?.id || "").toString();
+  const isFavorite = useFavoriteStore(selectIsFavorite(favoriteKey));
   const toggleFav = useFavoriteStore((s) => s.toggleFavorite);
   const addItem = useCartStore((s) => s.addItem);
   const removeItem = useCartStore((s) => s.removeItem);
@@ -186,16 +190,31 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
     }
   }, [product]); // Завантажуємо варіації лише при зміні продукту
 
+  // За замовчуванням виділяємо першу варіацію (колір/розмір), щоб кнопка мала клас selected одразу
+  useEffect(() => {
+    if (!variationsData.length) return;
+
+    const first = variationsData[0];
+    const firstColor = first.attributes?.find((a) => a.slug === "pa_color")
+      ?.option;
+    const firstSize = first.attributes?.find((a) => a.slug === "pa_size")
+      ?.option;
+
+    if (!selectedColor && firstColor) setSelectedColor(firstColor);
+    if (!selectedSize && firstSize) setSelectedSize(firstSize);
+  }, [variationsData, selectedColor, selectedSize]);
+
   // Спрощена логіка вибору варіації - шукаємо точну комбінацію або першу доступну
   useEffect(() => {
     if (!variationsData.length) return;
 
-    // Знаходимо варіацію за точною комбінацією розмір + колір
-    // Якщо комбінація не знайдена або не вибрана, беремо першу доступну варіацію
+    // Підтримуємо 3 кейси:
+    // - розмір + колір (одяг)
+    // - тільки колір (сумки тощо)
+    // - тільки розмір (на випадок товарів без кольору)
     const matchingVariation =
       variationsData.find((v) => {
         if (selectedSize && selectedColor) {
-          // Шукаємо точну комбінацію
           return (
             v.attributes?.some(
               (attr: any) =>
@@ -207,7 +226,20 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
             )
           );
         }
-        return false; // Якщо не вибрано повну комбінацію, не шукаємо
+
+        if (selectedColor) {
+          return v.attributes?.some(
+            (attr: any) => attr.slug === "pa_color" && attr.option === selectedColor
+          );
+        }
+
+        if (selectedSize) {
+          return v.attributes?.some(
+            (attr: any) => attr.slug === "pa_size" && attr.option === selectedSize
+          );
+        }
+
+        return false;
       }) || variationsData[0]; // За замовчуванням перша варіація
 
     if (matchingVariation) {
@@ -363,11 +395,21 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
   // Визначаємо чи є продукт хітом
   const isActuallyHit = isHitProduct();
 
-  // Розрахунок цін з урахуванням авторизації та знижок
+  const priceSellRegistry = getPriceSellRegistry(
+    product ? {
+      metaData: product.metaData,
+      meta_data: product.metaData,
+      wcProduct: (product.wcProduct as any)?.meta_data ? {
+        meta_data: (product.wcProduct as any).meta_data
+      } : undefined,
+    } : null
+  );
+
   const priceCalculation = calculatePrice({
     price: selectedVariation?.price || product?.price || 0,
     regularPrice: selectedVariation?.regular_price || product?.regularPrice,
     isLoggedIn,
+    priceSellRegistry,
   });
 
   const { finalPrice, originalPrice, totalDiscount, shouldShowOldPrice } =
@@ -551,6 +593,9 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
     id: number | string;
     slug?: string;
     name: string;
+    type?: string;
+    variations?: number[];
+    wcProduct?: { type?: string; variations?: number[] };
     price?: string | number;
     regular_price?: string | number;
     regularPrice?: string | number;
@@ -568,6 +613,8 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
         id: String(p.id),
         slug: p.slug,
         name: p.name,
+        productType: p.type ?? p.wcProduct?.type,
+        variations: p.variations ?? p.wcProduct?.variations,
         price: Number(p.price) || 0,
         originalPrice: Number(p.regular_price || p.regularPrice) || undefined,
         discount:
@@ -887,6 +934,36 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
                     >
                       Зареєструватися
                     </button>
+
+                    <button
+                      className={`${styles.favoriteBtn} ${
+                        isFavorite ? styles.favoriteActive : ""
+                      }`}
+                      onClick={() => {
+                        // Для варіативного продукту додаємо саме вибрану варіацію
+                        if (product?.wcProduct?.type === "variable" && !selectedVariation?.id) {
+                          return;
+                        }
+                        toggleFav({
+                          id: favoriteKey,
+                          slug: product?.slug || productSlug,
+                          name: product?.name || "",
+                          price: Number(selectedVariation?.price || product?.price || 0),
+                          originalPrice: Number(
+                            selectedVariation?.regular_price || product?.regularPrice || 0
+                          ),
+                          image: product?.image,
+                          variationId: selectedVariation?.id || undefined,
+                          color: selectedColor || undefined,
+                          size: selectedSize || undefined,
+                          productType: product?.wcProduct?.type,
+                          variations: product?.wcProduct?.variations,
+                        });
+                      }}
+                      title="Додати в улюблені"
+                    >
+                      {isFavorite ? <FavoriteBlacIcon /> : <Favorite2Icon />}
+                    </button>
                   </div>
                 ) : (
                   <div className={styles.actionButtons}>
@@ -951,11 +1028,21 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
                         }`}
                         onClick={() => {
                           if (isControlsDisabled) return;
+                          if (product?.wcProduct?.type === "variable" && !selectedVariation?.id) {
+                            return;
+                          }
                           toggleFav({
-                            id: product?.id || "",
+                            id: favoriteKey,
+                            slug: product?.slug || productSlug,
                             name: product?.name || "",
-                            // price: product?.price || 0,
+                            price: Number(selectedVariation?.price || product?.price || 0),
+                            originalPrice: Number(
+                              selectedVariation?.regular_price || product?.regularPrice || 0
+                            ),
                             image: product?.image,
+                            variationId: selectedVariation?.id || undefined,
+                            color: selectedColor || undefined,
+                            size: selectedSize || undefined,
                           });
                         }}
                         title="Додати в улюблені"
@@ -1199,6 +1286,8 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
               id={item.id}
               slug={item.slug}
               name={item.name}
+              productType={item.productType}
+              variations={item.variations}
               price={item.price}
               originalPrice={item.originalPrice}
               discount={item.discount}

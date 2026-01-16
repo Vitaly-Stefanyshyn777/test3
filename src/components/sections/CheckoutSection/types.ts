@@ -13,6 +13,8 @@ export interface FormData {
   apartment: string;
   paymentMethod: string;
   comment: string;
+  mailSend: boolean;
+  acceptTerms: boolean;
 }
 
 export interface CheckoutErrors {
@@ -30,4 +32,5 @@ export interface CheckoutErrors {
   house?: string;
   building?: string;
   apartment?: string;
+  acceptTerms?: string;
 }

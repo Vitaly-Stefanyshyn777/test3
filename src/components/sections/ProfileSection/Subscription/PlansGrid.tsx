@@ -5,13 +5,18 @@ import styles from "./Subscription.module.css";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { Сheck2Icon, СheckIcon } from "@/components/Icons/Icons";
-import { fetchTariffs, Tariff } from "@/lib/bfbApi";
+import { assignTariff, fetchTariffs, Tariff } from "@/lib/bfbApi";
 import { formatPrice } from "@/lib/priceUtils";
+import { useAuthStore } from "@/store/auth";
+import { submitWayForPayForm } from "@/lib/wayforpayForm";
 
 export default function PlansGrid() {
   const [tariffs, setTariffs] = useState<Tariff[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pendingTariffId, setPendingTariffId] = useState<number | null>(null);
+  const isAssigningRef = React.useRef(false);
+  const user = useAuthStore((s) => s.user);
 
   useEffect(() => {
     (async () => {
@@ -75,7 +80,7 @@ export default function PlansGrid() {
                       >
                         <Skeleton circle width={20} height={20} />
                         <Skeleton
-                          width={200 + Math.random() * 50}
+                          width={[220, 240, 210][j] ?? 220}
                           height={16}
                         />
                       </div>
@@ -104,6 +109,38 @@ export default function PlansGrid() {
       </div>
     );
   }
+
+  const handleSelectTariff = async (tariffId: number) => {
+    // Захист від подвійного натискання
+    if (isAssigningRef.current || pendingTariffId !== null) {
+      return;
+    }
+
+    const userId = user?.id ? Number(user.id) : NaN;
+    if (!Number.isFinite(userId) || userId <= 0) {
+      alert("Щоб обрати тариф, увійдіть у акаунт.");
+      return;
+    }
+
+    try {
+      isAssigningRef.current = true;
+      setPendingTariffId(tariffId);
+      const data = await assignTariff({ userId, tariffId });
+
+      if (data?.subscription?.action && data?.subscription?.fields) {
+        submitWayForPayForm(data.subscription.action, data.subscription.fields);
+        return;
+      }
+
+      alert("Не вдалося ініціювати підписку. Спробуйте ще раз.");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Невідома помилка";
+      alert(`Не вдалося обрати тариф. ${msg}`);
+    } finally {
+      setPendingTariffId(null);
+      isAssigningRef.current = false;
+    }
+  };
 
   return (
     <>
@@ -157,7 +194,15 @@ export default function PlansGrid() {
                         </div>
                       ))}
                     </div>
-                    <button className={styles.selectBtn}>Обрати тариф</button>
+                    <button
+                      className={styles.selectBtn}
+                      onClick={() => handleSelectTariff(tariff.id)}
+                      disabled={pendingTariffId === tariff.id}
+                    >
+                      {pendingTariffId === tariff.id
+                        ? "Оформлюємо..."
+                        : "Обрати тариф"}
+                    </button>
                   </div>
                 );
               })}
@@ -197,7 +242,13 @@ export default function PlansGrid() {
                       </div>
                     ))}
                   </div>
-                  <button className={styles.selectBtn}>Обрати тариф</button>
+                  <button
+                    className={styles.selectBtn}
+                    onClick={() => handleSelectTariff(tariff.id)}
+                    disabled={pendingTariffId === tariff.id}
+                  >
+                    {pendingTariffId === tariff.id ? "Оформлюємо..." : "Обрати тариф"}
+                  </button>
                 </div>
               );
             })}

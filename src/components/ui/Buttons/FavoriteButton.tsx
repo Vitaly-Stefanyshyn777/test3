@@ -1,12 +1,23 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useFavoriteStore, selectIsFavorite } from "@/store/favorites";
+import { useRouter } from "next/navigation";
 import {
   Favorite2Icon,
   FavoriteBlacIcon,
   BasketMobileRedGreenIcon,
 } from "@/components/Icons/Icons";
 import s from "./FavoriteButton.module.css";
+
+function extractProductNumericId(id: string): string | null {
+  const match = id.match(/(?:^|-)product-(\d+)/i);
+  if (match?.[1]) return match[1];
+  // чисто число
+  if (/^\d+$/.test(id)) return id;
+  // будь-яке перше число
+  const any = id.match(/\d+/);
+  return any?.[0] ?? null;
+}
 
 type Props = {
   id: string; // unique key for favorite store
@@ -17,11 +28,13 @@ type Props = {
   image?: string;
   className?: string;
   activeClassName?: string;
-  useRedGreenIconOnMobile?: boolean; // для використання червоно-зеленої іконки на мобільній версії в FavoritesModal
+  useRedGreenIconOnMobile?: boolean;
   variationId?: number;
   color?: string;
   size?: string;
   stockQuantity?: number | null;
+  productType?: string;
+  variations?: number[];
   wcProduct?: {
     prices?: {
       price: string;
@@ -46,8 +59,11 @@ export default function FavoriteButton({
   color,
   size,
   stockQuantity,
+  productType,
+  variations,
   wcProduct,
 }: Props) {
+  const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const isFav = useFavoriteStore(selectIsFavorite(id));
   const toggleFav = useFavoriteStore((s) => s.toggleFavorite);
@@ -61,9 +77,34 @@ export default function FavoriteButton({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  const getProductHref = () => {
+    const rawSlug = slug?.trim();
+    if (rawSlug) {
+      if (rawSlug.startsWith("/")) return rawSlug;
+      try {
+        return `/products/${
+          rawSlug.includes("%") ? decodeURIComponent(rawSlug) : rawSlug
+        }`;
+      } catch {
+        return `/products/${rawSlug}`;
+      }
+    }
+    const numeric = extractProductNumericId(id);
+    return numeric ? `/products/${numeric}` : "/products";
+  };
+
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    const isVariableByProps =
+      productType === "variable" || (variations?.length ?? 0) > 0;
+
+    if (!variationId && isVariableByProps) {
+      router.push(getProductHref());
+      return;
+    }
+
     toggleFav({
       id,
       slug,
@@ -75,7 +116,9 @@ export default function FavoriteButton({
       color,
       size,
       stockQuantity,
-      wcProduct
+      productType,
+      variations,
+      wcProduct,
     });
   };
 

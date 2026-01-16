@@ -56,15 +56,35 @@ export async function GET(
       cache: "no-store",
       headers: { Authorization: authHeader },
     });
-    const text = await upstreamRes.text();
 
-    return new NextResponse(text, {
-      status: upstreamRes.status,
-      headers: {
-        "content-type":
-          upstreamRes.headers.get("content-type") || "application/json",
-      },
-    });
+    if (!upstreamRes.ok) {
+      return new NextResponse(upstreamRes.body, {
+        status: upstreamRes.status,
+        headers: {
+          "content-type":
+            upstreamRes.headers.get("content-type") || "application/json",
+        },
+      });
+    }
+
+    const terms = await upstreamRes.json();
+
+    // WooCommerce API вже повертає ACF дані, але іноді як порожній масив []
+    // Нормалізуємо ACF дані: конвертуємо масив в об'єкт для консистентності
+    if (Array.isArray(terms)) {
+      const normalizedTerms = terms.map((term: any) => ({
+        ...term,
+        // Якщо acf є масивом або відсутнє, встановлюємо порожній об'єкт
+        acf:
+          Array.isArray(term.acf) || !term.acf || typeof term.acf !== "object"
+            ? {}
+            : term.acf,
+      }));
+
+      return NextResponse.json(normalizedTerms);
+    }
+
+    return NextResponse.json(terms);
   } catch (error) {
     return NextResponse.json(
       { error: "wc product attribute terms error" },

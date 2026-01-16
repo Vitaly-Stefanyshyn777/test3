@@ -552,6 +552,81 @@
   height: 1px;
   background: var(--grey);
 }
+.subscriptionHistory {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.subscriptionList {
+  gap: 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Subscription History Desktop Styles */
+.subscriptionItem {
+  width: 100%;
+  border-radius: 20px;
+  padding: 18px;
+  background: var(--bg-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.subscriptionDate {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  color: var(--black);
+}
+
+.subscriptionName {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  color: var(--black);
+}
+
+.subscriptionPrice {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  color: var(--black);
+}
+
+.subscriptionCurrency {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 140%;
+  color: var(--black);
+}
+
+.downloadButton {
+  background: transparent;
+  border: 1px solid var(--grey);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 140%;
+  color: var(--black);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.downloadButton:hover {
+  background: var(--black);
+  color: var(--white);
+}
 
 @media (max-width: 1000px) {
   .subscriptionContainer {
@@ -1092,49 +1167,67 @@
   }
 
   .subscriptionItem {
-    padding: 16px;
-    border-radius: 12px;
+    width: 100%;
+    border-radius: mvw(20);
+    padding: mvw(18);
     background: var(--bg-color);
-    border: 1px solid var(--light-gray);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: mvw(10);
+    flex-wrap: wrap;
   }
 
-  .subscriptionHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
+  .subscriptionDate {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(16);
+    line-height: 140%;
+    color: var(--black);
   }
 
   .subscriptionName {
-    font-family: var(--second-family);
-    font-weight: 600;
-    font-size: 16px;
-    line-height: 120%;
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(16);
+    line-height: 140%;
     color: var(--black);
   }
 
   .subscriptionPrice {
-    font-family: var(--second-family);
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 120%;
-    color: var(--violet);
-  }
-
-  .subscriptionDetails {
-    gap: 8px;
-  }
-
-  .subscriptionDate {
-    font-size: 14px;
-    line-height: 140%;
-    color: rgba(14, 14, 14, 0.6);
-  }
-
-  .subscriptionStatus {
-    font-size: 14px;
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(16);
     line-height: 140%;
     color: var(--black);
+  }
+
+  .subscriptionCurrency {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(16);
+    line-height: 140%;
+    color: var(--black);
+  }
+
+  .downloadButton {
+    margin-left: auto;
+    background: transparent;
+    border: mvw(1) solid var(--grey);
+    border-radius: mvw(8);
+    padding: mvw(8) mvw(16);
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: mvw(14);
+    line-height: 140%;
+    color: var(--black);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .downloadButton:hover {
+    background: var(--black);
+    color: var(--white);
   }
 
   .noSubscriptions {

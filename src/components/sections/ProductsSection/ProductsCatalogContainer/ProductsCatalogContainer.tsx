@@ -140,10 +140,16 @@ const ProductsCatalogContainer = ({
       p.dateCreated ??
       p.date_created;
 
+    const wc = (product as any).wcProduct as
+      | { type?: string; variations?: number[] }
+      | undefined;
+
     return {
       id: Number(product.id),
       slug: (product as any).slug, // Додаємо slug з продукту
       name: product.name,
+      type: wc?.type,
+      variations: wc?.variations,
       price: String(product.price ?? "0"),
       regular_price: String(p.regular_price ?? product.regularPrice ?? ""),
       sale_price: String(p.sale_price ?? product.salePrice ?? ""),

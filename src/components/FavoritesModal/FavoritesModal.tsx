@@ -36,7 +36,6 @@ export default function FavoritesModal() {
   const [desktopActiveIndex, setDesktopActiveIndex] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
 
-  /** DESKTOP — підрахунок dots для Swiper */
   const desktopTotalSlides = Math.max(
     1,
     items.length > 4 ? items.length - 4 + 1 : 1
@@ -60,7 +59,6 @@ export default function FavoritesModal() {
     return () => clearTimeout(timer);
   }, [isOpen]);
 
-  /** MOBILKA — залишаємо як було */
   const mobileChunkSize = 4;
   const mobilePages = useMemo(() => {
     const chunks: (typeof items)[] = [];
@@ -75,15 +73,12 @@ export default function FavoritesModal() {
       ? mobilePages[Math.min(activeIndex, mobilePages.length - 1)]
       : [];
 
-  /** -------- */
-
   useEffect(() => {
     setIsMounted(true);
     return () => setIsMounted(false);
   }, []);
 
   useEffect(() => {
-    // Виправляємо activeIndex тільки якщо він дійсно некоректний (щоб уникнути безкінечних циклів)
     if (mobilePages.length === 0) {
       if (activeIndex !== 0) {
         setActiveIndex(0);
@@ -99,7 +94,6 @@ export default function FavoritesModal() {
   }, [activeIndex, mobilePages.length]);
 
   useEffect(() => {
-    // Виправляємо desktopActiveIndex тільки якщо він дійсно некоректний
     if (desktopTotalSlides === 0) {
       if (desktopActiveIndex !== 0) {
         setDesktopActiveIndex(0);
@@ -131,7 +125,6 @@ export default function FavoritesModal() {
             </div>
 
             {isMobile ? (
-              /** ========= MOBILE ========= */
               <div className={s.mobileSliderWrap}>
                 {items.length === 0 ? (
                   <div className={s.empty}>Список порожній</div>
@@ -161,7 +154,6 @@ export default function FavoritesModal() {
                               ? it.id.replace("course-", "")
                               : undefined;
                             const normalizedImage = normalizeImageUrl(it.image);
-                            // Перетворюємо wcProduct для ProductCard
                             return (
                               <div
                                 key={it.id}
@@ -173,6 +165,8 @@ export default function FavoritesModal() {
                                   name={it.name}
                                   price={it.price || 0}
                                   originalPrice={it.originalPrice}
+                                  color={it.color}
+                                  size={it.size}
                                   image={normalizedImage}
                                   slug={
                                     isCourse && courseId
@@ -185,6 +179,8 @@ export default function FavoritesModal() {
                                   stockStatus={undefined}
                                   useRedGreenIconOnMobile={true}
                                   removeFromFavoritesOnAddToCart={true}
+                                  productType={it.productType}
+                                  variations={it.variations}
                                 />
                               </div>
                             );
@@ -196,7 +192,6 @@ export default function FavoritesModal() {
                 )}
               </div>
             ) : (
-              /** ========= DESKTOP ========= */
               <div className={s.desktopSliderWrap}>
                 {items.length === 0 ? (
                   <div className={s.empty}>Список порожній</div>
@@ -229,6 +224,8 @@ export default function FavoritesModal() {
                               name={it.name}
                               price={it.price || 0}
                               originalPrice={it.originalPrice}
+                              color={it.color}
+                              size={it.size}
                               image={normalizedImage}
                               slug={
                                 isCourse && courseId
@@ -257,8 +254,7 @@ export default function FavoritesModal() {
               <div className={s.buttonsWrap}>
                 <div className={s.navWrap}>
                   {isMobile
-                    ? // SliderNav на мобілці показуємо тільки коли більше 4 карток
-                      items.length > 4 && (
+                    ? items.length > 4 && (
                         <SliderNav
                           activeIndex={activeIndex}
                           dots={mobilePages.length}
@@ -285,7 +281,6 @@ export default function FavoritesModal() {
                   onClick={async () => {
                     const itemsToAdd = isMobile ? mobilePageItems : items;
 
-                    // Спочатку отримуємо всі ID товарів для очищення
                     const itemIds: string[] = [];
                     const cartItemsToAdd = [];
 
@@ -308,7 +303,6 @@ export default function FavoritesModal() {
                       }
                     }
 
-                    // Послідовно додаємо всі товари в кошик, щоб уникнути помилок
                     for (const cartItem of cartItemsToAdd) {
                       try {
                         await addToCart(cartItem, 1);
@@ -317,7 +311,6 @@ export default function FavoritesModal() {
                       }
                     }
 
-                    // Після успішного додавання всіх товарів - очищаємо favorites
                     if (itemIds.length > 0) {
                       try {
                         await removeAll(itemIds);
@@ -333,7 +326,6 @@ export default function FavoritesModal() {
                 <button
                   className={s.remove}
                   onClick={() => {
-                    // Негайне видалення всіх товарів з улюблених
                     clear();
                   }}
                 >

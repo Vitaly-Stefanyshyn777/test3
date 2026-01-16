@@ -190,6 +190,17 @@
   transform: translateY(0);
 }
 
+.watchButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--grey);
+}
+
+.watchButton:disabled:hover {
+  background-color: var(--grey);
+  transform: none;
+}
+
 .loading,
 .error,
 .empty {
@@ -399,6 +410,12 @@
     color: var(--violet);
     background: none;
     padding: 0;
+  }
+
+  .watchButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: var(--grey);
   }
 
   .watchButtonContainer {

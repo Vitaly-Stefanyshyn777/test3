@@ -38,13 +38,30 @@ export default function CheckoutForm({
     <div className={s.checkboxContainer}>
       <div className={s.checkboxBlock}>
         <label className={s.checkbox}>
-          <input type="checkbox" />
+          <input
+            type="checkbox"
+            checked={formData.mailSend}
+            onChange={(e) => {
+              setFormData({ mailSend: e.target.checked });
+            }}
+          />
           <span className={s.checkboxText}>Підписатись на e-mail розсилку</span>
         </label>
       </div>
       <div className={s.checkboxBlock}>
-        <label className={s.checkbox}>
-          <input type="checkbox" />
+        <label
+          className={`${s.checkbox} ${errors.acceptTerms ? s.checkboxError : ""}`}
+        >
+          <input
+            type="checkbox"
+            checked={formData.acceptTerms}
+            onChange={(e) => {
+              setFormData({ acceptTerms: e.target.checked });
+              if (e.target.checked) {
+                clearFieldError("acceptTerms");
+              }
+            }}
+          />
           <span className={s.checkboxText}>
             Приймаю умови оферти, політики конфіденційності та заяви про обробку
             персональних даних

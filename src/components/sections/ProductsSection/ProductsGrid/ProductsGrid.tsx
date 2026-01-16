@@ -10,6 +10,8 @@ interface Product {
   id: number;
   slug?: string; // Slug продукту
   name: string;
+  type?: string;
+  variations?: number[];
   price: string;
   regular_price?: string;
   sale_price?: string;
@@ -25,6 +27,12 @@ interface Product {
   average_rating?: string;
   review_count?: number;
   is_purchasable?: boolean;
+  wcProduct?: {
+    type?: string;
+    variations?: number[];
+    prices?: { price?: string; regular_price?: string; sale_price?: string };
+    on_sale?: boolean;
+  };
 }
 
 interface ProductsGridProps {
@@ -120,7 +128,7 @@ export default function ProductsGrid({
         // Нормалізуємо image: обробляємо випадок, коли src може бути рядком-масивом
         const image = normalizeImageUrl(p.images?.[0]?.src);
 
-        const storeProduct = undefined; // Дані WooCommerce продукту відсутні в цьому інтерфейсі
+        const storeProduct = p.wcProduct;
 
         // тихий режим — без логів
 
@@ -140,6 +148,8 @@ export default function ProductsGrid({
             id={id}
             slug={p.slug}
             name={p.name}
+            productType={p.type ?? p.wcProduct?.type}
+            variations={p.variations ?? p.wcProduct?.variations}
             price={priceNum}
             originalPrice={original}
             image={image}
@@ -147,13 +157,39 @@ export default function ProductsGrid({
             categories={productCategories[p.id] || p.categories}
             stockStatus={p.stock_status}
             dateCreated={p.date_created}
-            wcProduct={storeProduct}
-            allProducts={products.map((p) => ({
-              total_sales: 0,
+            wcProduct={storeProduct ? {
+              id: p.id,
+              name: p.name,
+              type: storeProduct.type || "simple",
+              variations: storeProduct.variations || [],
               average_rating: p.average_rating || "0",
               rating_count: p.review_count || 0,
+              total_sales: 0,
               featured: p.featured || false,
-              on_sale: p.on_sale || false,
+              on_sale: storeProduct.on_sale || false,
+              price: p.price,
+              regular_price: p.regular_price || p.price,
+              sale_price: p.sale_price || "",
+              images: p.images,
+              sku: p.sku,
+              meta_data: []
+            } : undefined}
+            allProducts={products.map((prod) => ({
+              id: prod.id,
+              name: prod.name,
+              type: prod.type || "simple",
+              variations: prod.variations || [],
+              average_rating: prod.average_rating || "0",
+              rating_count: prod.review_count || 0,
+              total_sales: 0,
+              featured: prod.featured || false,
+              on_sale: prod.on_sale || false,
+              price: prod.price,
+              regular_price: prod.regular_price || prod.price,
+              sale_price: prod.sale_price || "",
+              images: prod.images,
+              sku: prod.sku,
+              meta_data: []
             }))}
             isNoCertificationFilter={isNoCertificationFilter}
           />

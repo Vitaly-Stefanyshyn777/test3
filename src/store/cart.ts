@@ -14,6 +14,93 @@ import { normalizeImageUrl } from "@/lib/imageUtils";
 const getUserCartKey = (userId?: string | null) =>
   userId ? `bfb-cart-${userId}` : "bfb-cart";
 
+const productImageCache = new Map<number, string>();
+const qtyDebounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const pendingQtyByCartKey = new Map<string, number>();
+const QTY_DEBOUNCE_MS = 450;
+
+const isUsableImage = (url?: string) => {
+  const u = (url || "").trim();
+  return u !== "" && u !== "/placeholder.svg";
+};
+
+async function hydrateCartItemImages(
+  cartItems: CartItemResponse[],
+  currentItems: Record<string, CartItem>
+) {
+  const missingProductIds: number[] = [];
+
+  for (const cartItem of cartItems) {
+    const itemId =
+      cartItem.variation_id && cartItem.variation_id > 0
+        ? cartItem.variation_id.toString()
+        : cartItem.product_id.toString();
+
+    const existing = currentItems[itemId];
+
+    if (isUsableImage(cartItem.product_image)) {
+      productImageCache.set(
+        cartItem.product_id,
+        normalizeImageUrl(cartItem.product_image!)
+      );
+      continue;
+    }
+
+    const fromExisting = isUsableImage(existing?.image)
+      ? normalizeImageUrl(existing!.image!)
+      : undefined;
+    const fromCache = productImageCache.get(cartItem.product_id);
+
+    const candidate = fromExisting || fromCache;
+    if (candidate) {
+      cartItem.product_image = candidate;
+      productImageCache.set(cartItem.product_id, candidate);
+    } else {
+      missingProductIds.push(cartItem.product_id);
+    }
+  }
+
+  const uniqueMissing = Array.from(new Set(missingProductIds));
+  if (uniqueMissing.length === 0) return;
+
+  try {
+    const { getProductById } = await import("@/lib/products");
+    await Promise.all(
+      uniqueMissing.map(async (productId) => {
+        try {
+          const product = await getProductById(productId.toString());
+          const src = product.images?.[0]?.src;
+          if (isUsableImage(src)) {
+            productImageCache.set(productId, normalizeImageUrl(src));
+          }
+        } catch {
+          // ignore
+        }
+      })
+    );
+  } catch {
+    // ignore
+  }
+
+  for (const cartItem of cartItems) {
+    if (!isUsableImage(cartItem.product_image)) {
+      const cached = productImageCache.get(cartItem.product_id);
+      if (cached) cartItem.product_image = cached;
+    }
+  }
+}
+
+async function flushPendingQty(cartItemKey: string) {
+  const qty = pendingQtyByCartKey.get(cartItemKey);
+  pendingQtyByCartKey.delete(cartItemKey);
+  if (qty === undefined) return null;
+
+  if (qty <= 0) {
+    return await removeCartItemApi(cartItemKey);
+  }
+  return await updateCartItemApi(cartItemKey, qty);
+}
+
 const loadUserCart = (userId?: string | null): Record<string, CartItem> => {
   if (!userId || typeof window === "undefined") return {};
   try {
@@ -196,49 +283,13 @@ export const useCartStore = create<CartState>()(
             const currentItems = get().items; // Отримуємо поточні товари
             const itemsMap: Record<string, CartItem> = {};
 
-            const productsMap: Map<number, string> = new Map();
-            const productsToFetch = cartData.items.filter(
-              (item) => !item.product_image || item.product_image.trim() === ""
-            );
-
-            if (productsToFetch.length > 0) {
-              try {
-                const { getProductById } = await import("@/lib/products");
-                await Promise.all(
-                  productsToFetch.map(async (item) => {
-                    try {
-                      const product = await getProductById(
-                        item.product_id.toString()
-                      );
-                      if (
-                        product.images &&
-                        product.images.length > 0 &&
-                        product.images[0].src
-                      ) {
-                        productsMap.set(item.product_id, product.images[0].src);
-                      }
-                    } catch {
-                      // ignore
-                    }
-                  })
-                );
-              } catch {
-                // ignore
-              }
-            }
+            await hydrateCartItemImages(cartData.items, currentItems);
 
             cartData.items.forEach((item) => {
               const itemId = item.variation_id && item.variation_id > 0
                 ? item.variation_id.toString()
                 : item.product_id.toString();
               const existing = currentItems[itemId];
-
-              if (
-                (!item.product_image || item.product_image.trim() === "") &&
-                productsMap.has(item.product_id)
-              ) {
-                item.product_image = productsMap.get(item.product_id) || "";
-              }
 
               const cartItem = mapCartItemResponseToCartItem(item, existing);
               itemsMap[cartItem.id] = cartItem;
@@ -276,46 +327,10 @@ export const useCartStore = create<CartState>()(
           const currentItems = get().items;
           const itemsMap: Record<string, CartItem> = {};
 
-          const productsMap: Map<number, string> = new Map();
-          const productsToFetch = cartData.items.filter(
-            (item) => !item.product_image || item.product_image.trim() === ""
-          );
-
-          if (productsToFetch.length > 0) {
-            try {
-              const { getProductById } = await import("@/lib/products");
-              await Promise.all(
-                productsToFetch.map(async (item) => {
-                  try {
-                    const product = await getProductById(
-                      item.product_id.toString()
-                    );
-                    if (
-                      product.images &&
-                      product.images.length > 0 &&
-                      product.images[0].src
-                    ) {
-                      productsMap.set(item.product_id, product.images[0].src);
-                    }
-                  } catch {
-                    // ignore
-                  }
-                })
-              );
-            } catch {
-              // ignore
-            }
-          }
+          await hydrateCartItemImages(cartData.items, currentItems);
 
           cartData.items.forEach((item) => {
             const existing = currentItems[item.product_id.toString()];
-
-            if (
-              (!item.product_image || item.product_image.trim() === "") &&
-              productsMap.has(item.product_id)
-            ) {
-              item.product_image = productsMap.get(item.product_id) || "";
-            }
 
             const cartItem = mapCartItemResponseToCartItem(item, existing);
             itemsMap[cartItem.id] = cartItem;
@@ -514,6 +529,13 @@ export const useCartStore = create<CartState>()(
 
         if (!item) return; // Товар не знайдено
 
+        if (item.cart_item_key) {
+          const t = qtyDebounceTimers.get(item.cart_item_key);
+          if (t) clearTimeout(t);
+          qtyDebounceTimers.delete(item.cart_item_key);
+          pendingQtyByCartKey.delete(item.cart_item_key);
+        }
+
         // НЕГАЙНЕ оновлення стану для кращого UX
         const next = { ...state.items };
         delete next[actualKey];
@@ -574,78 +596,51 @@ export const useCartStore = create<CartState>()(
 
         // 🔄 Потім робимо API запит в бекграунді
         if (state.currentUserId && token && item.cart_item_key) {
-          // Використовуємо існуючу логіку синхронізації
-          (async () => {
-            try {
-              set({ isLoading: true });
-              const result = await updateCartItemApi(
-                item.cart_item_key!,
-                newQuantity
-              );
+          pendingQtyByCartKey.set(item.cart_item_key, newQuantity);
 
-              // Оновлюємо стан з відповіді сервера
-              const currentItems = get().items;
-              const itemsMap: Record<string, CartItem> = {};
+          const existingTimer = qtyDebounceTimers.get(item.cart_item_key);
+          if (existingTimer) clearTimeout(existingTimer);
 
-              const productsMap: Map<number, string> = new Map();
-              const productsToFetch = result.cart.items.filter(
-                (cartItem) =>
-                  !cartItem.product_image ||
-                  cartItem.product_image.trim() === ""
-              );
+          qtyDebounceTimers.set(
+            item.cart_item_key,
+            setTimeout(() => {
+              const cartItemKey = item.cart_item_key!;
+              qtyDebounceTimers.delete(cartItemKey);
 
-              if (productsToFetch.length > 0) {
+              (async () => {
                 try {
-                  const { getProductById } = await import("@/lib/products");
-                  await Promise.all(
-                    productsToFetch.map(async (cartItem) => {
-                      try {
-                        const product = await getProductById(
-                          cartItem.product_id.toString()
-                        );
-                        if (
-                          product.images &&
-                          product.images.length > 0 &&
-                          product.images[0].src
-                        ) {
-                          productsMap.set(
-                            cartItem.product_id,
-                            product.images[0].src
-                          );
-                        }
-                      } catch {
-                        // ignore
-                      }
-                    })
-                  );
+                  set({ isLoading: true });
+                  const result = await flushPendingQty(cartItemKey);
+                  if (!result?.cart?.items) {
+                    set({ isLoading: false });
+                    return;
+                  }
+
+                  const currentItems = get().items;
+                  const itemsMap: Record<string, CartItem> = {};
+
+                  await hydrateCartItemImages(result.cart.items, currentItems);
+
+                  result.cart.items.forEach((cartItem) => {
+                    const itemId =
+                      cartItem.variation_id && cartItem.variation_id > 0
+                        ? cartItem.variation_id.toString()
+                        : cartItem.product_id.toString();
+                    const existing = currentItems[itemId];
+                    const mapped = mapCartItemResponseToCartItem(
+                      cartItem,
+                      existing
+                    );
+                    itemsMap[mapped.id] = mapped;
+                  });
+
+                  set({ items: itemsMap, isLoading: false });
                 } catch {
-                  // ignore
+                  set({ isLoading: false });
                 }
-              }
-
-              result.cart.items.forEach((cartItem) => {
-                if (
-                  (!cartItem.product_image ||
-                    cartItem.product_image.trim() === "") &&
-                  productsMap.has(cartItem.product_id)
-                ) {
-                  cartItem.product_image =
-                    productsMap.get(cartItem.product_id) || "";
-                }
-
-                const itemId = cartItem.variation_id && cartItem.variation_id > 0
-                  ? cartItem.variation_id.toString()
-                  : cartItem.product_id.toString();
-                const existing = currentItems[itemId];
-                const mapped = mapCartItemResponseToCartItem(cartItem, existing);
-                itemsMap[mapped.id] = mapped;
-              });
-              set({ items: itemsMap, isLoading: false });
-            } catch (error) {
-              // При помилці відкатуємо зміни в UI
-              set({ items: { ...get().items, [id]: item }, isLoading: false });
-            }
-          })();
+              })();
+            }, QTY_DEBOUNCE_MS)
+          );
         } else {
           if (state.currentUserId) {
             saveUserCart(state.currentUserId, {
@@ -675,82 +670,51 @@ export const useCartStore = create<CartState>()(
 
         // 🔄 Потім робимо API запит в бекграунді
         if (state.currentUserId && token && item.cart_item_key) {
-          (async () => {
-            try {
-              set({ isLoading: true });
-              let result;
-              if (newQuantity <= 0) {
-                result = await removeCartItemApi(item.cart_item_key!);
-              } else {
-                result = await updateCartItemApi(
-                  item.cart_item_key!,
-                  newQuantity
-                );
-              }
+          pendingQtyByCartKey.set(item.cart_item_key, newQuantity);
 
-              // Оновлюємо стан з відповіді сервера
-              const currentItems = get().items;
-              const itemsMap: Record<string, CartItem> = {};
+          const existingTimer = qtyDebounceTimers.get(item.cart_item_key);
+          if (existingTimer) clearTimeout(existingTimer);
 
-              const productsMap: Map<number, string> = new Map();
-              const productsToFetch = result.cart.items.filter(
-                (cartItem) =>
-                  !cartItem.product_image ||
-                  cartItem.product_image.trim() === ""
-              );
+          qtyDebounceTimers.set(
+            item.cart_item_key,
+            setTimeout(() => {
+              const cartItemKey = item.cart_item_key!;
+              qtyDebounceTimers.delete(cartItemKey);
 
-              if (productsToFetch.length > 0) {
+              (async () => {
                 try {
-                  const { getProductById } = await import("@/lib/products");
-                  await Promise.all(
-                    productsToFetch.map(async (cartItem) => {
-                      try {
-                        const product = await getProductById(
-                          cartItem.product_id.toString()
-                        );
-                        if (
-                          product.images &&
-                          product.images.length > 0 &&
-                          product.images[0].src
-                        ) {
-                          productsMap.set(
-                            cartItem.product_id,
-                            product.images[0].src
-                          );
-                        }
-                      } catch {
-                        // ignore
-                      }
-                    })
-                  );
+                  set({ isLoading: true });
+                  const result = await flushPendingQty(cartItemKey);
+                  if (!result?.cart?.items) {
+                    set({ isLoading: false });
+                    return;
+                  }
+
+                  const currentItems = get().items;
+                  const itemsMap: Record<string, CartItem> = {};
+
+                  await hydrateCartItemImages(result.cart.items, currentItems);
+
+                  result.cart.items.forEach((cartItem) => {
+                    const itemId =
+                      cartItem.variation_id && cartItem.variation_id > 0
+                        ? cartItem.variation_id.toString()
+                        : cartItem.product_id.toString();
+                    const existing = currentItems[itemId];
+                    const mapped = mapCartItemResponseToCartItem(
+                      cartItem,
+                      existing
+                    );
+                    itemsMap[mapped.id] = mapped;
+                  });
+
+                  set({ items: itemsMap, isLoading: false });
                 } catch {
-                  // ignore
+                  set({ isLoading: false });
                 }
-              }
-
-              result.cart.items.forEach((cartItem) => {
-                if (
-                  (!cartItem.product_image ||
-                    cartItem.product_image.trim() === "") &&
-                  productsMap.has(cartItem.product_id)
-                ) {
-                  cartItem.product_image =
-                    productsMap.get(cartItem.product_id) || "";
-                }
-
-                const itemId = cartItem.variation_id && cartItem.variation_id > 0
-                  ? cartItem.variation_id.toString()
-                  : cartItem.product_id.toString();
-                const existing = currentItems[itemId];
-                const mapped = mapCartItemResponseToCartItem(cartItem, existing);
-                itemsMap[mapped.id] = mapped;
-              });
-              set({ items: itemsMap, isLoading: false });
-            } catch (error) {
-              // При помилці відкатуємо зміни в UI
-              set({ items: { ...get().items, [id]: item }, isLoading: false });
-            }
-          })();
+              })();
+            }, QTY_DEBOUNCE_MS)
+          );
         } else {
           if (state.currentUserId) {
             saveUserCart(state.currentUserId, next);
@@ -760,6 +724,10 @@ export const useCartStore = create<CartState>()(
       clear: async () => {
         const state = get();
         const { token } = useAuthStore.getState();
+
+        for (const t of qtyDebounceTimers.values()) clearTimeout(t);
+        qtyDebounceTimers.clear();
+        pendingQtyByCartKey.clear();
 
         // Негайне оновлення UI стану для кращого UX
         set({ items: {} });

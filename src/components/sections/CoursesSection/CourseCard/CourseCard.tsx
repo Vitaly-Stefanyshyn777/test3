@@ -10,7 +10,7 @@ import CartButton from "@/components/ui/Buttons/CartButton";
 import Badge from "@/components/ui/Badge/Badge";
 import BadgeContainer from "@/components/ui/Badge/BadgeContainer";
 import SubscriptionBadge from "@/components/ui/SubscriptionBadge/SubscriptionBadge";
-import { calculatePrice, formatPrice } from "@/lib/priceUtils";
+import { calculatePrice, formatPrice, getPriceSellRegistry } from "@/lib/priceUtils";
 
 interface CourseCardProps {
   id: string;
@@ -74,6 +74,8 @@ interface CourseCardProps {
     is_purchasable?: boolean;
   };
   allProducts?: Array<{ total_sales?: number }>;
+  acf?: Record<string, unknown>;
+  metaData?: Array<{ key: string; value: string }>;
 }
 
 const getHref = (id: string, slug?: string) => {
@@ -114,6 +116,8 @@ const CourseCard = ({
   courseData,
   wcProduct,
   allProducts = [],
+  acf,
+  metaData,
 }: CourseCardProps) => {
   const favoriteKey = `course-${id}`;
   const cartKey = `course-${id}`;
@@ -189,13 +193,19 @@ const CourseCard = ({
 
   const isOnSale = wcProduct?.on_sale || false;
 
-  // Розрахунок цін з урахуванням авторизації та знижок
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+
+  const priceSellRegistry = getPriceSellRegistry({
+    acf,
+    metaData,
+    meta_data: metaData,
+  });
 
   const priceCalculation = calculatePrice({
     price: parseFloat(salePrice || currentPrice || "0"),
     regularPrice: regularPrice ? parseFloat(regularPrice) : undefined,
     isLoggedIn,
+    priceSellRegistry,
   });
 
   const {

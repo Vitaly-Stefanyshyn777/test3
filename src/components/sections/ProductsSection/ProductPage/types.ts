@@ -27,6 +27,8 @@ export interface RelatedProduct {
   id: string;
   slug: string;
   name: string;
+  productType?: string;
+  variations?: number[];
   price: number;
   originalPrice?: number;
   discount: number;
@@ -43,6 +45,8 @@ export interface ProductLike {
   id: number | string;
   slug?: string;
   name: string;
+  type?: string;
+  variations?: number[];
   price?: string | number;
   regularPrice?: string | number;
   onSale?: boolean;
@@ -119,6 +123,8 @@ export interface RelatedProduct {
   id: string;
   slug: string;
   name: string;
+  productType?: string;
+  variations?: number[];
   price: number;
   originalPrice?: number;
   discount: number;

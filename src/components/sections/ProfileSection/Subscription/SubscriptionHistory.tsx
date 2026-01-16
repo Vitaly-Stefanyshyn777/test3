@@ -92,30 +92,17 @@ export default function SubscriptionHistory() {
       <div className={styles.subscriptionList}>
         {subscriptions.map((subscription) => (
           <div key={subscription.id} className={styles.subscriptionItem}>
-            <div className={styles.subscriptionHeader}>
-              <div className={styles.subscriptionName}>
-                {subscription.planName}
-              </div>
-              <div className={styles.subscriptionPrice}>
-                {subscription.price}$ / {subscription.period}
-              </div>
+            <div className={styles.subscriptionDate}>
+              {subscription.purchaseDate}
             </div>
-
-            <div className={styles.subscriptionDetails}>
-              <div className={styles.subscriptionDate}>
-                Дата покупки: {subscription.purchaseDate}
-              </div>
-              <div className={styles.subscriptionStatus}>
-                Статус:{" "}
-                {subscription.status === "completed"
-                  ? "Завершено"
-                  : subscription.status === "processing"
-                  ? "Обробляється"
-                  : subscription.status === "cancelled"
-                  ? "Скасовано"
-                  : subscription.status}
-              </div>
+            <div className={styles.subscriptionName}>
+              Підписка BFB {subscription.planName}
             </div>
+            <div className={styles.subscriptionPrice}>{subscription.price}</div>
+            <div className={styles.subscriptionCurrency}>
+              {/* тут має бути знак валюти */}
+            </div>
+            <button className={styles.downloadButton}>Скачати</button>
           </div>
         ))}
       </div>

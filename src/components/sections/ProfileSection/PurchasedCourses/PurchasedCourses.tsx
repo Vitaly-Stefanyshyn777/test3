@@ -16,12 +16,13 @@ const mapPurchasedProductToCourse = (product: PurchasedProduct): Course => ({
   description: product.purchase_date
     ? `Придбано: ${new Date(product.purchase_date).toLocaleDateString("uk-UA")}`
     : "Дата покупки невідома",
-  image: product.image || "/images/courses/default-course.jpg",
+  image: product.image || "",
   type: "Online",
   progress: { completed: 0, total: 1 },
   price: parseFloat(product.price || "0") || 0,
   currency: "₴",
-  watchUrl: product.id ? `/courses/${product.id}` : "#",
+  // Використовуємо тільки телеграм лінк, якщо він є
+  watchUrl: product.telegram_link || undefined,
 });
 
 const PurchasedCourses: React.FC<PurchasedCoursesProps> = ({

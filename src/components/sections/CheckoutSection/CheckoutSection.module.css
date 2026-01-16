@@ -242,6 +242,11 @@
   opacity: 0.5;
 }
 
+.checkboxError .checkboxText {
+  color: var(--style);
+  opacity: 1;
+}
+
 .checkboxBlock {
   width: auto;
   height: auto;

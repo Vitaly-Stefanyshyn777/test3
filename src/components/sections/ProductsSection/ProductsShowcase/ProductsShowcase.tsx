@@ -99,6 +99,8 @@ const ProductsShowcase: React.FC = () => {
     id: number | string;
     slug?: string;
     name: string;
+    productType?: string;
+    variations?: number[];
     price?: number | string;
     regularPrice?: number | string;
     image?: string;
@@ -127,6 +129,13 @@ const ProductsShowcase: React.FC = () => {
       id: (p as { id: number | string }).id,
       slug: (p as { slug?: string }).slug,
       name: (p as { name: string }).name,
+      productType:
+        (p as { productType?: string }).productType ??
+        (p as { type?: string }).type ??
+        (p as { wcProduct?: { type?: string } }).wcProduct?.type,
+      variations:
+        (p as { variations?: number[] }).variations ??
+        (p as { wcProduct?: { variations?: number[] } }).wcProduct?.variations,
       price: (p as { price?: number | string }).price,
       regularPrice:
         (p as { regularPrice?: number | string }).regularPrice ??
@@ -167,6 +176,8 @@ const ProductsShowcase: React.FC = () => {
         const normalized = (Array.isArray(data) ? data : []).map((p) => ({
           id: p.id,
           name: p.name,
+          productType: p.type,
+          variations: p.variations,
           price: p.price,
           regularPrice: p.regular_price,
           image: normalizeImageUrl(p.images?.[0]?.src),
@@ -330,6 +341,8 @@ const ProductsShowcase: React.FC = () => {
                     id={String(product.id)}
                     slug={product.slug}
                     name={product.name}
+                    productType={product.productType}
+                    variations={product.variations}
                     price={
                       typeof product.price === "string"
                         ? parseFloat(product.price)
@@ -358,6 +371,8 @@ const ProductsShowcase: React.FC = () => {
                     id={String(product.id)}
                     slug={product.slug}
                     name={product.name}
+                    productType={product.productType}
+                    variations={product.variations}
                     price={
                       typeof product.price === "string"
                         ? parseFloat(product.price)
