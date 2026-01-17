@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useCartStore, CartItem } from "@/store/cart";
 import { useAuthStore } from "@/store/auth";
@@ -9,8 +9,13 @@ import {
   CloseButtonIcon,
 } from "@/components/Icons/Icons";
 import { normalizeImageUrl } from "@/lib/imageUtils";
-import { calculatePrice } from "@/lib/priceUtils";
+import {
+  calculatePrice,
+  getPriceSellRegistry,
+  normalizePriceParams,
+} from "@/lib/priceUtils";
 import { getProductPriceAsync } from "@/lib/useProductPrices";
+import { fetchProductVariation, getProductById } from "@/lib/products";
 import s from "./CartModal.module.css";
 
 interface CartItemsListProps {
@@ -25,7 +30,16 @@ function CartItemRow({ item }: CartItemRowProps) {
   const increment = useCartStore((st) => st.increment);
   const decrement = useCartStore((st) => st.decrement);
   const removeItem = useCartStore((st) => st.removeItem);
+  const setItemMetaDataInStore = useCartStore((st) => st.setItemMetaData);
+  const setItemWcPrices = useCartStore((st) => st.setItemWcPrices);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const token = useAuthStore((state) => state.token);
+  const effectiveIsLoggedIn =
+    isLoggedIn ||
+    !!token ||
+    (typeof window !== "undefined" &&
+      (!!localStorage.getItem("bfb_token") ||
+        !!localStorage.getItem("bfb_token_old")));
 
   const imageUrl = normalizeImageUrl(item.image);
   const [imageError, setImageError] = useState(false);
@@ -33,6 +47,24 @@ function CartItemRow({ item }: CartItemRowProps) {
     price: number;
     originalPrice?: number;
   } | null>(null);
+  const [itemMetaData, setItemMetaData] = useState<
+    Array<{ key: string; value: string }> | undefined
+  >(item.metaData);
+  const [wcBasePrice, setWcBasePrice] = useState<number | undefined>(
+    item.wcPrice
+  );
+  const [wcBaseRegularPrice, setWcBaseRegularPrice] = useState<
+    number | undefined
+  >(item.wcRegularPrice);
+  const rowRef = useRef<HTMLDivElement | null>(null);
+
+  const parseWcPrice = (v: unknown): number => {
+    if (v === null || v === undefined) return 0;
+    const s = String(v);
+    const cleaned = s.replace(/[₴$€£\s,]/g, "").replace(",", ".");
+    const num = parseFloat(cleaned);
+    return Number.isFinite(num) ? num : 0;
+  };
 
   const handleImageError = () => {
     setImageError(true);
@@ -41,6 +73,122 @@ function CartItemRow({ item }: CartItemRowProps) {
   useEffect(() => {
     setImageError(false);
   }, [imageUrl]);
+
+  // Отримуємо metaData з API, якщо її немає в товарі
+  useEffect(() => {
+    const fetchMetaData = async () => {
+      // Якщо metaData вже є, не робимо запит
+      if (itemMetaData && itemMetaData.length > 0) {
+        return;
+      }
+
+      try {
+        // Отримуємо ПРОДУКТ (parent), бо `proce_sell_registry` зазвичай на продукті, а не на варіації
+        // В кошику `item.id` у нас зберігається ключ елемента (часто це productId),
+        // тому спочатку пробуємо ним.
+        const productId = item.productId ? String(item.productId) : item.id;
+
+        // Виключаємо курси
+        if (productId.startsWith("course-")) {
+          return;
+        }
+
+        // ВАЖЛИВО: /api/wc/products/{id} часто повертає meta_data: []
+        // На product page meta приходить через WC v3. Тут робимо так само.
+        const response = await fetch(
+          `/api/wc/v3/products/${encodeURIComponent(productId)}`
+        );
+        const product = response.ok ? await response.json() : null;
+
+        if (product?.meta_data && product.meta_data.length > 0) {
+          // Конвертуємо meta_data в формат metaData
+          const metaData: Array<{ key: string; value: string }> =
+            product.meta_data.map((meta: { key: string; value: unknown }) => ({
+              key: String(meta.key),
+              value:
+                meta.value === null || meta.value === undefined
+                  ? ""
+                  : String(meta.value),
+            }));
+          setItemMetaData(metaData);
+          // Важливо: зберігаємо в store, щоб CartModal (summary) теж перерахувався
+          setItemMetaDataInStore(item.id, metaData);
+        } else {
+        }
+      } catch (error) {
+        // При помилці не оновлюємо metaData
+      }
+    };
+
+    // Перевіряємо тільки якщо товар може бути WooCommerce продуктом
+    if (/\d/.test(item.id) && !item.id.startsWith("course-")) {
+      fetchMetaData();
+    }
+  }, [item.id, item.productId, itemMetaData, setItemMetaDataInStore]);
+
+  // Узгоджуємо логіку з ProductPage: беремо price/regular_price з WooCommerce продукту/варіації
+  useEffect(() => {
+    const fetchWcPrices = async () => {
+      if (wcBasePrice !== undefined && wcBaseRegularPrice !== undefined) return;
+
+      const parentId =
+        item.productId ?? (/^\d+$/.test(item.id) ? Number(item.id) : null);
+      if (!parentId) return;
+
+      try {
+        if (item.variationId && item.variationId > 0) {
+          const variation = await fetchProductVariation(
+            item.variationId,
+            parentId
+          );
+          const vPrice = parseWcPrice(
+            variation?.price ||
+              variation?.sale_price ||
+              variation?.regular_price
+          );
+          const vRegular = parseWcPrice(variation?.regular_price);
+          const nextWcPrice = vPrice || 0;
+          const nextWcRegular = vRegular || 0;
+          setWcBasePrice(nextWcPrice);
+          setWcBaseRegularPrice(nextWcRegular);
+          setItemWcPrices(item.id, {
+            wcPrice: nextWcPrice,
+            wcRegularPrice: nextWcRegular,
+          });
+          return;
+        }
+
+        // Як і для meta: беремо товар через WC v3, щоб дані були консистентні з product page
+        const response = await fetch(`/api/wc/v3/products/${parentId}`);
+        const product = response.ok ? await response.json() : null;
+        const pPrice = parseWcPrice(
+          product?.price || product?.sale_price || product?.regular_price
+        );
+        const pRegular = parseWcPrice(product?.regular_price);
+        const nextWcPrice = pPrice || 0;
+        const nextWcRegular = pRegular || 0;
+        setWcBasePrice(nextWcPrice);
+        setWcBaseRegularPrice(nextWcRegular);
+        setItemWcPrices(item.id, {
+          wcPrice: nextWcPrice,
+          wcRegularPrice: nextWcRegular,
+        });
+      } catch {
+        // ignore
+      }
+    };
+
+    if (!item.id.startsWith("course-")) {
+      fetchWcPrices();
+    }
+  }, [
+    item.id,
+    item.productId,
+    item.variationId,
+    wcBasePrice,
+    wcBaseRegularPrice,
+    setItemWcPrices,
+  ]);
 
   // Перевіряємо та оновлюємо ціни для варіативних товарів
   useEffect(() => {
@@ -67,7 +215,6 @@ function CartItemRow({ item }: CartItemRowProps) {
         }
       } catch (error) {
         // При помилці не перезаписуємо ціни - залишаємо оригінальні з кошика
-        console.error("Error updating cart item prices:", error);
       }
     };
 
@@ -86,21 +233,45 @@ function CartItemRow({ item }: CartItemRowProps) {
   const extractedColor = item.color;
   const extractedSize = item.size;
 
-  // Використовуємо виправлені ціни, якщо вони є, інакше - з кошика
-  // Пріоритет: salePrice > price
-  const priceToUse = correctedPrices?.price ?? (item.salePrice && item.salePrice > 0 ? item.salePrice : item.price);
-  const originalPriceToUse = correctedPrices?.originalPrice ?? (item.regularPrice && item.regularPrice > 0 ? item.regularPrice : item.originalPrice);
-
-  const { finalPrice, originalPrice, shouldShowOldPrice } = calculatePrice({
-    price: priceToUse,
+  // Використовуємо уніфіковану функцію для нормалізації цін
+  const normalizedPrices = normalizePriceParams({
+    wcPrice: wcBasePrice,
+    wcRegularPrice: wcBaseRegularPrice,
+    wcSalePrice: undefined, // Не використовуємо окремо, бо вже в wcPrice може бути sale_price
+    price: item.price,
+    originalPrice: item.originalPrice,
     regularPrice: item.regularPrice,
     salePrice: item.salePrice,
-    originalPrice: originalPriceToUse,
-    isLoggedIn,
   });
 
+  const priceSellRegistry = getPriceSellRegistry({
+    metaData: itemMetaData,
+  });
+
+  const { finalPrice, originalPrice, shouldShowOldPrice } = calculatePrice({
+    price: normalizedPrices.price,
+    regularPrice: normalizedPrices.regularPrice,
+    salePrice: normalizedPrices.salePrice,
+    isLoggedIn: effectiveIsLoggedIn,
+    priceSellRegistry,
+  });
+
+  // Додаткова перевірка: якщо shouldShowOldPrice false, але є різниця між originalPrice та finalPrice,
+  // показуємо стару ціну (це може статися, якщо regularPrice не був переданий)
+  const shouldDisplayOldPrice =
+    shouldShowOldPrice || (originalPrice > finalPrice && originalPrice > 0);
+
+  useEffect(() => {
+    const el = rowRef.current;
+    if (!el) return;
+    const oldEl = el.querySelector(`.${s.oldPrice}`) as HTMLElement | null;
+    const curEl = el.querySelector(
+      `.${s.currentPriceValue}`
+    ) as HTMLElement | null;
+  }, [item.id, shouldDisplayOldPrice, finalPrice, originalPrice]);
+
   return (
-    <div className={s.item}>
+    <div className={s.item} ref={rowRef}>
       <div className={s.itemMain}>
         <Image
           src={finalImageUrl}
@@ -152,7 +323,7 @@ function CartItemRow({ item }: CartItemRowProps) {
                   </span>
                   <span className={s.priceCurrency}>₴</span>
                 </span>
-                {shouldShowOldPrice && (
+                {shouldDisplayOldPrice && originalPrice > finalPrice && (
                   <span className={s.oldPrice}>
                     <span className={s.originalPriceValue}>
                       {originalPrice.toLocaleString()}

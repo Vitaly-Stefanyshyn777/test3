@@ -3,10 +3,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { useCartStore } from "@/store/cart";
 import { useAuthStore } from "@/store/auth";
 import { useProductsQuery } from "@/components/hooks/useProductsQuery";
-// import { calculatePrice, calculateCartPrice } from "@/lib/priceUtils";
-import { calculatePrice, calculateCartPrice } from "@/lib/priceUtils";
-
-import { getProductPriceAsync } from "@/lib/useProductPrices";
+import { calculatePrice, calculateCartPrice, getPriceSellRegistry, normalizePriceParams } from "@/lib/priceUtils";
 import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
 import { PlusIcon, CloseButtonIcon } from "@/components/Icons/Icons";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -62,6 +59,13 @@ export default function CartRecommendations() {
   const addItem = useCartStore((st) => st.addItem);
   const removeItem = useCartStore((st) => st.removeItem);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const token = useAuthStore((state) => state.token);
+  const effectiveIsLoggedIn =
+    isLoggedIn ||
+    !!token ||
+    (typeof window !== "undefined" &&
+      (!!localStorage.getItem("bfb_token") ||
+        !!localStorage.getItem("bfb_token_old")));
   const swiperRef = useRef<{
     slidePrev: () => void;
     slideNext: () => void;
@@ -69,9 +73,6 @@ export default function CartRecommendations() {
   } | null>(null);
   const [recoPage, setRecoPage] = useState(0);
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
-  const [productPrices, setProductPrices] = useState<
-    Record<string, { currentPrice: number; originalPrice?: number }>
-  >({});
 
   useEffect(() => {
     const checkMobile = () => {
@@ -86,37 +87,6 @@ export default function CartRecommendations() {
   }, []);
 
   const productsList = products || [];
-
-  // Завантажуємо правильні ціни для всіх продуктів
-  useEffect(() => {
-    const loadProductPrices = async () => {
-      const pricesMap: Record<
-        string,
-        { currentPrice: number; originalPrice?: number }
-      > = {};
-
-      await Promise.all(
-        productsList.map(async (product) => {
-          try {
-            const freshPrices = await getProductPriceAsync(String(product.id));
-            pricesMap[String(product.id)] = freshPrices;
-          } catch (error) {
-            console.error(
-              `Error loading price for product ${product.id}:`,
-              error
-            );
-            // Пропускаємо продукт при помилці завантаження цін
-          }
-        })
-      );
-
-      setProductPrices(pricesMap);
-    };
-
-    if (productsList.length > 0) {
-      loadProductPrices();
-    }
-  }, [productsList]);
 
   return (
     <div className={s.recommendations}>
@@ -165,21 +135,32 @@ export default function CartRecommendations() {
                   <div className={s.recoPriceButtonBlock}>
                     <div className={s.recoPriceBlock}>
                       {(() => {
-                        // Використовуємо завантажені ціни або fallback до існуючих
-                        const productPrice = productPrices[String(p.id)];
-                        const priceToUse =
-                          productPrice?.currentPrice ?? p.price ?? 0;
-                        const originalPriceToUse =
-                          productPrice?.originalPrice ?? p.regularPrice;
+                        // Використовуємо уніфіковану функцію для нормалізації цін (як в CartItemsList)
+                        const normalizedPrices = normalizePriceParams({
+                          wcProduct: p.wcProduct,
+                          price: p.price,
+                          originalPrice: p.originalPrice,
+                          regularPrice: p.regularPrice,
+                          salePrice: p.salePrice,
+                        });
+
+                        // Отримуємо відсоток знижки з metaData
+                        const priceSellRegistry = getPriceSellRegistry({
+                          metaData: p.metaData,
+                          meta_data: p.metaData,
+                          wcProduct: p.wcProduct ? { meta_data: (p.wcProduct as any).meta_data } : undefined,
+                        });
 
                         const {
                           finalPrice,
                           originalPrice,
                           shouldShowOldPrice,
                         } = calculatePrice({
-                          price: priceToUse,
-                          originalPrice: originalPriceToUse,
-                          isLoggedIn,
+                          price: normalizedPrices.price,
+                          regularPrice: normalizedPrices.regularPrice,
+                          salePrice: normalizedPrices.salePrice,
+                          isLoggedIn: effectiveIsLoggedIn,
+                          priceSellRegistry,
                         });
 
                         return (
@@ -217,29 +198,44 @@ export default function CartRecommendations() {
                       <button
                         className={s.smallPrimary}
                         onClick={async () => {
-                          // Використовуємо завантажені ціни або fallback
-                          const productPrice = productPrices[String(p.id)];
-                          const priceToUse =
-                            productPrice?.currentPrice ?? p.price ?? 0;
-                          const originalPriceToUse =
-                            productPrice?.originalPrice ?? p.regularPrice;
+                          // Використовуємо уніфіковану функцію для нормалізації цін (як в CartItemsList)
+                          const normalizedPrices = normalizePriceParams({
+                            wcProduct: p.wcProduct,
+                            price: p.price,
+                            originalPrice: p.originalPrice,
+                            regularPrice: p.regularPrice,
+                            salePrice: p.salePrice,
+                          });
+
+                          // Отримуємо відсоток знижки з metaData
+                          const priceSellRegistry = getPriceSellRegistry({
+                            metaData: p.metaData,
+                            meta_data: p.metaData,
+                            wcProduct: p.wcProduct ? { meta_data: (p.wcProduct as any).meta_data } : undefined,
+                          });
 
                           const { priceToAdd, originalPriceToAdd } =
                             calculateCartPrice({
-                              price: priceToUse,
-                              originalPrice: originalPriceToUse,
-                              isLoggedIn,
+                              price: normalizedPrices.price,
+                              regularPrice: normalizedPrices.regularPrice,
+                              salePrice: normalizedPrices.salePrice,
+                              isLoggedIn: effectiveIsLoggedIn,
+                              priceSellRegistry,
                             });
 
                           try {
                             await addItem({
                               id: String(p.id),
+                              productId: typeof p.id === "string" ? parseInt(p.id) : p.id,
                               name: p.name,
                               price: priceToAdd,
                               image: p.image,
                               color: p.color,
                               originalPrice: originalPriceToAdd,
                               stockQuantity: p.stockQuantity,
+                              metaData: p.metaData,
+                              wcPrice: normalizedPrices.price,
+                              wcRegularPrice: normalizedPrices.regularPrice,
                             });
                           } catch (error) {
                             alert((error as Error).message);

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useCartStore, selectCartTotal } from "@/store/cart";
+import { useAuthStore } from "@/store/auth";
 import CheckoutHeader from "@/components/layout/CheckoutHeader/CheckoutHeader";
 import CheckoutFooter from "@/components/layout/CheckoutFooter/CheckoutFooter";
 import OrderHeader from "./OrderHeader";
@@ -11,6 +12,10 @@ import OrderDetails from "./OrderDetails";
 import OrderSummary from "./OrderSummary";
 import s from "./OrderSuccessSection.module.css";
 import type { WooCommerceOrder } from "@/lib/bfbApi";
+import {
+  calculatePrice,
+  getPriceSellRegistry,
+} from "@/lib/priceUtils";
 
 interface OrderSuccessSectionProps {
   initialOrderId?: string | null;
@@ -25,6 +30,18 @@ export default function OrderSuccessSection({
   const [order, setOrder] = useState<WooCommerceOrder | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isHeaderSkeleton, setIsHeaderSkeleton] = useState(true);
+  const [productMetaById, setProductMetaById] = useState<
+    Record<number, Array<{ key: string; value: string }>>
+  >({});
+
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const token = useAuthStore((s) => s.token);
+  const effectiveIsLoggedIn =
+    isLoggedIn ||
+    !!token ||
+    (typeof window !== "undefined" &&
+      (!!localStorage.getItem("bfb_token") ||
+        !!localStorage.getItem("bfb_token_old")));
   // Якщо initialOrderId передано з сервера, завжди використовуємо тільки його
   // Це гарантує консистентність між сервером і клієнтом
   const orderId = initialOrderId;
@@ -64,6 +81,43 @@ export default function OrderSuccessSection({
     fetchOrder();
   }, [orderId]);
 
+  // Підтягуємо meta_data продуктів (для proce_sell_registry), щоб перерахувати totals як у checkout/cart
+  useEffect(() => {
+    const run = async () => {
+      if (!order?.line_items || order.line_items.length === 0) return;
+      const ids = Array.from(
+        new Set(order.line_items.map((it) => it.product_id).filter(Boolean))
+      ) as number[];
+      if (ids.length === 0) return;
+
+      try {
+        const results = await Promise.all(
+          ids.map(async (id) => {
+            const res = await fetch(`/api/wc/v3/products/${encodeURIComponent(String(id))}`);
+            const product = res.ok ? await res.json() : null;
+            const meta = Array.isArray(product?.meta_data) ? product.meta_data : [];
+            const normalized: Array<{ key: string; value: string }> = meta.map(
+              (m: { key: unknown; value: unknown }) => ({
+                key: String(m.key),
+                value: m.value === null || m.value === undefined ? "" : String(m.value),
+              })
+            );
+            return { id, meta: normalized };
+          })
+        );
+
+        setProductMetaById((prev) => {
+          const next = { ...prev };
+          for (const r of results) next[r.id] = r.meta;
+          return next;
+        });
+      } catch {
+        // ignore
+      }
+    };
+    run();
+  }, [order?.line_items]);
+
   // Відкладаємо рендеринг номера до тих пір, поки orderId не буде відомий
   const orderNumber = orderId
     ? order?.number
@@ -85,17 +139,52 @@ export default function OrderSuccessSection({
         day: "numeric",
       });
 
-  const deliveryCost = order?.shipping_total
-    ? parseFloat(order.shipping_total)
-    : safeTotal >= 1999
-    ? 0
-    : 100;
+  const orderComputed = React.useMemo(() => {
+    if (!order?.line_items || order.line_items.length === 0) {
+      return {
+        finalTotal: safeTotal,
+        discount: discount,
+      };
+    }
 
-  const orderTotal = order?.total ? parseFloat(order.total) : safeTotal;
-  const orderDiscount = order?.discount_total
-    ? parseFloat(order.discount_total)
-    : discount;
-  const finalTotal = orderTotal || safeTotal - discount + deliveryCost;
+    let totalFinal = 0;
+    let totalOriginal = 0;
+
+    for (const it of order.line_items) {
+      const qty = it.quantity && it.quantity > 0 ? it.quantity : 1;
+      const lineTotal = Number(it.total || 0);
+      const lineSubtotal = Number(it.subtotal || 0);
+      const unitWcPrice = lineTotal / qty;
+      const unitRegular = lineSubtotal > 0 ? lineSubtotal / qty : 0;
+      const salePrice =
+        unitWcPrice > 0 && unitRegular > 0 && unitWcPrice < unitRegular
+          ? unitWcPrice
+          : undefined;
+
+      const priceSellRegistry = getPriceSellRegistry({
+        metaData: productMetaById[it.product_id],
+      });
+
+      const calc = calculatePrice({
+        price: unitWcPrice,
+        regularPrice: unitRegular,
+        salePrice,
+        isLoggedIn: effectiveIsLoggedIn,
+        priceSellRegistry,
+      });
+
+      totalFinal += calc.finalPrice * qty;
+      totalOriginal += calc.originalPrice * qty;
+    }
+
+    const discountAmount =
+      totalOriginal > totalFinal ? totalOriginal - totalFinal : 0;
+
+    return {
+      finalTotal: totalFinal,
+      discount: discountAmount,
+    };
+  }, [order?.line_items, productMetaById, effectiveIsLoggedIn, safeTotal, discount]);
 
   // Дані з замовлення
   const firstNameRaw = order?.billing?.first_name?.trim() || "";
@@ -174,10 +263,10 @@ export default function OrderSuccessSection({
               />
 
               <OrderSummary
-                safeTotal={orderTotal || safeTotal}
-                discount={orderDiscount || discount}
-                deliveryCost={deliveryCost}
-                finalTotal={finalTotal}
+                safeTotal={orderComputed.finalTotal}
+                discount={orderComputed.discount}
+                deliveryCost={0}
+                finalTotal={orderComputed.finalTotal}
               />
             </div>
           </div>

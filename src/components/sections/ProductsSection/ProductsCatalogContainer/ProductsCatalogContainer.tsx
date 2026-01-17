@@ -164,6 +164,8 @@ const ProductsCatalogContainer = ({
       attributes: [],
       stock_status: String(p.stock_status ?? product.stockStatus ?? ""),
       date_created: dateCreatedValue,
+      // IMPORTANT: keep meta for subscription discount (proce_sell_registry)
+      metaData: (product as any).metaData ?? [],
       wcProduct: (product as any).wcProduct,
     };
   });

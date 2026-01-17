@@ -2,7 +2,7 @@
 import React, { useMemo } from "react";
 import { useCartStore, type CartItem } from "@/store/cart";
 import { useAuthStore } from "@/store/auth";
-import { calculatePrice } from "@/lib/priceUtils";
+import { calculatePrice, getPriceSellRegistry, normalizePriceParams } from "@/lib/priceUtils";
 import { useCheckoutState } from "@/components/hooks/useCheckoutState";
 import { useCheckoutValidation } from "@/components/hooks/useCheckoutValidation";
 import { useOrderSubmission } from "@/components/hooks/useOrderSubmission";
@@ -20,18 +20,39 @@ export default function CheckoutSection() {
   const itemsMap = useCartStore((st) => st.items);
   const items = Object.values(itemsMap) as CartItem[];
   const isLoggedIn = useAuthStore((st) => st.isLoggedIn);
+  const token = useAuthStore((st) => st.token);
+  const effectiveIsLoggedIn =
+    isLoggedIn ||
+    !!token ||
+    (typeof window !== "undefined" &&
+      (!!localStorage.getItem("bfb_token") ||
+        !!localStorage.getItem("bfb_token_old")));
 
   // Обчислюємо total з урахуванням знижки для авторизованих
   const total = useMemo(() => {
     return items.reduce((acc, it) => {
-      const { finalPrice } = calculatePrice({
+      const normalizedPrices = normalizePriceParams({
+        wcPrice: it.wcPrice,
+        wcRegularPrice: it.wcRegularPrice,
+        wcSalePrice: undefined,
         price: it.price,
         originalPrice: it.originalPrice,
-        isLoggedIn,
+        regularPrice: it.regularPrice,
+        salePrice: it.salePrice,
+      });
+      const priceSellRegistry = getPriceSellRegistry({
+        metaData: it.metaData,
+      });
+      const { finalPrice } = calculatePrice({
+        price: normalizedPrices.price,
+        regularPrice: normalizedPrices.regularPrice,
+        salePrice: normalizedPrices.salePrice,
+        isLoggedIn: effectiveIsLoggedIn,
+        priceSellRegistry,
       });
       return acc + finalPrice * it.quantity;
     }, 0);
-  }, [items, isLoggedIn]);
+  }, [items, effectiveIsLoggedIn]);
 
   const safeTotal = total || 0;
 

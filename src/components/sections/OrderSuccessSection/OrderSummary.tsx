@@ -32,7 +32,7 @@ export default function OrderSummary({
         <div className={s.costRow}>
           <span className={s.costLabel}>Вартість доставки:</span>
           <span className={s.costValue}>
-            {deliveryCost === 0 ? "Безкоштовно" : 'За тарифами "Нової Пошти"'}
+            За тарифами "Нової Пошти"
           </span>
         </div>
         <div className={s.costRow}>

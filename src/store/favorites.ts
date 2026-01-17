@@ -55,6 +55,7 @@ export interface FavoriteItem {
   stockQuantity?: number | null;
   productType?: string;
   variations?: number[];
+  metaData?: Array<{ key: string; value: string }>;
   wcProduct?: {
     prices?: {
       price: string;

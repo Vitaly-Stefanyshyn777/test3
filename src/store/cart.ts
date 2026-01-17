@@ -10,7 +10,6 @@ import {
 } from "@/lib/bfbApi";
 import { useAuthStore } from "./auth";
 import { normalizeImageUrl } from "@/lib/imageUtils";
-
 const getUserCartKey = (userId?: string | null) =>
   userId ? `bfb-cart-${userId}` : "bfb-cart";
 
@@ -128,6 +127,21 @@ const saveUserCart = (
 
 export interface CartItem {
   id: string;
+  /**
+   * WooCommerce product_id (parent product). Потрібно, щоб коректно тягнути meta_data
+   * навіть коли в кошику лежить варіація.
+   */
+  productId?: number;
+  /**
+   * Актуальна WooCommerce ціна (price) для відображення/розрахунків у кошику.
+   * Для варіативних товарів — ціна обраної варіації.
+   */
+  wcPrice?: number;
+  /**
+   * WooCommerce regular_price для відображення/розрахунків у кошику.
+   * Для варіативних товарів — regular_price обраної варіації.
+   */
+  wcRegularPrice?: number;
   name: string;
   price: number;
   image?: string;
@@ -141,10 +155,14 @@ export interface CartItem {
   cart_item_key?: string;
   stockQuantity?: number | null;
   variationId?: number;
+  metaData?: Array<{ key: string; value: string }>;
 }
 
 export interface AddItemData {
   id: string;
+  productId?: number;
+  wcPrice?: number;
+  wcRegularPrice?: number;
   name: string;
   price: number;
   image?: string;
@@ -156,6 +174,7 @@ export interface AddItemData {
   sku?: string;
   stockQuantity?: number | null;
   variationId?: number;
+  metaData?: Array<{ key: string; value: string }>;
 }
 
 interface CartState {
@@ -170,6 +189,14 @@ interface CartState {
   removeItem: (id: string) => Promise<void>;
   increment: (id: string, step?: number) => Promise<void>;
   decrement: (id: string, step?: number) => Promise<void>;
+  setItemMetaData: (
+    id: string,
+    metaData: Array<{ key: string; value: string }>
+  ) => void;
+  setItemWcPrices: (
+    id: string,
+    prices: { wcPrice?: number; wcRegularPrice?: number }
+  ) => void;
   loadUserData: (userId: string | null) => Promise<void>;
   setUserId: (userId: string | null) => void;
   syncFromApi: () => Promise<void>;
@@ -210,6 +237,9 @@ const mapCartItemResponseToCartItem = (
 
   return {
     id: itemId,
+    productId: item.product_id,
+    wcPrice: existingItem?.wcPrice,
+    wcRegularPrice: existingItem?.wcRegularPrice,
     name: productName,
     price: parseFloat(priceValue),
     image: finalImage || productImage,
@@ -218,10 +248,15 @@ const mapCartItemResponseToCartItem = (
     color: existingItem?.color,
     size: existingItem?.size,
     originalPrice: existingItem?.originalPrice,
-    regularPrice: parsePrice(item.regular_price) ?? existingItem?.regularPrice,
-    salePrice: parsePrice(item.sale_price) ?? existingItem?.salePrice,
+    regularPrice:
+      parsePrice(item.regular_price ?? item.product_regular_price) ??
+      existingItem?.regularPrice,
+    salePrice:
+      parsePrice(item.sale_price ?? item.product_sale_price) ??
+      existingItem?.salePrice,
     sku: existingItem?.sku,
     variationId: item.variation_id && item.variation_id > 0 ? item.variation_id : existingItem?.variationId,
+    metaData: existingItem?.metaData,
   };
 };
 
@@ -250,6 +285,41 @@ export const useCartStore = create<CartState>()(
       open: () => set({ isOpen: true }),
       close: () => set({ isOpen: false }),
       toggle: () => set((s) => ({ isOpen: !s.isOpen })),
+      setItemMetaData: (id, metaData) => {
+        const state = get();
+        const existing = state.items[id];
+        if (!existing) return;
+        set({
+          items: {
+            ...state.items,
+            [id]: {
+              ...existing,
+              metaData,
+            },
+          },
+        });
+      },
+      setItemWcPrices: (id, prices) => {
+        const state = get();
+        const existing = state.items[id];
+        if (!existing) return;
+        set({
+          items: {
+            ...state.items,
+            [id]: {
+              ...existing,
+              wcPrice:
+                typeof prices.wcPrice === "number"
+                  ? prices.wcPrice
+                  : existing.wcPrice,
+              wcRegularPrice:
+                typeof prices.wcRegularPrice === "number"
+                  ? prices.wcRegularPrice
+                  : existing.wcRegularPrice,
+            },
+          },
+        });
+      },
       setUserId: (userId: string | null) => {
         const state = get();
         if (state.currentUserId && state.currentUserId !== userId) {
@@ -343,23 +413,33 @@ export const useCartStore = create<CartState>()(
       addItem: async (item, qty = 1) => {
         const state = get();
         const { token } = useAuthStore.getState();
-        const productId = extractProductId(item.id);
-
-        if (productId === null) {
-          return;
+        
+        // Для варіацій: item.id може бути variation_id, тому НЕ використовуємо extractProductId
+        // якщо є variationId, бо це дасть неправильний productId
+        let productId: number | null = null;
+        if (item.productId) {
+          productId = item.productId;
+        } else if (!item.variationId) {
+          // Тільки для не-варіацій використовуємо extractProductId
+          productId = extractProductId(item.id);
         }
+
+        if (productId === null) return;
 
         const isLoggedIn = !!token && !!state.currentUserId;
         
-        let existing = state.items[item.id];
+        // Для варіацій: шукаємо за variationId, а не за item.id
+        // бо item.id для варіації = variation_id, і різні варіації мають різні id
+        let existing: CartItem | undefined = undefined;
         
-        if (!existing && item.variationId) {
-          const foundByVariation = Object.values(state.items).find(
+        if (item.variationId) {
+          // Для варіацій: шукаємо за variationId
+          existing = Object.values(state.items).find(
             (cartItem) => cartItem.variationId === item.variationId
           );
-          if (foundByVariation) {
-            existing = foundByVariation;
-          }
+        } else {
+          // Для звичайних товарів: шукаємо за item.id
+          existing = state.items[item.id];
         }
         
         const nextQty = (existing?.quantity || 0) + qty;
@@ -393,6 +473,9 @@ export const useCartStore = create<CartState>()(
 
         const newItem: CartItem = {
           id: item.id,
+          productId: item.productId ?? productId ?? undefined,
+          wcPrice: item.wcPrice,
+          wcRegularPrice: item.wcRegularPrice,
           name: item.name,
           price: item.price,
           image: finalImage,
@@ -405,6 +488,7 @@ export const useCartStore = create<CartState>()(
           quantity: nextQty,
           stockQuantity: item.stockQuantity,
           variationId: item.variationId,
+          metaData: item.metaData,
         };
 
         if (isLoggedIn) {
@@ -416,11 +500,19 @@ export const useCartStore = create<CartState>()(
             try {
               set({ isLoading: true });
 
+
               let result;
               if (existing?.cart_item_key) {
-                result = await updateCartItemApi(existing.cart_item_key, nextQty);
+                result = await updateCartItemApi(
+                  existing.cart_item_key,
+                  nextQty
+                );
               } else {
-                result = await addToCartApi(productId, nextQty, item.variationId || 0);
+                result = await addToCartApi(
+                  productId,
+                  nextQty,
+                  item.variationId || 0
+                );
               }
 
               if (result?.cart?.items) {
@@ -558,14 +650,9 @@ export const useCartStore = create<CartState>()(
 
               if (isNotFound) {
                 // Товар вже видалений або cart_item_key неправильний - ігноруємо
-                console.warn(
-                  "Товар вже видалений або cart_item_key неправильний:",
-                  item.cart_item_key
-                );
                 set({ isLoading: false });
               } else {
                 // Інші помилки - повертаємо товар назад
-                console.error("Помилка видалення товару:", error);
                 const currentState = get();
                 const restored = { ...currentState.items, [actualKey]: item };
                 set({ items: restored, isLoading: false });

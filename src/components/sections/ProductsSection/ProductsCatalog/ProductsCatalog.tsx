@@ -75,7 +75,26 @@ const ProductsCatalog = () => {
 
     (async () => {
       try {
-        // Використовуємо закешовані дані замість нових запитів
+        // Мапа відомих slug категорій до їх ID та назв
+        const knownCategorySlugs: Record<string, { id: string; name: string }> = {
+          "inventory-accessories": { id: "87", name: "Аксесуари" },
+          "inventory-boards": { id: "86", name: "Борди" },
+          "inventory": { id: "85", name: "Інвентар" },
+          "for-sport": { id: "30", name: "Товари для спорту" },
+        };
+
+        // Спочатку перевіряємо мапу відомих slug
+        if (knownCategorySlugs[q]) {
+          const category = knownCategorySlugs[q];
+          if (category.id !== appliedCategoryRef.current) {
+            setAppliedWcFilters({ category: category.id });
+            resetFilters();
+          }
+          setCatalogTitle(category.name);
+          return;
+        }
+
+        // Якщо не знайшли в мапі, шукаємо в закешованих даних
         let found = (categories85 || []).find((c) => c.slug === q);
 
         // Якщо не знайшли в інвентарі, шукаємо в інших категоріях

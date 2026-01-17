@@ -10,7 +10,7 @@ import CartButton from "@/components/ui/Buttons/CartButton";
 import Badge from "@/components/ui/Badge/Badge";
 import BadgeContainer from "@/components/ui/Badge/BadgeContainer";
 import SubscriptionBadge from "@/components/ui/SubscriptionBadge/SubscriptionBadge";
-import { calculatePrice, formatPrice, getPriceSellRegistry } from "@/lib/priceUtils";
+import { calculatePrice, formatPrice, getPriceSellRegistry, normalizePriceParams } from "@/lib/priceUtils";
 
 interface CourseCardProps {
   id: string;
@@ -154,42 +154,12 @@ const CourseCard = ({
     return totalSales >= topSalesThreshold;
   };
 
-  // Використовуємо уніфіковані функції з priceUtils
-
-  const currentPrice =
-    wcProduct?.prices?.price &&
-    wcProduct.prices.price !== "0" &&
-    wcProduct.prices.price !== "" &&
-    wcProduct.prices.price.trim() !== ""
-      ? wcProduct.prices.price
-      : price !== undefined &&
-        price !== null &&
-        price.toString() !== "0" &&
-        price.toString() !== "" &&
-        price.toString().trim() !== ""
-      ? price.toString()
-      : "0";
-
-  const regularPrice =
-    wcProduct?.prices?.regular_price &&
-    wcProduct.prices.regular_price !== "0" &&
-    wcProduct.prices.regular_price !== "" &&
-    wcProduct.prices.regular_price.trim() !== ""
-      ? wcProduct.prices.regular_price
-      : propOriginalPrice !== undefined &&
-        propOriginalPrice !== null &&
-        propOriginalPrice.toString() !== "0" &&
-        propOriginalPrice.toString() !== "" &&
-        propOriginalPrice.toString().trim() !== ""
-      ? propOriginalPrice.toString()
-      : "0";
-
-  const salePrice =
-    wcProduct?.prices?.sale_price &&
-    wcProduct.prices.sale_price !== "0" &&
-    wcProduct.prices.sale_price !== ""
-      ? wcProduct.prices.sale_price
-      : null;
+  // Використовуємо уніфіковану функцію для нормалізації цін
+  const normalizedPrices = normalizePriceParams({
+    wcProduct,
+    price,
+    originalPrice: propOriginalPrice,
+  });
 
   const isOnSale = wcProduct?.on_sale || false;
 
@@ -202,8 +172,9 @@ const CourseCard = ({
   });
 
   const priceCalculation = calculatePrice({
-    price: parseFloat(salePrice || currentPrice || "0"),
-    regularPrice: regularPrice ? parseFloat(regularPrice) : undefined,
+    price: normalizedPrices.price,
+    regularPrice: normalizedPrices.regularPrice,
+    salePrice: normalizedPrices.salePrice,
     isLoggedIn,
     priceSellRegistry,
   });
@@ -217,11 +188,11 @@ const CourseCard = ({
 
 
   // Форматовані ціни для відображення
-  const formattedCurrentPrice = formatPrice(currentPrice);
+  const formattedCurrentPrice = formatPrice(normalizedPrices.price);
   const formattedRegularPrice = shouldShowOldPrice
     ? formatPrice(calculatedOriginalPrice)
     : null;
-  const formattedSalePrice = salePrice ? formatPrice(salePrice) : null;
+  const formattedSalePrice = normalizedPrices.salePrice ? formatPrice(normalizedPrices.salePrice) : null;
   const formattedFinalPrice = formatPrice(finalPrice);
 
   const isActuallyNew = isNewProduct(dateCreated) || isNew;
@@ -287,7 +258,7 @@ const CourseCard = ({
           name={name}
           price={price || 0}
           originalPrice={
-            regularPrice ? parseFloat(regularPrice) : calculatedOriginalPrice
+            normalizedPrices.regularPrice ? normalizedPrices.regularPrice : calculatedOriginalPrice
           }
           image={image}
           className={styles.favoriteBtn}
@@ -296,11 +267,11 @@ const CourseCard = ({
             wcProduct
               ? {
                   prices: {
-                    price: wcProduct.prices?.price || currentPrice || "0",
+                    price: wcProduct.prices?.price || String(normalizedPrices.price) || "0",
                     regular_price:
-                      wcProduct.prices?.regular_price || regularPrice || "0",
+                      wcProduct.prices?.regular_price || (normalizedPrices.regularPrice ? String(normalizedPrices.regularPrice) : "0"),
                     sale_price:
-                      wcProduct.prices?.sale_price || salePrice || "0",
+                      wcProduct.prices?.sale_price || (normalizedPrices.salePrice ? String(normalizedPrices.salePrice) : "0"),
                   },
                   on_sale: wcProduct.on_sale || isOnSale,
                 }
@@ -365,8 +336,8 @@ const CourseCard = ({
                     </span>
                     <span className={styles.priceCurrency}></span>
                   </span>
-                  {regularPrice &&
-                    parseFloat(regularPrice) > 0 &&
+                  {normalizedPrices.regularPrice &&
+                    normalizedPrices.regularPrice > 0 &&
                     totalDiscount > 0 && (
                       <span className={styles.originalPrice}>
                         <span className={styles.originalPriceValue}>
@@ -382,9 +353,9 @@ const CourseCard = ({
                       {formattedSalePrice || formattedCurrentPrice || "0"}
                     </span>
                   </span>
-                  {salePrice &&
-                    regularPrice &&
-                    parseFloat(regularPrice) > 0 && (
+                  {normalizedPrices.salePrice &&
+                    normalizedPrices.regularPrice &&
+                    normalizedPrices.regularPrice > 0 && (
                       <span className={styles.originalPrice}>
                         <span className={styles.originalPriceValue}>
                           {formattedRegularPrice}
@@ -401,27 +372,25 @@ const CourseCard = ({
             name={name}
             price={
               // Зберігаємо базову ціну (без знижки авторизації), знижка застосовується при відображенні
-              parseFloat(
-                salePrice ||
-                  currentPrice ||
-                  regularPrice ||
-                  price?.toString() ||
-                  "0"
-              )
+              normalizedPrices.salePrice ||
+              normalizedPrices.price ||
+              normalizedPrices.regularPrice ||
+              price ||
+              0
             }
             originalPrice={
-              regularPrice && parseFloat(regularPrice) > 0
-                ? parseFloat(regularPrice)
+              normalizedPrices.regularPrice && normalizedPrices.regularPrice > 0
+                ? normalizedPrices.regularPrice
                 : propOriginalPrice
             }
             regularPrice={
-              regularPrice && parseFloat(regularPrice) > 0
-                ? parseFloat(regularPrice)
+              normalizedPrices.regularPrice && normalizedPrices.regularPrice > 0
+                ? normalizedPrices.regularPrice
                 : undefined
             }
             salePrice={
-              salePrice && parseFloat(salePrice) > 0
-                ? parseFloat(salePrice)
+              normalizedPrices.salePrice && normalizedPrices.salePrice > 0
+                ? normalizedPrices.salePrice
                 : undefined
             }
             image={imageUrl}

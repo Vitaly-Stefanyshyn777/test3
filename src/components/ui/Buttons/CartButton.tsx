@@ -33,6 +33,7 @@ type Props = {
   activeClassName?: string;
   removeFromFavoritesOnAddToCart?: boolean;
   requireAuth?: boolean;
+  metaData?: Array<{ key: string; value: string }>;
 };
 
 export default function CartButton({
@@ -51,6 +52,7 @@ export default function CartButton({
   activeClassName = "",
   removeFromFavoritesOnAddToCart = false,
   requireAuth = true,
+  metaData,
 }: Props) {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
@@ -137,6 +139,7 @@ export default function CartButton({
             salePrice,
             image,
             stockQuantity,
+            metaData,
           },
           1
         );

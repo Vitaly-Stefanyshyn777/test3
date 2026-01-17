@@ -17,6 +17,34 @@ import { useScrollLock } from "@/components/hooks/useScrollLock";
 import FavoritesModalSkeleton from "./FavoritesModalSkeleton";
 import { normalizeImageUrl } from "@/lib/imageUtils";
 
+type FavoriteEnrichedData = {
+  price?: number;
+  originalPrice?: number;
+  metaData?: Array<{ key: string; value: string }>;
+};
+
+function toNumber(value: unknown): number | undefined {
+  if (value === null || value === undefined) return undefined;
+  const n =
+    typeof value === "number"
+      ? value
+      : typeof value === "string"
+      ? parseFloat(value)
+      : parseFloat(String(value));
+  return Number.isFinite(n) ? n : undefined;
+}
+
+function extractProductSlug(slug?: string): string | null {
+  if (!slug) return null;
+  const raw = slug.trim();
+  if (!raw) return null;
+  // може бути "/products/sumka-bfb" або "sumka-bfb"
+  const withoutQuery = raw.split("?")[0] || "";
+  const parts = withoutQuery.split("/").filter(Boolean);
+  if (parts.length === 0) return null;
+  return parts[parts.length - 1] || null;
+}
+
 export default function FavoritesModal() {
   const isOpen = useFavoriteStore((st) => st.isOpen);
   const close = useFavoriteStore((st) => st.close);
@@ -30,6 +58,9 @@ export default function FavoritesModal() {
   const clearCart = useCartStore((st) => st.clear);
 
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
+  const [enrichedByKey, setEnrichedByKey] = useState<
+    Record<string, FavoriteEnrichedData>
+  >({});
   const swiperRef = useRef<SwiperType | null>(null);
   const desktopSwiperRef = useRef<SwiperType | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -58,6 +89,139 @@ export default function FavoritesModal() {
     const timer = setTimeout(() => setShowSkeleton(false), 300);
     return () => clearTimeout(timer);
   }, [isOpen]);
+
+  // Підтягуємо з WC meta_data (proce_sell_registry) + regular_price для коректного розрахунку ціни у FavoritesModal
+  useEffect(() => {
+    if (!isOpen) return;
+    if (items.length === 0) return;
+
+    let cancelled = false;
+
+    const run = async () => {
+      // кеш slug -> product (id/meta/regular) щоб не робити зайві запити
+      const productCache = new Map<
+        string,
+        { id: number; meta_data?: Array<{ key: string; value: unknown }>; regular_price?: unknown; price?: unknown; sale_price?: unknown }
+      >();
+
+      const tasks = items.map(async (it) => {
+        // Курси не обробляємо через WC
+        if (it.id.startsWith("course-")) return;
+
+        // якщо вже є metaData+originalPrice — не чіпаємо
+        const already =
+          enrichedByKey[it.id] ||
+          (it.metaData && it.metaData.length > 0 && it.originalPrice);
+        if (already) return;
+
+        const slug = extractProductSlug(it.slug);
+        let parentProduct: any | null = null;
+        let parentId: number | null = null;
+
+        try {
+          if (slug) {
+            if (productCache.has(slug)) {
+              const cached = productCache.get(slug)!;
+              parentId = cached.id;
+              parentProduct = cached;
+            } else {
+              const res = await fetch(
+                `/api/wc/v3/products?slug=${encodeURIComponent(slug)}`
+              );
+              const arr = res.ok ? await res.json() : null;
+              parentProduct = Array.isArray(arr) ? arr[0] : null;
+              parentId =
+                parentProduct && typeof parentProduct.id === "number"
+                  ? parentProduct.id
+                  : null;
+              if (parentId) {
+                productCache.set(slug, parentProduct);
+              }
+            }
+          }
+
+          // fallback: якщо slug немає/не спрацювало — пробуємо як числовий id
+          if (!parentId) {
+            const numeric = it.id.match(/\d+/)?.[0];
+            parentId = numeric ? parseInt(numeric, 10) : null;
+          }
+
+          // якщо досі нема parentId — нічого не робимо
+          if (!parentId) return;
+
+          if (!parentProduct || !parentProduct.meta_data) {
+            const res = await fetch(
+              `/api/wc/v3/products/${encodeURIComponent(String(parentId))}`
+            );
+            parentProduct = res.ok ? await res.json() : parentProduct;
+          }
+
+          const metaData: Array<{ key: string; value: string }> =
+            Array.isArray(parentProduct?.meta_data) && parentProduct.meta_data.length > 0
+              ? parentProduct.meta_data.map(
+                  (m: { key: unknown; value: unknown }) => ({
+                    key: String(m.key),
+                    value:
+                      m.value === null || m.value === undefined
+                        ? ""
+                        : String(m.value),
+                  })
+                )
+              : [];
+
+          let price: number | undefined;
+          let originalPrice: number | undefined;
+
+          // якщо це варіація — беремо ціну/regular_price з варіації
+          if (it.variationId && it.variationId > 0) {
+            const vRes = await fetch(
+              `/api/wc/v3/products/${encodeURIComponent(
+                String(parentId)
+              )}/variations/${encodeURIComponent(String(it.variationId))}`
+            );
+            const variation = vRes.ok ? await vRes.json() : null;
+            const vPrice =
+              toNumber(variation?.price) ??
+              toNumber(variation?.sale_price) ??
+              toNumber(variation?.regular_price);
+            const vRegular = toNumber(variation?.regular_price);
+            price = vPrice;
+            originalPrice = vRegular;
+          } else {
+            // simple — беремо з продукту
+            const pPrice =
+              toNumber(parentProduct?.price) ??
+              toNumber(parentProduct?.sale_price) ??
+              toNumber(parentProduct?.regular_price);
+            const pRegular = toNumber(parentProduct?.regular_price);
+            price = pPrice;
+            originalPrice = pRegular;
+          }
+
+          if (cancelled) return;
+
+          setEnrichedByKey((prev) => ({
+            ...prev,
+            [it.id]: {
+              price: price ?? prev[it.id]?.price,
+              originalPrice: originalPrice ?? prev[it.id]?.originalPrice,
+              metaData: metaData.length > 0 ? metaData : prev[it.id]?.metaData,
+            },
+          }));
+        } catch {
+          // ігноруємо — UI просто відобразить те, що вже є
+        }
+      });
+
+      await Promise.all(tasks);
+    };
+
+    run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, items, enrichedByKey]);
 
   const mobileChunkSize = 4;
   const mobilePages = useMemo(() => {
@@ -154,6 +318,16 @@ export default function FavoritesModal() {
                               ? it.id.replace("course-", "")
                               : undefined;
                             const normalizedImage = normalizeImageUrl(it.image);
+                            const enriched = enrichedByKey[it.id];
+                            const effectivePrice =
+                              enriched?.price ?? it.price ?? 0;
+                            const effectiveOriginalPrice =
+                              enriched?.originalPrice ?? it.originalPrice;
+                            const effectiveMetaData =
+                              (enriched?.metaData &&
+                                enriched.metaData.length > 0 &&
+                                enriched.metaData) ||
+                              it.metaData;
                             return (
                               <div
                                 key={it.id}
@@ -163,8 +337,8 @@ export default function FavoritesModal() {
                                 <ProductCard
                                   id={it.id}
                                   name={it.name}
-                                  price={it.price || 0}
-                                  originalPrice={it.originalPrice}
+                                  price={effectivePrice}
+                                  originalPrice={effectiveOriginalPrice}
                                   color={it.color}
                                   size={it.size}
                                   image={normalizedImage}
@@ -181,6 +355,7 @@ export default function FavoritesModal() {
                                   removeFromFavoritesOnAddToCart={true}
                                   productType={it.productType}
                                   variations={it.variations}
+                                  metaData={effectiveMetaData}
                                 />
                               </div>
                             );
@@ -216,14 +391,23 @@ export default function FavoritesModal() {
                         ? it.id.replace("course-", "")
                         : undefined;
                       const normalizedImage = normalizeImageUrl(it.image);
+                      const enriched = enrichedByKey[it.id];
+                      const effectivePrice = enriched?.price ?? it.price ?? 0;
+                      const effectiveOriginalPrice =
+                        enriched?.originalPrice ?? it.originalPrice;
+                      const effectiveMetaData =
+                        (enriched?.metaData &&
+                          enriched.metaData.length > 0 &&
+                          enriched.metaData) ||
+                        it.metaData;
                       return (
                         <SwiperSlide key={it.id} className={s.desktopSlide}>
                           <div onClick={() => close()}>
                             <ProductCard
                               id={it.id}
                               name={it.name}
-                              price={it.price || 0}
-                              originalPrice={it.originalPrice}
+                              price={effectivePrice}
+                              originalPrice={effectiveOriginalPrice}
                               color={it.color}
                               size={it.size}
                               image={normalizedImage}
@@ -238,6 +422,9 @@ export default function FavoritesModal() {
                               stockStatus={undefined}
                               useRedGreenIconOnMobile={true}
                               removeFromFavoritesOnAddToCart={true}
+                              productType={it.productType}
+                              variations={it.variations}
+                              metaData={effectiveMetaData}
                             />
                           </div>
                         </SwiperSlide>
@@ -288,17 +475,29 @@ export default function FavoritesModal() {
                       if (typeof it.price === "number") {
                         const itemId = it.id;
                         itemIds.push(itemId);
+                        const enriched = enrichedByKey[it.id];
+                        const effectivePrice =
+                          enriched?.price ?? it.price ?? 0;
+                        const effectiveOriginalPrice =
+                          enriched?.originalPrice ?? it.originalPrice;
+                        const effectiveMetaData =
+                          (enriched?.metaData &&
+                            enriched.metaData.length > 0 &&
+                            enriched.metaData) ||
+                          it.metaData;
 
                         cartItemsToAdd.push({
-                            id: itemId,
-                            name: it.name,
-                            price: it.price,
-                            image: it.image,
-                            regularPrice: it.regularPrice,
-                            salePrice: it.salePrice,
-                            variationId: it.variationId,
-                            color: it.color,
-                            size: it.size,
+                          id: itemId,
+                          name: it.name,
+                          price: effectivePrice,
+                          image: it.image,
+                          originalPrice: effectiveOriginalPrice,
+                          regularPrice: effectiveOriginalPrice,
+                          salePrice: undefined,
+                          variationId: it.variationId,
+                          color: it.color,
+                          size: it.size,
+                          metaData: effectiveMetaData,
                         });
                       }
                     }
@@ -307,7 +506,6 @@ export default function FavoritesModal() {
                       try {
                         await addToCart(cartItem, 1);
                       } catch (error) {
-                        console.error('Failed to add item to cart:', cartItem.id, error);
                       }
                     }
 
@@ -315,7 +513,6 @@ export default function FavoritesModal() {
                       try {
                         await removeAll(itemIds);
                       } catch (error) {
-                        console.error('Failed to remove items from favorites:', error);
                       }
                     }
                   }}

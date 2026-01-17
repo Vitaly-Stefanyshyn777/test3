@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useCartStore } from "@/store/cart";
 import { useFavoriteStore, selectIsFavorite } from "@/store/favorites";
-import { calculatePrice, formatPrice } from "@/lib/priceUtils";
+import { calculatePrice, formatPrice, normalizePriceParams } from "@/lib/priceUtils";
 import { normalizeImageUrl } from "@/lib/imageUtils";
 import type { Product } from "@/lib/products";
 import type { ProductVariation } from "../sections/ProductsSection/ProductPage/types";
@@ -75,6 +75,21 @@ export function useProductActions(
 
     productName = productName.trim(); // видаляємо зайві пробіли
 
+    // Використовуємо уніфіковану функцію для нормалізації цін
+    const normalizedPrices = normalizePriceParams({
+      wcProduct: selectedVariation
+        ? {
+            price: selectedVariation.price,
+            regular_price: selectedVariation.regular_price,
+            sale_price: selectedVariation.sale_price,
+          }
+        : product?.wcProduct,
+      price: product?.price,
+      originalPrice: product?.originalPrice,
+      regularPrice: product?.regularPrice,
+      salePrice: product?.salePrice,
+    });
+
     try {
       await addItem(
         {
@@ -83,13 +98,15 @@ export function useProductActions(
             product.id?.toString() ||
             "unknown",
           name: productName,
-          price: parsedPrice,
+          price: normalizedPrices.salePrice || normalizedPrices.price,
           image: previewImage,
           color: selectedColor,
           size: selectedSize,
-          originalPrice: parsedOriginalPrice,
-          regularPrice: selectedVariation?.regular_price || product.regularPrice ? parseFloat((selectedVariation?.regular_price || product.regularPrice).toString()) : undefined,
-          salePrice: selectedVariation?.price || product.price ? parseFloat((selectedVariation?.price || product.price).toString()) : undefined,
+          originalPrice: normalizedPrices.regularPrice,
+          regularPrice: normalizedPrices.regularPrice,
+          salePrice: normalizedPrices.salePrice,
+          wcPrice: normalizedPrices.price,
+          wcRegularPrice: normalizedPrices.regularPrice,
           sku: product.sku,
           stockQuantity: product.stockQuantity,
           variationId: selectedVariation?.id,
@@ -110,12 +127,27 @@ export function useProductActions(
   const toggleFavorite = () => {
     if (!product?.id || !product?.name) return;
 
+    // Використовуємо уніфіковану функцію для нормалізації цін
+    const favoriteNormalizedPrices = normalizePriceParams({
+      wcProduct: selectedVariation
+        ? {
+            price: selectedVariation.price,
+            regular_price: selectedVariation.regular_price,
+            sale_price: selectedVariation.sale_price,
+          }
+        : product?.wcProduct,
+      price: product?.price,
+      originalPrice: product?.originalPrice,
+      regularPrice: product?.regularPrice,
+      salePrice: product?.salePrice,
+    });
+
     // Використовуємо дані варіації, якщо вона вибрана
     const favoriteItem = {
       id: selectedVariation ? selectedVariation.id.toString() : product.id.toString(),
       name: product.name,
-      price: parseFloat(String(selectedVariation?.price || product.price || 0)) || undefined,
-      originalPrice: parseFloat(String(selectedVariation?.regular_price || product.regularPrice || 0)) || undefined,
+      price: favoriteNormalizedPrices.salePrice || favoriteNormalizedPrices.price,
+      originalPrice: favoriteNormalizedPrices.regularPrice,
       image: normalizeImageUrl(product.images?.[0]?.src),
       variationId: selectedVariation?.id,
       color: undefined, // спростимо, колір можна додати пізніше якщо потрібно

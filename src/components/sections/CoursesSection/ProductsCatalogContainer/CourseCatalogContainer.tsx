@@ -5,7 +5,7 @@ import SliderNav from "@/components/ui/SliderNav/SliderNavActions";
 import type SwiperType from "swiper";
 import ProductsGrid from "../CoursesGrid/CoursesGrid";
 import { SortType } from "@/components/ui/FilterSortPanel/FilterSortPanel";
-import { calculatePrice, getPriceSellRegistry } from "@/lib/priceUtils";
+import { calculatePrice, getPriceSellRegistry, normalizePriceParams } from "@/lib/priceUtils";
 import { useAuthStore } from "@/store/auth";
 
 interface Props {
@@ -80,6 +80,15 @@ const CourseCatalogContainer = ({
         ) || undefined
       : undefined;
 
+    // Використовуємо уніфіковану функцію для нормалізації цін
+    const normalizedPrices = normalizePriceParams({
+      wcProduct: (course as any).wcProduct,
+      price,
+      originalPrice: (course as any).originalPrice || regularPrice,
+      regularPrice,
+      salePrice: undefined,
+    });
+
     const priceSellRegistry = getPriceSellRegistry({
       acf: (course as any).acf,
       metaData: (course as any).metaData,
@@ -88,15 +97,9 @@ const CourseCatalogContainer = ({
     });
 
     const priceCalculation = calculatePrice({
-      price,
-      regularPrice,
-      salePrice: (course as any).wcProduct?.prices?.sale_price
-        ? parseFloat(
-            String((course as any).wcProduct.prices.sale_price)
-              .replace(/[₴$€£\s,]/g, "")
-              .replace(",", ".")
-          ) || undefined
-        : undefined,
+      price: normalizedPrices.price,
+      regularPrice: normalizedPrices.regularPrice,
+      salePrice: normalizedPrices.salePrice,
       isLoggedIn,
       priceSellRegistry,
     });

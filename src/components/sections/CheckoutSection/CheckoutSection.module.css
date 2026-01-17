@@ -735,7 +735,7 @@
   font-weight: 600;
   display: flex;
   align-items: baseline;
-  gap: 4px;
+  gap: 0px;
 }
 .currentPriceValue {
   color: #e3362c;
@@ -943,8 +943,8 @@
   gap: 6px;
 }
 .color {
-  color: rgba(14, 14, 14, 0.6);
-  font-size: 14px;
+  color: rgba(14, 14, 14, 0.4);
+  font-size: 12px;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -999,7 +999,7 @@
 .oldPrice {
   color: #bdbdbd;
   text-decoration: line-through;
-  margin-left: 8px;
+  margin-left: 0px;
 }
 .removeBtn {
   border-radius: 8px;
@@ -1415,7 +1415,7 @@
 
   .oldPrice {
     font-size: mvw(12);
-    margin-left: mvw(4);
+    margin-left: mvw(0);
     opacity: 0.5;
   }
 

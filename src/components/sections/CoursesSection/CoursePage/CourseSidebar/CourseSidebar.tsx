@@ -30,7 +30,7 @@ import { useCourseQuery as useCourseDataQuery } from "@/lib/coursesQueries";
 import { useCartStore } from "@/store/cart";
 import CourseSidebarCourseInfoSkeleton from "./CourseSidebarCourseInfoSkeleton";
 import CourseSidebarImageSkeleton from "./CourseSidebarImageSkeleton";
-import { calculatePrice, formatPrice, getPriceSellRegistry } from "@/lib/priceUtils";
+import { calculatePrice, formatPrice, getPriceSellRegistry, normalizePriceParams } from "@/lib/priceUtils";
 
 interface CourseSidebarProps {
   courseId?: string | number;
@@ -108,11 +108,8 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
     const courseItem = {
       id: courseIdString,
       name: courseName,
-      price: parseFloat(hasDiscount ? salePrice : currentPrice) / 100,
-      originalPrice:
-        regularPrice && regularPrice !== "0"
-          ? parseFloat(regularPrice) / 100
-          : undefined,
+      price: normalizedPrices.salePrice || normalizedPrices.price,
+      originalPrice: normalizedPrices.regularPrice,
       image: normalizeImageUrl(
         courseImage || product?.images?.[0]?.src || "/placeholder.svg"
       ),
@@ -181,24 +178,9 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
         course.title?.rendered?.replace(/____FULL____/g, "") ||
         "Основи тренерства BFB";
 
-      // Парсуємо regularPrice та salePrice для передачі в корзину
-      const courseRegularPrice =
-        regularPrice && regularPrice !== "0"
-          ? parseFloat(regularPrice)
-          : undefined;
-      const courseSalePrice =
-        salePrice && salePrice !== "0" && salePrice !== null
-          ? parseFloat(salePrice)
-          : undefined;
-
+      // Використовуємо нормалізовані ціни (як в CartItemsList)
       // Базова ціна для корзини (без знижки авторизації, вона застосується в корзині)
-      // Якщо є salePrice - використовуємо його, інакше використовуємо regularPrice як базову ціну
-      // Це дозволить відображати дві ціни в корзині (regularPrice як стара, regularPrice*0.8 як нова)
-      const basePriceForCart =
-        courseSalePrice ||
-        (courseRegularPrice
-          ? courseRegularPrice
-          : parseFloat(currentPrice || "0"));
+      const basePriceForCart = normalizedPrices.salePrice || normalizedPrices.price;
 
       const courseImageUrl = normalizeImageUrl(
         courseImage || product?.images?.[0]?.src || "/placeholder.svg"
@@ -211,11 +193,11 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
             name: courseName,
             price: basePriceForCart,
             originalPrice:
-              courseRegularPrice && courseRegularPrice > basePriceForCart
-                ? courseRegularPrice
+              normalizedPrices.regularPrice && normalizedPrices.regularPrice > basePriceForCart
+                ? normalizedPrices.regularPrice
                 : undefined,
-            regularPrice: courseRegularPrice,
-            salePrice: courseSalePrice,
+            regularPrice: normalizedPrices.regularPrice,
+            salePrice: normalizedPrices.salePrice,
             image: courseImageUrl,
             stockQuantity: null, // Курси завжди доступні
           },
@@ -486,34 +468,16 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
   // Використовуємо уніфіковані функції з priceUtils
 
   // Визначаємо ціни для поточного курсу (як в CourseCard - якщо немає або "0" - fallback)
-  const currentPrice =
-    courseData?.wcProduct?.prices?.price &&
-    courseData.wcProduct.prices.price !== "0"
-      ? courseData.wcProduct.prices.price
-      : courseData?.price ||
-        storeProduct?.prices?.price ||
-        product?.sale_price ||
-        product?.price ||
-        "0";
-  const regularPrice =
-    courseData?.wcProduct?.prices?.regular_price &&
-    courseData.wcProduct.prices.regular_price !== "0"
-      ? courseData.wcProduct.prices.regular_price
-      : courseData?.originalPrice ||
-        storeProduct?.prices?.regular_price ||
-        product?.regular_price;
-  const salePrice =
-    courseData?.wcProduct?.prices?.sale_price &&
-    courseData.wcProduct.prices.sale_price !== "0"
-      ? courseData.wcProduct.prices.sale_price
-      : storeProduct?.prices?.sale_price || null;
-  const isOnSale = courseData?.wcProduct?.on_sale || false;
+  // Використовуємо уніфіковану функцію для нормалізації цін
+  const normalizedPrices = normalizePriceParams({
+    wcProduct: courseData?.wcProduct,
+    price: courseData?.price,
+    originalPrice: courseData?.originalPrice,
+    regularPrice: storeProduct?.prices?.regular_price || product?.regular_price,
+    salePrice: storeProduct?.prices?.sale_price || product?.sale_price,
+  });
 
-  // Додаткові дані для fallback логіки (як в CourseCard)
-  const fallbackPrice = courseData?.price ? parseFloat(courseData.price) : 0;
-  const fallbackOriginalPrice = courseData?.originalPrice
-    ? parseFloat(courseData.originalPrice)
-    : 0;
+  const isOnSale = courseData?.wcProduct?.on_sale || false;
 
   const priceSellRegistry = getPriceSellRegistry({
     acf: courseData?.courseData as Record<string, unknown> | undefined,
@@ -523,8 +487,9 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
   });
 
   const priceCalculation = calculatePrice({
-    price: parseFloat(salePrice || currentPrice || "0"),
-    regularPrice: regularPrice ? parseFloat(regularPrice) : undefined,
+    price: normalizedPrices.price,
+    regularPrice: normalizedPrices.regularPrice,
+    salePrice: normalizedPrices.salePrice,
     isLoggedIn,
     priceSellRegistry,
   });
@@ -537,23 +502,15 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
   } = priceCalculation;
 
   // Форматовані ціни для відображення
-  const formattedCurrentPrice = formatPrice(currentPrice);
+  const formattedCurrentPrice = formatPrice(normalizedPrices.price);
   const formattedRegularPrice = shouldShowOldPrice
     ? formatPrice(calculatedOriginalPrice)
     : null;
-  const formattedSalePrice = salePrice ? formatPrice(salePrice) : null;
+  const formattedSalePrice = normalizedPrices.salePrice ? formatPrice(normalizedPrices.salePrice) : null;
   const formattedFinalPrice = formatPrice(finalPrice);
 
   // Визначаємо чи є знижка
   const hasDiscount = shouldShowOldPrice;
-
-  // Додаткова перевірка для fallback цін
-  const hasFallbackDiscount =
-    !hasDiscount &&
-    fallbackOriginalPrice &&
-    fallbackPrice &&
-    fallbackOriginalPrice > fallbackPrice &&
-    fallbackPrice > 0;
 
   // Розраховуємо знижку
   const finalDiscount = Math.round(totalDiscount);
@@ -566,18 +523,15 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
     courseData,
     storeProduct,
     product,
-    currentPrice,
-    regularPrice,
-    salePrice,
+    normalizedPrices.price,
+    normalizedPrices.regularPrice,
+    normalizedPrices.salePrice,
     isOnSale,
     formattedCurrentPrice,
     formattedRegularPrice,
     formattedSalePrice,
     hasDiscount,
-    hasFallbackDiscount,
     finalDiscount,
-    fallbackPrice,
-    fallbackOriginalPrice,
   ]);
 
   // Логування для дебагу Course_include
@@ -885,13 +839,13 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
                 <span className={styles.currentPrice}>
                   {isLoggedIn ? formattedFinalPrice : formattedCurrentPrice}
                 </span>
-                {((hasDiscount || hasFallbackDiscount) &&
+                {((hasDiscount &&
                   formattedRegularPrice &&
-                  regularPrice !== "0") ||
+                  formattedRegularPrice !== "0") ||
                 (isLoggedIn &&
                   finalPrice > 0 &&
                   formattedRegularPrice &&
-                  regularPrice !== "0") ? (
+                  formattedRegularPrice !== "0")) ? (
                   <div className={styles.oldPrice}>
                     <span>{formattedRegularPrice}</span>
                     {/* <span className={styles.oldPriceCurrency}>₴</span> */}
@@ -938,13 +892,13 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({ courseId = 169 }) => {
                 <span className={styles.currentPrice}>
                   {isLoggedIn ? formattedFinalPrice : formattedCurrentPrice}
                 </span>
-                {((hasDiscount || hasFallbackDiscount) &&
+                {((hasDiscount &&
                   formattedRegularPrice &&
-                  regularPrice !== "0") ||
+                  formattedRegularPrice !== "0") ||
                 (isLoggedIn &&
                   finalPrice > 0 &&
                   formattedRegularPrice &&
-                  regularPrice !== "0") ? (
+                  formattedRegularPrice !== "0")) ? (
                   <div className={styles.oldPrice}>
                     <span>{formattedRegularPrice}</span>
                     <span className={styles.oldPriceCurrency}>₴</span>

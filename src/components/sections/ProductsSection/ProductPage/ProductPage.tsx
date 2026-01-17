@@ -25,7 +25,7 @@ import { useAuthStore } from "@/store/auth";
 import RegisterModal from "@/components/auth/RegisterModal/RegisterModal";
 import { normalizeImageUrl } from "@/lib/imageUtils";
 import { useCartStore } from "@/store/cart";
-import { calculatePrice, formatPrice, getPriceSellRegistry } from "@/lib/priceUtils";
+import { calculatePrice, formatPrice, getPriceSellRegistry, normalizePriceParams } from "@/lib/priceUtils";
 import ProductPageSkeleton from "./ProductPageSkeleton";
 
 export default function ProductPage({ productSlug }: { productSlug: string }) {
@@ -129,6 +129,22 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
   const thumbNavThreshold = isMobile ?? false ? 4 : maxVisibleThumbs;
   const shouldShowThumbNav = imagesLength > thumbNavThreshold;
 
+  // WC v3 variations часто повертають attributes без `slug` (лише { id, name, option }).
+  // Нормалізуємо атрибути, щоб коректно знаходити варіацію по коліру/розміру.
+  const normalizeVariationAttrSlug = (attr: any): string => {
+    const rawSlug = typeof attr?.slug === "string" ? attr.slug : "";
+    if (rawSlug) return rawSlug;
+
+    const name = String(attr?.name ?? "").toLowerCase();
+    if (name === "pa_color" || name.includes("колір") || name.includes("color")) {
+      return "pa_color";
+    }
+    if (name === "pa_size" || name.includes("розмір") || name.includes("size")) {
+      return "pa_size";
+    }
+    return name;
+  };
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 1000);
@@ -163,12 +179,21 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
             })
         );
 
-        const validVariations = variations.filter(Boolean);
-        setVariationsData(validVariations);
+        const validVariations = variations.filter(Boolean) as any[];
+        const normalizedVariations = validVariations.map((v) => ({
+          ...v,
+          attributes: Array.isArray(v?.attributes)
+            ? v.attributes.map((a: any) => ({
+                ...a,
+                slug: typeof a?.slug === "string" ? a.slug : normalizeVariationAttrSlug(a),
+              }))
+            : [],
+        }));
+        setVariationsData(normalizedVariations);
 
         // Знаходимо варіацію за замовчуванням - першу доступну
         // (логіка вибору буде оброблена окремим useEffect)
-        const defaultVariation = validVariations[0];
+        const defaultVariation = normalizedVariations[0];
 
         if (defaultVariation) {
           setSelectedVariation({
@@ -179,7 +204,6 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
           });
         }
       } catch (error) {
-        console.warn("Не вдалося завантажити варіації продукту:", error);
       } finally {
         setVariationsLoading(false);
       }
@@ -195,10 +219,12 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
     if (!variationsData.length) return;
 
     const first = variationsData[0];
-    const firstColor = first.attributes?.find((a) => a.slug === "pa_color")
-      ?.option;
-    const firstSize = first.attributes?.find((a) => a.slug === "pa_size")
-      ?.option;
+    const firstColor = first.attributes?.find(
+      (a) => normalizeVariationAttrSlug(a) === "pa_color"
+    )?.option;
+    const firstSize = first.attributes?.find(
+      (a) => normalizeVariationAttrSlug(a) === "pa_size"
+    )?.option;
 
     if (!selectedColor && firstColor) setSelectedColor(firstColor);
     if (!selectedSize && firstSize) setSelectedSize(firstSize);
@@ -218,24 +244,30 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
           return (
             v.attributes?.some(
               (attr: any) =>
-                attr.slug === "pa_size" && attr.option === selectedSize
+                normalizeVariationAttrSlug(attr) === "pa_size" &&
+                attr.option === selectedSize
             ) &&
             v.attributes?.some(
               (attr: any) =>
-                attr.slug === "pa_color" && attr.option === selectedColor
+                normalizeVariationAttrSlug(attr) === "pa_color" &&
+                attr.option === selectedColor
             )
           );
         }
 
         if (selectedColor) {
           return v.attributes?.some(
-            (attr: any) => attr.slug === "pa_color" && attr.option === selectedColor
+            (attr: any) =>
+              normalizeVariationAttrSlug(attr) === "pa_color" &&
+              attr.option === selectedColor
           );
         }
 
         if (selectedSize) {
           return v.attributes?.some(
-            (attr: any) => attr.slug === "pa_size" && attr.option === selectedSize
+            (attr: any) =>
+              normalizeVariationAttrSlug(attr) === "pa_size" &&
+              attr.option === selectedSize
           );
         }
 
@@ -395,6 +427,21 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
   // Визначаємо чи є продукт хітом
   const isActuallyHit = isHitProduct();
 
+  // Використовуємо уніфіковану функцію для нормалізації цін
+  const normalizedPrices = normalizePriceParams({
+    wcProduct: selectedVariation
+      ? {
+          price: selectedVariation.price,
+          regular_price: selectedVariation.regular_price,
+          sale_price: selectedVariation.sale_price,
+        }
+      : product?.wcProduct,
+    price: product?.price,
+    originalPrice: product?.originalPrice,
+    regularPrice: product?.regularPrice,
+    salePrice: product?.salePrice,
+  });
+
   const priceSellRegistry = getPriceSellRegistry(
     product ? {
       metaData: product.metaData,
@@ -406,8 +453,9 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
   );
 
   const priceCalculation = calculatePrice({
-    price: selectedVariation?.price || product?.price || 0,
-    regularPrice: selectedVariation?.regular_price || product?.regularPrice,
+    price: normalizedPrices.price,
+    regularPrice: normalizedPrices.regularPrice,
+    salePrice: normalizedPrices.salePrice,
     isLoggedIn,
     priceSellRegistry,
   });
@@ -423,18 +471,18 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
   );
   const productSizes = productSizeAttribute?.options || [];
 
-  // Якщо немає в основних атрибутах, отримуємо з варіацій
-  const availableSizes =
-    productSizes.length > 0
-      ? productSizes
-      : Array.from(
-          new Set(
-            variationsData
-              .flatMap((v) => v.attributes || [])
-              .filter((attr) => attr.slug === "pa_size")
-              .map((attr) => attr.option)
-          )
-        );
+  // Для відповідності вибору варіації — спочатку беремо з варіацій (точні значення option),
+  // і тільки якщо варіації не підвантажились — fallback на атрибути продукту.
+  const variationSizes = Array.from(
+    new Set(
+      variationsData
+        .flatMap((v) => v.attributes || [])
+        .filter((attr) => normalizeVariationAttrSlug(attr) === "pa_size")
+        .map((attr) => attr.option)
+        .filter(Boolean)
+    )
+  );
+  const availableSizes = variationSizes.length > 0 ? variationSizes : productSizes;
 
   // Аналогічно для кольорів
   const productColorAttribute = product.attributes?.find(
@@ -442,17 +490,17 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
   );
   const productColors = productColorAttribute?.options || [];
 
+  const variationColors = Array.from(
+    new Set(
+      variationsData
+        .flatMap((v) => v.attributes || [])
+        .filter((attr) => normalizeVariationAttrSlug(attr) === "pa_color")
+        .map((attr) => attr.option)
+        .filter(Boolean)
+    )
+  );
   const availableColors =
-    productColors.length > 0
-      ? productColors
-      : Array.from(
-          new Set(
-            variationsData
-              .flatMap((v) => v.attributes || [])
-              .filter((attr) => attr.slug === "pa_color")
-              .map((attr) => attr.option)
-          )
-        );
+    variationColors.length > 0 ? variationColors : productColors;
 
   // Якщо немає динамічних розмірів, використовуємо порожній масив (не статичні розміри)
   const sizes = availableSizes.length > 0 ? availableSizes : [];
@@ -469,18 +517,24 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
 
     setIsAddingToCart(true);
 
-    // Базові ціни з варіації або продукту (без знижки авторизації)
-    const basePrice = selectedVariation?.price || product.price || 0;
-    const baseRegularPrice =
-      selectedVariation?.regular_price || product.regularPrice;
-    const baseSalePrice = selectedVariation?.sale_price || product.salePrice;
+    // Використовуємо уніфіковану функцію для нормалізації цін (як в CartItemsList)
+    const cartNormalizedPrices = normalizePriceParams({
+      wcProduct: selectedVariation
+        ? {
+            price: selectedVariation.price,
+            regular_price: selectedVariation.regular_price,
+            sale_price: selectedVariation.sale_price,
+          }
+        : product?.wcProduct,
+      price: product?.price,
+      originalPrice: product?.originalPrice,
+      regularPrice: product?.regularPrice,
+      salePrice: product?.salePrice,
+    });
 
     // Базова ціна для кошика - використовуємо sale_price якщо є, інакше price
     // Це та ціна, яка буде відображатися як основна
-    const priceToUse =
-      baseSalePrice && parseFloat(baseSalePrice) > 0
-        ? parseFloat(baseSalePrice)
-        : parseFloat(basePrice.toString());
+    const priceToUse = cartNormalizedPrices.salePrice || cartNormalizedPrices.price;
     const previewImage =
       normalizeImageUrl(product.images?.[selectedImageIndex]?.src) ||
       normalizeImageUrl(product.images?.[0]?.src) ||
@@ -535,18 +589,26 @@ export default function ProductPage({ productSlug }: { productSlug: string }) {
             selectedVariation?.id.toString() ||
             product.id?.toString() ||
             productSlug,
+          // ВАЖЛИВО: для варіацій `id` === variation_id, але бекенд/кошик має знати parent product_id
+          // щоб коректно тягнути meta_data (proce_sell_registry) і ціни.
+          productId: product?.id ? Number(product.id) : undefined,
+          // Щоб CartModal не "довго підгружався" — одразу кладемо metaData та WC-ціни в item
+          metaData: Array.isArray((product as any)?.metaData)
+            ? (product as any).metaData.map((m: any) => ({
+                key: String(m?.key ?? ""),
+                value: m?.value === null || m?.value === undefined ? "" : String(m.value),
+              }))
+            : [],
+          wcPrice: cartNormalizedPrices.price,
+          wcRegularPrice: cartNormalizedPrices.regularPrice,
           name: productName,
           price: priceToUse,
           image: previewImage,
           color: selectedColor,
           size: selectedSize,
-          originalPrice: baseRegularPrice
-            ? parseFloat(baseRegularPrice)
-            : undefined,
-          regularPrice: baseRegularPrice
-            ? parseFloat(baseRegularPrice)
-            : undefined,
-          salePrice: baseSalePrice ? parseFloat(baseSalePrice) : undefined,
+          originalPrice: cartNormalizedPrices.regularPrice,
+          regularPrice: cartNormalizedPrices.regularPrice,
+          salePrice: cartNormalizedPrices.salePrice,
           sku: product.sku,
           stockQuantity: product.stockQuantity,
           variationId: selectedVariation?.id,

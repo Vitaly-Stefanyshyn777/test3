@@ -2301,6 +2301,8 @@ export interface CartItemResponse {
   product_name?: string;
   name?: string;
   product_price?: string;
+  product_regular_price?: string;
+  product_sale_price?: string;
   price?: string;
   regular_price?: string;
   sale_price?: string;

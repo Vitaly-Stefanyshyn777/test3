@@ -5,7 +5,11 @@ import s from "./CartModal.module.css";
 import { useCartStore } from "@/store/cart";
 import { useAuthStore } from "@/store/auth";
 import { useScrollLock } from "@/components/hooks/useScrollLock";
-import { calculatePrice } from "@/lib/priceUtils";
+import {
+  calculatePrice,
+  getPriceSellRegistry,
+  normalizePriceParams,
+} from "@/lib/priceUtils";
 import CartHeader from "./CartHeader";
 import CartItemsList from "./CartItemsList";
 import CartSummary from "./CartSummary";
@@ -18,35 +22,53 @@ export default function CartModal() {
   const itemsMap = useCartStore((st) => st.items);
   const items = useMemo(() => Object.values(itemsMap), [itemsMap]);
   const isLoggedIn = useAuthStore((st) => st.isLoggedIn);
+  const token = useAuthStore((st) => st.token);
+  const effectiveIsLoggedIn =
+    isLoggedIn ||
+    !!token ||
+    (typeof window !== "undefined" &&
+      (!!localStorage.getItem("bfb_token") ||
+        !!localStorage.getItem("bfb_token_old")));
 
   const total = useMemo(() => {
     return items.reduce((acc, it) => {
-      const { finalPrice } = calculatePrice({
+      const normalizedPrices = normalizePriceParams({
+        wcPrice: it.wcPrice,
+        wcRegularPrice: it.wcRegularPrice,
+        wcSalePrice: undefined,
         price: it.price,
+        originalPrice: it.originalPrice,
         regularPrice: it.regularPrice,
         salePrice: it.salePrice,
-        originalPrice: it.originalPrice,
-        isLoggedIn,
+      });
+      const priceSellRegistry = getPriceSellRegistry({
+        metaData: it.metaData,
+      });
+      const { finalPrice } = calculatePrice({
+        price: normalizedPrices.price,
+        regularPrice: normalizedPrices.regularPrice,
+        salePrice: normalizedPrices.salePrice,
+        isLoggedIn: effectiveIsLoggedIn,
+        priceSellRegistry,
       });
       return acc + finalPrice * it.quantity;
     }, 0);
-  }, [items, isLoggedIn]);
+  }, [items, effectiveIsLoggedIn]);
+
+  // Розраховуємо суму без знижки для відображення
+  const totalWithoutDiscount = useMemo(() => {
+    return items.reduce((acc, it) => {
+      const regularPrice =
+        it.wcRegularPrice || it.regularPrice || it.originalPrice || it.price;
+      return acc + regularPrice * it.quantity;
+    }, 0);
+  }, [items]);
 
   const discount = useMemo(() => {
-    return items.reduce((acc, it) => {
-      const { finalPrice, originalPrice, shouldShowOldPrice } = calculatePrice({
-        price: it.price,
-        regularPrice: it.regularPrice,
-        salePrice: it.salePrice,
-        originalPrice: it.originalPrice,
-        isLoggedIn,
-      });
-      const diff = shouldShowOldPrice
-        ? (originalPrice - finalPrice) * it.quantity
-        : 0;
-      return acc + diff;
-    }, 0);
-  }, [items, isLoggedIn]);
+    // Сума знижки = різниця між загальною сумою без знижки та зі знижкою
+    return Math.max(0, totalWithoutDiscount - total);
+  }, [total, totalWithoutDiscount]);
+
   const FREE_SHIPPING_LIMIT = 1999;
   const remainingToFree = Math.max(0, FREE_SHIPPING_LIMIT - total);
   const progressPct = Math.min(

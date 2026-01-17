@@ -15,6 +15,7 @@ import {
   calculatePrice,
   formatPrice as formatPriceUtil,
   getPriceSellRegistry,
+  normalizePriceParams,
 } from "@/lib/priceUtils";
 
 interface ProductCardProps {
@@ -133,24 +134,14 @@ const ProductCard = ({
     );
   };
 
-  const hasRealDiscount =
-    originalPriceFromApi && originalPriceFromApi > priceFromApi;
-
-  const currentPrice =
-    priceFromApi > 0 ? priceFromApi.toString() : price?.toString() || "0";
-  const regularPrice = hasRealDiscount ? originalPriceFromApi.toString() : null;
-  const salePrice = hasRealDiscount ? currentPrice : null;
-
-  const hasDiscount = salePrice && regularPrice && salePrice !== regularPrice;
-  const finalDiscount =
-    hasDiscount && salePrice && regularPrice
-      ? calculateDiscount(salePrice, regularPrice)
-      : discount || 0;
-
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
-  const basePrice = salePrice || currentPrice || "0";
-  const basePriceNum = parseFloat(basePrice) || 0;
+  // Використовуємо уніфіковану функцію для нормалізації цін
+  const normalizedPrices = normalizePriceParams({
+    wcProduct,
+    price,
+    originalPrice,
+  });
 
   const priceSellRegistry = getPriceSellRegistry({
     metaData,
@@ -159,8 +150,9 @@ const ProductCard = ({
   });
 
   const priceCalculation = calculatePrice({
-    price: basePriceNum,
-    regularPrice: regularPrice ? parseFloat(regularPrice) : undefined,
+    price: normalizedPrices.price,
+    regularPrice: normalizedPrices.regularPrice,
+    salePrice: normalizedPrices.salePrice,
     isLoggedIn,
     priceSellRegistry,
   });
@@ -178,11 +170,17 @@ const ProductCard = ({
   const formattedRegularPrice =
     calculatedOriginalPrice > 0
       ? formatPriceUtil(calculatedOriginalPrice)
-      : regularPrice
-      ? formatPrice(regularPrice)
+      : normalizedPrices.regularPrice && normalizedPrices.regularPrice > 0
+      ? formatPriceUtil(normalizedPrices.regularPrice)
       : null;
-  const formattedSalePrice = salePrice ? formatPrice(salePrice) : null;
-  const formattedCurrentPrice = currentPrice ? formatPrice(currentPrice) : null;
+  const formattedSalePrice =
+    normalizedPrices.salePrice && normalizedPrices.salePrice > 0
+      ? formatPriceUtil(normalizedPrices.salePrice)
+      : null;
+  const formattedCurrentPrice =
+    normalizedPrices.price && normalizedPrices.price > 0
+      ? formatPriceUtil(normalizedPrices.price)
+      : null;
 
   const showDiscount = totalDiscount > 0;
 
@@ -329,10 +327,9 @@ const ProductCard = ({
           slug={slug}
           name={name}
           price={price || 0}
-          originalPrice={
-            regularPrice ? parseFloat(regularPrice) : originalPrice
-          }
+          originalPrice={normalizedPrices.regularPrice || originalPrice}
           image={imageUrl}
+          metaData={metaData}
           className={styles.favoriteBtn}
           activeClassName={styles.favoriteActive}
           useRedGreenIconOnMobile={useRedGreenIconOnMobile}
@@ -342,10 +339,18 @@ const ProductCard = ({
             wcProduct
               ? {
                   prices: {
-                    price: wcProduct.price || currentPrice || "0",
+                    price:
+                      wcProduct.price || String(normalizedPrices.price) || "0",
                     regular_price:
-                      wcProduct.regular_price || regularPrice || "0",
-                    sale_price: wcProduct.sale_price || salePrice || "0",
+                      wcProduct.regular_price ||
+                      (normalizedPrices.regularPrice
+                        ? String(normalizedPrices.regularPrice)
+                        : "0"),
+                    sale_price:
+                      wcProduct.sale_price ||
+                      (normalizedPrices.salePrice
+                        ? String(normalizedPrices.salePrice)
+                        : "0"),
                   },
                   on_sale: wcProduct.on_sale,
                 }
@@ -386,16 +391,13 @@ const ProductCard = ({
                       {formattedFinalPrice}
                     </span>
                   </span>
-                  {regularPrice &&
-                    parseFloat(regularPrice) > 0 &&
-                    totalDiscount > 0 && (
-                      <span className={styles.originalPrice}>
-                        <span className={styles.originalPriceValue}>
-                          {formattedRegularPrice}
-                        </span>
-                        <span className={styles.originalPriceCurrency}>₴</span>
+                  {shouldShowOldPrice && formattedRegularPrice && (
+                    <span className={styles.originalPrice}>
+                      <span className={styles.originalPriceValue}>
+                        {formattedRegularPrice}
                       </span>
-                    )}
+                    </span>
+                  )}
                 </>
               ) : (
                 <>
@@ -424,30 +426,29 @@ const ProductCard = ({
             productType={effectiveProductType}
             variations={effectiveVariations}
             price={
-              parseFloat(
-                salePrice ||
-                  currentPrice ||
-                  regularPrice ||
-                  price?.toString() ||
-                  "0"
-              )
+              normalizedPrices.salePrice ||
+              normalizedPrices.price ||
+              normalizedPrices.regularPrice ||
+              price ||
+              0
             }
             originalPrice={
-              regularPrice && parseFloat(regularPrice) > 0
-                ? parseFloat(regularPrice)
+              normalizedPrices.regularPrice && normalizedPrices.regularPrice > 0
+                ? normalizedPrices.regularPrice
                 : originalPrice
             }
             regularPrice={
-              regularPrice && parseFloat(regularPrice) > 0
-                ? parseFloat(regularPrice)
+              normalizedPrices.regularPrice && normalizedPrices.regularPrice > 0
+                ? normalizedPrices.regularPrice
                 : undefined
             }
             salePrice={
-              salePrice && parseFloat(salePrice) > 0
-                ? parseFloat(salePrice)
+              normalizedPrices.salePrice && normalizedPrices.salePrice > 0
+                ? normalizedPrices.salePrice
                 : undefined
             }
             image={imageUrl}
+            metaData={metaData}
             removeFromFavoritesOnAddToCart={removeFromFavoritesOnAddToCart}
             requireAuth={false}
             className={`${styles.cartBtn} ${

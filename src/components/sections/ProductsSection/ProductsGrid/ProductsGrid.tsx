@@ -152,6 +152,7 @@ export default function ProductsGrid({
             variations={p.variations ?? p.wcProduct?.variations}
             price={priceNum}
             originalPrice={original}
+            metaData={(p as any).metaData ?? (p as any).meta_data ?? []}
             image={image}
             sku={p.sku}
             categories={productCategories[p.id] || p.categories}
@@ -172,7 +173,11 @@ export default function ProductsGrid({
               sale_price: p.sale_price || "",
               images: p.images,
               sku: p.sku,
-              meta_data: []
+              meta_data:
+                (storeProduct as any)?.meta_data ??
+                (p as any)?.meta_data ??
+                (p as any)?.metaData ??
+                []
             } : undefined}
             allProducts={products.map((prod) => ({
               id: prod.id,

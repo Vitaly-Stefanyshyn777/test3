@@ -37,7 +37,10 @@ const Breadcrumbs: React.FC = () => {
   // Перевіряємо чи це 404 сторінка
   React.useEffect(() => {
     const checkFor404Page = () => {
-      if (typeof window !== "undefined" && document.querySelector('[data-page="404"]')) {
+      if (
+        typeof window !== "undefined" &&
+        document.querySelector('[data-page="404"]')
+      ) {
         setIs404Page(true);
       } else {
         setIs404Page(false);
@@ -51,11 +54,11 @@ const Breadcrumbs: React.FC = () => {
 
   // Обробка кліку на breadcrumb item
   const handleBreadcrumbClick = (item: BreadcrumbItem, e: React.MouseEvent) => {
-    // Якщо це "Інвентар" і ми на сторінці products - скидаємо фільтри та перенаправляємо на категорію "30"
+    // Якщо це "Інвентар" і ми на сторінці products - скидаємо фільтри та перенаправляємо на /products без параметрів
     if (item.label === "Інвентар" && pathname.startsWith("/products")) {
       e.preventDefault();
-      // Перенаправляємо на /products?category=30 (Товари для спорту)
-      router.push("/products?category=30");
+      // Перенаправляємо на /products без параметрів (показуємо всі дефолтні категорії)
+      router.push("/products");
     }
     // Для інших випадків використовуємо стандартну навігацію через Link
   };
@@ -75,7 +78,10 @@ const Breadcrumbs: React.FC = () => {
 
       if (segment === "trainers") {
         label = "Знайди тренера";
-      } else if (segment === "#LearningFormats" || segment === "#LearningMobileFormats") {
+      } else if (
+        segment === "#LearningFormats" ||
+        segment === "#LearningMobileFormats"
+      ) {
         label = "Навчання B.F.B";
       } else if (segment === "courses-landing") {
         label = "Інструкторство BFB";
@@ -149,10 +155,13 @@ const Breadcrumbs: React.FC = () => {
   let breadcrumbs = generateBreadcrumbs();
 
   // Спеціальна логіка для сторінки 404
-  if (typeof window !== "undefined" && document.querySelector('[data-page="404"]')) {
+  if (
+    typeof window !== "undefined" &&
+    document.querySelector('[data-page="404"]')
+  ) {
     breadcrumbs = [
       { label: "Головна", href: "/" },
-      { label: "404", isActive: true }
+      { label: "404", isActive: true },
     ];
   }
 
@@ -162,8 +171,13 @@ const Breadcrumbs: React.FC = () => {
     if (categorySlug) {
       const map: Record<string, string> = {
         "30": "Товари для спорту",
+        "85": "Інвентар",
+        "86": "Борди",
+        "87": "Аксесуари",
         "inventory-boards": "Борди",
         "inventory-accessories": "Аксесуари",
+        inventory: "Інвентар",
+        "for-sport": "Товари для спорту",
         girya: "Гантелі",
       };
       const label = map[categorySlug];
@@ -172,8 +186,7 @@ const Breadcrumbs: React.FC = () => {
         if (breadcrumbs.length > 0) {
           const last = breadcrumbs[breadcrumbs.length - 1];
           last.isActive = false;
-          last.href = "/products";
-          // Змінюємо назву з "Інвентар" на "Інвентар"
+          last.href = "/products"; // При кліку на "Інвентар" переходимо на /products без параметрів
           last.label = "Інвентар";
         }
         breadcrumbs.push({ label, isActive: true });
@@ -182,13 +195,21 @@ const Breadcrumbs: React.FC = () => {
         if (breadcrumbs.length > 0) {
           const last = breadcrumbs[breadcrumbs.length - 1];
           last.label = "Інвентар";
+          // Встановлюємо href для можливості повернутися на /products
+          if (last.href === undefined) {
+            last.href = "/products";
+            last.isActive = false;
+          }
         }
       }
     } else {
-      // Якщо немає category параметра, змінюємо назву з "Інвентар" на "Інвентар"
+      // Якщо немає category параметра, залишаємо "Інвентар" як активний текст
       if (breadcrumbs.length > 0) {
         const last = breadcrumbs[breadcrumbs.length - 1];
         last.label = "Інвентар";
+        // Не встановлюємо href, бо ми вже на /products
+        last.href = undefined;
+        last.isActive = true;
       }
     }
   }
@@ -318,9 +339,7 @@ const Breadcrumbs: React.FC = () => {
         isCoursesLanding ? styles.onCoursesLanding : ""
       } ${isContacts ? styles.onContacts : ""} ${
         isAboutBfb ? styles.onAboutBfb : ""
-      } ${is404Page ? styles.on404 : ""} ${
-        isHidden ? styles.hidden : ""
-      }`}
+      } ${is404Page ? styles.on404 : ""} ${isHidden ? styles.hidden : ""}`}
       aria-label="Хлібні крихти"
     >
       <div className={styles.breadcrumbsContainer}>

@@ -35,6 +35,7 @@ type Props = {
   stockQuantity?: number | null;
   productType?: string;
   variations?: number[];
+  metaData?: Array<{ key: string; value: string }>;
   wcProduct?: {
     prices?: {
       price: string;
@@ -61,6 +62,7 @@ export default function FavoriteButton({
   stockQuantity,
   productType,
   variations,
+  metaData,
   wcProduct,
 }: Props) {
   const router = useRouter();
@@ -118,6 +120,7 @@ export default function FavoriteButton({
       stockQuantity,
       productType,
       variations,
+      metaData,
       wcProduct,
     });
   };

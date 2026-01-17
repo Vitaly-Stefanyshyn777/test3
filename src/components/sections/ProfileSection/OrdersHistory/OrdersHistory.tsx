@@ -9,13 +9,20 @@ import { adminRequest } from "@/lib/api";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { normalizeImageUrl } from "@/lib/imageUtils";
 import OrdersHistorySkeleton from "./OrdersHistorySkeleton";
+import {
+  calculatePrice,
+  formatPrice as formatPriceUtil,
+  getPriceSellRegistry,
+} from "@/lib/priceUtils";
 
 interface WCOrderItem {
   id: number;
   name: string;
   quantity: number;
+  subtotal?: string;
   total: string;
   product_id?: number;
+  variation_id?: number;
   meta_data?: Array<{
     key: string;
     value: string;
@@ -82,6 +89,14 @@ const OrdersHistory: React.FC = () => {
   const ordersPerPage = 4;
   const productsPerPage = 3;
   const user = useAuthStore((s) => s.user);
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const token = useAuthStore((s) => s.token);
+  const effectiveIsLoggedIn =
+    isLoggedIn ||
+    !!token ||
+    (typeof window !== "undefined" &&
+      (!!localStorage.getItem("bfb_token") ||
+        !!localStorage.getItem("bfb_token_old")));
   const router = useRouter();
   const {
     data: ordersData = [],
@@ -102,9 +117,7 @@ const OrdersHistory: React.FC = () => {
           if (profile?.id) {
             customerId = String(profile.id);
           }
-        } catch (e) {
-          console.warn("[OrdersHistory] Failed to get numeric user ID:", e);
-        }
+        } catch {}
       }
       const path = `/wp-json/wc/v3/orders?customer=${encodeURIComponent(
         String(customerId || user?.id || "")
@@ -158,6 +171,26 @@ const OrdersHistory: React.FC = () => {
       const productId = productIds[index];
       if (query.data?.images?.[0]?.src) {
         map.set(productId, query.data.images[0].src);
+      }
+    });
+    return map;
+  }, [productQueries, productIds]);
+
+  // Мапа meta_data (для proce_sell_registry) по product_id
+  const productMetaMap = useMemo(() => {
+    const map = new Map<number, Array<{ key: string; value: string }>>();
+    productQueries.forEach((query, index) => {
+      const productId = productIds[index];
+      const meta = query.data?.meta_data;
+      if (productId && Array.isArray(meta) && meta.length > 0) {
+        map.set(
+          productId,
+          meta.map((m: { key: unknown; value: unknown }) => ({
+            key: String(m.key),
+            value:
+              m.value === null || m.value === undefined ? "" : String(m.value),
+          }))
+        );
       }
     });
     return map;
@@ -326,6 +359,60 @@ const OrdersHistory: React.FC = () => {
     }
 
     return null;
+  };
+
+  const calcOrderLineItemPrices = (item: WCOrderItem, orderProductId?: number) => {
+    const qty = item.quantity && item.quantity > 0 ? item.quantity : 1;
+    const total = Number(item.total || 0);
+    const subtotal = Number(item.subtotal || 0);
+    const unitWcPrice = total / qty;
+    const unitRegular = subtotal > 0 ? subtotal / qty : 0;
+
+    const priceSellRegistry = getPriceSellRegistry({
+      metaData: orderProductId ? productMetaMap.get(orderProductId) : undefined,
+    });
+
+    const priceCalc = calculatePrice({
+      price: unitWcPrice,
+      regularPrice: unitRegular,
+      salePrice: unitWcPrice > 0 && unitRegular > 0 && unitWcPrice < unitRegular ? unitWcPrice : undefined,
+      isLoggedIn: effectiveIsLoggedIn,
+      priceSellRegistry,
+    });
+
+    const unitFinal = priceCalc.finalPrice;
+    const unitOriginal = priceCalc.originalPrice;
+    const shouldShowOld =
+      priceCalc.shouldShowOldPrice || (unitOriginal > unitFinal && unitOriginal > 0);
+    return {
+      unitFinal: Number.isFinite(unitFinal) ? unitFinal : 0,
+      unitOriginal: Number.isFinite(unitOriginal) ? unitOriginal : 0,
+      shouldShowOld,
+    };
+  };
+
+  const calcOrderDiscount = (order: ViewOrder): number => {
+    const items = (order.lineItems || []) as WCOrderItem[];
+    return items.reduce((acc, it) => {
+      const productId = it.product_id;
+      const prices = calcOrderLineItemPrices(it, productId);
+      const qty = it.quantity && it.quantity > 0 ? it.quantity : 1;
+      const diff =
+        prices.unitOriginal > prices.unitFinal
+          ? (prices.unitOriginal - prices.unitFinal) * qty
+          : 0;
+      return acc + (Number.isFinite(diff) ? diff : 0);
+    }, 0);
+  };
+
+  const calcOrderFinalTotal = (order: ViewOrder): number => {
+    const items = (order.lineItems || []) as WCOrderItem[];
+    return items.reduce((acc, it) => {
+      const productId = it.product_id;
+      const prices = calcOrderLineItemPrices(it, productId);
+      const qty = it.quantity && it.quantity > 0 ? it.quantity : 1;
+      return acc + prices.unitFinal * qty;
+    }, 0);
   };
 
   const handleViewProduct = (order: ViewOrder) => {
@@ -537,15 +624,28 @@ const OrdersHistory: React.FC = () => {
                                           <span
                                             className={styles.productItemPrice}
                                           >
-                                            {item.total} ₴
+                                            {formatPriceUtil(
+                                              calcOrderLineItemPrices(item, item.product_id)
+                                                .unitFinal
+                                            )}{" "}
+                                            ₴
                                           </span>
-                                          <span
-                                            className={
-                                              styles.productItemOriginalPrice
-                                            }
-                                          >
-                                            {item.total} ₴
-                                          </span>
+                                          {calcOrderLineItemPrices(item, item.product_id)
+                                            .shouldShowOld && (
+                                            <span
+                                              className={
+                                                styles.productItemOriginalPrice
+                                              }
+                                            >
+                                              {formatPriceUtil(
+                                                calcOrderLineItemPrices(
+                                                  item,
+                                                  item.product_id
+                                                ).unitOriginal
+                                              )}{" "}
+                                              ₴
+                                            </span>
+                                          )}
                                         </div>
                                       </div>
                                     </div>
@@ -641,9 +741,7 @@ const OrdersHistory: React.FC = () => {
                                     Сума замовлення
                                   </span>
                                   <span className={styles.costValue}>
-                                    {order.originalOrder?.total
-                                      ? parseFloat(order.originalOrder.total).toFixed(2)
-                                      : "0.00"}{" "}
+                                    {formatPriceUtil(calcOrderFinalTotal(order))}{" "}
                                     ₴
                                   </span>
                                 </div>
@@ -652,11 +750,7 @@ const OrdersHistory: React.FC = () => {
                                     Сума знижки
                                   </span>
                                   <span className={styles.costValue}>
-                                    {order.originalOrder?.discount_total
-                                      ? parseFloat(
-                                          order.originalOrder.discount_total
-                                        ).toFixed(2)
-                                      : "0.00"}{" "}
+                                    {formatPriceUtil(calcOrderDiscount(order))}{" "}
                                     ₴
                                   </span>
                                 </div>
@@ -665,12 +759,7 @@ const OrdersHistory: React.FC = () => {
                                     Сума доставки
                                   </span>
                                   <span className={styles.costValue}>
-                                    {order.originalOrder?.shipping_total
-                                      ? parseFloat(
-                                          order.originalOrder.shipping_total
-                                        ).toFixed(2)
-                                      : "0.00"}{" "}
-                                    ₴
+                                    За тарифами "Нової Пошти"
                                   </span>
                                 </div>
                               </div>
@@ -681,11 +770,7 @@ const OrdersHistory: React.FC = () => {
                                   Разом
                                 </span>
                                 <span className={styles.costValueTotal}>
-                                  {order.originalOrder?.total
-                                    ? parseFloat(
-                                        order.originalOrder.total
-                                      ).toFixed(2)
-                                    : "0.00"}{" "}
+                                  {formatPriceUtil(calcOrderFinalTotal(order))}{" "}
                                   ₴
                                 </span>
                               </div>
@@ -708,7 +793,7 @@ const OrdersHistory: React.FC = () => {
                           Сума замовлення:
                         </span>
                         <span className={styles.infoValue}>
-                          {order.totalPrice}
+                          {formatPriceUtil(calcOrderFinalTotal(order))}
                           <span className={styles.priceCurrency}>₴</span>
                         </span>
                       </div>

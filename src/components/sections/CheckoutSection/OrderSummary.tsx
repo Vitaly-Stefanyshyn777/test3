@@ -3,7 +3,11 @@ import React, { useMemo, useEffect } from "react";
 import Image from "next/image";
 import { useCartStore, CartItem } from "@/store/cart";
 import { useAuthStore } from "@/store/auth";
-import { calculatePrice } from "@/lib/priceUtils";
+import {
+  calculatePrice,
+  getPriceSellRegistry,
+  normalizePriceParams,
+} from "@/lib/priceUtils";
 import { getProductPriceAsync } from "@/lib/useProductPrices";
 import {
   MinuswIcon,
@@ -27,6 +31,13 @@ export default function OrderSummary({ total, updateItem }: OrderSummaryProps) {
   const decrement = useCartStore((st) => st.decrement);
   const removeItem = useCartStore((st) => st.removeItem);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const token = useAuthStore((state) => state.token);
+  const effectiveIsLoggedIn =
+    isLoggedIn ||
+    !!token ||
+    (typeof window !== "undefined" &&
+      (!!localStorage.getItem("bfb_token") ||
+        !!localStorage.getItem("bfb_token_old")));
 
   // Перевіряємо та оновлюємо ціни для всіх товарів при завантаженні
   useEffect(() => {
@@ -50,10 +61,7 @@ export default function OrderSummary({ total, updateItem }: OrderSummaryProps) {
             });
           }
         } catch (error) {
-          console.error(
-            "Error updating cart item prices in OrderSummary:",
-            error
-          );
+          // ignore
         }
       }
     };
@@ -67,20 +75,29 @@ export default function OrderSummary({ total, updateItem }: OrderSummaryProps) {
 
   const safeTotal = total || 0;
 
-  // Обчислюємо загальну знижку
-  const totalDiscount = useMemo(() => {
+  // Розраховуємо суму без знижки для відображення
+  const totalWithoutDiscount = useMemo(() => {
     return items.reduce((acc, it) => {
-      const { finalPrice, originalPrice, shouldShowOldPrice } = calculatePrice({
+      const normalizedPrices = normalizePriceParams({
+        wcPrice: it.wcPrice,
+        wcRegularPrice: it.wcRegularPrice,
+        wcSalePrice: undefined,
         price: it.price,
         originalPrice: it.originalPrice,
-        isLoggedIn,
+        regularPrice: it.regularPrice,
+        salePrice: it.salePrice,
       });
-      const diff = shouldShowOldPrice
-        ? (originalPrice - finalPrice) * it.quantity
-        : 0;
-      return acc + diff;
+      const regularPrice =
+        normalizedPrices.regularPrice || normalizedPrices.price;
+      return acc + regularPrice * it.quantity;
     }, 0);
-  }, [items, isLoggedIn]);
+  }, [items]);
+
+  // Обчислюємо загальну знижку
+  const totalDiscount = useMemo(() => {
+    // Сума знижки = різниця між загальною сумою без знижки та зі знижкою
+    return Math.max(0, totalWithoutDiscount - safeTotal);
+  }, [safeTotal, totalWithoutDiscount]);
 
   return (
     <div className={s.summaryCard}>
@@ -116,18 +133,17 @@ export default function OrderSummary({ total, updateItem }: OrderSummaryProps) {
                       <CloseButtonIcon />
                     </button>
                   </div>
-                  {(it.color || it.size) && (
+                  {(it.color || it.size || it.sku || it.id) && (
                     <div className={s.color}>
-                      {it.color && `Колір: ${it.color}`}
-                      {it.color && it.size && ", "}
-                      {it.size && `Розмір: ${it.size}`}
-                    </div>
-                  )}
-                  {(it.sku || it.id) && (
-                    <div className={s.color}>
-                      <span className={s.colorCode}>
-                        Код товару: {it.sku || it.id}
-                      </span>
+                      {it.color && it.color}
+                      {it.color && it.size && " | "}
+                      {it.size && it.size}
+                      {(it.color || it.size) && (it.sku || it.id) && " | "}
+                      {(it.sku || it.id) && (
+                        <span className={s.colorCode}>
+                          Код товару: {it.sku || it.id}
+                        </span>
+                      )}
                     </div>
                   )}
                 </div>
@@ -147,14 +163,28 @@ export default function OrderSummary({ total, updateItem }: OrderSummaryProps) {
                   <div className={s.priceWrap}>
                     <div className={s.prices}>
                       {(() => {
+                        const normalizedPrices = normalizePriceParams({
+                          wcPrice: it.wcPrice,
+                          wcRegularPrice: it.wcRegularPrice,
+                          wcSalePrice: undefined,
+                          price: it.price,
+                          originalPrice: it.originalPrice,
+                          regularPrice: it.regularPrice,
+                          salePrice: it.salePrice,
+                        });
+                        const priceSellRegistry = getPriceSellRegistry({
+                          metaData: it.metaData,
+                        });
                         const {
                           finalPrice,
                           originalPrice,
                           shouldShowOldPrice,
                         } = calculatePrice({
-                          price: it.price,
-                          originalPrice: it.originalPrice,
-                          isLoggedIn,
+                          price: normalizedPrices.price,
+                          regularPrice: normalizedPrices.regularPrice,
+                          salePrice: normalizedPrices.salePrice,
+                          isLoggedIn: effectiveIsLoggedIn,
+                          priceSellRegistry,
                         });
 
                         return (
